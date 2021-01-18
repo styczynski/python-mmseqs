@@ -1,0 +1,7 @@
+dist/
+build/
+src/unafold_python.egg-info/
+unafold/.DS_Store
+**/.DS_Store
+.idea/
+**/*.so

@@ -1,0 +1,3 @@
+[submodule "src/mmseqs_native/src"]
+	path = src/mmseqs_native/src
+	url = https://github.com/soedinglab/MMseqs2
