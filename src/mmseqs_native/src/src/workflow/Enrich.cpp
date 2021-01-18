@@ -3,6 +3,7 @@
 #include "Debug.h"
 #include "Util.h"
 #include "CommandCaller.h"
+#include "output.h"
 
 #include "enrich.sh.h"
 
@@ -13,7 +14,7 @@ void setEnrichWorkflowDefaults(Parameters *p) {
     p->expansionMode = 1;
 }
 
-int enrich(int argc, const char **argv, const Command &command) {
+int enrich(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     setEnrichWorkflowDefaults(&par);
     par.parseParameters(argc, argv, command, true, 0, 0);

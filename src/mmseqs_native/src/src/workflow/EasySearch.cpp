@@ -7,6 +7,7 @@
 #include "Debug.h"
 #include "Parameters.h"
 #include "easysearch.sh.h"
+#include "output.h"
 
 void setEasySearchDefaults(Parameters *p, bool linsearch) {
     if (linsearch) {
@@ -27,7 +28,7 @@ void setEasySearchMustPassAlong(Parameters *p, bool linsearch) {
     p->PARAM_ALIGNMENT_MODE.wasSet = true;
 }
 
-int doeasysearch(int argc, const char **argv, const Command &command, bool linsearch) {
+int doeasysearch(mmseqs_output* out, int argc, const char **argv, const Command &command, bool linsearch) {
     Parameters &par = Parameters::getInstance();
     par.PARAM_ADD_BACKTRACE.addCategory(MMseqsParameter::COMMAND_EXPERT);
     par.PARAM_MAX_REJECTED.addCategory(MMseqsParameter::COMMAND_EXPERT);
@@ -146,10 +147,10 @@ int doeasysearch(int argc, const char **argv, const Command &command, bool linse
     return EXIT_FAILURE;
 }
 
-int easysearch(int argc, const char **argv, const Command &command) {
-    return doeasysearch(argc, argv, command, false);
+int easysearch(mmseqs_output* out, int argc, const char **argv, const Command &command) {
+    return doeasysearch(out, argc, argv, command, false);
 }
 
-int easylinsearch(int argc, const char **argv, const Command &command) {
-    return doeasysearch(argc, argv, command, true);
+int easylinsearch(mmseqs_output* out, int argc, const char **argv, const Command &command) {
+    return doeasysearch(out, argc, argv, command, true);
 }

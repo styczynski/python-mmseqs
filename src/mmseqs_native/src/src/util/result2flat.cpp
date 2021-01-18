@@ -4,9 +4,10 @@
 #include "DBReader.h"
 #include "Debug.h"
 #include "Util.h"
+#include "output.h"
 
 
-int result2flat(int argc, const char **argv, const Command &command) {
+int result2flat(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

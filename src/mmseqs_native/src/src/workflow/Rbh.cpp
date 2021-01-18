@@ -4,6 +4,7 @@
 #include "Debug.h"
 #include "Parameters.h"
 #include "rbh.sh.h"
+#include "output.h"
 
 #include <cassert>
 
@@ -16,7 +17,7 @@ void setRbhDefaults(Parameters *p) {
     p->orfMaxLength = 32734;
 }
 
-int rbh(int argc, const char **argv, const Command &command) {
+int rbh(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     setRbhDefaults(&par);
 

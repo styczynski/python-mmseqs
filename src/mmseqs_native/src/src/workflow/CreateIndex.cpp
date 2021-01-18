@@ -6,12 +6,13 @@
 #include "FileUtil.h"
 
 #include "createindex.sh.h"
+#include "output.h"
 
 #include <string>
 #include <cassert>
 #include <climits>
 
-int createindex(Parameters &par, const Command &command, const std::string &indexerModule, const std::string &flag) {
+int createindex(mmseqs_output* out, Parameters &par, const Command &command, const std::string &indexerModule, const std::string &flag) {
     bool sensitivity = false;
     // only set kmerScore  to INT_MAX if -s was used
     for (size_t i = 0; i < par.createindex.size(); i++) {
@@ -38,20 +39,19 @@ int createindex(Parameters &par, const Command &command, const std::string &inde
     par.filenames.pop_back();
     par.filenames.push_back(tmpDir);
 
-    CommandCaller cmd;
-    cmd.addVariable("INDEXER", indexerModule.c_str());
-    cmd.addVariable("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : NULL);
+    out->output_string("INDEXER", indexerModule);
+    out->output_string("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : "");
     par.translate = 1;
-    cmd.addVariable("ORF_PAR", par.createParameterString(par.extractorfs).c_str());
-    cmd.addVariable("EXTRACT_FRAMES_PAR", par.createParameterString(par.extractframes).c_str());
-    cmd.addVariable("SPLIT_SEQ_PAR", par.createParameterString(par.splitsequence).c_str());
+    out->output_string("ORF_PAR", par.createParameterString(par.extractorfs));
+    out->output_string("EXTRACT_FRAMES_PAR", par.createParameterString(par.extractframes));
+    out->output_string("SPLIT_SEQ_PAR", par.createParameterString(par.splitsequence));
     if(indexerModule == "kmerindexdb"){
-        cmd.addVariable("INDEX_PAR", par.createParameterString(par.kmerindexdb).c_str());
+        out->output_string("INDEX_PAR", par.createParameterString(par.kmerindexdb));
     }else{
-        cmd.addVariable("INDEX_PAR", par.createParameterString(par.indexdb).c_str());
+        out->output_string("INDEX_PAR", par.createParameterString(par.indexdb));
     }
     if(flag.size() > 0){
-        cmd.addVariable(flag.c_str(), "1");
+        out->output_string(flag, "1");
     }
 
     //std::string program(tmpDir + "/createindex.sh");
@@ -61,7 +61,7 @@ int createindex(Parameters &par, const Command &command, const std::string &inde
 }
 
 
-int createlinindex(int argc, const char **argv, const Command& command) {
+int createlinindex(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.orfStartMode = 1;
     par.orfMinLength = 30;
@@ -100,11 +100,11 @@ int createlinindex(int argc, const char **argv, const Command& command) {
                             << "Please provide the parameter --search-type 2 (translated) or 3 (nucleotide)\n";
         return EXIT_FAILURE;
     }
-    return createindex(par, command, "kmerindexdb", (isNucl == false) ? "" : (par.searchType == Parameters::SEARCH_TYPE_TRANSLATED||
+    return createindex(out, par, command, "kmerindexdb", (isNucl == false) ? "" : (par.searchType == Parameters::SEARCH_TYPE_TRANSLATED||
                                                                                            par.searchType == Parameters::SEARCH_TYPE_TRANS_NUCL_ALN) ? "TRANSLATED" : "LIN_NUCL");
 }
 
-int createindex(int argc, const char **argv, const Command& command) {
+int createindex(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.orfStartMode = 1;
     par.orfMinLength = 30;
@@ -172,6 +172,6 @@ int createindex(int argc, const char **argv, const Command& command) {
                             << "Please provide the parameter --search-type 2 (translated) or 3 (nucleotide)\n";
         return EXIT_FAILURE;
     }
-    return createindex(par, command, "indexdb",  (isNucl == false) ? "" : (par.searchType == Parameters::SEARCH_TYPE_TRANSLATED||
+    return createindex(out, par, command, "indexdb",  (isNucl == false) ? "" : (par.searchType == Parameters::SEARCH_TYPE_TRANSLATED||
                                                                   par.searchType == Parameters::SEARCH_TYPE_TRANS_NUCL_ALN) ? "TRANSLATED" : "NUCL");
 }

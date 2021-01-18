@@ -4,12 +4,13 @@
 #include "Debug.h"
 #include "Util.h"
 #include "FileUtil.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int reverseseq(int argn, const char **argv, const Command& command) {
+int reverseseq(mmseqs_output* out, int argn, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argn, argv, command, true, true, 0);
 

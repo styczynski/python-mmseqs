@@ -11,6 +11,7 @@
 #include "blastp.sh.h"
 #include "blastn.sh.h"
 #include "Parameters.h"
+#include "output.h"
 
 #include <iomanip>
 #include <climits>
@@ -198,7 +199,7 @@ void setNuclSearchDefaults(Parameters *p) {
 }
 
 
-int search(int argc, const char **argv, const Command& command) {
+int search(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters &par = Parameters::getInstance();
     setSearchDefaults(&par);
     par.PARAM_COV_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);

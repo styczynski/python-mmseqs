@@ -4,6 +4,7 @@
 #include "FileUtil.h"
 #include "Debug.h"
 #include "UniprotKB.h"
+#include "output.h"
 
 #ifdef HAVE_ZLIB
 #include "gzstream.h"
@@ -62,7 +63,7 @@ void setConvertKbDefaults(Parameters *par, unsigned int maxColumns) {
     par->kbColumns = ss.str();
 }
 
-int convertkb(int argc, const char **argv, const Command &command) {
+int convertkb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     UniprotKB kb;
     size_t columns = static_cast<unsigned int>(kb.getColumnCount());
 

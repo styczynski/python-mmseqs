@@ -7,6 +7,7 @@
 #include "Parameters.h"
 
 #include "easycluster.sh.h"
+#include "output.h"
 
 
 void setEasyClusterDefaults(Parameters *p) {
@@ -28,7 +29,7 @@ void setEasyClusterMustPassAlong(Parameters *p) {
     p->PARAM_MAX_SEQS.wasSet = true;
 }
 
-int easycluster(int argc, const char **argv, const Command &command) {
+int easycluster(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.PARAM_MAX_SEQS.addCategory(MMseqsParameter::COMMAND_EXPERT);
     par.PARAM_ADD_BACKTRACE.addCategory(MMseqsParameter::COMMAND_EXPERT);

@@ -6,12 +6,13 @@
 #include "Matcher.h"
 #include "QueryMatcher.h"
 #include "FastSort.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int sortresult(int argc, const char **argv, const Command &command) {
+int sortresult(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

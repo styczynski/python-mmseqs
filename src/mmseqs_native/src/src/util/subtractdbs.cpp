@@ -4,6 +4,7 @@
 #include "DBWriter.h"
 #include "Util.h"
 #include "Parameters.h"
+#include "output.h"
 
 #include <map>
 
@@ -11,7 +12,7 @@
 #include <omp.h>
 #endif
 
-int subtractdbs(int argc, const char **argv, const Command& command) {
+int subtractdbs(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
     par.evalProfile = (par.evalThr < par.evalProfile) ? par.evalThr : par.evalProfile;

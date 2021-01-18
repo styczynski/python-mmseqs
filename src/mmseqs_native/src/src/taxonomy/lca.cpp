@@ -5,6 +5,7 @@
 #include "Debug.h"
 #include "Util.h"
 #include "Matcher.h"
+#include "output.h"
 #include <algorithm>
 
 #ifdef OPENMP
@@ -15,7 +16,7 @@ static bool compareToFirstInt(const std::pair<unsigned int, unsigned int>& lhs, 
     return (lhs.first <= rhs.first);
 }
 
-int dolca(int argc, const char **argv, const Command& command, bool majority) {
+int dolca(mmseqs_output* out, int argc, const char **argv, const Command& command, bool majority) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
     NcbiTaxonomy * t = NcbiTaxonomy::openTaxonomy(par.db1);
@@ -211,10 +212,10 @@ int dolca(int argc, const char **argv, const Command& command, bool majority) {
     return EXIT_SUCCESS;
 }
 
-int lca(int argc, const char **argv, const Command& command) {
-    return dolca(argc, argv, command, false);
+int lca(mmseqs_output* out, int argc, const char **argv, const Command& command) {
+    return dolca(out, argc, argv, command, false);
 }
 
-int majoritylca(int argc, const char **argv, const Command& command) {
-    return dolca(argc, argv, command, true);
+int majoritylca(mmseqs_output* out, int argc, const char **argv, const Command& command) {
+    return dolca(out, argc, argv, command, true);
 }

@@ -1,6 +1,7 @@
 #include "DBReader.h"
 #include "DBWriter.h"
 #include "Debug.h"
+#include "output.h"
 
 #include "Util.h"
 
@@ -8,7 +9,7 @@
 #include <omp.h>
 #endif
 
-int createseqfiledb(int argc, const char **argv, const Command &command) {
+int createseqfiledb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

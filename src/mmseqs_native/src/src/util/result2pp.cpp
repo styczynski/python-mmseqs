@@ -6,6 +6,7 @@
 #include "MathUtil.h"
 #include "Matcher.h"
 #include "SubstitutionMatrix.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
@@ -17,7 +18,7 @@ float computeNeff(float neffA, float maxNeffA, float neffB, float maxNeffB, floa
     return avgNewNeff + 1 - exp(log(avgNewNeff) * (1 - w));
 }
 
-int result2pp(int argc, const char **argv, const Command& command) {
+int result2pp(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     MMseqsMPI::init(argc, argv);
 
     Parameters &par = Parameters::getInstance();

@@ -6,6 +6,7 @@
 #include "Util.h"
 #include "IndexReader.h"
 #include "NucleotideMatrix.h"
+#include "output.h"
 
 #include <climits>
 
@@ -13,7 +14,7 @@
 #include <omp.h>
 #endif
 
-int countkmer(int argc, const char **argv, const Command& command) {
+int countkmer(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.verbosity = 1;
     par.kmerSize = 5;

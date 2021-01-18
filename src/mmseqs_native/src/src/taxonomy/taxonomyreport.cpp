@@ -5,6 +5,7 @@
 #include "Debug.h"
 #include "Util.h"
 #include "krona_prelude.html.h"
+#include "output.h"
 
 #include <algorithm>
 #include <unordered_map>
@@ -129,7 +130,7 @@ void kronaReport(FILE* FP, const NcbiTaxonomy& taxDB, const std::unordered_map<T
     }
 }
 
-int taxonomyreport(int argc, const char **argv, const Command& command) {
+int taxonomyreport(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

@@ -6,12 +6,13 @@
 #include "Sequence.h"
 #include "SubstitutionMatrix.h"
 #include "itoa.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int profile2pssm(int argc, const char **argv, const Command &command) {
+int profile2pssm(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_PROFILE);
 

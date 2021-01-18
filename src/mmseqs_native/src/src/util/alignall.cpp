@@ -8,12 +8,13 @@
 #include "SubstitutionMatrix.h"
 #include "Alignment.h"
 #include "itoa.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int alignall(int argc, const char **argv, const Command &command) {
+int alignall(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.overrideParameterDescription(par.PARAM_ALIGNMENT_MODE, "How to compute the alignment:\n0: automatic\n1: only score and end_pos\n2: also start_pos and cov\n3: also seq.id", NULL, 0);
     par.parseParameters(argc, argv, command, true, 0, 0);

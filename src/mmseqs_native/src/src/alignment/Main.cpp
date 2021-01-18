@@ -3,13 +3,14 @@
 #include "Debug.h"
 #include "Util.h"
 #include "MMseqsMPI.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
 
-int align(int argc, const char **argv, const Command& command) {
+int align(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     MMseqsMPI::init(argc, argv);
 
     Parameters& par = Parameters::getInstance();
@@ -31,7 +32,7 @@ int align(int argc, const char **argv, const Command& command) {
     return EXIT_SUCCESS;
 }
 
-int lcaalign(int argc, const char **argv, const Command& command) {
+int lcaalign(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     MMseqsMPI::init(argc, argv);
 
     Parameters& par = Parameters::getInstance();

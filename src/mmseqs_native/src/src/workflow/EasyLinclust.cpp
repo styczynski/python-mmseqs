@@ -5,6 +5,7 @@
 #include "Util.h"
 #include "Debug.h"
 #include "Parameters.h"
+#include "output.h"
 
 namespace linclust {
 #include "easycluster.sh.h"
@@ -35,7 +36,7 @@ void setEasyLinclustMustPassAlong(Parameters *p) {
     p->PARAM_E_PROFILE.wasSet = true;
 }
 
-int easylinclust(int argc, const char **argv, const Command &command) {
+int easylinclust(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.PARAM_ADD_BACKTRACE.addCategory(MMseqsParameter::COMMAND_EXPERT);
     par.PARAM_ALT_ALIGNMENT.addCategory(MMseqsParameter::COMMAND_EXPERT);

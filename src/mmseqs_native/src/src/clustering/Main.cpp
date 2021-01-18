@@ -1,7 +1,8 @@
 #include "Clustering.h"
 #include "Parameters.h"
+#include "output.h"
 
-int clust(int argc, const char **argv, const Command& command) {
+int clust(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

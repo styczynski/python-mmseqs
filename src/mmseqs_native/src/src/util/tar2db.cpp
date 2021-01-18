@@ -5,6 +5,7 @@
 #include "PatternCompiler.h"
 
 #include "microtar.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
@@ -49,7 +50,7 @@ int mtar_gzopen(mtar_t *tar, const char *filename) {
 #include <bzlib.h>
 #endif
 
-int tar2db(int argc, const char **argv, const Command& command) {
+int tar2db(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
 

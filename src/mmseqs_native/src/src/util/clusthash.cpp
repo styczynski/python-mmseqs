@@ -8,12 +8,13 @@
 #include "DistanceCalculator.h"
 #include "Orf.h"
 #include "FastSort.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int clusthash(int argc, const char **argv, const Command &command) {
+int clusthash(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.alphabetSize = MultiParam<int>(Parameters::CLUST_HASH_DEFAULT_ALPH_SIZE,5);
     par.seqIdThr = (float)Parameters::CLUST_HASH_DEFAULT_MIN_SEQ_ID/100.0f;

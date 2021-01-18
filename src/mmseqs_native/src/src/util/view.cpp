@@ -2,8 +2,9 @@
 #include "IndexReader.h"
 #include "Debug.h"
 #include "Util.h"
+#include "output.h"
 
-int view(int argc, const char **argv, const Command& command) {
+int view(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, false, 0, 0);
     std::vector<std::string> ids = Util::split(par.idList, ",");

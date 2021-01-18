@@ -5,6 +5,7 @@
 #include "Matcher.h"
 #include "Util.h"
 #include "itoa.h"
+#include "output.h"
 
 #include "Orf.h"
 
@@ -16,7 +17,7 @@
 #include <omp.h>
 #endif
 
-int extractframes(int argc, const char **argv, const Command& command) {
+int extractframes(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

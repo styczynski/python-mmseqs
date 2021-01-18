@@ -5,6 +5,7 @@
 #include "Debug.h"
 #include "Util.h"
 #include "TaxonomyExpression.h"
+#include "output.h"
 #include <map>
 #include <algorithm>
 
@@ -16,7 +17,7 @@ static bool compareToFirstInt(const std::pair<unsigned int, unsigned int>& lhs, 
     return (lhs.first <= rhs.first);
 }
 
-int filtertaxseqdb(int argc, const char **argv, const Command& command) {
+int filtertaxseqdb(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
     

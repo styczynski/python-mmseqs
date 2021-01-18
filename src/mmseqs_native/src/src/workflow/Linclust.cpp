@@ -4,6 +4,7 @@
 #include "CommandCaller.h"
 #include "Debug.h"
 #include "FileUtil.h"
+#include "output.h"
 
 #include "linclust.sh.h"
 
@@ -18,7 +19,7 @@ void setLinclustWorkflowDefaults(Parameters *p) {
     p->alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV;
 }
 
-int linclust(int argc, const char **argv, const Command& command) {
+int linclust(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     setLinclustWorkflowDefaults(&par);
     par.PARAM_ADD_BACKTRACE.addCategory(MMseqsParameter::COMMAND_EXPERT);

@@ -11,8 +11,9 @@
 #include "Util.h"
 #include "KSeqWrapper.h"
 #include "itoa.h"
+#include "output.h"
 
-int createdb(int argc, const char **argv, const Command& command) {
+int createdb(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
 

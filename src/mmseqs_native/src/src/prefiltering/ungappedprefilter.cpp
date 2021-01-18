@@ -14,6 +14,7 @@
 #include "NucleotideMatrix.h"
 #include "FastSort.h"
 #include "SubstitutionMatrixProfileStates.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
@@ -160,7 +161,7 @@ int doRescorealldiagonal(Parameters &par, DBReader<unsigned int> &qdbr, DBWriter
     return 0;
 }
 
-int ungappedprefilter(int argc, const char **argv, const Command &command) {
+int ungappedprefilter(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     MMseqsMPI::init(argc, argv);
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);

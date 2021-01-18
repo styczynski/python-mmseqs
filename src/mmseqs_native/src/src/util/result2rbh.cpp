@@ -2,12 +2,13 @@
 #include "DBReader.h"
 #include "DBWriter.h"
 #include "Util.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int result2rbh(int argc, const char **argv, const Command &command) {
+int result2rbh(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

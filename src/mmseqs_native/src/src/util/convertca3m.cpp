@@ -5,12 +5,13 @@
 #include "Util.h"
 #include "Matcher.h"
 #include "CompressedA3M.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int convertca3m(int argc, const char **argv, const Command &command) {
+int convertca3m(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

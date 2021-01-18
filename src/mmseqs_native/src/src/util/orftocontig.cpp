@@ -5,12 +5,13 @@
 #include "Orf.h"
 #include "Debug.h"
 #include "Util.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int orftocontig(int argn, const char **argv, const Command& command) {
+int orftocontig(mmseqs_output* out, int argn, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argn, argv, command, true, true, 0);
 

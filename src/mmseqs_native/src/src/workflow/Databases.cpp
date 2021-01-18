@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include "databases.sh.h"
+#include "output.h"
 
 struct EnvironmentEntry {
     const char* key;
@@ -223,7 +224,7 @@ std::string listDatabases(const Command &command, bool detailed) {
     return description;
 }
 
-int databases(int argc, const char **argv, const Command &command) {
+int databases(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, false, Parameters::PARSE_ALLOW_EMPTY, 0);
 

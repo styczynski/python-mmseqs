@@ -3,12 +3,13 @@
 #include "DBWriter.h"
 #include "Debug.h"
 #include "Util.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int result2repseq(int argc, const char **argv, const Command &command) {
+int result2repseq(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

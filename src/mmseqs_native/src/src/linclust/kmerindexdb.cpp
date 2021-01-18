@@ -8,6 +8,7 @@
 #include "ReducedMatrix.h"
 #include "KmerIndex.h"
 #include "kmersearch.h"
+#include "output.h"
 
 #ifndef SIZE_T_MAX
 #define SIZE_T_MAX ((size_t) -1)
@@ -15,7 +16,7 @@
 
 extern const char* version;
 
-int kmerindexdb(int argc, const char **argv, const Command &command) {
+int kmerindexdb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     MMseqsMPI::init(argc, argv);
 
     Parameters &par = Parameters::getInstance();

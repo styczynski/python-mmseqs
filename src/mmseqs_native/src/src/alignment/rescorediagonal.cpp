@@ -12,6 +12,7 @@
 #include "NucleotideMatrix.h"
 #include "IndexReader.h"
 #include "FastSort.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
@@ -374,7 +375,7 @@ int doRescorediagonal(Parameters &par,
     return 0;
 }
 
-int rescorediagonal(int argc, const char **argv, const Command &command) {
+int rescorediagonal(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     MMseqsMPI::init(argc, argv);
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);

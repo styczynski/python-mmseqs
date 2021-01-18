@@ -5,6 +5,7 @@
 //include "DistanceCalculator.h"
 #include "Timer.h"
 #include "Application.h"
+#include "output.h"
 
 #include <iomanip>
 
@@ -35,9 +36,9 @@ Command *getCommandByName(const char *s) {
     return NULL;
 }
 
-int runCommand(Command *p, int argc, const char **argv) {
+int runCommand(mmseqs_output* out, Command *p, int argc, const char **argv) {
     Timer timer;
-    int status = p->commandFunction(argc, argv, *p);
+    int status = p->commandFunction(out, argc, argv, *p);
     Debug(Debug::INFO) << "Time for processing: " << timer.lap() << "\n";
     return status;
 }
@@ -179,7 +180,8 @@ int shellcompletion(int argc, const char **argv) {
     return EXIT_SUCCESS;
 }
 
-int call_mmseqs(mmseqs_call_args args) {
+mmseqs_output call_mmseqs(mmseqs_call_args args) {
+    mmseqs_output out;
 
     const int argc = args.cli_args.size();
     char** argvp = (char**) malloc(argc * sizeof(char*));
@@ -196,25 +198,27 @@ int call_mmseqs(mmseqs_call_args args) {
 
     if (argc < 2) {
         printUsage(false);
-        return EXIT_SUCCESS;
+        return out;
     }
 
     if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
         printUsage(true);
-        return EXIT_SUCCESS;
+        return out;
     }
 
     setenv("MMSEQS", argv[0], true);
     Command *c = NULL;
     if (strncmp(argv[1], "shellcompletion", strlen("shellcompletion")) == 0) {
-        return shellcompletion(argc - 2, argv + 2);
+        shellcompletion(argc - 2, argv + 2);
+        return out;
     } else if ((c = getCommandByName(argv[1])) != NULL) {
-        runCommand(c, argc - 2, argv + 2);
+        runCommand(&out, c, argc - 2, argv + 2);
+        return out;
     } else {
         printUsage(true);
         Debug(Debug::INFO) << "\nInvalid Command: " << argv[1] << "\n";
-        return EXIT_FAILURE;
+        return out;
     }
 
-    return EXIT_SUCCESS;
+    return out;
 }

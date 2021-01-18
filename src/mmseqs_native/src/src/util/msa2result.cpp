@@ -8,6 +8,7 @@
 #include "MathUtil.h"
 #include "AlignmentSymmetry.h"
 #include "Matcher.h"
+#include "output.h"
 
 #include "kseq.h"
 #include "KSeqBufferReader.h"
@@ -23,7 +24,7 @@ void setMsa2ResultDefaults(Parameters *p) {
     p->pca = 0.0;
 }
 
-int msa2result(int argc, const char **argv, const Command &command) {
+int msa2result(mmseqs_output* out, int argc, const char **argv, const Command &command) {
 //    return EXIT_FAILURE;
 //}
     Parameters &par = Parameters::getInstance();

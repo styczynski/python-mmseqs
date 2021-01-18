@@ -15,6 +15,7 @@
 #include "MarkovKmerScore.h"
 #include "FileUtil.h"
 #include "FastSort.h"
+#include "output.h"
 
 #include <sys/stat.h>
 #include <sys/mman.h>
@@ -760,7 +761,7 @@ std::vector<std::pair<size_t, size_t>> setupKmerSplits(Parameters &par, BaseMatr
     return hashRanges;
 }
 
-int kmermatcher(int argc, const char **argv, const Command &command) {
+int kmermatcher(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     MMseqsMPI::init(argc, argv);
 
     Parameters &par = Parameters::getInstance();

@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include "update_clustering.sh.h"
+#include "output.h"
 
 extern void setClusterAutomagicParameters(Parameters& par);
 
@@ -16,7 +17,7 @@ void setClusterUpdateDefaults(Parameters *p) {
 void setClusterUpdateMustPassAlong(Parameters *p) {
     p->PARAM_ALIGNMENT_MODE.wasSet = true;
 }
-int clusterupdate(int argc, const char **argv, const Command& command) {
+int clusterupdate(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     setClusterUpdateDefaults(&par);
     par.PARAM_ADD_BACKTRACE.addCategory(MMseqsParameter::COMMAND_EXPERT);

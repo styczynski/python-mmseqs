@@ -6,8 +6,9 @@
 #include "DBWriter.h"
 #include "Debug.h"
 #include "Util.h"
+#include "output.h"
 
-int maskbygff(int argc, const char **argv, const Command& command) {
+int maskbygff(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

@@ -11,11 +11,12 @@
 #include "Debug.h"
 #include "Util.h"
 #include "FileUtil.h"
+#include "output.h"
 
 const char headerStart[] = {'>'};
 const char newline[] = {'\n'};
 
-int convert2fasta(int argc, const char **argv, const Command& command) {
+int convert2fasta(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

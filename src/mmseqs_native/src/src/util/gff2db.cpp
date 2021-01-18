@@ -4,8 +4,9 @@
 #include "Util.h"
 #include "MemoryMapped.h"
 #include "Orf.h"
+#include "output.h"
 
-int gff2db(int argc, const char **argv, const Command &command) {
+int gff2db(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

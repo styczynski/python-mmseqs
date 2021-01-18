@@ -11,6 +11,7 @@
 #include "ExtendedSubstitutionMatrix.h"
 #include "IndexReader.h"
 #include "FastSort.h"
+#include "output.h"
 #include <string>
 #include <vector>
 
@@ -18,7 +19,7 @@
 #include <omp.h>
 #endif
 
-int alignbykmer(int argc, const char **argv, const Command &command) {
+int alignbykmer(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Debug(Debug::INFO) << "Rescore diagonals.\n";
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);

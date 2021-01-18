@@ -3,8 +3,9 @@
 #include "DBWriter.h"
 #include "Debug.h"
 #include "Util.h"
+#include "output.h"
 
-int splitdb(int argc, const char **argv, const Command& command) {
+int splitdb(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

@@ -7,6 +7,7 @@
 
 #include "taxpercontig.sh.h"
 #include "taxonomy.sh.h"
+#include "output.h"
 
 extern int computeSearchMode(int queryDbType, int targetDbType, int targetSrcDbType, int searchType);
 
@@ -34,7 +35,7 @@ void setTaxonomyMustPassAlong(Parameters *p) {
     p->PARAM_ORF_MAX_LENGTH.wasSet = true;
 }
 
-int taxonomy(int argc, const char **argv, const Command& command) {
+int taxonomy(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
 
     for (size_t i = 0; i < par.searchworkflow.size(); i++) {

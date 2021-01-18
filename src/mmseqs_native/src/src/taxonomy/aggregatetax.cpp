@@ -5,6 +5,7 @@
 #include "Debug.h"
 #include "Util.h"
 #include "Matcher.h"
+#include "output.h"
 #include <map>
 #include <algorithm>
 
@@ -12,7 +13,7 @@
 #include <omp.h>
 #endif
 
-int aggregate(const bool useAln, int argc, const char **argv, const Command& command) {
+int aggregate(mmseqs_output* out, const bool useAln, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 
@@ -191,10 +192,10 @@ int aggregate(const bool useAln, int argc, const char **argv, const Command& com
 
 }
 
-int aggregatetaxweights(int argc, const char **argv, const Command& command) {
-    return aggregate(true, argc, argv, command);
+int aggregatetaxweights(mmseqs_output* out, int argc, const char **argv, const Command& command) {
+    return aggregate(out, true, argc, argv, command);
 }
 
-int aggregatetax(int argc, const char **argv, const Command& command) {
-    return aggregate(false, argc, argv, command);
+int aggregatetax(mmseqs_output* out, int argc, const char **argv, const Command& command) {
+    return aggregate(out, false, argc, argv, command);
 }

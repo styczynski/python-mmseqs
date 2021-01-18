@@ -7,6 +7,7 @@
 #include "Util.h"
 #include "MathUtil.h"
 #include "FileUtil.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include "omp.h"
@@ -127,7 +128,7 @@ void parseHMM(char *data, std::string *sequence, std::string *header, char *prof
     *size = curr_pos;
 }
 
-int convertprofiledb(int argc, const char **argv, const Command &command) {
+int convertprofiledb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

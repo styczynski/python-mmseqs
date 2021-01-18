@@ -6,6 +6,7 @@
 #include "Debug.h"
 #include "FileUtil.h"
 #include "Parameters.h"
+#include "output.h"
 
 #include <algorithm>
 
@@ -370,7 +371,7 @@ void setDbConcatDefault(Parameters *par) {
     par->threads = 1;
 }
 
-int concatdbs(int argc, const char **argv, const Command& command) {
+int concatdbs(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     setDbConcatDefault(&par);
     par.parseParameters(argc, argv, command, true, 0, 0);

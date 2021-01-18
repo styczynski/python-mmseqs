@@ -5,6 +5,7 @@
 #include "Debug.h"
 #include "Util.h"
 #include "FastSort.h"
+#include "output.h"
 
 #include <climits>
 
@@ -37,7 +38,7 @@ void copyEntry(unsigned int oldKey, unsigned int newKey, DBReader<unsigned int>&
     }
 }
 
-int renamedbkeys(int argc, const char **argv, const Command &command) {
+int renamedbkeys(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

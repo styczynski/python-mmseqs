@@ -8,12 +8,13 @@
 #include "DBConcat.h"
 #include "HeaderSummarizer.h"
 #include "CompressedA3M.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int result2msa(int argc, const char **argv, const Command &command) {
+int result2msa(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     MMseqsMPI::init(argc, argv);
 
     Parameters &par = Parameters::getInstance();

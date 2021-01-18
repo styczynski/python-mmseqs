@@ -15,6 +15,7 @@
 #include "PSSMMasker.h"
 #include "FastSort.h"
 #include "IntervalArray.h"
+#include "output.h"
 #include <stack>
 #include <map>
 #ifdef OPENMP
@@ -80,7 +81,7 @@ static bool compareHitsByKeyScore(const Matcher::result_t &first, const Matcher:
     return false;
 }
 
-int expandaln(int argc, const char **argv, const Command& command, bool returnAlnRes) {
+int expandaln(mmseqs_output* out, int argc, const char **argv, const Command& command, bool returnAlnRes) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 
@@ -358,10 +359,10 @@ int expandaln(int argc, const char **argv, const Command& command, bool returnAl
     return EXIT_SUCCESS;
 }
 
-int expandaln(int argc, const char **argv, const Command& command) {
-    return expandaln(argc, argv, command, true);
+int expandaln(mmseqs_output* out, int argc, const char **argv, const Command& command) {
+    return expandaln(out, argc, argv, command, true);
 }
 
-int expand2profile(int argc, const char **argv, const Command& command) {
-    return expandaln(argc, argv, command, false);
+int expand2profile(mmseqs_output* out, int argc, const char **argv, const Command& command) {
+    return expandaln(out, argc, argv, command, false);
 }

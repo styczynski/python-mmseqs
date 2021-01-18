@@ -3,6 +3,7 @@
 #include "DBWriter.h"
 #include "Util.h"
 #include "Debug.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
@@ -83,13 +84,13 @@ const bool tsvOut, const std::string &mappingFile, const std::string &userStrToA
     return EXIT_SUCCESS;
 }
 
-int prefixid(int argc, const char **argv, const Command& command) {
+int prefixid(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
     return(addid(par.db1, par.db1Index, par.db2, par.db2Index, par.tsvOut, par.mappingFile, par.prefix, true, par.threads, par.compressed));
 }
 
-int suffixid(int argc, const char **argv, const Command& command) {
+int suffixid(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
     return(addid(par.db1, par.db1Index, par.db2, par.db2Index, par.tsvOut, par.mappingFile, par.prefix, false, par.threads, par.compressed));

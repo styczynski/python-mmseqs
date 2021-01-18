@@ -9,12 +9,13 @@
 #include "FileUtil.h"
 #include "tantan.h"
 #include "IndexReader.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int result2profile(int argc, const char **argv, const Command &command, bool returnAlnRes) {
+int result2profile(mmseqs_output* out, int argc, const char **argv, const Command &command, bool returnAlnRes) {
     MMseqsMPI::init(argc, argv);
 
     Parameters &par = Parameters::getInstance();
@@ -271,11 +272,11 @@ int result2profile(int argc, const char **argv, const Command &command, bool ret
     return EXIT_SUCCESS;
 }
 
-int result2profile(int argc, const char **argv, const Command &command) {
-    return result2profile(argc, argv, command, false);
+int result2profile(mmseqs_output* out, int argc, const char **argv, const Command &command) {
+    return result2profile(out, argc, argv, command, false);
 }
 
-int filterresult(int argc, const char **argv, const Command &command) {
-    return result2profile(argc, argv, command, true);
+int filterresult(mmseqs_output* out, int argc, const char **argv, const Command &command) {
+    return result2profile(out, argc, argv, command, true);
 }
 

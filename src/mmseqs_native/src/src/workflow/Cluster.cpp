@@ -8,6 +8,7 @@
 #include "cascaded_clustering.sh.h"
 #include "nucleotide_clustering.sh.h"
 #include "clustering.sh.h"
+#include "output.h"
 
 #include <cassert>
 
@@ -103,7 +104,7 @@ void setClusterAutomagicParameters(Parameters& par) {
     }
 }
 
-int clusteringworkflow(int argc, const char **argv, const Command& command) {
+int clusteringworkflow(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters &par = Parameters::getInstance();
     setWorkflowDefaults(&par);
     par.PARAM_MAX_SEQS.addCategory(MMseqsParameter::COMMAND_EXPERT);

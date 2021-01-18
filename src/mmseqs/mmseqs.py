@@ -27,6 +27,7 @@ class MMSeqs:
 
 
     def execute(self, cli_args):
+        print(f'execute ==> {repr(cli_args)}')
         call_args = MMSeqsCallArgs()
         call_args.cli_args = ["mmseq2", *[str(arg) for arg in cli_args]]
         return _call_mmseqs(call_args)

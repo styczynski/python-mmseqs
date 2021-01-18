@@ -5,12 +5,13 @@
 #include "Debug.h"
 #include "Sequence.h"
 #include "SubstitutionMatrix.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int profile2seq(int argc, const char **argv, const Command &command, bool consensus) {
+int profile2seq(mmseqs_output* out, int argc, const char **argv, const Command &command, bool consensus) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_PROFILE);
 
@@ -53,10 +54,10 @@ int profile2seq(int argc, const char **argv, const Command &command, bool consen
     return EXIT_SUCCESS;
 }
 
-int profile2consensus(int argc, const char **argv, const Command &command) {
-    return profile2seq(argc, argv, command, true);
+int profile2consensus(mmseqs_output* out, int argc, const char **argv, const Command &command) {
+    return profile2seq(out, argc, argv, command, true);
 }
 
-int profile2repseq(int argc, const char **argv, const Command &command) {
-    return profile2seq(argc, argv, command, false);
+int profile2repseq(mmseqs_output* out, int argc, const char **argv, const Command &command) {
+    return profile2seq(out, argc, argv, command, false);
 }

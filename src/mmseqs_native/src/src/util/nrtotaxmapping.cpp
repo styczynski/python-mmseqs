@@ -6,6 +6,7 @@
 #include "NcbiTaxonomy.h"
 #include "FastSort.h"
 #include "MemoryMapped.h"
+#include "output.h"
 
 #ifdef HAVE_ZLIB
 #include "gzstream.h"
@@ -48,7 +49,7 @@ TaxID lookupTaxID(const std::vector<std::pair<std::string, TaxID>>& mapping, con
     }
 }
 
-int nrtotaxmapping(int argc, const char **argv, const Command& command) {
+int nrtotaxmapping(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

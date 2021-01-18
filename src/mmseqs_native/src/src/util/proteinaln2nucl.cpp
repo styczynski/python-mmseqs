@@ -5,12 +5,13 @@
 #include "Debug.h"
 #include "DBReader.h"
 #include "DBWriter.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int proteinaln2nucl(int argc, const char **argv, const Command &command) {
+int proteinaln2nucl(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

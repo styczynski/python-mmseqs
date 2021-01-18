@@ -6,8 +6,9 @@
 #include "Debug.h"
 #include "Util.h"
 #include "createtaxdb.sh.h"
+#include "output.h"
 
-int createtaxdb(int argc, const char **argv, const Command& command) {
+int createtaxdb(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

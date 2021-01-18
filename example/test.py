@@ -20,8 +20,9 @@ import mmseqs
 #   tar2db                Convert content of tar archives to any DB
 #   msa2profile           Convert a MSA DB to a profile DB
 
-if True:
-    mmseqs.MMSeqs().execute(["createindex", "mmseqs_storage/databases/test", "tmp", "--search-type", "3"])
+if False:
+    out = mmseqs.MMSeqs().execute(["createindex", "mmseqs_storage/databases/test", "tmp", "--search-type", "3"])
+    print(out)
     # mmseqs.MMSeqs().execute(["databases", "-h"])
 else:
     client = mmseqs.MMSeqs()
@@ -30,3 +31,4 @@ else:
     print(client.databases.list())
     #client.databases[0].delete()
     #print(client.databases.list())
+    client.databases[0].create_index()

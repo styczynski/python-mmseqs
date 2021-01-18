@@ -7,8 +7,9 @@
 #include "Debug.h"
 #include "Parameters.h"
 #include "easyrbh.sh.h"
+#include "output.h"
 
-int easyrbh(int argc, const char **argv, const Command &command) {
+int easyrbh(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.PARAM_ADD_BACKTRACE.addCategory(MMseqsParameter::COMMAND_EXPERT);
     par.PARAM_MAX_REJECTED.addCategory(MMseqsParameter::COMMAND_EXPERT);

@@ -2,6 +2,7 @@
 #include "Parameters.h"
 #include "FastSort.h"
 #include "Aggregation.h"
+#include "output.h"
 
 #include <algorithm>
 
@@ -212,7 +213,7 @@ private:
     bool shortOutput;
 };
 
-int resultsbyset(int argc, const char **argv, const Command &command) {
+int resultsbyset(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

@@ -3,6 +3,7 @@
 #include "Debug.h"
 #include "Util.h"
 #include "CommandCaller.h"
+#include "output.h"
 
 #include "map.sh.h"
 
@@ -23,7 +24,7 @@ void setMapWorkflowDefaults(Parameters *p) {
     p->orfMaxLength = 32734;
 }
 
-int map(int argc, const char **argv, const Command &command) {
+int map(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     setMapWorkflowDefaults(&par);
 

@@ -2,12 +2,13 @@
 #include "DBReader.h"
 #include "DBWriter.h"
 #include "Debug.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int doCompression(int argc, const char **argv, const Command& command, bool shouldCompress) {
+int doCompression(mmseqs_output* out, int argc, const char **argv, const Command& command, bool shouldCompress) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 
@@ -47,10 +48,10 @@ int doCompression(int argc, const char **argv, const Command& command, bool shou
     return EXIT_SUCCESS;
 }
 
-int compress(int argc, const char **argv, const Command& command) {
-    return doCompression(argc, argv, command, true);
+int compress(mmseqs_output* out, int argc, const char **argv, const Command& command) {
+    return doCompression(out, argc, argv, command, true);
 }
 
-int decompress(int argc, const char **argv, const Command& command) {
-    return doCompression(argc, argv, command, false);
+int decompress(mmseqs_output* out, int argc, const char **argv, const Command& command) {
+    return doCompression(out, argc, argv, command, false);
 }

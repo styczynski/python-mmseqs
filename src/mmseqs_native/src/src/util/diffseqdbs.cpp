@@ -12,6 +12,7 @@
 #include "DBReader.h"
 #include "DBWriter.h"
 #include "Util.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
@@ -34,7 +35,7 @@ struct compareKeyToFirstEntry {
     }
 };
 
-int diffseqdbs(int argc, const char **argv, const Command &command) {
+int diffseqdbs(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

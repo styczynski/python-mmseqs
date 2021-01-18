@@ -7,6 +7,7 @@
 #include "itoa.h"
 #include "TranslateNucl.h"
 #include "Orf.h"
+#include "output.h"
 
 #include <unistd.h>
 #include <climits>
@@ -16,7 +17,7 @@
 #include <omp.h>
 #endif
 
-int extractorfs(int argc, const char **argv, const Command& command) {
+int extractorfs(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

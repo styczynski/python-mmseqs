@@ -4,6 +4,7 @@
 #include "Util.h"
 #include "CommandCaller.h"
 #include "easytaxonomy.sh.h"
+#include "output.h"
 
 void setEasyTaxonomyDefaults(Parameters *p) {
     p->removeTmpFiles = true;
@@ -16,7 +17,7 @@ void setEasyTaxonomyMustPassAlong(Parameters *p) {
     p->PARAM_WRITE_LOOKUP.wasSet = true;
 }
 
-int easytaxonomy(int argc, const char **argv, const Command& command) {
+int easytaxonomy(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
 
     for (size_t i = 0; i < par.createdb.size(); i++){

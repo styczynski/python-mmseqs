@@ -5,6 +5,7 @@
 #include "Debug.h"
 #include "PrefilteringIndexReader.h"
 #include "LinsearchIndexReader.h"
+#include "output.h"
 
 #include "linsearch.sh.h"
 
@@ -31,7 +32,7 @@ void setLinsearchDefaults(Parameters *p) {
 }
 
 
-int linsearch(int argc, const char **argv, const Command &command) {
+int linsearch(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     setLinsearchDefaults(&par);
     par.PARAM_COV_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);

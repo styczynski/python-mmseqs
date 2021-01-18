@@ -4,6 +4,7 @@
 #include "Util.h"
 #include "DBReader.h"
 #include "CommandCaller.h"
+#include "output.h"
 
 #include "multihitdb.sh.h"
 
@@ -11,7 +12,7 @@ void setMultiHitDbWorkflowDefaults(Parameters *p) {
     p->orfMinLength = 30;
 }
 
-int multihitdb(int argc, const char **argv, const Command &command) {
+int multihitdb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     setMultiHitDbWorkflowDefaults(&par);
     par.parseParameters(argc, argv, command, true, 0, 0);

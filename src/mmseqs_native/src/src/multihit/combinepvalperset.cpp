@@ -3,6 +3,7 @@
 #include "Aggregation.h"
 #include "itoa.h"
 #include "Util.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
@@ -220,7 +221,7 @@ private:
     double** logBiLookup;
 };
 
-int combinepvalperset(int argc, const char **argv, const Command &command) {
+int combinepvalperset(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

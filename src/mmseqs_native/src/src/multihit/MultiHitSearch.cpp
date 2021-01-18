@@ -3,6 +3,7 @@
 #include "Debug.h"
 #include "Util.h"
 #include "CommandCaller.h"
+#include "output.h"
 
 #include "multihitsearch.sh.h"
 
@@ -25,7 +26,7 @@ void setMultiHitSearchWorkflowDefaults(Parameters *p) {
     p->alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV; 
 }
 
-int multihitsearch(int argc, const char **argv, const Command &command) {
+int multihitsearch(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     setMultiHitSearchWorkflowDefaults(&par);
 

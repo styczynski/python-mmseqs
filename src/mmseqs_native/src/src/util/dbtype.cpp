@@ -3,8 +3,9 @@
 #include "Parameters.h"
 #include "Util.h"
 #include "FileUtil.h"
+#include "output.h"
 
-int dbtype(int argc, const char **argv, const Command &command) {
+int dbtype(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, false, 0, 0);
     Debug(Debug::INFO) << Parameters::getDbTypeName(FileUtil::parseDbType(par.db1.c_str()));

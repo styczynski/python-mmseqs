@@ -4,6 +4,7 @@
 #include "Parameters.h"
 #include "DBReader.h"
 #include "DBWriter.h"
+#include "output.h"
 
 #include <unordered_map>
 

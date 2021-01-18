@@ -6,6 +6,7 @@
 #include "FileUtil.h"
 #include "CompressedA3M.h"
 #include "MathUtil.h"
+#include "output.h"
 
 #include "kseq.h"
 #include "KSeqBufferReader.h"
@@ -21,7 +22,7 @@ void setMsa2ProfileDefaults(Parameters *p) {
     p->pca = 0.0;
 }
 
-int msa2profile(int argc, const char **argv, const Command &command) {
+int msa2profile(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     setMsa2ProfileDefaults(&par);
     par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_PROFILE);

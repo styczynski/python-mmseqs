@@ -10,6 +10,7 @@
 #include "PrefilteringIndexReader.h"
 #include "IndexReader.h"
 #include "FastSort.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
@@ -347,13 +348,13 @@ int doswap(Parameters& par, bool isGeneralMode) {
     return EXIT_SUCCESS;
 }
 
-int swapdb(int argc, const char **argv, const Command &command) {
+int swapdb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
     return doswap(par, true);
 }
 
-int swapresults(int argc, const char **argv, const Command &command) {
+int swapresults(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
     return doswap(par, false);

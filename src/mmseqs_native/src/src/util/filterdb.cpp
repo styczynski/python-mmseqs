@@ -6,6 +6,7 @@
 #include "FileUtil.h"
 #include "ExpressionParser.h"
 #include "FastSort.h"
+#include "output.h"
 #include <fstream>
 #include <random>
 #include <iostream>
@@ -82,7 +83,7 @@ struct compareFirstEntryDecreasing {
     }
 };
 
-int filterdb(int argc, const char **argv, const Command &command) {
+int filterdb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

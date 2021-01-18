@@ -4,6 +4,7 @@
 #include "FileUtil.h"
 #include "Debug.h"
 #include "Util.h"
+#include "output.h"
 #include <algorithm>
 
 #ifdef OPENMP
@@ -15,7 +16,7 @@ static bool compareToFirstInt(const std::pair<unsigned int, unsigned int> &lhs, 
     return (lhs.first <= rhs.first);
 }
 
-int addtaxonomy(int argc, const char **argv, const Command &command) {
+int addtaxonomy(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

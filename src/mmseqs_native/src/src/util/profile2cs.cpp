@@ -8,12 +8,13 @@
 #include "Sequence.h"
 #include "SubstitutionMatrix.h"
 #include "itoa.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int profile2cs(int argc, const char **argv, const Command &command) {
+int profile2cs(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.alphabetSize = 8;
     par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_PROFILE);

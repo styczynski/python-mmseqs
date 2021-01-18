@@ -4,6 +4,7 @@
 #include "PrefilteringIndexReader.h"
 #include "Prefiltering.h"
 #include "Parameters.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
@@ -39,7 +40,7 @@ std::string findIncompatibleParameter(DBReader<unsigned int>& index, const Param
     return "";
 }
 
-int indexdb(int argc, const char **argv, const Command &command) {
+int indexdb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     setIndexDbDefaults(&par);
     par.parseParameters(argc, argv, command, true, 0, 0);

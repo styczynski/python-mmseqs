@@ -9,6 +9,7 @@
 #include "Timer.h"
 #include "IndexReader.h"
 #include "FileUtil.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
@@ -171,7 +172,7 @@ void updateLengths(std::vector<Matcher::result_t> &results, unsigned int qSource
     }
 }
 
-int offsetalignment(int argc, const char **argv, const Command &command) {
+int offsetalignment(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

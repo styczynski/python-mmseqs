@@ -6,6 +6,7 @@
 #include "CompressedA3M.h"
 #include "MathUtil.h"
 #include "Domain.h"
+#include "output.h"
 
 #include <fstream>
 #include <iomanip>
@@ -216,7 +217,7 @@ int doAnnotate(Parameters &par) {
     return status;
 }
 
-int summarizetabs(int argc, const char **argv, const Command& command) {
+int summarizetabs(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     Parameters& par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

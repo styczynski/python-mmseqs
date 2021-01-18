@@ -7,6 +7,7 @@
 #include "CompressedA3M.h"
 #include "MathUtil.h"
 #include "Domain.h"
+#include "output.h"
 
 #include <fstream>
 #include <iomanip>
@@ -359,7 +360,7 @@ int doExtract(Parameters &par) {
     return status;
 }
 
-int extractdomains(int argc, const char **argv, const Command& command) {
+int extractdomains(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     MMseqsMPI::init(argc, argv);
 
     Parameters& par = Parameters::getInstance();

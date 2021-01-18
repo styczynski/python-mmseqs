@@ -2,6 +2,7 @@
 #define MMSEQS_COMMAND_H
 
 #include <vector>
+#include "output.h"
 
 const unsigned int CITATION_MMSEQS2  = 1U << 0;
 const unsigned int CITATION_MMSEQS1  = 1U << 1;
@@ -89,7 +90,7 @@ struct DbType{
 
 struct Command {
     const char *cmd;
-    int (*commandFunction)(int, const char **, const Command&);
+    int (*commandFunction)(mmseqs_output* out, int, const char **, const Command&);
     std::vector<MMseqsParameter*>* params;
     CommandMode mode;
     const char *description;

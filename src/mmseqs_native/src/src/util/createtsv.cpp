@@ -5,6 +5,7 @@
 #include "Util.h"
 #include "IndexReader.h"
 #include "FileUtil.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
@@ -15,7 +16,7 @@
 #define SIZE_T_MAX ((size_t) -1)
 #endif
 
-int createtsv(int argc, const char **argv, const Command &command) {
+int createtsv(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
 

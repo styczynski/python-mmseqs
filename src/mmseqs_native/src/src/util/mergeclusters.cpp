@@ -3,6 +3,7 @@
 #include "DBWriter.h"
 #include "Util.h"
 #include "itoa.h"
+#include "output.h"
 
 #include <list>
 
@@ -10,7 +11,7 @@
 #include <omp.h>
 #endif
 
-int mergeclusters(int argc, const char **argv, const Command &command) {
+int mergeclusters(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, true, 0);
 

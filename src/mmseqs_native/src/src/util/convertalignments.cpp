@@ -11,6 +11,7 @@
 #include "Orf.h"
 #include "MemoryMapped.h"
 #include "NcbiTaxonomy.h"
+#include "output.h"
 
 #define ZSTD_STATIC_LINKING_ONLY
 #include <zstd.h>
@@ -143,7 +144,7 @@ static bool compareToFirstInt(const std::pair<unsigned int, unsigned int>& lhs, 
     return (lhs.first <= rhs.first);
 }
 
-int convertalignments(int argc, const char **argv, const Command &command) {
+int convertalignments(mmseqs_output* out, int argc, const char **argv, const Command &command) {
     Parameters &par = Parameters::getInstance();
     par.parseParameters(argc, argv, command, true, 0, 0);
 

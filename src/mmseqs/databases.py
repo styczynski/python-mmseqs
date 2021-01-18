@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from glob import glob
 from datetime import date
 
-from .utils import remove_paths
+from .utils import remove_paths, to_args
 from .base import MMSeqsBase
 
 PARAM_DB_TYPE_MAPPING = dict(
@@ -83,10 +83,58 @@ class Database:
     def create_index(self):
         tmp_dir = 'tmp'
         seq_db_path = os.path.join(self._base.settings.seq_storage_directory, self.name)
+
+        out = self._base._execute_cli(['createindex', seq_db_path, tmp_dir, '--search-type', 3])
+        print(out.vars_str)
+
         if not os.path.isfile(f'{seq_db_path}.dbtype'):
             raise Exception('Invalid database state')
         if not os.path.isdir(tmp_dir):
             raise Exception('Missing temporary directory')
+
+        if 'TRANSLATED' in out.vars_str and len(out.vars_str['TRANSLATED']) > 0:
+            if not os.path.exists(os.path.join(tmp_dir, 'orfs_aa.dbtype')):
+                self._base._execute_cli([
+                    "extractorfs",
+                    seq_db_path,
+                    os.path.join(tmp_dir, 'orfs_aa'),
+                    *to_args(out.vars_str['ORF_PAR'])])
+
+            self._base._execute_cli([
+                out.vars_str['INDEXER'],
+                os.path.join(tmp_dir, 'orfs_aa'),
+                seq_db_path,
+                *to_args(out.vars_str['INDEX_PAR'])])
+
+            if 'REMOVE_TMP' in out.vars_str and len(out.vars_str['REMOVE_TMP']) > 0:
+                self._base._execute_cli([
+                    'rmdb',
+                    os.path.join(tmp_dir, 'orfs_aa')])
+
+        elif ('LIN_NUCL' in out.vars_str and len(out.vars_str['LIN_NUCL']) > 0) or ('NUCL' in out.vars_str and len(out.vars_str['NUCL']) > 0):
+            if not os.path.exists(os.path.join(tmp_dir, 'nucl_split_seq.dbtype')):
+                self._base._execute_cli([
+                    "splitsequence",
+                    seq_db_path,
+                    os.path.join(tmp_dir, 'nucl_split_seq'),
+                    *to_args(out.vars_str['SPLIT_SEQ_PAR'])])
+            self._base._execute_cli([
+                out.vars_str['INDEXER'],
+                os.path.join(tmp_dir, 'nucl_split_seq'),
+                seq_db_path,
+                *to_args(out.vars_str['INDEX_PAR'])])
+
+            if 'REMOVE_TMP' in out.vars_str and len(out.vars_str['REMOVE_TMP']) > 0:
+                self._base._execute_cli([
+                    'rmdb',
+                    os.path.join(tmp_dir, 'nucl_split_seq')])
+
+        else:
+            self._base._execute_cli([
+                out.vars_str['INDEXER'],
+                seq_db_path,
+                seq_db_path,
+                *to_args(out.vars_str['INDEX_PAR'])])
 
 
 def inject_base(objs: List[any]):

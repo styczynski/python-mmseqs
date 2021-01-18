@@ -5,12 +5,13 @@
 #include "DBReader.h"
 #include "Timer.h"
 #include "FileUtil.h"
+#include "output.h"
 
 #ifdef OPENMP
 #include <omp.h>
 #endif
 
-int prefilter(int argc, const char **argv, const Command& command) {
+int prefilter(mmseqs_output* out, int argc, const char **argv, const Command& command) {
     MMseqsMPI::init(argc, argv);
 
     Parameters& par = Parameters::getInstance();
