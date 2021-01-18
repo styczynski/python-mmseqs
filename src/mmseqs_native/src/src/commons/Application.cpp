@@ -186,10 +186,11 @@ int call_mmseqs(mmseqs_call_args args) {
 
     for (int i=0; i<argc; ++i) {
         const int len = args.cli_args[i].size();
-        argvp[i] = (char*) malloc(len * sizeof(char));
+        argvp[i] = (char*) malloc((len+1) * sizeof(char));
         for (int j=0;j<len;++j) {
             argvp[i][j] = args.cli_args[i][j];
         }
+        argvp[i][len] = '\0';
     }
     const char** argv = (const char**) argvp;
 
@@ -208,7 +209,7 @@ int call_mmseqs(mmseqs_call_args args) {
     if (strncmp(argv[1], "shellcompletion", strlen("shellcompletion")) == 0) {
         return shellcompletion(argc - 2, argv + 2);
     } else if ((c = getCommandByName(argv[1])) != NULL) {
-        EXIT(runCommand(c, argc - 2, argv + 2));
+        runCommand(c, argc - 2, argv + 2);
     } else {
         printUsage(true);
         Debug(Debug::INFO) << "\nInvalid Command: " << argv[1] << "\n";

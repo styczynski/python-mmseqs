@@ -5,7 +5,12 @@
 
 namespace py = pybind11;
 
-PYBIND11_PLUGIN(unafold_python_native) {
+int call_mmseqs_proxy(mmseqs_call_args args) {
+    pybind11::gil_scoped_release release;
+    return call_mmseqs(args);
+}
+
+PYBIND11_PLUGIN(mmseqs_native) {
   py::module m("mmseqs_native", R"doc(
         Python module
         -----------------------
@@ -21,7 +26,7 @@ PYBIND11_PLUGIN(unafold_python_native) {
     .def(pybind11::init<>())
     .def_readwrite("cli_args", &mmseqs_call_args::cli_args);
 
-  m.def("_call_mmseqs", &call_mmseqs, R"doc(
+  m.def("_call_mmseqs", &call_mmseqs_proxy, R"doc(
         Run mmseqs2
     )doc");
 

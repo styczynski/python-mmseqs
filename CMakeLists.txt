@@ -149,7 +149,7 @@ endif ()
 
 if (CYGWIN)
     # default cygwin allocator (dlmalloc) locks on every allocation and destroys MT performance
-    add_subdirectory(lib/nedmalloc)
+    add_subdirectory(src/mmseqs_native/src/lib/nedmalloc)
     # IPS4O seems to deadlock on cygwin
     set(DISABLE_IPS4O 1)
 endif()
@@ -228,6 +228,8 @@ file(GLOB BINDINGS_COMMON_SRCS "src/mmseqs_native/src/src/commons/*.cpp"
                                "src/mmseqs_native/src/src/*.cpp")
 
 # Generate python module
+
+add_subdirectory(src/mmseqs_native/src/src/version)
 add_subdirectory(lib/pybind11)
 pybind11_add_module(mmseqs_native ${SOURCES} "${SOURCE_DIR}/bindings.cpp" ${BINDINGS_COMMON_SRCS})
 target_include_directories(mmseqs_native PUBLIC ${CMAKE_BINARY_DIR}/generated)
@@ -250,5 +252,5 @@ append_target_property(mmseqs_native COMPILE_FLAGS ${COMPILE_TMP})
 append_target_property(mmseqs_native LINK_FLAGS ${LINK_TMP})
 set_property(TARGET mmseqs_native APPEND PROPERTY COMPILE_DEFINITIONS ${DEF_TMP})
 set_property(TARGET mmseqs_native APPEND PROPERTY INCLUDE_DIRECTORIES ${INCL_TMP})
-
+target_link_libraries(mmseqs_native PRIVATE version)
 

@@ -54,9 +54,9 @@ int createindex(Parameters &par, const Command &command, const std::string &inde
         cmd.addVariable(flag.c_str(), "1");
     }
 
-    std::string program(tmpDir + "/createindex.sh");
-    FileUtil::writeFile(program, createindex_sh, createindex_sh_len);
-    cmd.execProgram(program.c_str(), par.filenames);
+    //std::string program(tmpDir + "/createindex.sh");
+    //FileUtil::writeFile(program, createindex_sh, createindex_sh_len);
+    //cmd.execProgram(program.c_str(), par.filenames);
     return 0;
 }
 

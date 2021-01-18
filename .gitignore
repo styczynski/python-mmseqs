@@ -7,3 +7,4 @@ unafold/.DS_Store
 **/.DS_Store
 .idea/
 **/*.so
+mmseqs_storage/
