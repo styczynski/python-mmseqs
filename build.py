@@ -43,6 +43,7 @@ class CMakeBuild(build_ext):
         cmake_args = [
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + extdir,
             "-DPYTHON_EXECUTABLE=" + sys.executable,
+            "-DREQUIRE_OPENMP=0",
         ]
 
         cfg = "Debug" if self.debug else "Release"
@@ -129,7 +130,7 @@ def build(setup_kwargs):
     setup_kwargs.update(
         {
             "ext_modules": [
-                CMakeExtension("unafold_python/unafold_python_native")
+                CMakeExtension("mmseqs/mmseqs_native")
             ],
             "cmdclass": {"build_ext": CMakeBuild},
             "zip_safe": False,

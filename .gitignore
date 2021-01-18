@@ -1,4 +1,6 @@
 dist/
+**/__pycache__/
+**/*.egg-info/
 build/
 src/unafold_python.egg-info/
 unafold/.DS_Store

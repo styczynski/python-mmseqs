@@ -1,12 +1,13 @@
 cmake_minimum_required(VERSION 2.8.12)
 project(mmseqs_native)
 
+set(CMAKE_VERBOSE_MAKEFILE ON)
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 SET(SOURCE_DIR "src/mmseqs_native")
-#### START COPY
 
 message("-- Source Directory: ${CMAKE_CURRENT_SOURCE_DIR}")
 message("-- Project Directory: ${PROJECT_SOURCE_DIR}")
@@ -203,7 +204,7 @@ add_subdirectory(src/mmseqs_native/src/lib/microtar)
 include_directories(src/mmseqs_native/src/lib/simde)
 
 include_directories(lib)
-include_directories(src/mmseqs_native/src/lib/simd)
+include_directories(src/mmseqs_native/src/lib)
 include_directories(src/mmseqs_native/src/lib/gzstream)
 include_directories(src/mmseqs_native/src/lib/alp)
 include_directories(src/mmseqs_native/src/lib/cacode)
@@ -223,8 +224,31 @@ if (NOT FRAMEWORK_ONLY AND INSTALL_UTIL)
 endif ()
 
 
-#### END COPY
+file(GLOB BINDINGS_COMMON_SRCS "src/mmseqs_native/src/src/commons/*.cpp"
+                               "src/mmseqs_native/src/src/*.cpp")
 
 # Generate python module
 add_subdirectory(lib/pybind11)
-pybind11_add_module(mmseqs_native ${SOURCES} "${SOURCE_DIR}/bindings.cpp")
+pybind11_add_module(mmseqs_native ${SOURCES} "${SOURCE_DIR}/bindings.cpp" ${BINDINGS_COMMON_SRCS})
+target_include_directories(mmseqs_native PUBLIC ${CMAKE_BINARY_DIR}/generated)
+target_include_directories(mmseqs_native PUBLIC ${PROJECT_BINARY_DIR}/generated)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/alignment)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/clustering)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/commons)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/multihit)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/prefiltering)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/linclust)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/taxonomy)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/util)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src)
+get_target_property(COMPILE_TMP mmseqs-framework COMPILE_FLAGS)
+get_target_property(LINK_TMP mmseqs-framework LINK_FLAGS)
+get_target_property(DEF_TMP mmseqs-framework COMPILE_DEFINITIONS)
+get_target_property(INCL_TMP mmseqs-framework INCLUDE_DIRECTORIES)
+target_link_libraries(mmseqs_native PRIVATE mmseqs-framework)
+append_target_property(mmseqs_native COMPILE_FLAGS ${COMPILE_TMP})
+append_target_property(mmseqs_native LINK_FLAGS ${LINK_TMP})
+set_property(TARGET mmseqs_native APPEND PROPERTY COMPILE_DEFINITIONS ${DEF_TMP})
+set_property(TARGET mmseqs_native APPEND PROPERTY INCLUDE_DIRECTORIES ${INCL_TMP})
+
+

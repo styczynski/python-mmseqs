@@ -1,6 +1,5 @@
-from .unafold import hybrid_min, hybrid_min_files
+from .mmseqs import MMSeqs
 
 __all__ = [
-    "hybrid_min_files",
-    "hybrid_min",
+    "MMSeqs",
 ]

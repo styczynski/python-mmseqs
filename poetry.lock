@@ -6,11 +6,6 @@ category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "appdirs"
 version = "1.4.4"
@@ -19,11 +14,6 @@ category = "dev"
 optional = false
 python-versions = "*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "atomicwrites"
 version = "1.4.0"
@@ -31,11 +21,6 @@ description = "Atomic file writes."
 category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "attrs"
@@ -51,11 +36,6 @@ docs = ["furo", "sphinx", "zope.interface"]
 tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface"]
 tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "black"
 version = "20.8b1"
@@ -67,43 +47,33 @@ python-versions = ">=3.6"
 [package.dependencies]
 appdirs = "*"
 click = ">=7.1.2"
-mypy_extensions = ">=0.4.3"
+mypy-extensions = ">=0.4.3"
 pathspec = ">=0.6,<1"
 regex = ">=2020.1.8"
 toml = ">=0.10.1"
 typed-ast = ">=1.4.0"
-typing_extensions = ">=3.7.4"
+typing-extensions = ">=3.7.4"
 
 [package.extras]
 colorama = ["colorama (>=0.4.3)"]
 d = ["aiohttp (>=3.3.2)", "aiohttp-cors"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.python.org/simple"
-reference = "default_pypi"
-
 [[package]]
 name = "boto3"
-version = "1.16.52"
+version = "1.16.56"
 description = "The AWS SDK for Python"
 category = "dev"
 optional = false
 python-versions = "*"
 
 [package.dependencies]
-botocore = ">=1.19.52,<1.20.0"
+botocore = ">=1.19.56,<1.20.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.3.0,<0.4.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "botocore"
-version = "1.19.52"
+version = "1.19.56"
 description = "Low-level, data-driven core of boto 3."
 category = "dev"
 optional = false
@@ -114,11 +84,6 @@ jmespath = ">=0.7.1,<1.0.0"
 python-dateutil = ">=2.1,<3.0.0"
 urllib3 = {version = ">=1.25.4,<1.27", markers = "python_version != \"3.4\""}
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "certifi"
 version = "2020.12.5"
@@ -126,11 +91,6 @@ description = "Python package for providing Mozilla's CA Bundle."
 category = "dev"
 optional = false
 python-versions = "*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "chardet"
@@ -140,11 +100,6 @@ category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "click"
 version = "7.1.2"
@@ -153,11 +108,6 @@ category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "colorama"
 version = "0.4.4"
@@ -165,11 +115,6 @@ description = "Cross-platform colored terminal text."
 category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "docspec"
@@ -183,11 +128,6 @@ python-versions = "*"
 "nr.databind.core" = ">=0.0.19,<0.1.0"
 "nr.databind.json" = ">=0.0.9,<0.1.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "docspec-python"
 version = "0.0.7"
@@ -200,11 +140,6 @@ python-versions = "*"
 docspec = ">=0.2.0,<0.3.0"
 "nr.sumtype" = ">=0.0.3,<0.1.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "entrypoints"
 version = "0.3"
@@ -212,11 +147,6 @@ description = "Discover and load entry points from installed packages."
 category = "dev"
 optional = false
 python-versions = ">=2.7"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "execnet"
@@ -232,11 +162,6 @@ apipkg = ">=1.4"
 [package.extras]
 testing = ["pre-commit"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "flake8"
 version = "3.8.4"
@@ -249,11 +174,6 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,>=2.7"
 mccabe = ">=0.6.0,<0.7.0"
 pycodestyle = ">=2.6.0a1,<2.7.0"
 pyflakes = ">=2.2.0,<2.3.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "flakehell"
@@ -275,11 +195,6 @@ urllib3 = "*"
 docs = ["alabaster", "pygments-github-lexers", "recommonmark", "sphinx"]
 dev = ["dlint", "flake8-2020", "flake8-aaa", "flake8-absolute-import", "flake8-alfred", "flake8-annotations-complexity", "flake8-bandit", "flake8-black", "flake8-broken-line", "flake8-bugbear", "flake8-builtins", "flake8-coding", "flake8-cognitive-complexity", "flake8-commas", "flake8-comprehensions", "flake8-debugger", "flake8-django", "flake8-docstrings", "flake8-eradicate", "flake8-executable", "flake8-expression-complexity", "flake8-fixme", "flake8-functions", "flake8-future-import", "flake8-import-order", "flake8-isort", "flake8-logging-format", "flake8-mock", "flake8-mutable", "flake8-mypy", "flake8-pep3101", "flake8-pie", "flake8-print", "flake8-printf-formatting", "flake8-pyi", "flake8-pytest", "flake8-pytest-style", "flake8-quotes", "flake8-requirements", "flake8-rst-docstrings", "flake8-scrapy", "flake8-spellcheck", "flake8-sql", "flake8-strict", "flake8-string-format", "flake8-tidy-imports", "flake8-todo", "flake8-use-fstring", "flake8-variables-names", "isort", "mccabe", "pandas-vet", "pep8-naming", "pylint", "pytest", "typing-extensions", "wemake-python-styleguide"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.python.org/simple"
-reference = "default_pypi"
-
 [[package]]
 name = "idna"
 version = "2.10"
@@ -288,11 +203,6 @@ category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "iniconfig"
 version = "1.1.1"
@@ -300,11 +210,6 @@ description = "iniconfig: brain-dead simple config-ini parsing"
 category = "dev"
 optional = false
 python-versions = "*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "isort"
@@ -315,14 +220,9 @@ optional = false
 python-versions = ">=3.6,<4.0"
 
 [package.extras]
-colors = ["colorama (>=0.4.3,<0.5.0)"]
-requirements_deprecated_finder = ["pip-api", "pipreqs"]
 pipfile_deprecated_finder = ["pipreqs", "requirementslib"]
-
-[package.source]
-type = "legacy"
-url = "https://pypi.python.org/simple"
-reference = "default_pypi"
+requirements_deprecated_finder = ["pipreqs", "pip-api"]
+colors = ["colorama (>=0.4.3,<0.5.0)"]
 
 [[package]]
 name = "jinja2"
@@ -338,11 +238,6 @@ MarkupSafe = ">=0.23"
 [package.extras]
 i18n = ["Babel (>=0.8)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "jmespath"
 version = "0.10.0"
@@ -350,11 +245,6 @@ description = "JSON Matching Expressions"
 category = "dev"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "markupsafe"
@@ -364,11 +254,6 @@ category = "dev"
 optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "mccabe"
 version = "0.6.1"
@@ -377,11 +262,6 @@ category = "dev"
 optional = false
 python-versions = "*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "mypy-extensions"
 version = "0.4.3"
@@ -389,11 +269,6 @@ description = "Experimental type system extensions for programs checked with the
 category = "dev"
 optional = false
 python-versions = "*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "nr.collections"
@@ -410,11 +285,6 @@ six = ">=1.11.0,<2.0.0"
 [package.extras]
 test = ["nr.fs (>=1.5.0,<2.0.0)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "nr.databind.core"
 version = "0.0.22"
@@ -428,11 +298,6 @@ python-versions = "*"
 "nr.interface" = ">=0.0.1,<0.1.0"
 "nr.pylang.utils" = ">=0.0.3,<0.1.0"
 "nr.stream" = ">=0.0.1,<0.1.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "nr.databind.json"
@@ -449,11 +314,6 @@ python-versions = "*"
 "nr.parsing.date" = ">=0.1.0,<1.0.0"
 "nr.pylang.utils" = ">=0.0.1,<0.1.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "nr.fs"
 version = "1.6.3"
@@ -464,11 +324,6 @@ python-versions = "*"
 
 [package.dependencies]
 six = ">=1.11.0,<2.0.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "nr.interface"
@@ -484,11 +339,6 @@ python-versions = "*"
 "nr.pylang.utils" = ">=0.0.1,<0.1.0"
 six = ">=1.11.0,<2.0.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "nr.metaclass"
 version = "0.0.6"
@@ -496,11 +346,6 @@ description = "Metaclass utilities."
 category = "dev"
 optional = false
 python-versions = "*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "nr.parsing.date"
@@ -513,11 +358,6 @@ python-versions = ">=3.5.0,<4.0.0"
 [package.dependencies]
 "nr.utils.re" = ">=0.1.0,<0.2.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "nr.pylang.utils"
 version = "0.0.4"
@@ -528,11 +368,6 @@ python-versions = ">=3.4.0,<4.0.0"
 
 [package.dependencies]
 "nr.collections" = ">=0.0.1,<1.0.0"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "nr.stream"
@@ -547,11 +382,6 @@ python-versions = "*"
 "nr.pylang.utils" = ">=0.0.1,<1.0.0"
 six = ">=1.11.0,<2.0.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "nr.sumtype"
 version = "0.0.4"
@@ -564,11 +394,6 @@ python-versions = "*"
 "nr.metaclass" = ">=0.0.4,<1.0.0"
 "nr.stream" = ">=0.0.2,<1.0.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "nr.utils.re"
 version = "0.1.1"
@@ -576,11 +401,6 @@ description = "This module provides some utility functions for applying regular 
 category = "dev"
 optional = false
 python-versions = "*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "packaging"
@@ -593,11 +413,6 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 [package.dependencies]
 pyparsing = ">=2.0.2"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "pathspec"
 version = "0.8.1"
@@ -605,11 +420,6 @@ description = "Utility library for gitignore style pattern matching of file path
 category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "pluggy"
@@ -622,11 +432,6 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 [package.extras]
 dev = ["pre-commit", "tox"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "py"
 version = "1.10.0"
@@ -635,11 +440,6 @@ category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "pycodestyle"
 version = "2.6.0"
@@ -647,11 +447,6 @@ description = "Python style guide checker"
 category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "pydoc-markdown"
@@ -676,11 +471,6 @@ six = ">=1.11.0,<2.0.0"
 toml = ">=0.10.1,<1.0.0"
 watchdog = ">=1.0.0,<2.0.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.python.org/simple"
-reference = "default_pypi"
-
 [[package]]
 name = "pyflakes"
 version = "2.2.0"
@@ -689,23 +479,13 @@ category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "pygments"
-version = "2.7.3"
+version = "2.7.4"
 description = "Pygments is a syntax highlighting package written in Python."
 category = "dev"
 optional = false
 python-versions = ">=3.5"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "pyparsing"
@@ -714,11 +494,6 @@ description = "Python parsing module"
 category = "dev"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "pytest"
@@ -741,11 +516,6 @@ toml = "*"
 [package.extras]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.python.org/simple"
-reference = "default_pypi"
-
 [[package]]
 name = "pytest-forked"
 version = "1.3.0"
@@ -757,11 +527,6 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 [package.dependencies]
 py = "*"
 pytest = ">=3.10"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "pytest-xdist"
@@ -780,11 +545,6 @@ pytest-forked = "*"
 psutil = ["psutil (>=3.0)"]
 testing = ["filelock"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.python.org/simple"
-reference = "default_pypi"
-
 [[package]]
 name = "python-dateutil"
 version = "2.8.1"
@@ -796,23 +556,13 @@ python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,>=2.7"
 [package.dependencies]
 six = ">=1.5"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "pyyaml"
 version = "5.3.1"
 description = "YAML parser and emitter for Python"
 category = "dev"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
+python-versions = "*"
 
 [[package]]
 name = "regex"
@@ -821,11 +571,6 @@ description = "Alternative regular expression module, to replace re."
 category = "dev"
 optional = false
 python-versions = "*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "requests"
@@ -845,11 +590,6 @@ urllib3 = ">=1.21.1,<1.27"
 security = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)"]
 socks = ["PySocks (>=1.5.6,!=1.5.7)", "win-inet-pton"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "s3pypi"
 version = "0.11.0"
@@ -862,11 +602,6 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 boto3 = ">=1.9.211,<2.0.0"
 Jinja2 = ">=2.10.1,<3.0.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.python.org/simple"
-reference = "default_pypi"
-
 [[package]]
 name = "s3transfer"
 version = "0.3.4"
@@ -878,11 +613,6 @@ python-versions = "*"
 [package.dependencies]
 botocore = ">=1.12.36,<2.0a.0"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "six"
 version = "1.15.0"
@@ -890,11 +620,6 @@ description = "Python 2 and 3 compatibility utilities"
 category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "toml"
@@ -904,11 +629,6 @@ category = "dev"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "typed-ast"
 version = "1.4.2"
@@ -917,11 +637,6 @@ category = "dev"
 optional = false
 python-versions = "*"
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "typing-extensions"
 version = "3.7.4.3"
@@ -929,11 +644,6 @@ description = "Backported and Experimental Type Hints for Python 3.5+"
 category = "dev"
 optional = false
 python-versions = "*"
-
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
 
 [[package]]
 name = "urllib3"
@@ -948,11 +658,6 @@ brotli = ["brotlipy (>=0.6.0)"]
 secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "ipaddress"]
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [[package]]
 name = "watchdog"
 version = "1.0.2"
@@ -964,15 +669,10 @@ python-versions = ">=3.6"
 [package.extras]
 watchmedo = ["PyYAML (>=3.10)", "argh (>=0.24.1)"]
 
-[package.source]
-type = "legacy"
-url = "https://pypi.covidgenomics.com/production"
-reference = "covid_genomics_pypi"
-
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "452714851b3b39b9820f243edb080a7ce38edb9ce45ad7385009be06882ac58e"
+content-hash = "593ef0510b582200d65e137f3e3d86dcf5ce5c5efe9bc621bb48a4bb528b3e6e"
 
 [metadata.files]
 apipkg = [
@@ -995,12 +695,12 @@ black = [
     {file = "black-20.8b1.tar.gz", hash = "sha256:1c02557aa099101b9d21496f8a914e9ed2222ef70336404eeeac8edba836fbea"},
 ]
 boto3 = [
-    {file = "boto3-1.16.52-py2.py3-none-any.whl", hash = "sha256:81c514185de8937ba75023a2466fae0cc6f170e6348fdac31c235c32ba9d58f3"},
-    {file = "boto3-1.16.52.tar.gz", hash = "sha256:360a9f805b11f2e468d48815193c55278765fb30b64350893ab63236a5034726"},
+    {file = "boto3-1.16.56-py2.py3-none-any.whl", hash = "sha256:3f26aad4c6b238055d17fd662620284ffb4ced542ed9a2f7f9df65d97a3f1190"},
+    {file = "boto3-1.16.56.tar.gz", hash = "sha256:47151ed571c316458f4931cd2422995ba0c9f6818c5df7d75f49fc845208e42e"},
 ]
 botocore = [
-    {file = "botocore-1.19.52-py2.py3-none-any.whl", hash = "sha256:d8f50e4162012ccfab64c2db4fcc99313d46d57789072251bab56013d66546e2"},
-    {file = "botocore-1.19.52.tar.gz", hash = "sha256:dc5ec23deadbe9327d3c81d03fddf80805c549059baabd80dea605941fe6a221"},
+    {file = "botocore-1.19.56-py2.py3-none-any.whl", hash = "sha256:a37d073c2f166753cc3799e77d87d4096e24433fcca5e7c8cc8e77e5dbfe60e9"},
+    {file = "botocore-1.19.56.tar.gz", hash = "sha256:01496e4c2c06aab79689f2c345a0e2cceb5fe1da7858a7e7df189bcf97703223"},
 ]
 certifi = [
     {file = "certifi-2020.12.5-py2.py3-none-any.whl", hash = "sha256:719a74fb9e33b9bd44cc7f3a8d94bc35e4049deebe19ba7d8e108280cfd59830"},
@@ -1177,8 +877,8 @@ pyflakes = [
     {file = "pyflakes-2.2.0.tar.gz", hash = "sha256:35b2d75ee967ea93b55750aa9edbbf72813e06a66ba54438df2cfac9e3c27fc8"},
 ]
 pygments = [
-    {file = "Pygments-2.7.3-py3-none-any.whl", hash = "sha256:f275b6c0909e5dafd2d6269a656aa90fa58ebf4a74f8fcf9053195d226b24a08"},
-    {file = "Pygments-2.7.3.tar.gz", hash = "sha256:ccf3acacf3782cbed4a989426012f1c535c9a90d3a7fc3f16d231b9372d2b716"},
+    {file = "Pygments-2.7.4-py3-none-any.whl", hash = "sha256:bc9591213a8f0e0ca1a5e68a479b4887fdc3e75d0774e5c71c31920c427de435"},
+    {file = "Pygments-2.7.4.tar.gz", hash = "sha256:df49d09b498e83c1a73128295860250b0b7edd4c723a32e9bc0d295c7c2ec337"},
 ]
 pyparsing = [
     {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
