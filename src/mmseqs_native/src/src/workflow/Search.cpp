@@ -12,7 +12,9 @@
 #include "blastn.sh.h"
 #include "Parameters.h"
 #include "output.h"
+#include "Application.h"
 
+#include <iostream>
 #include <iomanip>
 #include <climits>
 #include <cassert>
@@ -294,30 +296,36 @@ int search(mmseqs_output* out, Parameters &par) {
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
+    std::string parentTmpDir = tmpDir;
     tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
     par.filenames.push_back(tmpDir);
 
     const int originalRescoreMode = par.rescoreMode;
+    bool needTargetSplit = false;
+    bool extract_frames = false;
+    bool need_query_split = false;
+    std::string search_prog = "";
+    
     CommandCaller cmd;
-    cmd.addVariable("VERBOSITY", par.createParameterString(par.onlyverbosity).c_str());
-    cmd.addVariable("THREADS_COMP_PAR", par.createParameterString(par.threadsandcompression).c_str());
-    cmd.addVariable("VERB_COMP_PAR", par.createParameterString(par.verbandcompression).c_str());
+    out->output_string("VERBOSITY", par.createParameterString(par.onlyverbosity));
+    out->output_string("THREADS_COMP_PAR", par.createParameterString(par.threadsandcompression));
+    out->output_string("VERB_COMP_PAR", par.createParameterString(par.verbandcompression));
     if (isUngappedMode) {
-        cmd.addVariable("ALIGN_MODULE", "rescorediagonal");
+        out->output_string("ALIGN_MODULE", "rescorediagonal");
     } else if (par.lcaSearch) {
-        cmd.addVariable("ALIGN_MODULE", "lcaalign");
+        out->output_string("ALIGN_MODULE", "lcaalign");
     } else {
-        cmd.addVariable("ALIGN_MODULE", "align");
+        out->output_string("ALIGN_MODULE", "align");
     }
-    cmd.addVariable("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : NULL);
+    out->output_string("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : "");
     std::string program;
-    cmd.addVariable("RUNNER", par.runner.c_str());
-//    cmd.addVariable("ALIGNMENT_DB_EXT", Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_PROFILE_STATE_SEQ) ? ".255" : "");
+    out->output_string("RUNNER", par.runner);
+//    out->output_string("ALIGNMENT_DB_EXT", Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_PROFILE_STATE_SEQ) ? ".255" : "");
     par.filenames[1] = targetDB;
     if (par.sliceSearch == true) {
         // By default (0), diskSpaceLimit (in bytes) will be set in the workflow to use as much as possible
-        cmd.addVariable("AVAIL_DISK", SSTR(static_cast<size_t>(par.diskSpaceLimit)).c_str());
+        out->output_string("AVAIL_DISK", SSTR(static_cast<size_t>(par.diskSpaceLimit)));
 
         // correct Eval threshold for inverted search
         const size_t queryDbSize = FileUtil::countLines(par.db1Index.c_str());
@@ -328,26 +336,26 @@ int search(mmseqs_output* out, Parameters &par) {
         par.covMode = Util::swapCoverageMode(par.covMode);
         size_t maxResListLen = par.maxResListLen;
         par.maxResListLen = INT_MAX;
-        cmd.addVariable("PREFILTER_PAR", par.createParameterString(par.prefilter).c_str());
+        out->output_string("PREFILTER_PAR", par.createParameterString(par.prefilter));
         par.maxResListLen = maxResListLen;
         double originalEvalThr = par.evalThr;
         par.evalThr = std::numeric_limits<double>::max();
-        cmd.addVariable("SWAP_PAR", par.createParameterString(par.swapresult).c_str());
+        out->output_string("SWAP_PAR", par.createParameterString(par.swapresult));
         par.evalThr = originalEvalThr;
         if (isUngappedMode) {
             par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
-            cmd.addVariable("ALIGNMENT_PAR", par.createParameterString(par.rescorediagonal).c_str());
+            out->output_string("ALIGNMENT_PAR", par.createParameterString(par.rescorediagonal));
             par.rescoreMode = originalRescoreMode;
         } else {
-            cmd.addVariable("ALIGNMENT_PAR", par.createParameterString(par.align).c_str());
+            out->output_string("ALIGNMENT_PAR", par.createParameterString(par.align));
         }
-        cmd.addVariable("SORTRESULT_PAR", par.createParameterString(par.sortresult).c_str());
+        out->output_string("SORTRESULT_PAR", par.createParameterString(par.sortresult));
         par.covMode = originalCovMode;
 
         program = tmpDir + "/searchslicedtargetprofile.sh";
         FileUtil::writeFile(program, searchslicedtargetprofile_sh, searchslicedtargetprofile_sh_len);
     } else if (searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_PROFILE) {
-        cmd.addVariable("PREFILTER_PAR", par.createParameterString(par.prefilter).c_str());
+        out->output_string("PREFILTER_PAR", par.createParameterString(par.prefilter));
         // we need to align all hits in case of target Profile hits
         size_t maxResListLen = par.maxResListLen;
         par.maxResListLen = INT_MAX;
@@ -355,20 +363,20 @@ int search(mmseqs_output* out, Parameters &par) {
         par.covMode = Util::swapCoverageMode(par.covMode);
         if (isUngappedMode) {
             par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
-            cmd.addVariable("ALIGNMENT_PAR", par.createParameterString(par.rescorediagonal).c_str());
+            out->output_string("ALIGNMENT_PAR", par.createParameterString(par.rescorediagonal));
             par.rescoreMode = originalRescoreMode;
         } else {
-            cmd.addVariable("ALIGNMENT_PAR", par.createParameterString(par.align).c_str());
+            out->output_string("ALIGNMENT_PAR", par.createParameterString(par.align));
         }
         par.covMode = originalCovMode;
         par.maxResListLen = maxResListLen;
-        cmd.addVariable("SWAP_PAR", par.createParameterString(par.swapresult).c_str());
+        out->output_string("SWAP_PAR", par.createParameterString(par.swapresult));
         FileUtil::writeFile(tmpDir + "/searchtargetprofile.sh", searchtargetprofile_sh, searchtargetprofile_sh_len);
         program = std::string(tmpDir + "/searchtargetprofile.sh");
     } else if (par.numIterations > 1) {
-        cmd.addVariable("NUM_IT", SSTR(par.numIterations).c_str());
-        cmd.addVariable("SUBSTRACT_PAR", par.createParameterString(par.subtractdbs).c_str());
-        cmd.addVariable("VERBOSITY_PAR", par.createParameterString(par.onlyverbosity).c_str());
+        out->output_string("NUM_IT", SSTR(par.numIterations));
+        out->output_string("SUBSTRACT_PAR", par.createParameterString(par.subtractdbs));
+        out->output_string("VERBOSITY_PAR", par.createParameterString(par.onlyverbosity));
 
         double originalEval = par.evalThr;
         par.evalThr = (par.evalThr < par.evalProfile) ? par.evalThr  : par.evalProfile;
@@ -386,20 +394,20 @@ int search(mmseqs_output* out, Parameters &par) {
                 par.evalThr = originalEval;
             }
 
-            cmd.addVariable(std::string("PREFILTER_PAR_" + SSTR(i)).c_str(),
-                            par.createParameterString(par.prefilter).c_str());
+            out->output_string(std::string("PREFILTER_PAR_" + SSTR(i)),
+                            par.createParameterString(par.prefilter));
             if (isUngappedMode) {
                 par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
-                cmd.addVariable(std::string("ALIGNMENT_PAR_" + SSTR(i)).c_str(),
-                                par.createParameterString(par.rescorediagonal).c_str());
+                out->output_string(std::string("ALIGNMENT_PAR_" + SSTR(i)),
+                                par.createParameterString(par.rescorediagonal));
                 par.rescoreMode = originalRescoreMode;
             } else {
-                cmd.addVariable(std::string("ALIGNMENT_PAR_" + SSTR(i)).c_str(),
-                                par.createParameterString(par.align).c_str());
+                out->output_string(std::string("ALIGNMENT_PAR_" + SSTR(i)),
+                                par.createParameterString(par.align));
             }
             par.pca = 0.0;
-            cmd.addVariable(std::string("PROFILE_PAR_" + SSTR(i)).c_str(),
-                            par.createParameterString(par.result2profile).c_str());
+            out->output_string(std::string("PROFILE_PAR_" + SSTR(i)),
+                            par.createParameterString(par.result2profile));
             par.pca = 1.0;
         }
 
@@ -411,7 +419,7 @@ int search(mmseqs_output* out, Parameters &par) {
                 Debug(Debug::ERROR) << "--start-sens should not be greater -s.\n";
                 EXIT(EXIT_FAILURE);
             }
-            cmd.addVariable("SENSE_0", SSTR(par.startSens).c_str());
+            out->output_string("SENSE_0", SSTR(par.startSens));
             float sensStepSize = (par.sensitivity - par.startSens) / (static_cast<float>(par.sensSteps) - 1);
             for (int step = 1; step < par.sensSteps; step++) {
                 std::string stepKey = "SENSE_" + SSTR(step);
@@ -419,15 +427,15 @@ int search(mmseqs_output* out, Parameters &par) {
                 std::stringstream stream;
                 stream << std::fixed << std::setprecision(1) << stepSense;
                 std::string value = stream.str();
-                cmd.addVariable(stepKey.c_str(), value.c_str());
+                out->output_string(stepKey.c_str(), value);
             }
-            cmd.addVariable("STEPS", SSTR((int) par.sensSteps).c_str());
+            out->output_string("STEPS", SSTR((int) par.sensSteps));
         } else {
             std::stringstream stream;
             stream << std::fixed << std::setprecision(1) << par.sensitivity;
             std::string sens = stream.str();
-            cmd.addVariable("SENSE_0", sens.c_str());
-            cmd.addVariable("STEPS", SSTR(1).c_str());
+            out->output_string("SENSE_0", sens);
+            out->output_string("STEPS", SSTR(1));
         }
 
         std::vector<MMseqsParameter*> prefilterWithoutS;
@@ -436,30 +444,31 @@ int search(mmseqs_output* out, Parameters &par) {
                 prefilterWithoutS.push_back(par.prefilter[i]);
             }
         }
-        cmd.addVariable("PREFILTER_PAR", par.createParameterString(prefilterWithoutS).c_str());
+        out->output_string("PREFILTER_PAR", par.createParameterString(prefilterWithoutS));
         if (isUngappedMode) {
             par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
-            cmd.addVariable("ALIGNMENT_PAR", par.createParameterString(par.rescorediagonal).c_str());
+            out->output_string("ALIGNMENT_PAR", par.createParameterString(par.rescorediagonal));
             par.rescoreMode = originalRescoreMode;
         } else {
-            cmd.addVariable("ALIGNMENT_PAR", par.createParameterString(par.align).c_str());
+            out->output_string("ALIGNMENT_PAR", par.createParameterString(par.align));
         }
         FileUtil::writeFile(tmpDir + "/blastp.sh", blastp_sh, blastp_sh_len);
         program = std::string(tmpDir + "/blastp.sh");
     }
 
     if (searchMode & (Parameters::SEARCH_MODE_FLAG_QUERY_TRANSLATED|Parameters::SEARCH_MODE_FLAG_TARGET_TRANSLATED)) {
-        cmd.addVariable("NO_TARGET_INDEX", (indexStr == "") ? "TRUE" : NULL);
+        out->output_string("NO_TARGET_INDEX", (indexStr == "") ? "TRUE" : "");
         FileUtil::writeFile(tmpDir + "/translated_search.sh", translated_search_sh, translated_search_sh_len);
-        cmd.addVariable("QUERY_NUCL", (searchMode & Parameters::SEARCH_MODE_FLAG_QUERY_TRANSLATED) ? "TRUE" : NULL);
-        cmd.addVariable("TARGET_NUCL", (searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_TRANSLATED)  ? "TRUE" : NULL);
-        cmd.addVariable("THREAD_COMP_PAR", par.createParameterString(par.threadsandcompression).c_str());
+        out->output_string("QUERY_NUCL", (searchMode & Parameters::SEARCH_MODE_FLAG_QUERY_TRANSLATED) ? "TRUE" : "");
+        out->output_string("TARGET_NUCL", (searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_TRANSLATED)  ? "TRUE" : "");
+        out->output_string("THREAD_COMP_PAR", par.createParameterString(par.threadsandcompression).c_str());
         par.subDbMode = 1;
-        cmd.addVariable("CREATESUBDB_PAR", par.createParameterString(par.createsubdb).c_str());
+        out->output_string("CREATESUBDB_PAR", par.createParameterString(par.createsubdb));
         par.translate = 1;
-        cmd.addVariable("ORF_PAR", par.createParameterString(par.extractorfs).c_str());
-        cmd.addVariable("OFFSETALIGNMENT_PAR", par.createParameterString(par.offsetalignment).c_str());
-        cmd.addVariable("SEARCH", program.c_str());
+        out->output_string("ORF_PAR", par.createParameterString(par.extractorfs));
+        out->output_string("OFFSETALIGNMENT_PAR", par.createParameterString(par.offsetalignment));
+        out->output_string("SEARCH", program);
+        search_prog = program;
         program = std::string(tmpDir + "/translated_search.sh");
     }else if(searchMode & Parameters::SEARCH_MODE_FLAG_QUERY_NUCLEOTIDE &&
             searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_NUCLEOTIDE){
@@ -469,7 +478,8 @@ int search(mmseqs_output* out, Parameters &par) {
             case 0:
                 par.forwardFrames= "";
                 par.reverseFrames= "1";
-                cmd.addVariable("EXTRACTFRAMES","TRUE");
+                out->output_string("EXTRACTFRAMES","TRUE");
+                extract_frames = true;
                 break;
             case 1:
                 par.forwardFrames= "1";
@@ -478,24 +488,180 @@ int search(mmseqs_output* out, Parameters &par) {
             case 2:
                 par.forwardFrames= "1";
                 par.reverseFrames= "1";
-                cmd.addVariable("EXTRACTFRAMES","TRUE");
+                out->output_string("EXTRACTFRAMES","TRUE");
+                extract_frames = true;
                 break;
         }
-        cmd.addVariable("SPLITSEQUENCE_PAR", par.createParameterString(par.splitsequence).c_str());
+        out->output_string("SPLITSEQUENCE_PAR", par.createParameterString(par.splitsequence));
         if(indexStr=="") {
-            cmd.addVariable("NEEDTARGETSPLIT", "TRUE");
+            out->output_string("NEEDTARGETSPLIT", "TRUE");
+            needTargetSplit = true;
         }
-        cmd.addVariable("NEEDQUERYSPLIT","TRUE");
-        cmd.addVariable("EXTRACT_FRAMES_PAR", par.createParameterString(par.extractframes).c_str());
-        cmd.addVariable("OFFSETALIGNMENT_PAR", par.createParameterString(par.offsetalignment).c_str());
-        cmd.addVariable("SEARCH", program.c_str());
+        out->output_string("NEEDQUERYSPLIT","TRUE");
+        need_query_split = true;
+        out->output_string("EXTRACT_FRAMES_PAR", par.createParameterString(par.extractframes));
+        out->output_string("OFFSETALIGNMENT_PAR", par.createParameterString(par.offsetalignment));
+        out->output_string("SEARCH", program);
+        search_prog = program;
         program = std::string(tmpDir + "/blastn.sh");
 
     }
-    cmd.execProgram(program.c_str(), par.filenames);
 
+    //////////
+
+    std::string query = par.filenames[0];
+    std::string target = par.filenames[1];
+    std::string result = par.filenames[2];
+
+    std::cout << "step_search A\n" << std::flush;
+    if (needTargetSplit) {
+        if (!FileUtil::fileExists((tmpDir + "/target_seqs_split.dbtype").c_str())) {
+            std::cout << "step_search B\n" << std::flush;
+            Parameters splitsequence_par;
+
+// OFFSETALIGNMENT_PAR: [--chain-alignments 0 --merge-query 1 --search-type 0 --threads 1 --compressed 0 --db-load-mode 0 -v 3 ]
+//EXTRACT_FRAMES_PAR: [--forward-frames 1,2,3 --reverse-frames 1,2,3 --create-lookup 0 --threads 1 --compressed 0 -v 3 ]
+// SPLITSEQUENCE_PAR: [--max-seq-len 65535 --sequence-overlap 0 --sequence-split-mode 1 --headers-split-mode 0 --create-lookup 0 --threads 1 --compressed 0 -v 3 ]
+            splitsequence_par.setDBFields(1, target);
+            splitsequence_par.setDBFields(2, tmpDir + "/target_seqs_split");
+            splitsequence_par.maxSeqLen = 65535;
+            splitsequence_par.sequenceOverlap = 0;
+            splitsequence_par.sequenceSplitMode = 1;
+            splitsequence_par.headerSplitMode = 0;
+            splitsequence_par.createLookup = 0;
+            splitsequence_par.threads = 1;
+            splitsequence_par.compressed = 0;
+            subcall_mmseqs(out, "splitsequence", splitsequence_par);
+        }
+        target = tmpDir + "/target_seqs_split";
+        std::cout << "step_search C\n" << std::flush;
+    }
+
+    std::cout << "step_search D\n" << std::flush;
+    if (extract_frames) {
+        if (!FileUtil::fileExists((tmpDir + "/query_seqs.dbtype").c_str())) {
+            std::cout << "step_search E\n" << std::flush;
+            Parameters extractframes_par;
+
+//EXTRACT_FRAMES_PAR: [--forward-frames 1,2,3 --reverse-frames 1,2,3 --create-lookup 0 --threads 1 --compressed 0 -v 3 ]
+            extractframes_par.setDBFields(1, query);
+            extractframes_par.setDBFields(2, tmpDir + "/query_seqs");
+            extractframes_par.forwardFrames = "1,2,3";
+            extractframes_par.reverseFrames = "1,2,3";
+            extractframes_par.createLookup = 0;
+            extractframes_par.threads = 1;
+            extractframes_par.compressed = 0;
+            subcall_mmseqs(out, "extractframes", extractframes_par);
+        }
+        query = tmpDir + "/query_seqs";
+        std::cout << "step_search F\n" << std::flush;
+    }
+
+    std::cout << "step_search G\n" << std::flush;
+    if (need_query_split) {
+        if (!FileUtil::fileExists((tmpDir + "/query_seqs_split.dbtype").c_str())) {
+            std::cout << "step_search H\n" << std::flush;
+            Parameters splitsequence_par;
+            splitsequence_par.setDBFields(1, query);
+            splitsequence_par.setDBFields(2, tmpDir + "/query_seqs_split");
+            splitsequence_par.maxSeqLen = 65535;
+            splitsequence_par.sequenceOverlap = 0;
+            splitsequence_par.sequenceSplitMode = 1;
+            splitsequence_par.headerSplitMode = 0;
+            splitsequence_par.createLookup = 0;
+            splitsequence_par.threads = 1;
+            splitsequence_par.compressed = 0;
+            subcall_mmseqs(out, "splitsequence", splitsequence_par);
+        }
+        query = tmpDir + "/query_seqs_split";
+        std::cout << "step_search I\n" << std::flush;
+    }
+    
+    // mkdir tmpDir
+    std::string searchTmpDir = parentTmpDir + "/search";
+    //FileUtil::makeDir(searchTmpDir.c_str());
+
+    std::cout << "step_search J\n" << std::flush;
+    if (!FileUtil::fileExists((tmpDir + "/aln.dbtype").c_str())) {
+        Parameters nested_search_par;
+        std::cout << "step_search K\n" << std::flush;
+        std::vector<std::string> search_filenames = {
+            query,
+            target,
+            tmpDir + "/aln",
+            searchTmpDir,
+        };
+        nested_search_par.filenames = search_filenames;
+        nested_search_par.setDBFields(1, query);
+        nested_search_par.setDBFields(2, target);
+        nested_search_par.setDBFields(3, tmpDir + "/aln");
+        nested_search_par.setDBFields(4, searchTmpDir);
+        nested_search_par.spacedKmer = true;
+        nested_search_par.alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV;
+        nested_search_par.sensitivity = 5.7;
+        nested_search_par.evalThr = 0.001;
+        nested_search_par.orfStartMode = 1;
+        nested_search_par.orfMinLength = 30;
+        nested_search_par.orfMaxLength = 32734;
+        nested_search_par.evalProfile = 0.1;
+        nested_search_par.baseTmpPath = par.baseTmpPath;
+
+
+        Debug(Debug::ERROR) << "Call: " << program << "\n";
+        out->print();
+        EXIT(EXIT_FAILURE);
+
+        subcall_mmseqs(out, "search", nested_search_par);
+        std::cout << "step_search L\n" << std::flush;
+    }
+
+    std::cout << "step_search M\n" << std::flush;
+    if (!FileUtil::fileExists((result+".dbtype").c_str())) {
+        std::cout << "step_search N\n" << std::flush;
+        Parameters offsetalignment_par;
+        std::vector<std::string> alignment_filenames = {
+            par.filenames[0],
+            query,
+            par.filenames[1],
+            target,
+            tmpDir + "/aln",
+            result,
+        };
+        offsetalignment_par.filenames = alignment_filenames;
+        offsetalignment_par.setDBFields(1, par.filenames[0]);
+        offsetalignment_par.setDBFields(2, query);
+        offsetalignment_par.setDBFields(3, par.filenames[1]);
+        offsetalignment_par.setDBFields(4, target);
+        offsetalignment_par.setDBFields(5, tmpDir + "/aln");
+        offsetalignment_par.setDBFields(6, result);
+        offsetalignment_par.chainAlignment = 0;
+        offsetalignment_par.mergeQuery = 1;
+        offsetalignment_par.searchType = 0;
+        offsetalignment_par.threads = 1;
+        offsetalignment_par.compressed = 0;
+        offsetalignment_par.preloadMode = 0;
+        subcall_mmseqs(out, "offsetalignment", offsetalignment_par);
+        std::cout << "step_search O\n" << std::flush;
+    }
+
+    std::cout << "step_search P\n" << std::flush;
+    if (par.removeTmpFiles) {
+        std::cout << "step_search Q\n" << std::flush;
+        Parameters rmdb_par;
+        rmdb_par.setDBFields(1, tmpDir + "/q_orfs");
+        subcall_mmseqs(out, "rmdb", rmdb_par);
+        rmdb_par.setDBFields(1, tmpDir + "/q_orfs_aa");
+        subcall_mmseqs(out, "rmdb", rmdb_par);
+        rmdb_par.setDBFields(1, tmpDir + "/t_orfs");
+        subcall_mmseqs(out, "rmdb", rmdb_par);
+        rmdb_par.setDBFields(1, tmpDir + "/t_orfs_aa");
+        subcall_mmseqs(out, "rmdb", rmdb_par);
+    }
+    std::cout << "step_search R\n" << std::flush;
+
+    //cmd.execProgram(program.c_str(), par.filenames);
     // Should never get here
-    assert(false);
+    //assert(false);
 
     return 0;
 }

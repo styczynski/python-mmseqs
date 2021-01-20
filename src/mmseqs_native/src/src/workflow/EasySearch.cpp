@@ -10,6 +10,8 @@
 #include "easysearch.sh.h"
 #include "output.h"
 
+#include <iostream>
+
 void setEasySearchDefaults(Parameters *p, bool linsearch) {
     if (linsearch) {
         p->shuffleDatabase = false;
@@ -96,6 +98,7 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
+    std::string originalTmpDir = tmpDir;
     tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
 
@@ -203,14 +206,26 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
             tmpDir + "/query",
             target,
             intermediate,
-            tmpDir + "/search_tmp",
+            originalTmpDir,
         };
         search_par.filenames = search_filenames;
         search_par.setDBFields(1, tmpDir + "/query");
         search_par.setDBFields(2, target);
         search_par.setDBFields(3, intermediate);
-        search_par.setDBFields(4, tmpDir + "/search_tmp");
+        search_par.setDBFields(4, originalTmpDir);
+        search_par.spacedKmer = true;
+        search_par.alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV;
+        search_par.sensitivity = 5.7;
+        search_par.evalThr = 0.001;
+        search_par.orfStartMode = 1;
+        search_par.orfMinLength = 30;
+        search_par.orfMaxLength = 32734;
+        search_par.evalProfile = 0.1;
+        search_par.baseTmpPath = par.baseTmpPath;
+
+        std::cout << "Call search\n" << std::flush;
         subcall_mmseqs(out, search_module, search_par);
+        std::cout << "Calling search doneA\n" << std::flush;
     }
 
     return 0;
