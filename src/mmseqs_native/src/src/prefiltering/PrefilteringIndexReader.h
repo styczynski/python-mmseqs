@@ -4,6 +4,7 @@
 #include "BaseMatrix.h"
 #include "IndexTable.h"
 #include "DBReader.h"
+#include "output.h"
 #include <string>
 
 struct PrefilteringIndexData {
@@ -53,7 +54,7 @@ public:
     static bool checkIfIndexFile(DBReader<unsigned int> *reader);
     static std::string indexName(const std::string &outDB);
 
-    static void createIndexFile(const std::string &outDb,
+    static void createIndexFile(mmseqs_output* out, const std::string &outDb,
                                 DBReader<unsigned int> *dbr1, DBReader<unsigned int> *dbr2,
                                 DBReader<unsigned int> *hdbr1, DBReader<unsigned int> *hdbr2,
                                 BaseMatrix *seedSubMat, int maxSeqLen, bool spacedKmer, const std::string &spacedKmerPattern,

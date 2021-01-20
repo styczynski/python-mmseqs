@@ -26,30 +26,30 @@ void setMultiHitSearchWorkflowDefaults(Parameters *p) {
     p->alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV; 
 }
 
-int multihitsearch(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    setMultiHitSearchWorkflowDefaults(&par);
-
-    par.PARAM_MAX_REJECTED.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_DB_OUTPUT.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_OVERLAP.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    for (size_t i = 0; i < par.extractorfs.size(); i++){
-        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.translatenucs.size(); i++){
-        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.splitsequence.size(); i++) {
-        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.result2profile.size(); i++){
-        par.result2profile[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int multihitsearch(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    setMultiHitSearchWorkflowDefaults(&par);
+//
+//    par.PARAM_MAX_REJECTED.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_DB_OUTPUT.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_OVERLAP.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    for (size_t i = 0; i < par.extractorfs.size(); i++){
+//        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.translatenucs.size(); i++){
+//        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.splitsequence.size(); i++) {
+//        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.result2profile.size(); i++){
+//        par.result2profile[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     if (FileUtil::directoryExists(par.db4.c_str()) == false) {
         Debug(Debug::INFO) << "Tmp " << par.db4 << " folder does not exist or is not a directory.\n";
@@ -60,7 +60,7 @@ int multihitsearch(mmseqs_output* out, int argc, const char **argv, const Comman
             Debug(Debug::INFO) << "Created dir " << par.db4 << "\n";
         }
     }
-    size_t hash = par.hashParameter(command.databases, par.filenames, par.multihitsearch);
+    size_t hash = par.hashParameter(par.databases_types, par.filenames, par.multihitsearch);
     std::string tmpDir = par.db4 + "/" + SSTR(hash);
     if (FileUtil::directoryExists(tmpDir.c_str()) == false) {
         if (FileUtil::makeDir(tmpDir.c_str()) == false) {

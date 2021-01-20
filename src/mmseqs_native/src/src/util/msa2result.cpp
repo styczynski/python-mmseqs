@@ -24,12 +24,12 @@ void setMsa2ResultDefaults(Parameters *p) {
     p->pca = 0.0;
 }
 
-int msa2result(mmseqs_output* out, int argc, const char **argv, const Command &command) {
+int msa2result(mmseqs_output* out, Parameters &par) {
 //    return EXIT_FAILURE;
 //}
-    Parameters &par = Parameters::getInstance();
-    setMsa2ResultDefaults(&par);
-    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_PROFILE);
+//    Parameters &par = Parameters::getInstance();
+//    setMsa2ResultDefaults(&par);
+//    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_PROFILE);
 
     std::string msaData = par.db1;
     std::string msaIndex = par.db1Index;

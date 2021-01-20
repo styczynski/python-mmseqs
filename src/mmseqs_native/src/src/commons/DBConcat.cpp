@@ -371,10 +371,10 @@ void setDbConcatDefault(Parameters *par) {
     par->threads = 1;
 }
 
-int concatdbs(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    setDbConcatDefault(&par);
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int concatdbs(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    setDbConcatDefault(&par);
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     // TODO check equal db type
     DBConcat outDB(par.db1.c_str(), par.db1Index.c_str(),

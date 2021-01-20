@@ -38,9 +38,9 @@ void copyEntry(unsigned int oldKey, unsigned int newKey, DBReader<unsigned int>&
     }
 }
 
-int renamedbkeys(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int renamedbkeys(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     FILE *orderFile = NULL;
     if (FileUtil::fileExists(par.db1.c_str())) {

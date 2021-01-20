@@ -4,6 +4,10 @@
 #include <vector>
 #include "output.h"
 
+typedef const unsigned int CommandMode;
+struct MMseqsParameter;
+struct DbType;
+
 const unsigned int CITATION_MMSEQS2  = 1U << 0;
 const unsigned int CITATION_MMSEQS1  = 1U << 1;
 const unsigned int CITATION_UNICLUST = 1U << 2;
@@ -16,9 +20,6 @@ const unsigned int CITATION_TAXONOMY = 1U << 6;
 // citations from inheriting modules will start from here
 const unsigned int CITATION_END      = CITATION_TAXONOMY << 1;
 
-struct MMseqsParameter;
-
-typedef const unsigned int CommandMode;
 
 CommandMode COMMAND_MAIN              = 1U << 1;
 CommandMode COMMAND_FORMAT_CONVERSION = 1U << 2;
@@ -88,22 +89,11 @@ struct DbType{
 };
 
 
-struct Command {
-    const char *cmd;
-    int (*commandFunction)(mmseqs_output* out, int, const char **, const Command&);
-    std::vector<MMseqsParameter*>* params;
-    CommandMode mode;
-    const char *description;
-    const char *examples;
-    const char *author;
-    const char *usage;
-    unsigned int citations;
-    std::vector<DbType> databases;
-};
-
 struct Categories {
     const char* title;
     CommandMode mode;
 };
+
+
 
 #endif

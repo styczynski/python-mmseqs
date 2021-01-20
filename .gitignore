@@ -8,3 +8,4 @@ unafold/.DS_Store
 .idea/
 **/*.so
 mmseqs_storage/
+mmseqs_native.cpython-*/

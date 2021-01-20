@@ -17,9 +17,9 @@
 #include <omp.h>
 #endif
 
-int result2dnamsa(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int result2dnamsa(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     DBReader<unsigned int> qDbr(par.db1.c_str(), par.db1Index.c_str(), par.threads, DBReader<unsigned int>::USE_INDEX|DBReader<unsigned int>::USE_DATA);
     qDbr.open(DBReader<unsigned int>::NOSORT);

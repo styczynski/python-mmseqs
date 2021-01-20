@@ -17,11 +17,11 @@
 #include <omp.h>
 #endif
 
-int splitsequence(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    par.maxSeqLen = 10000;
-    par.sequenceOverlap = 300;
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int splitsequence(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    par.maxSeqLen = 10000;
+//    par.sequenceOverlap = 300;
+//    par.parseParameters(argc, argv, command, true, 0, 0);
     int mode = DBReader<unsigned int>::USE_INDEX;
     if (par.sequenceSplitMode == Parameters::SEQUENCE_SPLIT_MODE_HARD) {
         mode |= DBReader<unsigned int>::USE_DATA;

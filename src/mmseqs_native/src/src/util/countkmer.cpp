@@ -14,12 +14,12 @@
 #include <omp.h>
 #endif
 
-int countkmer(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    par.verbosity = 1;
-    par.kmerSize = 5;
-    par.spacedKmer = false;
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int countkmer(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    par.verbosity = 1;
+//    par.kmerSize = 5;
+//    par.spacedKmer = false;
+//    par.parseParameters(argc, argv, command, true, 0, 0);
     std::vector<std::string> ids = Util::split(par.idList, ",");
     int indexSrcType = IndexReader::SEQUENCES;
 

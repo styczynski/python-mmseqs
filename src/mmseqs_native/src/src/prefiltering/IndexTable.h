@@ -17,6 +17,7 @@
 #include "KmerGenerator.h"
 #include "Parameters.h"
 #include "FastSort.h"
+#include "output.h"
 #include <stdlib.h>
 #include <algorithm>
 
@@ -252,7 +253,7 @@ public:
         offsets[0] = 0;
     }
 
-    void printStatistics(char *num2aa) {
+    void printStatistics(mmseqs_output* out, char *num2aa) {
         const size_t top_N = 10;
         std::pair<size_t, size_t> topElements[top_N];
         for (size_t j = 0; j < top_N; j++) {
@@ -286,6 +287,11 @@ public:
         Debug(Debug::INFO) << "DB size:          " << (entrySize * sizeof(IndexEntryLocal) + tableSize * sizeof(size_t))/1024/1024 << " MB\n";
         Debug(Debug::INFO) << "Avg k-mer size:   " << avgKmer << "\n";
         Debug(Debug::INFO) << "Top " << top_N << " k-mers\n";
+
+        out->output_string("INDEX_TABLE_ENTRIES", std::to_string(entrySize));
+        out->output_string("INDEX_TABLE_DB_SIZE", std::to_string((entrySize * sizeof(IndexEntryLocal) + tableSize * sizeof(size_t))/1024/1024));
+        out->output_string("INDEX_AVG_KMER_SIZE", std::to_string(avgKmer));
+
         for (size_t j = 0; j < top_N; j++) {
             Debug(Debug::INFO) << "    ";
             indexer->printKmer(topElements[j].second, kmerSize, num2aa);

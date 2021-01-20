@@ -32,24 +32,7 @@ void setLinsearchDefaults(Parameters *p) {
 }
 
 
-int linsearch(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    setLinsearchDefaults(&par);
-    par.PARAM_COV_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_C.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_MIN_SEQ_ID.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    for (size_t i = 0; i < par.extractorfs.size(); i++) {
-        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.translatenucs.size(); i++) {
-        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-
-    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
-
+int linsearch(mmseqs_output* out, Parameters &par) {
     const int queryDbType = FileUtil::parseDbType(par.db1.c_str());
     std::string indexStr = LinsearchIndexReader::searchForIndex(par.db2);
     if (indexStr.empty()) {
@@ -96,19 +79,19 @@ int linsearch(mmseqs_output* out, int argc, const char **argv, const Command &co
     const bool isUngappedMode = par.alignmentMode == Parameters::ALIGNMENT_MODE_UNGAPPED;
     if (isUngappedMode && (Parameters::isEqualDbtype(queryDbType, Parameters::DBTYPE_HMM_PROFILE) ||
                            Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_HMM_PROFILE))) {
-        par.printUsageMessage(command, MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
+        // par.printUsageMessage(command, MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
         Debug(Debug::ERROR) << "Cannot use ungapped alignment mode with profile databases.\n";
         EXIT(EXIT_FAILURE);
     }
 
-    par.printParameters(command.cmd, argc, argv, par.searchworkflow);
+   // par.printParameters(command.cmd, argc, argv, par.searchworkflow);
 
     std::string tmpDir = par.db4;
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, par.linsearchworkflow));
+    std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames, par.linsearchworkflow));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
-    tmpDir = FileUtil::createTemporaryDirectory(tmpDir, hash);
+    tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
     par.filenames.push_back(tmpDir);
 

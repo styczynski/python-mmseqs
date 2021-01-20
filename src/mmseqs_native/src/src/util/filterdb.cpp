@@ -83,9 +83,9 @@ struct compareFirstEntryDecreasing {
     }
 };
 
-int filterdb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int filterdb(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     const size_t column = static_cast<size_t>(par.filterColumn);
     const int columnToTake = par.columnToTake;

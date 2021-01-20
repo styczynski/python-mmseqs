@@ -7,6 +7,10 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_FLAGS_DEBUG  "-g")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,defs")
+
 SET(SOURCE_DIR "src/mmseqs_native")
 
 message("-- Source Directory: ${CMAKE_CURRENT_SOURCE_DIR}")
@@ -232,6 +236,7 @@ file(GLOB BINDINGS_COMMON_SRCS "src/mmseqs_native/src/src/commons/*.cpp"
 add_subdirectory(src/mmseqs_native/src/src/version)
 add_subdirectory(lib/pybind11)
 pybind11_add_module(mmseqs_native ${SOURCES} "${SOURCE_DIR}/bindings.cpp" ${BINDINGS_COMMON_SRCS})
+set_target_properties(mmseqs_native PROPERTIES LINK_FLAGS "-Wl,-undefined,error")
 target_include_directories(mmseqs_native PUBLIC ${CMAKE_BINARY_DIR}/generated)
 target_include_directories(mmseqs_native PUBLIC ${PROJECT_BINARY_DIR}/generated)
 target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/alignment)

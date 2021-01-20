@@ -13,9 +13,9 @@
 #include <omp.h>
 #endif
 
-int aggregate(mmseqs_output* out, const bool useAln, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int aggregate(mmseqs_output* out, const bool useAln, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     // open taxonomy - evolutionary relationships amongst taxa
     NcbiTaxonomy * t = NcbiTaxonomy::openTaxonomy(par.db1);
@@ -192,10 +192,10 @@ int aggregate(mmseqs_output* out, const bool useAln, int argc, const char **argv
 
 }
 
-int aggregatetaxweights(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    return aggregate(out, true, argc, argv, command);
+int aggregatetaxweights(mmseqs_output* out, Parameters &par) {
+    return aggregate(out, true, par);
 }
 
-int aggregatetax(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    return aggregate(out, false, argc, argv, command);
+int aggregatetax(mmseqs_output* out, Parameters &par) {
+    return aggregate(out, false, par);
 }

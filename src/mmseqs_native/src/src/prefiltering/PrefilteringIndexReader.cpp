@@ -5,6 +5,7 @@
 #include "FileUtil.h"
 #include "IndexBuilder.h"
 #include "Parameters.h"
+#include "output.h"
 
 const char*  PrefilteringIndexReader::CURRENT_VERSION = "16";
 unsigned int PrefilteringIndexReader::VERSION = 0;
@@ -47,7 +48,7 @@ std::string PrefilteringIndexReader::indexName(const std::string &outDB) {
     return result;
 }
 
-void PrefilteringIndexReader::createIndexFile(const std::string &outDB,
+void PrefilteringIndexReader::createIndexFile(mmseqs_output* out, const std::string &outDB,
                                               DBReader<unsigned int> *dbr1, DBReader<unsigned int> *dbr2,
                                               DBReader<unsigned int> *hdbr1, DBReader<unsigned int> *hdbr2,
                                               BaseMatrix *subMat, int maxSeqLen,
@@ -208,7 +209,7 @@ void PrefilteringIndexReader::createIndexFile(const std::string &outDB,
                                    (maskMode == 1 || maskLowerCase == 1) ? &sequenceLookup : NULL,
                                    (maskMode == 0 ) ? &sequenceLookup : NULL,
                                    *subMat, &seq, dbr1, dbFrom, dbFrom + dbSize, kmerThr, maskMode, maskLowerCase);
-        indexTable.printStatistics(subMat->num2aa);
+        indexTable.printStatistics(out, subMat->num2aa);
 
         if (sequenceLookup == NULL) {
             Debug(Debug::ERROR) << "Invalid mask mode. No sequence lookup created!\n";

@@ -12,11 +12,11 @@
 #include <omp.h>
 #endif
 
-int subtractdbs(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int subtractdbs(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
     par.evalProfile = (par.evalThr < par.evalProfile) ? par.evalThr : par.evalProfile;
-    par.printParameters(command.cmd, argc, argv, *command.params);
+    // par.printParameters(command.cmd, argc, argv, *command.params);
     const double evalThreshold = par.evalProfile;
 
     Debug(Debug::INFO) << "Remove " << par.db2 << " ids from " << par.db1 << "\n";

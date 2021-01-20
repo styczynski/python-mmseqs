@@ -90,8 +90,15 @@ MultiParam<char*>::MultiParam(const char* filename) {
 }
 
 MultiParam<char*>::~MultiParam() {
-    free(nucleotides);
-    free(aminoacids);
+    return;
+    if (nucleotides != NULL) {
+        free(nucleotides);
+        nucleotides = NULL;
+    }
+    if (aminoacids != NULL) {
+        free(aminoacids);
+        aminoacids = NULL;
+    }
 }
 
 std::string MultiParam<char*>::format(const MultiParam<char*> &file) {

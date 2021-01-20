@@ -130,9 +130,9 @@ void kronaReport(FILE* FP, const NcbiTaxonomy& taxDB, const std::unordered_map<T
     }
 }
 
-int taxonomyreport(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int taxonomyreport(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     // 1. Read taxonomy
     NcbiTaxonomy * taxDB = NcbiTaxonomy::openTaxonomy(par.db1);

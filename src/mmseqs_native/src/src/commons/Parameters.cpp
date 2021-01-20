@@ -276,10 +276,11 @@ Parameters::Parameters():
         PARAM_HELP_LONG(PARAM_HELP_LONG_ID, "--help", "Help", "Help", typeid(bool), (void *) &help, "", MMseqsParameter::COMMAND_HIDDEN)
 {
     if (instance) {
-        Debug(Debug::ERROR) << "Parameter instance already exists!\n";
-        abort();
+        //Debug(Debug::ERROR) << "Parameter instance already exists!\n";
+        //abort();
+    } else {
+        instance = this;
     }
-    instance = this;
 
 
         // onlyverbosity
@@ -1260,166 +1261,166 @@ Parameters::Parameters():
 }
 
 
-void Parameters::printUsageMessage(const Command& command, const unsigned int outputFlag, const char* extraText) {
-    const std::vector<MMseqsParameter*>& parameters = *command.params;
-    std::ostringstream ss;
-    ss << "usage: " << binary_name << " " << command.cmd << " " << command.usage << (parameters.size() > 0 ? " [options]" : "") << "\n";
-    if (extraText != NULL) {
-        ss << extraText;
-    }
-    if (outputFlag == 0xFFFFFFFF) {
-        ss << " By " << command.author << "\n";
-    }
-    ss << "options: ";
-
-    struct {
-        const char* title;
-        unsigned int category;
-    } categories[] = {
-            {"prefilter",MMseqsParameter::COMMAND_PREFILTER},
-            {"align",    MMseqsParameter::COMMAND_ALIGN},
-            {"clust",    MMseqsParameter::COMMAND_CLUST},
-            {"kmermatcher", MMseqsParameter::COMMAND_CLUSTLINEAR},
-            {"profile",  MMseqsParameter::COMMAND_PROFILE},
-            {"misc",     MMseqsParameter::COMMAND_MISC},
-            {"common",   MMseqsParameter::COMMAND_COMMON},
-            {"expert",   MMseqsParameter::COMMAND_EXPERT}
-    };
-
-    const bool printExpert = MMseqsParameter::COMMAND_EXPERT & outputFlag;
-    size_t maxParamWidth = 0;
-    for (size_t i = 0; i < ARRAY_SIZE(categories); ++i) {
-        for (size_t j = 0; j < parameters.size(); j++) {
-            const MMseqsParameter *par = parameters[j];
-            bool isExpert = (par->category & MMseqsParameter::COMMAND_EXPERT);
-            if (par->category & categories[i].category && (printExpert || isExpert == false)) {
-                maxParamWidth = std::max(strlen(parameters[j]->name), maxParamWidth);
-            }
-        }
-    }
-    // space in front of options
-    maxParamWidth += 6;
-    std::map<int, bool> alreadyPrintMap;
-    // header
-    ss << std::setprecision(3) << std::fixed;
-    bool printHeader = true;
-    std::string paramString;
-    paramString.reserve(100);
-    bool hasExpert = false;
-    for (size_t i = 0; i < ARRAY_SIZE(categories); ++i) {
-        bool categoryFound = false;
-        for (size_t j = 0; j < parameters.size(); j++) {
-            const MMseqsParameter * par = parameters[j];
-            bool isExpert = (par->category & MMseqsParameter::COMMAND_EXPERT);
-            bool alreadyPrint = alreadyPrintMap[par->uniqid];
-            if (par->category & categories[i].category && (printExpert || isExpert == false ) && alreadyPrint == false ) {
-//                int others = (par.category ^ categories[i].category);
-//                if(others & outputFlag  )
-//                    continue;
-                categoryFound = true;
-                break;
-            }
-        }
-        if (categoryFound) {
-            paramString.clear();
-            if (outputFlag == 0xFFFFFFFF) {
-                paramString.append(categories[i].title).append(":");
-            }
-            ss << paramString << std::string(maxParamWidth < paramString.size()? 1 : maxParamWidth - paramString.size(), ' ');
-
-            if(printHeader==true){
-                //ss << " ";
-                //ss << std::left << std::setw(10) << "default" << " ";
-                //ss << std::fixed << "description [value range]";
-                printHeader = false;
-            }
-            ss << std::endl;
-            // body
-            for (size_t j = 0; j < parameters.size(); j++) {
-                paramString.clear();
-                const MMseqsParameter * par = parameters[j];
-                bool isExpert = (par->category & MMseqsParameter::COMMAND_EXPERT);
-                hasExpert |= isExpert;
-                bool alreadyPrint = alreadyPrintMap[par->uniqid];
-                if (par->category & categories[i].category && (printExpert || isExpert == false) && alreadyPrint == false ) {
-                    paramString.append(par->name);
-                    std::string valueString;
-                    if (par->type == typeid(int)) {
-                        paramString.append(" INT");
-                        valueString = SSTR(*(int *) par->value);
-                    } else if (par->type == typeid(float)) {
-                        paramString.append(" FLOAT");
-                        valueString = SSTR(*(float *) par->value);
-                    } else if (par->type == typeid(double)) {
-                        paramString.append(" DOUBLE");
-                        valueString = SSTR(*(double *) par->value);
-                    } else if (par->type == typeid(ByteParser)) {
-                        paramString.append(" BYTE");
-                        valueString = ByteParser::format(*((size_t *) par->value), 'a', 'h');
-                    } else if (par->type == typeid(bool)) {
-                        paramString.append(" BOOL");
-                        valueString = SSTR(*(bool *)par->value);
-                    } else if (par->type == typeid(std::string)) {
-                        paramString.append(" STR");
-                        valueString = *((std::string *) par->value);
-                    } else if (par->type == typeid(MultiParam<char*>)) {
-                        paramString.append(" TWIN"); //nucl:VAL,aa:VAL"
-                        valueString = MultiParam<char*>::format(*((MultiParam<char*> *) par->value));
-                    } else if (par->type == typeid(MultiParam<int>)) {
-                        paramString.append(" TWIN"); //nucl:VAL,aa:VAL"
-                        valueString = MultiParam<int>::format(*((MultiParam<int> *) par->value));
-                    } else if (par->type == typeid(MultiParam<float>)) {
-                        paramString.append(" TWIN"); //nucl:VAL,aa:VAL"
-                        valueString = MultiParam<float>::format(*((MultiParam<float> *) par->value));
-                    }
-
-                    ss << " " << paramString << std::string(maxParamWidth < paramString.size()? 1 : maxParamWidth - paramString.size(), ' ');
-
-                    ss << " ";
-                    const char* description = par->description;
-                    while (description != NULL && *description != '\0') {
-                        ss.put(*description);
-                        if (*description == '\n') {
-                            ss << std::string(maxParamWidth + 2, ' ');
-                        }
-                        description++;
-                    }
-                    ss << " [" << valueString << "]";
-                    ss << std::endl;
-                    alreadyPrintMap[par->uniqid] = true;
-                }
-            }
-        }
-    }
-
-    if (command.examples) {
-        ss << "\nexamples:\n ";
-        const char *data = command.examples;
-        while (*data != '\0') {
-            ss.put(*data);
-            if (*data == '\n') {
-                ss.put(' ');
-            }
-            data++;
-        }
-        if (*(data - 1) != '\n') {
-            ss.put('\n');
-        }
-    }
-    if (command.citations > 0) {
-        ss << "\nreferences:\n";
-        for (unsigned int pos = 0; pos != sizeof(command.citations) * CHAR_BIT; ++pos) {
-            unsigned int citation = 1 << pos;
-            if (command.citations & citation && citations.find(citation) != citations.end()) {
-                ss << " - " << citations.at(citation) << "\n";
-            }
-        }
-    }
-    if (printExpert == false && hasExpert) {
-        ss << "\n" << "Show an extended list of options by calling '" << binary_name << " " << command.cmd << " -h'.\n";
-    }
-    Debug(Debug::INFO) << ss.str();
-}
+//void Parameters::printUsageMessage(const Command& command, const unsigned int outputFlag, const char* extraText) {
+//    const std::vector<MMseqsParameter*>& parameters = *command.params;
+//    std::ostringstream ss;
+//    ss << "usage: " << binary_name << " " << command.cmd << " " << command.usage << (parameters.size() > 0 ? " [options]" : "") << "\n";
+//    if (extraText != NULL) {
+//        ss << extraText;
+//    }
+//    if (outputFlag == 0xFFFFFFFF) {
+//        ss << " By " << command.author << "\n";
+//    }
+//    ss << "options: ";
+//
+//    struct {
+//        const char* title;
+//        unsigned int category;
+//    } categories[] = {
+//            {"prefilter",MMseqsParameter::COMMAND_PREFILTER},
+//            {"align",    MMseqsParameter::COMMAND_ALIGN},
+//            {"clust",    MMseqsParameter::COMMAND_CLUST},
+//            {"kmermatcher", MMseqsParameter::COMMAND_CLUSTLINEAR},
+//            {"profile",  MMseqsParameter::COMMAND_PROFILE},
+//            {"misc",     MMseqsParameter::COMMAND_MISC},
+//            {"common",   MMseqsParameter::COMMAND_COMMON},
+//            {"expert",   MMseqsParameter::COMMAND_EXPERT}
+//    };
+//
+//    const bool printExpert = MMseqsParameter::COMMAND_EXPERT & outputFlag;
+//    size_t maxParamWidth = 0;
+//    for (size_t i = 0; i < ARRAY_SIZE(categories); ++i) {
+//        for (size_t j = 0; j < parameters.size(); j++) {
+//            const MMseqsParameter *par = parameters[j];
+//            bool isExpert = (par->category & MMseqsParameter::COMMAND_EXPERT);
+//            if (par->category & categories[i].category && (printExpert || isExpert == false)) {
+//                maxParamWidth = std::max(strlen(parameters[j]->name), maxParamWidth);
+//            }
+//        }
+//    }
+//    // space in front of options
+//    maxParamWidth += 6;
+//    std::map<int, bool> alreadyPrintMap;
+//    // header
+//    ss << std::setprecision(3) << std::fixed;
+//    bool printHeader = true;
+//    std::string paramString;
+//    paramString.reserve(100);
+//    bool hasExpert = false;
+//    for (size_t i = 0; i < ARRAY_SIZE(categories); ++i) {
+//        bool categoryFound = false;
+//        for (size_t j = 0; j < parameters.size(); j++) {
+//            const MMseqsParameter * par = parameters[j];
+//            bool isExpert = (par->category & MMseqsParameter::COMMAND_EXPERT);
+//            bool alreadyPrint = alreadyPrintMap[par->uniqid];
+//            if (par->category & categories[i].category && (printExpert || isExpert == false ) && alreadyPrint == false ) {
+////                int others = (par.category ^ categories[i].category);
+////                if(others & outputFlag  )
+////                    continue;
+//                categoryFound = true;
+//                break;
+//            }
+//        }
+//        if (categoryFound) {
+//            paramString.clear();
+//            if (outputFlag == 0xFFFFFFFF) {
+//                paramString.append(categories[i].title).append(":");
+//            }
+//            ss << paramString << std::string(maxParamWidth < paramString.size()? 1 : maxParamWidth - paramString.size(), ' ');
+//
+//            if(printHeader==true){
+//                //ss << " ";
+//                //ss << std::left << std::setw(10) << "default" << " ";
+//                //ss << std::fixed << "description [value range]";
+//                printHeader = false;
+//            }
+//            ss << std::endl;
+//            // body
+//            for (size_t j = 0; j < parameters.size(); j++) {
+//                paramString.clear();
+//                const MMseqsParameter * par = parameters[j];
+//                bool isExpert = (par->category & MMseqsParameter::COMMAND_EXPERT);
+//                hasExpert |= isExpert;
+//                bool alreadyPrint = alreadyPrintMap[par->uniqid];
+//                if (par->category & categories[i].category && (printExpert || isExpert == false) && alreadyPrint == false ) {
+//                    paramString.append(par->name);
+//                    std::string valueString;
+//                    if (par->type == typeid(int)) {
+//                        paramString.append(" INT");
+//                        valueString = SSTR(*(int *) par->value);
+//                    } else if (par->type == typeid(float)) {
+//                        paramString.append(" FLOAT");
+//                        valueString = SSTR(*(float *) par->value);
+//                    } else if (par->type == typeid(double)) {
+//                        paramString.append(" DOUBLE");
+//                        valueString = SSTR(*(double *) par->value);
+//                    } else if (par->type == typeid(ByteParser)) {
+//                        paramString.append(" BYTE");
+//                        valueString = ByteParser::format(*((size_t *) par->value), 'a', 'h');
+//                    } else if (par->type == typeid(bool)) {
+//                        paramString.append(" BOOL");
+//                        valueString = SSTR(*(bool *)par->value);
+//                    } else if (par->type == typeid(std::string)) {
+//                        paramString.append(" STR");
+//                        valueString = *((std::string *) par->value);
+//                    } else if (par->type == typeid(MultiParam<char*>)) {
+//                        paramString.append(" TWIN"); //nucl:VAL,aa:VAL"
+//                        valueString = MultiParam<char*>::format(*((MultiParam<char*> *) par->value));
+//                    } else if (par->type == typeid(MultiParam<int>)) {
+//                        paramString.append(" TWIN"); //nucl:VAL,aa:VAL"
+//                        valueString = MultiParam<int>::format(*((MultiParam<int> *) par->value));
+//                    } else if (par->type == typeid(MultiParam<float>)) {
+//                        paramString.append(" TWIN"); //nucl:VAL,aa:VAL"
+//                        valueString = MultiParam<float>::format(*((MultiParam<float> *) par->value));
+//                    }
+//
+//                    ss << " " << paramString << std::string(maxParamWidth < paramString.size()? 1 : maxParamWidth - paramString.size(), ' ');
+//
+//                    ss << " ";
+//                    const char* description = par->description;
+//                    while (description != NULL && *description != '\0') {
+//                        ss.put(*description);
+//                        if (*description == '\n') {
+//                            ss << std::string(maxParamWidth + 2, ' ');
+//                        }
+//                        description++;
+//                    }
+//                    ss << " [" << valueString << "]";
+//                    ss << std::endl;
+//                    alreadyPrintMap[par->uniqid] = true;
+//                }
+//            }
+//        }
+//    }
+//
+//    if (command.examples) {
+//        ss << "\nexamples:\n ";
+//        const char *data = command.examples;
+//        while (*data != '\0') {
+//            ss.put(*data);
+//            if (*data == '\n') {
+//                ss.put(' ');
+//            }
+//            data++;
+//        }
+//        if (*(data - 1) != '\n') {
+//            ss.put('\n');
+//        }
+//    }
+//    if (command.citations > 0) {
+//        ss << "\nreferences:\n";
+//        for (unsigned int pos = 0; pos != sizeof(command.citations) * CHAR_BIT; ++pos) {
+//            unsigned int citation = 1 << pos;
+//            if (command.citations & citation && citations.find(citation) != citations.end()) {
+//                ss << " - " << citations.at(citation) << "\n";
+//            }
+//        }
+//    }
+//    if (printExpert == false && hasExpert) {
+//        ss << "\n" << "Show an extended list of options by calling '" << binary_name << " " << command.cmd << " -h'.\n";
+//    }
+//    Debug(Debug::INFO) << ss.str();
+//}
 
 int compileRegex(regex_t * regex, const char * regexText){
     int status = regcomp(regex, regexText, REG_EXTENDED | REG_NEWLINE);
@@ -1440,415 +1441,419 @@ bool parseBool(const std::string &p) {
         EXIT(EXIT_FAILURE);
     }
 }
-
-void Parameters::parseParameters(int argc, const char *pargv[], const Command &command, bool printPar, int parseFlags,
-                                 int outputFlags) {
-    filenames.clear();
-    std::vector<MMseqsParameter*> & par = *command.params;
-
-    bool canHandleHelp = false;
-    for (size_t parIdx = 0; parIdx < par.size(); parIdx++) {
-        if (par[parIdx]->uniqid == PARAM_HELP_ID || par[parIdx]->uniqid == PARAM_HELP_LONG_ID) {
-            canHandleHelp = true;
-        }
-    }
-
-    size_t parametersFound = 0;
-    for (int argIdx = 0; argIdx < argc; argIdx++) {
-        // it is a parameter if it starts with - or --
-        const bool longParameter = (pargv[argIdx][0] == '-' && pargv[argIdx][1] == '-');
-        if (longParameter || (pargv[argIdx][0] == '-')) {
-            if ((parseFlags & PARSE_REST) && longParameter && pargv[argIdx][2] == '\0') {
-                restArgv = pargv + argIdx + 1;
-                restArgc = argc - (argIdx + 1);
-                break;
-            }
-            std::string parameter(pargv[argIdx]);
-            if (canHandleHelp == false && (parameter.compare("-h") == 0 || parameter.compare("--help") == 0)) {
-                printUsageMessage(command, 0xFFFFFFFF);
-                EXIT(EXIT_SUCCESS);
-            }
-
-            bool hasUnrecognizedParameter = true;
-            for (size_t parIdx = 0; parIdx < par.size(); parIdx++) {
-                if(parameter.compare(par[parIdx]->name) == 0) {
-                    if (typeid(bool) != par[parIdx]->type && argIdx + 1 == argc) {
-                        printUsageMessage(command, outputFlags);
-                        Debug(Debug::ERROR) << "Missing argument " << par[parIdx]->name << "\n";
-                        EXIT(EXIT_FAILURE);
-                    }
-
-                    if (par[parIdx]->wasSet) {
-                        printUsageMessage(command, outputFlags);
-                        Debug(Debug::ERROR) << "Duplicate parameter " << par[parIdx]->name << "\n";
-                        EXIT(EXIT_FAILURE);
-                    }
-
-                    if (typeid(int) == par[parIdx]->type) {
-                        regex_t regex;
-                        compileRegex(&regex, par[parIdx]->regex);
-                        int nomatch = regexec(&regex, pargv[argIdx+1], 0, NULL, 0);
-                        regfree(&regex);
-                        // if no match found or two matches found (we want exactly one match)
-                        if (nomatch){
-                            printUsageMessage(command, 0xFFFFFFFF);
-                            Debug(Debug::ERROR) << "Error in argument " << par[parIdx]->name << "\n";
-                            EXIT(EXIT_FAILURE);
-                        }else{
-                            *((int *) par[parIdx]->value) = atoi(pargv[argIdx+1]);
-                            par[parIdx]->wasSet = true;
-                        }
-                        argIdx++;
-                    } else if (typeid(ByteParser) == par[parIdx]->type) {
-                        regex_t regex;
-                        compileRegex(&regex, par[parIdx]->regex);
-                        int nomatch = regexec(&regex, pargv[argIdx+1], 0, NULL, 0);
-                        regfree(&regex);
-
-                        // if no match found or two matches found (we want exactly one match)
-                        if (nomatch){
-                            printUsageMessage(command, 0xFFFFFFFF);
-                            Debug(Debug::ERROR) << "Error in argument regex " << par[parIdx]->name << "\n";
-                            EXIT(EXIT_FAILURE);
-                        } else {
-                            size_t value = ByteParser::parse(pargv[argIdx+1]);
-                            if (value == ByteParser::INVALID_SIZE) {
-                                printUsageMessage(command, 0xFFFFFFFF);
-                                Debug(Debug::ERROR) << "Error in value parsing " << par[parIdx]->name << "\n";
-                                EXIT(EXIT_FAILURE);
-                            } else {
-                                *((size_t *) par[parIdx]->value) = value;
-                                par[parIdx]->wasSet = true;
-                            }
-                        }
-                        argIdx++;
-                    } else if (typeid(MultiParam<char*>) == par[parIdx]->type) {
-                        std::string val(pargv[argIdx+1]);
-                        if (Util::startWith("b64:", val)) {
-                            val = base64_decode(val.c_str() + 4, val.size() - 4);
-                        }
-                        MultiParam<char*> value = MultiParam<char*>(val);
-                        if (value == MultiParam<char*>("INVALID", "INVALID")) {
-                            printUsageMessage(command, 0xFFFFFFFF);
-                            Debug(Debug::ERROR) << "Error in value parsing " << par[parIdx]->name << "\n";
-                            EXIT(EXIT_FAILURE);
-                        } else {
-                            *((MultiParam<char*> *) par[parIdx]->value) = value;
-                            par[parIdx]->wasSet = true;
-                        }
-                        argIdx++;
-                    }else if (typeid(MultiParam<int>) == par[parIdx]->type) {
-                        MultiParam<int> value = MultiParam<int>(pargv[argIdx+1]);
-                        if (value.aminoacids == INT_MAX || value.nucleotides == INT_MAX) {
-                            printUsageMessage(command, 0xFFFFFFFF);
-                            Debug(Debug::ERROR) << "Error in value parsing " << par[parIdx]->name << "\n";
-                            EXIT(EXIT_FAILURE);
-                        } else {
-                            *((MultiParam<int> *) par[parIdx]->value) = value;
-                            par[parIdx]->wasSet = true;
-                        }
-                        argIdx++;
-                    }else if (typeid(MultiParam<float>) == par[parIdx]->type) {
-                        MultiParam<float> value = MultiParam<float>(pargv[argIdx + 1]);
-                        if (value.aminoacids == FLT_MAX || value.nucleotides == FLT_MAX) {
-                            printUsageMessage(command, 0xFFFFFFFF);
-                            Debug(Debug::ERROR) << "Error in value parsing " << par[parIdx]->name << "\n";
-                            EXIT(EXIT_FAILURE);
-                        } else {
-                            *((MultiParam<float> *) par[parIdx]->value) = value;
-                            par[parIdx]->wasSet = true;
-                        }
-                        argIdx++;
-                    }else if (typeid(float) == par[parIdx]->type) {
-                        regex_t regex;
-                        compileRegex(&regex, par[parIdx]->regex);
-                        int nomatch = regexec(&regex, pargv[argIdx+1], 0, NULL, 0);
-                        regfree(&regex);
-                        if (nomatch){
-                            printUsageMessage(command, 0xFFFFFFFF);
-                            Debug(Debug::ERROR) << "Error in argument " << par[parIdx]->name << "\n";
-                            EXIT(EXIT_FAILURE);
-                        }else{
-                            double input = strtod(pargv[argIdx+1], NULL);
-                            *((float *) par[parIdx]->value) = static_cast<float>(input);
-                            par[parIdx]->wasSet = true;
-                        }
-                        argIdx++;
-                    } else if (typeid(double) == par[parIdx]->type) {
-                        regex_t regex;
-                        compileRegex(&regex, par[parIdx]->regex);
-                        int nomatch = regexec(&regex, pargv[argIdx+1], 0, NULL, 0);
-                        regfree(&regex);
-                        if (nomatch){
-                            printUsageMessage(command, 0xFFFFFFFF);
-                            Debug(Debug::ERROR) << "Error in argument " << par[parIdx]->name << "\n";
-                            EXIT(EXIT_FAILURE);
-                        }else{
-                            *((double *) par[parIdx]->value) = strtod(pargv[argIdx+1], NULL);
-                            par[parIdx]->wasSet = true;
-                        }
-                        argIdx++;
-                    } else if (typeid(std::string) == par[parIdx]->type) {
-                        std::string val(pargv[argIdx+1]);
-                        if (Util::startWith("b64:", val)) {
-                            val = base64_decode(val.c_str() + 4, val.size() - 4);
-                        }
-                        std::string* currVal = (std::string*)par[parIdx]->value;
-                        currVal->assign(val);
-                        par[parIdx]->wasSet = true;
-                        argIdx++;
-                    } else if (typeid(bool) == par[parIdx]->type) {
-                        bool *value = (bool *) par[parIdx]->value;
-                        if (argIdx + 1 == argc || pargv[argIdx+1][0] == '-') {
-                            *value = !*value;
-                        } else {
-                            *value = parseBool(pargv[argIdx+1]);
-                            argIdx++;
-                        }
-                        par[parIdx]->wasSet = true;
-                    } else {
-                        Debug(Debug::ERROR) << "Wrong parameter type in parseParameters. Please inform the developers\n";
-                        EXIT(EXIT_FAILURE);
-                    }
-
-                    hasUnrecognizedParameter = false;
-                    continue;
-                }
-            }
-
-            if (hasUnrecognizedParameter) {
-                printUsageMessage(command, 0xFFFFFFFF);
-
-                // Suggest some parameter that the user might have meant
-                std::vector<MMseqsParameter *>::const_iterator index = par.end();
-                int maxDistance = 0;
-                for (std::vector<MMseqsParameter *>::const_iterator it = par.begin(); it != par.end(); ++it) {
-                    int distance = DistanceCalculator::localLevenshteinDistance(parameter, (*it)->name);
-                    if (distance > maxDistance) {
-                        maxDistance = distance;
-                        index = it;
-                    }
-                }
-
-                Debug(Debug::ERROR) << "Unrecognized parameter \"" << parameter << "\"";
-                if (index != par.end()) {
-                    Debug(Debug::ERROR) << ". Did you mean \"" << (*index)->name << "\" (" << (*index)->display << ")?\n";
-                } else {
-                    Debug(Debug::ERROR) << "\n";
-                }
-
-                EXIT(EXIT_FAILURE);
-            }
-
-            parametersFound++;
-        } else {
-            // parameter is actually a filename
-#ifdef __CYGWIN__
-            // normalize windows paths to cygwin unix paths
-            const char *path = pargv[argIdx];
-            ssize_t size = cygwin_conv_path(CCP_WIN_A_TO_POSIX | CCP_RELATIVE, path, NULL, 0);
-            if (size < 0) {
-                Debug(Debug::ERROR) << "Could not convert cygwin path!\n";
-                EXIT(EXIT_FAILURE);
-            } else {
-                char *posix = new char[size];
-                if (cygwin_conv_path(CCP_WIN_A_TO_POSIX | CCP_RELATIVE, path, posix, size)) {
-                    Debug(Debug::ERROR) << "Could not convert cygwin path!\n";
-                    EXIT(EXIT_FAILURE);
-                }
-                filenames.emplace_back(posix);
-                delete posix;
-            }
-#else
-            filenames.emplace_back(pargv[argIdx]);
-#endif
-        }
-    }
-
-    if (MMseqsMPI::isMaster()) {
-        Debug::setDebugLevel(verbosity);
-    }
-
-#ifdef OPENMP
-    omp_set_num_threads(threads);
-#endif
-#ifndef OPENMP
-    threads = 1;
-#endif
-
-
-    bool ignorePathCountChecks = command.databases.empty() == false && command.databases[0].specialType & DbType::ZERO_OR_ALL && filenames.size() == 0;
-    const size_t MAX_DB_PARAMETER = 6;
-    if (ignorePathCountChecks == false && command.databases.size() > MAX_DB_PARAMETER) {
-        Debug(Debug::ERROR) << "Use argv if you need more than " << MAX_DB_PARAMETER << " db parameters" << "\n";
-        EXIT(EXIT_FAILURE);
-    }
-
-    if (ignorePathCountChecks == false && filenames.size() < command.databases.size()){
-        printUsageMessage(command, outputFlags);
-        Debug(Debug::ERROR) << "Not enough input paths provided. ";
-        if (command.databases.size() == 1) {
-            Debug(Debug::ERROR) << "1 path is required.\n";
-        } else {
-            Debug(Debug::ERROR) << command.databases.size() << " paths are required.\n";
-        }
-        EXIT(EXIT_FAILURE);
-    }
-
-    bool isVar = false;
-    bool isStartVar = false;
-    bool isMiddleVar = false;
-    bool isEndVar = false;
-    if(command.databases.empty() == false && command.databases[0].validator != NULL) {
-        if (command.databases.size() >= 2) {
-            for(size_t i = 0; i < command.databases.size();i++){
-                if(i == 0){
-                    isStartVar |= (command.databases[i].specialType & DbType::VARIADIC);
-                } else if(i == command.databases.size() - 1){
-                    isEndVar |= (command.databases[i].specialType & DbType::VARIADIC);
-                } else {
-                    isMiddleVar |= (command.databases[i].specialType & DbType::VARIADIC);
-                }
-
-            }
-            isVar = isStartVar | isMiddleVar | isEndVar;
-        }
-        if (ignorePathCountChecks == false && isVar == false && filenames.size() > command.databases.size()) {
-            printUsageMessage(command, outputFlags);
-            Debug(Debug::ERROR) << "Too many input paths provided. Only " << SSTR(command.databases.size()) << " are allowed\n";
-            EXIT(EXIT_FAILURE);
-        }
-    }
-    switch (std::min(filenames.size(), MAX_DB_PARAMETER)) {
-        case 6:
-            db6 = filenames[5];
-            db6Index = db6;
-            db6Index.append(".index");
-            db6dbtype = db6;
-            db6dbtype.append(".dbtype");
-            hdr6 = db6;
-            hdr6.append("_h");
-            hdr6Index = hdr6;
-            hdr6Index.append(".index");
-            hdr6dbtype = hdr6;
-            hdr6dbtype.append(".dbtype");
-            // FALLTHROUGH
-        case 5:
-            db5 = filenames[4];
-            db5Index = db5;
-            db5Index.append(".index");
-            db5dbtype = db5;
-            db5dbtype.append(".dbtype");
-            hdr5 = db5;
-            hdr5.append("_h");
-            hdr5Index = hdr5;
-            hdr5Index.append(".index");
-            hdr5dbtype = hdr5;
-            hdr5dbtype.append(".dbtype");
-            // FALLTHROUGH
-        case 4:
-            db4 = filenames[3];
-            db4Index = db4;
-            db4Index.append(".index");
-            db4dbtype = db4;
-            db4dbtype.append(".dbtype");
-            hdr4 = db4;
-            hdr4.append("_h");
-            hdr4Index = hdr4;
-            hdr4Index.append(".index");
-            hdr4dbtype = hdr4;
-            hdr4dbtype.append(".dbtype");
-            // FALLTHROUGH
-        case 3:
-            db3 = filenames[2];
-            db3Index = db3;
-            db3Index.append(".index");
-            db3dbtype = db3;
-            db3dbtype.append(".dbtype");
-            hdr3 = db3;
-            hdr3.append("_h");
-            hdr3Index = hdr3;
-            hdr3Index.append(".index");
-            hdr3dbtype = hdr3;
-            hdr3dbtype.append(".dbtype");
-            // FALLTHROUGH
-        case 2:
-            db2 = filenames[1];
-            db2Index = db2;
-            db2Index.append(".index");
-            db2dbtype = db2;
-            db2dbtype.append(".dbtype");
-            hdr2 = db2;
-            hdr2.append("_h");
-            hdr2Index = hdr2;
-            hdr2Index.append(".index");
-            hdr2dbtype = hdr2;
-            hdr2dbtype.append(".dbtype");
-            // FALLTHROUGH
-        case 1:
-            db1 = filenames[0];
-            db1Index = db1;
-            db1Index.append(".index");
-            db1dbtype = db1;
-            db1dbtype.append(".dbtype");
-            hdr1 = db1;
-            hdr1.append("_h");
-            hdr1Index = hdr1;
-            hdr1Index.append(".index");
-            hdr1dbtype = hdr1;
-            hdr1dbtype.append(".dbtype");
-            break;
-        default:
-            // Do not abort execution if we expect a variable amount of parameters
-            if (parseFlags & PARSE_VARIADIC)
-                break;
-            // FALLTHROUGH
-        case 0:
-            if (parseFlags & PARSE_ALLOW_EMPTY)
-                break;
-            printUsageMessage(command, outputFlags);
-            printParameters(command.cmd, argc, pargv, par);
-            Debug(Debug::ERROR) << "Unrecognized parameters!" << "\n";
-            EXIT(EXIT_FAILURE);
-    }
-
-    // set up substituionMatrix
-    for(size_t i = 0 ; i < substitutionMatrices.size(); i++) {
-        bool isAminoAcid   = (strcmp(scoringMatrixFile.aminoacids, substitutionMatrices[i].name.c_str()) == 0);
-        bool isNucleotide  = (strcmp(scoringMatrixFile.nucleotides, substitutionMatrices[i].name.c_str()) == 0);
-        bool isSeedAminoAcid   = (strcmp(seedScoringMatrixFile.aminoacids, substitutionMatrices[i].name.c_str()) == 0);
-        bool isSeedNucleotide  = (strcmp(seedScoringMatrixFile.nucleotides, substitutionMatrices[i].name.c_str()) == 0);
-        if (isAminoAcid || isNucleotide|| isSeedAminoAcid|| isSeedNucleotide) {
-            std::string matrixData((const char *)substitutionMatrices[i].subMatData, substitutionMatrices[i].subMatDataLen);
-            std::string matrixName = substitutionMatrices[i].name;
-            if(isAminoAcid) {
-                free(scoringMatrixFile.aminoacids);
-                scoringMatrixFile.aminoacids = BaseMatrix::serialize(matrixName, matrixData);
-            }
-            if(isNucleotide) {
-                free(scoringMatrixFile.nucleotides);
-                scoringMatrixFile.nucleotides = BaseMatrix::serialize(matrixName, matrixData);
-            }
-            if(isSeedAminoAcid) {
-                free(seedScoringMatrixFile.aminoacids);
-                seedScoringMatrixFile.aminoacids = BaseMatrix::serialize(matrixName, matrixData);
-            }
-            if(isSeedNucleotide) {
-                free(seedScoringMatrixFile.nucleotides);
-                seedScoringMatrixFile.nucleotides = BaseMatrix::serialize(matrixName, matrixData);
-            }
-        }
-    }
-
-    if (ignorePathCountChecks == false) {
-        checkIfDatabaseIsValid(command, argc, pargv, isStartVar, isMiddleVar, isEndVar);
-    }
-
-    if (printPar == true) {
-        printParameters(command.cmd, argc, pargv, par);
-    }
-
-}
+//
+//void Parameters::parseParameters(int argc, const char *pargv[], const Command &command, bool printPar, int parseFlags,
+//                                 int outputFlags) {
+//    filenames.clear();
+//    std::vector<MMseqsParameter*> & par = *command.params;
+//
+//    for (int i=0;i<argc;++i) {
+//        Debug(Debug::ERROR) << pargv[i];
+//    }
+//
+//    bool canHandleHelp = false;
+//    for (size_t parIdx = 0; parIdx < par.size(); parIdx++) {
+//        if (par[parIdx]->uniqid == PARAM_HELP_ID || par[parIdx]->uniqid == PARAM_HELP_LONG_ID) {
+//            canHandleHelp = true;
+//        }
+//    }
+//
+//    size_t parametersFound = 0;
+//    for (int argIdx = 0; argIdx < argc; argIdx++) {
+//        // it is a parameter if it starts with - or --
+//        const bool longParameter = (pargv[argIdx][0] == '-' && pargv[argIdx][1] == '-');
+//        if (longParameter || (pargv[argIdx][0] == '-')) {
+//            if ((parseFlags & PARSE_REST) && longParameter && pargv[argIdx][2] == '\0') {
+//                restArgv = pargv + argIdx + 1;
+//                restArgc = argc - (argIdx + 1);
+//                break;
+//            }
+//            std::string parameter(pargv[argIdx]);
+//            if (canHandleHelp == false && (parameter.compare("-h") == 0 || parameter.compare("--help") == 0)) {
+//                printUsageMessage(command, 0xFFFFFFFF);
+//                EXIT(EXIT_SUCCESS);
+//            }
+//
+//            bool hasUnrecognizedParameter = true;
+//            for (size_t parIdx = 0; parIdx < par.size(); parIdx++) {
+//                if(parameter.compare(par[parIdx]->name) == 0) {
+//                    if (typeid(bool) != par[parIdx]->type && argIdx + 1 == argc) {
+//                        printUsageMessage(command, outputFlags);
+//                        Debug(Debug::ERROR) << "Missing argument " << par[parIdx]->name << "\n";
+//                        EXIT(EXIT_FAILURE);
+//                    }
+//
+//                    if (par[parIdx]->wasSet) {
+//                        printUsageMessage(command, outputFlags);
+//                        Debug(Debug::ERROR) << "Duplicate parameter " << par[parIdx]->name << "\n";
+//                        EXIT(EXIT_FAILURE);
+//                    }
+//
+//                    if (typeid(int) == par[parIdx]->type) {
+//                        regex_t regex;
+//                        compileRegex(&regex, par[parIdx]->regex);
+//                        int nomatch = regexec(&regex, pargv[argIdx+1], 0, NULL, 0);
+//                        regfree(&regex);
+//                        // if no match found or two matches found (we want exactly one match)
+//                        if (nomatch){
+//                            printUsageMessage(command, 0xFFFFFFFF);
+//                            Debug(Debug::ERROR) << "Error in argument " << par[parIdx]->name << "\n";
+//                            EXIT(EXIT_FAILURE);
+//                        }else{
+//                            *((int *) par[parIdx]->value) = atoi(pargv[argIdx+1]);
+//                            par[parIdx]->wasSet = true;
+//                        }
+//                        argIdx++;
+//                    } else if (typeid(ByteParser) == par[parIdx]->type) {
+//                        regex_t regex;
+//                        compileRegex(&regex, par[parIdx]->regex);
+//                        int nomatch = regexec(&regex, pargv[argIdx+1], 0, NULL, 0);
+//                        regfree(&regex);
+//
+//                        // if no match found or two matches found (we want exactly one match)
+//                        if (nomatch){
+//                            printUsageMessage(command, 0xFFFFFFFF);
+//                            Debug(Debug::ERROR) << "Error in argument regex " << par[parIdx]->name << "\n";
+//                            EXIT(EXIT_FAILURE);
+//                        } else {
+//                            size_t value = ByteParser::parse(pargv[argIdx+1]);
+//                            if (value == ByteParser::INVALID_SIZE) {
+//                                printUsageMessage(command, 0xFFFFFFFF);
+//                                Debug(Debug::ERROR) << "Error in value parsing " << par[parIdx]->name << "\n";
+//                                EXIT(EXIT_FAILURE);
+//                            } else {
+//                                *((size_t *) par[parIdx]->value) = value;
+//                                par[parIdx]->wasSet = true;
+//                            }
+//                        }
+//                        argIdx++;
+//                    } else if (typeid(MultiParam<char*>) == par[parIdx]->type) {
+//                        std::string val(pargv[argIdx+1]);
+//                        if (Util::startWith("b64:", val)) {
+//                            val = base64_decode(val.c_str() + 4, val.size() - 4);
+//                        }
+//                        MultiParam<char*> value = MultiParam<char*>(val);
+//                        if (value == MultiParam<char*>("INVALID", "INVALID")) {
+//                            printUsageMessage(command, 0xFFFFFFFF);
+//                            Debug(Debug::ERROR) << "Error in value parsing " << par[parIdx]->name << "\n";
+//                            EXIT(EXIT_FAILURE);
+//                        } else {
+//                            *((MultiParam<char*> *) par[parIdx]->value) = value;
+//                            par[parIdx]->wasSet = true;
+//                        }
+//                        argIdx++;
+//                    }else if (typeid(MultiParam<int>) == par[parIdx]->type) {
+//                        MultiParam<int> value = MultiParam<int>(pargv[argIdx+1]);
+//                        if (value.aminoacids == INT_MAX || value.nucleotides == INT_MAX) {
+//                            printUsageMessage(command, 0xFFFFFFFF);
+//                            Debug(Debug::ERROR) << "Error in value parsing " << par[parIdx]->name << "\n";
+//                            EXIT(EXIT_FAILURE);
+//                        } else {
+//                            *((MultiParam<int> *) par[parIdx]->value) = value;
+//                            par[parIdx]->wasSet = true;
+//                        }
+//                        argIdx++;
+//                    }else if (typeid(MultiParam<float>) == par[parIdx]->type) {
+//                        MultiParam<float> value = MultiParam<float>(pargv[argIdx + 1]);
+//                        if (value.aminoacids == FLT_MAX || value.nucleotides == FLT_MAX) {
+//                            printUsageMessage(command, 0xFFFFFFFF);
+//                            Debug(Debug::ERROR) << "Error in value parsing " << par[parIdx]->name << "\n";
+//                            EXIT(EXIT_FAILURE);
+//                        } else {
+//                            *((MultiParam<float> *) par[parIdx]->value) = value;
+//                            par[parIdx]->wasSet = true;
+//                        }
+//                        argIdx++;
+//                    }else if (typeid(float) == par[parIdx]->type) {
+//                        regex_t regex;
+//                        compileRegex(&regex, par[parIdx]->regex);
+//                        int nomatch = regexec(&regex, pargv[argIdx+1], 0, NULL, 0);
+//                        regfree(&regex);
+//                        if (nomatch){
+//                            printUsageMessage(command, 0xFFFFFFFF);
+//                            Debug(Debug::ERROR) << "Error in argument " << par[parIdx]->name << "\n";
+//                            EXIT(EXIT_FAILURE);
+//                        }else{
+//                            double input = strtod(pargv[argIdx+1], NULL);
+//                            *((float *) par[parIdx]->value) = static_cast<float>(input);
+//                            par[parIdx]->wasSet = true;
+//                        }
+//                        argIdx++;
+//                    } else if (typeid(double) == par[parIdx]->type) {
+//                        regex_t regex;
+//                        compileRegex(&regex, par[parIdx]->regex);
+//                        int nomatch = regexec(&regex, pargv[argIdx+1], 0, NULL, 0);
+//                        regfree(&regex);
+//                        if (nomatch){
+//                            printUsageMessage(command, 0xFFFFFFFF);
+//                            Debug(Debug::ERROR) << "Error in argument " << par[parIdx]->name << "\n";
+//                            EXIT(EXIT_FAILURE);
+//                        }else{
+//                            *((double *) par[parIdx]->value) = strtod(pargv[argIdx+1], NULL);
+//                            par[parIdx]->wasSet = true;
+//                        }
+//                        argIdx++;
+//                    } else if (typeid(std::string) == par[parIdx]->type) {
+//                        std::string val(pargv[argIdx+1]);
+//                        if (Util::startWith("b64:", val)) {
+//                            val = base64_decode(val.c_str() + 4, val.size() - 4);
+//                        }
+//                        std::string* currVal = (std::string*)par[parIdx]->value;
+//                        currVal->assign(val);
+//                        par[parIdx]->wasSet = true;
+//                        argIdx++;
+//                    } else if (typeid(bool) == par[parIdx]->type) {
+//                        bool *value = (bool *) par[parIdx]->value;
+//                        if (argIdx + 1 == argc || pargv[argIdx+1][0] == '-') {
+//                            *value = !*value;
+//                        } else {
+//                            *value = parseBool(pargv[argIdx+1]);
+//                            argIdx++;
+//                        }
+//                        par[parIdx]->wasSet = true;
+//                    } else {
+//                        Debug(Debug::ERROR) << "Wrong parameter type in parseParameters. Please inform the developers\n";
+//                        EXIT(EXIT_FAILURE);
+//                    }
+//
+//                    hasUnrecognizedParameter = false;
+//                    continue;
+//                }
+//            }
+//
+//            if (hasUnrecognizedParameter) {
+//                printUsageMessage(command, 0xFFFFFFFF);
+//
+//                // Suggest some parameter that the user might have meant
+//                std::vector<MMseqsParameter *>::const_iterator index = par.end();
+//                int maxDistance = 0;
+//                for (std::vector<MMseqsParameter *>::const_iterator it = par.begin(); it != par.end(); ++it) {
+//                    int distance = DistanceCalculator::localLevenshteinDistance(parameter, (*it)->name);
+//                    if (distance > maxDistance) {
+//                        maxDistance = distance;
+//                        index = it;
+//                    }
+//                }
+//
+//                Debug(Debug::ERROR) << "Unrecognized parameter \"" << parameter << "\"";
+//                if (index != par.end()) {
+//                    Debug(Debug::ERROR) << ". Did you mean \"" << (*index)->name << "\" (" << (*index)->display << ")?\n";
+//                } else {
+//                    Debug(Debug::ERROR) << "\n";
+//                }
+//
+//                EXIT(EXIT_FAILURE);
+//            }
+//
+//            parametersFound++;
+//        } else {
+//            // parameter is actually a filename
+//#ifdef __CYGWIN__
+//            // normalize windows paths to cygwin unix paths
+//            const char *path = pargv[argIdx];
+//            ssize_t size = cygwin_conv_path(CCP_WIN_A_TO_POSIX | CCP_RELATIVE, path, NULL, 0);
+//            if (size < 0) {
+//                Debug(Debug::ERROR) << "Could not convert cygwin path!\n";
+//                EXIT(EXIT_FAILURE);
+//            } else {
+//                char *posix = new char[size];
+//                if (cygwin_conv_path(CCP_WIN_A_TO_POSIX | CCP_RELATIVE, path, posix, size)) {
+//                    Debug(Debug::ERROR) << "Could not convert cygwin path!\n";
+//                    EXIT(EXIT_FAILURE);
+//                }
+//                filenames.emplace_back(posix);
+//                delete posix;
+//            }
+//#else
+//            filenames.emplace_back(pargv[argIdx]);
+//#endif
+//        }
+//    }
+//
+//    if (MMseqsMPI::isMaster()) {
+//        Debug::setDebugLevel(verbosity);
+//    }
+//
+//#ifdef OPENMP
+//    omp_set_num_threads(threads);
+//#endif
+//#ifndef OPENMP
+//    threads = 1;
+//#endif
+//
+//
+//    bool ignorePathCountChecks = command.databases.empty() == false && command.databases[0].specialType & DbType::ZERO_OR_ALL && filenames.size() == 0;
+//    const size_t MAX_DB_PARAMETER = 6;
+//    if (ignorePathCountChecks == false && command.databases.size() > MAX_DB_PARAMETER) {
+//        Debug(Debug::ERROR) << "Use argv if you need more than " << MAX_DB_PARAMETER << " db parameters" << "\n";
+//        EXIT(EXIT_FAILURE);
+//    }
+//
+//    if (ignorePathCountChecks == false && filenames.size() < command.databases.size()){
+//        printUsageMessage(command, outputFlags);
+//        Debug(Debug::ERROR) << "Not enough input paths provided. ";
+//        if (command.databases.size() == 1) {
+//            Debug(Debug::ERROR) << "1 path is required.\n";
+//        } else {
+//            Debug(Debug::ERROR) << command.databases.size() << " paths are required.\n";
+//        }
+//        EXIT(EXIT_FAILURE);
+//    }
+//
+//    bool isVar = false;
+//    bool isStartVar = false;
+//    bool isMiddleVar = false;
+//    bool isEndVar = false;
+//    if(command.databases.empty() == false && command.databases[0].validator != NULL) {
+//        if (command.databases.size() >= 2) {
+//            for(size_t i = 0; i < command.databases.size();i++){
+//                if(i == 0){
+//                    isStartVar |= (command.databases[i].specialType & DbType::VARIADIC);
+//                } else if(i == command.databases.size() - 1){
+//                    isEndVar |= (command.databases[i].specialType & DbType::VARIADIC);
+//                } else {
+//                    isMiddleVar |= (command.databases[i].specialType & DbType::VARIADIC);
+//                }
+//
+//            }
+//            isVar = isStartVar | isMiddleVar | isEndVar;
+//        }
+//        if (ignorePathCountChecks == false && isVar == false && filenames.size() > command.databases.size()) {
+//            printUsageMessage(command, outputFlags);
+//            Debug(Debug::ERROR) << "Too many input paths provided. Only " << SSTR(command.databases.size()) << " are allowed\n";
+//            EXIT(EXIT_FAILURE);
+//        }
+//    }
+//    switch (std::min(filenames.size(), MAX_DB_PARAMETER)) {
+//        case 6:
+//            db6 = filenames[5];
+//            db6Index = db6;
+//            db6Index.append(".index");
+//            db6dbtype = db6;
+//            db6dbtype.append(".dbtype");
+//            hdr6 = db6;
+//            hdr6.append("_h");
+//            hdr6Index = hdr6;
+//            hdr6Index.append(".index");
+//            hdr6dbtype = hdr6;
+//            hdr6dbtype.append(".dbtype");
+//            // FALLTHROUGH
+//        case 5:
+//            db5 = filenames[4];
+//            db5Index = db5;
+//            db5Index.append(".index");
+//            db5dbtype = db5;
+//            db5dbtype.append(".dbtype");
+//            hdr5 = db5;
+//            hdr5.append("_h");
+//            hdr5Index = hdr5;
+//            hdr5Index.append(".index");
+//            hdr5dbtype = hdr5;
+//            hdr5dbtype.append(".dbtype");
+//            // FALLTHROUGH
+//        case 4:
+//            db4 = filenames[3];
+//            db4Index = db4;
+//            db4Index.append(".index");
+//            db4dbtype = db4;
+//            db4dbtype.append(".dbtype");
+//            hdr4 = db4;
+//            hdr4.append("_h");
+//            hdr4Index = hdr4;
+//            hdr4Index.append(".index");
+//            hdr4dbtype = hdr4;
+//            hdr4dbtype.append(".dbtype");
+//            // FALLTHROUGH
+//        case 3:
+//            db3 = filenames[2];
+//            db3Index = db3;
+//            db3Index.append(".index");
+//            db3dbtype = db3;
+//            db3dbtype.append(".dbtype");
+//            hdr3 = db3;
+//            hdr3.append("_h");
+//            hdr3Index = hdr3;
+//            hdr3Index.append(".index");
+//            hdr3dbtype = hdr3;
+//            hdr3dbtype.append(".dbtype");
+//            // FALLTHROUGH
+//        case 2:
+//            db2 = filenames[1];
+//            db2Index = db2;
+//            db2Index.append(".index");
+//            db2dbtype = db2;
+//            db2dbtype.append(".dbtype");
+//            hdr2 = db2;
+//            hdr2.append("_h");
+//            hdr2Index = hdr2;
+//            hdr2Index.append(".index");
+//            hdr2dbtype = hdr2;
+//            hdr2dbtype.append(".dbtype");
+//            // FALLTHROUGH
+//        case 1:
+//            db1 = filenames[0];
+//            db1Index = db1;
+//            db1Index.append(".index");
+//            db1dbtype = db1;
+//            db1dbtype.append(".dbtype");
+//            hdr1 = db1;
+//            hdr1.append("_h");
+//            hdr1Index = hdr1;
+//            hdr1Index.append(".index");
+//            hdr1dbtype = hdr1;
+//            hdr1dbtype.append(".dbtype");
+//            break;
+//        default:
+//            // Do not abort execution if we expect a variable amount of parameters
+//            if (parseFlags & PARSE_VARIADIC)
+//                break;
+//            // FALLTHROUGH
+//        case 0:
+//            if (parseFlags & PARSE_ALLOW_EMPTY)
+//                break;
+//            printUsageMessage(command, outputFlags);
+//            printParameters(command.cmd, argc, pargv, par);
+//            Debug(Debug::ERROR) << "Unrecognized parameters!" << "\n";
+//            EXIT(EXIT_FAILURE);
+//    }
+//
+//    // set up substituionMatrix
+//    for(size_t i = 0 ; i < substitutionMatrices.size(); i++) {
+//        bool isAminoAcid   = (strcmp(scoringMatrixFile.aminoacids, substitutionMatrices[i].name.c_str()) == 0);
+//        bool isNucleotide  = (strcmp(scoringMatrixFile.nucleotides, substitutionMatrices[i].name.c_str()) == 0);
+//        bool isSeedAminoAcid   = (strcmp(seedScoringMatrixFile.aminoacids, substitutionMatrices[i].name.c_str()) == 0);
+//        bool isSeedNucleotide  = (strcmp(seedScoringMatrixFile.nucleotides, substitutionMatrices[i].name.c_str()) == 0);
+//        if (isAminoAcid || isNucleotide|| isSeedAminoAcid|| isSeedNucleotide) {
+//            std::string matrixData((const char *)substitutionMatrices[i].subMatData, substitutionMatrices[i].subMatDataLen);
+//            std::string matrixName = substitutionMatrices[i].name;
+//            if(isAminoAcid) {
+//                free(scoringMatrixFile.aminoacids);
+//                scoringMatrixFile.aminoacids = BaseMatrix::serialize(matrixName, matrixData);
+//            }
+//            if(isNucleotide) {
+//                free(scoringMatrixFile.nucleotides);
+//                scoringMatrixFile.nucleotides = BaseMatrix::serialize(matrixName, matrixData);
+//            }
+//            if(isSeedAminoAcid) {
+//                free(seedScoringMatrixFile.aminoacids);
+//                seedScoringMatrixFile.aminoacids = BaseMatrix::serialize(matrixName, matrixData);
+//            }
+//            if(isSeedNucleotide) {
+//                free(seedScoringMatrixFile.nucleotides);
+//                seedScoringMatrixFile.nucleotides = BaseMatrix::serialize(matrixName, matrixData);
+//            }
+//        }
+//    }
+//
+//    if (ignorePathCountChecks == false) {
+//        checkIfDatabaseIsValid(command, argc, pargv, isStartVar, isMiddleVar, isEndVar);
+//    }
+//
+//    if (printPar == true) {
+//        printParameters(command.cmd, argc, pargv, par);
+//    }
+//
+//}
 
 std::vector<std::string> Parameters::findMissingTaxDbFiles(const std::string &filename) {
     std::vector<std::string> missingFiles;
@@ -1872,169 +1877,169 @@ void Parameters::printTaxDbError(const std::string &filename, const std::vector<
         Debug(Debug::ERROR) << "- " << missingFiles[i] << "\n";
     }
 }
+//
+//void Parameters::checkIfDatabaseIsValid(const Command& command, int argc, const char** argv, bool isStartVar, bool isMiddleVar, bool isEndVar) {
+//    size_t fileIdx = 0;
+//    for (size_t dbIdx = 0; dbIdx < command.databases.size(); dbIdx++) {
+//        const DbType &db = command.databases[dbIdx];
+//
+//        // special checks
+//        if (db.accessMode == db.ACCESS_MODE_INPUT) {
+//            size_t argumentDist = 0;
+//            if (dbIdx == 0 && isStartVar) {
+//                argumentDist = (filenames.size() - command.databases.size());
+//            } else if (dbIdx == command.databases.size() - 1 && isEndVar) {
+//                argumentDist = (filenames.size() - command.databases.size());
+//            } else if ((command.databases[dbIdx].specialType & DbType::VARIADIC) && isMiddleVar) {
+//                argumentDist = (filenames.size() - command.databases.size());
+//            }
+//
+//            size_t currFileIdx = fileIdx;
+//            for (; fileIdx <= currFileIdx + argumentDist; fileIdx++) {
+//                if (db.validator == NULL) {
+//                    continue;
+//                }
+//
+//                if (filenames[fileIdx] != "stdin" && FileUtil::fileExists((filenames[fileIdx]).c_str()) == false && FileUtil::fileExists((filenames[fileIdx] + ".dbtype").c_str()) == false) {
+//                    printParameters(command.cmd, argc, argv, *command.params);
+//                    Debug(Debug::ERROR) << "Input " << filenames[fileIdx] << " does not exist\n";
+//                    EXIT(EXIT_FAILURE);
+//                }
+//                int dbtype = FileUtil::parseDbType(filenames[fileIdx].c_str());
+//                if (db.specialType & DbType::NEED_HEADER && FileUtil::fileExists((filenames[fileIdx] + "_h.dbtype").c_str()) == false && Parameters::isEqualDbtype(dbtype, Parameters::DBTYPE_INDEX_DB) == false) {
+//                    printParameters(command.cmd, argc, argv, *command.params);
+//                    Debug(Debug::ERROR) << "Database " << filenames[fileIdx] << " needs header information\n";
+//                    EXIT(EXIT_FAILURE);
+//                }
+//                if (db.specialType & DbType::NEED_TAXONOMY) {
+//                    std::vector<std::string> missingFiles = findMissingTaxDbFiles(filenames[fileIdx]);
+//                    if (missingFiles.empty() == false) {
+//                        printParameters(command.cmd, argc, argv, *command.params);
+//                        printTaxDbError(filenames[fileIdx], missingFiles);
+//                        EXIT(EXIT_FAILURE);
+//                    }
+//                }
+//                if (db.specialType & DbType::NEED_LOOKUP && FileUtil::fileExists((filenames[fileIdx] + ".lookup").c_str()) == false) {
+//                    printParameters(command.cmd, argc, argv, *command.params);
+//                    Debug(Debug::ERROR) << "Database " << filenames[fileIdx] << " needs a lookup file\n";
+//                    EXIT(EXIT_FAILURE);
+//                }
+//                bool dbtypeFound = false;
+//                for (size_t i = 0; i < db.validator->size() && dbtypeFound == false; i++) {
+//                    int validatorDbtype = db.validator->at(i);
+//                    if (validatorDbtype == Parameters::DBTYPE_STDIN) {
+//                        dbtypeFound = (filenames[fileIdx] == "stdin");
+//                    } else if (validatorDbtype == Parameters::DBTYPE_FLATFILE) {
+//                        dbtypeFound = (FileUtil::fileExists(filenames[fileIdx].c_str()) == true &&
+//                                       FileUtil::directoryExists(filenames[fileIdx].c_str()) == false);
+//                    } else if (validatorDbtype == Parameters::DBTYPE_DIRECTORY) {
+//                        dbtypeFound = FileUtil::directoryExists(filenames[fileIdx].c_str());
+//                    } else if (Parameters::isEqualDbtype(db.validator->at(i), dbtype)) {
+//                        dbtypeFound = true;
+//                    }
+//                }
+//                if (dbtypeFound == false) {
+//                    printParameters(command.cmd, argc, argv, *command.params);
+//                    Debug(Debug::ERROR) << "Input database \"" << filenames[fileIdx] << "\" has the wrong type ("
+//                                        << Parameters::getDbTypeName(dbtype) << ")\nAllowed input:\n";
+//                    for (size_t i = 0; i < db.validator->size(); ++i) {
+//                        Debug(Debug::ERROR) << "- " << Parameters::getDbTypeName(db.validator->at(i)) << "\n";
+//                    }
+//                    EXIT(EXIT_FAILURE);
+//                }
+//            }
+//        } else if (db.accessMode == db.ACCESS_MODE_OUTPUT) {
+//            if (db.validator == &DbValidator::directory) {
+//                if (FileUtil::directoryExists(filenames[fileIdx].c_str()) == false) {
+//                    if (FileUtil::makeDir(filenames[fileIdx].c_str()) == false) {
+//                        printParameters(command.cmd, argc, argv, *command.params);
+//                        Debug(Debug::ERROR) << "Cannot create temporary directory " << filenames[dbIdx] << "\n";
+//                        EXIT(EXIT_FAILURE);
+//                    } else {
+//                        Debug(Debug::INFO) << "Create directory " << filenames[dbIdx] << "\n";
+//                    }
+//                }
+//                fileIdx++;
+//            } else {
+//                if (FileUtil::fileExists(filenames[fileIdx].c_str()) == true) {
+//                    Debug(Debug::WARNING) << filenames[fileIdx] << " exists and will be overwritten\n";
+//                }
+//                fileIdx++;
+//            }
+//        } else {
+//            fileIdx++;
+//        }
+//    }
+//}
 
-void Parameters::checkIfDatabaseIsValid(const Command& command, int argc, const char** argv, bool isStartVar, bool isMiddleVar, bool isEndVar) {
-    size_t fileIdx = 0;
-    for (size_t dbIdx = 0; dbIdx < command.databases.size(); dbIdx++) {
-        const DbType &db = command.databases[dbIdx];
-
-        // special checks
-        if (db.accessMode == db.ACCESS_MODE_INPUT) {
-            size_t argumentDist = 0;
-            if (dbIdx == 0 && isStartVar) {
-                argumentDist = (filenames.size() - command.databases.size());
-            } else if (dbIdx == command.databases.size() - 1 && isEndVar) {
-                argumentDist = (filenames.size() - command.databases.size());
-            } else if ((command.databases[dbIdx].specialType & DbType::VARIADIC) && isMiddleVar) {
-                argumentDist = (filenames.size() - command.databases.size());
-            }
-
-            size_t currFileIdx = fileIdx;
-            for (; fileIdx <= currFileIdx + argumentDist; fileIdx++) {
-                if (db.validator == NULL) {
-                    continue;
-                }
-
-                if (filenames[fileIdx] != "stdin" && FileUtil::fileExists((filenames[fileIdx]).c_str()) == false && FileUtil::fileExists((filenames[fileIdx] + ".dbtype").c_str()) == false) {
-                    printParameters(command.cmd, argc, argv, *command.params);
-                    Debug(Debug::ERROR) << "Input " << filenames[fileIdx] << " does not exist\n";
-                    EXIT(EXIT_FAILURE);
-                }
-                int dbtype = FileUtil::parseDbType(filenames[fileIdx].c_str());
-                if (db.specialType & DbType::NEED_HEADER && FileUtil::fileExists((filenames[fileIdx] + "_h.dbtype").c_str()) == false && Parameters::isEqualDbtype(dbtype, Parameters::DBTYPE_INDEX_DB) == false) {
-                    printParameters(command.cmd, argc, argv, *command.params);
-                    Debug(Debug::ERROR) << "Database " << filenames[fileIdx] << " needs header information\n";
-                    EXIT(EXIT_FAILURE);
-                }
-                if (db.specialType & DbType::NEED_TAXONOMY) {
-                    std::vector<std::string> missingFiles = findMissingTaxDbFiles(filenames[fileIdx]);
-                    if (missingFiles.empty() == false) {
-                        printParameters(command.cmd, argc, argv, *command.params);
-                        printTaxDbError(filenames[fileIdx], missingFiles);
-                        EXIT(EXIT_FAILURE);
-                    }
-                }
-                if (db.specialType & DbType::NEED_LOOKUP && FileUtil::fileExists((filenames[fileIdx] + ".lookup").c_str()) == false) {
-                    printParameters(command.cmd, argc, argv, *command.params);
-                    Debug(Debug::ERROR) << "Database " << filenames[fileIdx] << " needs a lookup file\n";
-                    EXIT(EXIT_FAILURE);
-                }
-                bool dbtypeFound = false;
-                for (size_t i = 0; i < db.validator->size() && dbtypeFound == false; i++) {
-                    int validatorDbtype = db.validator->at(i);
-                    if (validatorDbtype == Parameters::DBTYPE_STDIN) {
-                        dbtypeFound = (filenames[fileIdx] == "stdin");
-                    } else if (validatorDbtype == Parameters::DBTYPE_FLATFILE) {
-                        dbtypeFound = (FileUtil::fileExists(filenames[fileIdx].c_str()) == true &&
-                                       FileUtil::directoryExists(filenames[fileIdx].c_str()) == false);
-                    } else if (validatorDbtype == Parameters::DBTYPE_DIRECTORY) {
-                        dbtypeFound = FileUtil::directoryExists(filenames[fileIdx].c_str());
-                    } else if (Parameters::isEqualDbtype(db.validator->at(i), dbtype)) {
-                        dbtypeFound = true;
-                    }
-                }
-                if (dbtypeFound == false) {
-                    printParameters(command.cmd, argc, argv, *command.params);
-                    Debug(Debug::ERROR) << "Input database \"" << filenames[fileIdx] << "\" has the wrong type ("
-                                        << Parameters::getDbTypeName(dbtype) << ")\nAllowed input:\n";
-                    for (size_t i = 0; i < db.validator->size(); ++i) {
-                        Debug(Debug::ERROR) << "- " << Parameters::getDbTypeName(db.validator->at(i)) << "\n";
-                    }
-                    EXIT(EXIT_FAILURE);
-                }
-            }
-        } else if (db.accessMode == db.ACCESS_MODE_OUTPUT) {
-            if (db.validator == &DbValidator::directory) {
-                if (FileUtil::directoryExists(filenames[fileIdx].c_str()) == false) {
-                    if (FileUtil::makeDir(filenames[fileIdx].c_str()) == false) {
-                        printParameters(command.cmd, argc, argv, *command.params);
-                        Debug(Debug::ERROR) << "Cannot create temporary directory " << filenames[dbIdx] << "\n";
-                        EXIT(EXIT_FAILURE);
-                    } else {
-                        Debug(Debug::INFO) << "Create directory " << filenames[dbIdx] << "\n";
-                    }
-                }
-                fileIdx++;
-            } else {
-                if (FileUtil::fileExists(filenames[fileIdx].c_str()) == true) {
-                    Debug(Debug::WARNING) << filenames[fileIdx] << " exists and will be overwritten\n";
-                }
-                fileIdx++;
-            }
-        } else {
-            fileIdx++;
-        }
-    }
-}
-
-
-void Parameters::printParameters(const std::string &module, int argc, const char* pargv[],
-                                 const std::vector<MMseqsParameter*> &par){
-    if (Debug::debugLevel < Debug::INFO) {
-        return;
-    }
-
-    Debug(Debug::INFO) << module << " ";
-    for (int i = 0; i < argc; i++) {
-        // don't expose users to the interal b64 masking of whitespace characters
-        if (strncmp("b64:", pargv[i], 4) == 0) {
-            Debug(Debug::INFO) << "'" << base64_decode(pargv[i] + 4, strlen(pargv[i]) - 4) << "' ";
-        } else {
-            Debug(Debug::INFO) << pargv[i] << " ";
-        }
-    }
-    Debug(Debug::INFO) << "\n\n";
-
-    if (CommandCaller::getCallDepth() > 0) {
-        return;
-    }
-
-    size_t maxWidth = 0;
-    for(size_t i = 0; i < par.size(); i++) {
-        maxWidth = std::max(strlen(par[i]->display), maxWidth);
-    }
-
-    std::stringstream ss;
-    ss << std::boolalpha;
-
-    ss << std::setw(maxWidth) << std::left  << "MMseqs Version:" << "\t" << version << "\n";
-
-
-    for (size_t i = 0; i < par.size(); i++) {
-        if (par[i]->category & MMseqsParameter::COMMAND_HIDDEN) {
-            continue;
-        }
-        ss << std::setw(maxWidth) << std::left << par[i]->display << "\t";
-        if(typeid(int) == par[i]->type ){
-            ss << *((int *)par[i]->value);
-        } else if(typeid(ByteParser) == par[i]->type) {
-            ss << ByteParser::format(*((size_t *)par[i]->value), 'a', 'h');
-        } else if(PARAM_SUB_MAT.uniqid == par[i]->uniqid ||
-                  PARAM_SEED_SUB_MAT.uniqid == par[i]->uniqid) {
-            MultiParam<char*> * param = ((MultiParam<char*> *) par[i]->value);
-            MultiParam<char*> tmpPar(BaseMatrix::unserializeName(param->aminoacids).c_str(),
-                                     BaseMatrix::unserializeName(param->nucleotides).c_str());
-            ss << MultiParam<char*>::format(tmpPar);
-        } else if(typeid(MultiParam<char*>) == par[i]->type) {
-            ss << MultiParam<char*>::format(*((MultiParam<char*> *)par[i]->value));
-        } else if(typeid(MultiParam<int>) == par[i]->type) {
-            ss << MultiParam<int>::format(*((MultiParam<int> *)par[i]->value));
-        } else if(typeid(MultiParam<float>) == par[i]->type) {
-            ss << MultiParam<float>::format(*((MultiParam<float> *)par[i]->value));
-        } else if(typeid(float) == par[i]->type) {
-            ss << *((float *)par[i]->value);
-        } else if(typeid(double) == par[i]->type) {
-            ss << *((double *)par[i]->value);
-        } else if(typeid(std::string) == par[i]->type) {
-            ss << *((std::string *) par[i]->value);
-        } else if (typeid(bool) == par[i]->type) {
-            ss << *((bool *)par[i]->value);
-        }
-        ss << "\n";
-    }
-
-    Debug(Debug::INFO) << ss.str() << "\n";
-}
+//
+//void Parameters::printParameters(const std::string &module, int argc, const char* pargv[],
+//                                 const std::vector<MMseqsParameter*> &par){
+//    if (Debug::debugLevel < Debug::INFO) {
+//        return;
+//    }
+//
+//    Debug(Debug::INFO) << module << " ";
+//    for (int i = 0; i < argc; i++) {
+//        // don't expose users to the interal b64 masking of whitespace characters
+//        if (strncmp("b64:", pargv[i], 4) == 0) {
+//            Debug(Debug::INFO) << "'" << base64_decode(pargv[i] + 4, strlen(pargv[i]) - 4) << "' ";
+//        } else {
+//            Debug(Debug::INFO) << pargv[i] << " ";
+//        }
+//    }
+//    Debug(Debug::INFO) << "\n\n";
+//
+//    if (CommandCaller::getCallDepth() > 0) {
+//        return;
+//    }
+//
+//    size_t maxWidth = 0;
+//    for(size_t i = 0; i < par.size(); i++) {
+//        maxWidth = std::max(strlen(par[i]->display), maxWidth);
+//    }
+//
+//    std::stringstream ss;
+//    ss << std::boolalpha;
+//
+//    ss << std::setw(maxWidth) << std::left  << "MMseqs Version:" << "\t" << version << "\n";
+//
+//
+//    for (size_t i = 0; i < par.size(); i++) {
+//        if (par[i]->category & MMseqsParameter::COMMAND_HIDDEN) {
+//            continue;
+//        }
+//        ss << std::setw(maxWidth) << std::left << par[i]->display << "\t";
+//        if(typeid(int) == par[i]->type ){
+//            ss << *((int *)par[i]->value);
+//        } else if(typeid(ByteParser) == par[i]->type) {
+//            ss << ByteParser::format(*((size_t *)par[i]->value), 'a', 'h');
+//        } else if(PARAM_SUB_MAT.uniqid == par[i]->uniqid ||
+//                  PARAM_SEED_SUB_MAT.uniqid == par[i]->uniqid) {
+//            MultiParam<char*> * param = ((MultiParam<char*> *) par[i]->value);
+//            MultiParam<char*> tmpPar(BaseMatrix::unserializeName(param->aminoacids).c_str(),
+//                                     BaseMatrix::unserializeName(param->nucleotides).c_str());
+//            ss << MultiParam<char*>::format(tmpPar);
+//        } else if(typeid(MultiParam<char*>) == par[i]->type) {
+//            ss << MultiParam<char*>::format(*((MultiParam<char*> *)par[i]->value));
+//        } else if(typeid(MultiParam<int>) == par[i]->type) {
+//            ss << MultiParam<int>::format(*((MultiParam<int> *)par[i]->value));
+//        } else if(typeid(MultiParam<float>) == par[i]->type) {
+//            ss << MultiParam<float>::format(*((MultiParam<float> *)par[i]->value));
+//        } else if(typeid(float) == par[i]->type) {
+//            ss << *((float *)par[i]->value);
+//        } else if(typeid(double) == par[i]->type) {
+//            ss << *((double *)par[i]->value);
+//        } else if(typeid(std::string) == par[i]->type) {
+//            ss << *((std::string *) par[i]->value);
+//        } else if (typeid(bool) == par[i]->type) {
+//            ss << *((bool *)par[i]->value);
+//        }
+//        ss << "\n";
+//    }
+//
+//    Debug(Debug::INFO) << ss.str() << "\n";
+//}
 
 
 
@@ -2599,4 +2604,67 @@ std::vector<int> Parameters::getOutputFormat(int formatMode, const std::string &
         formatCodes.push_back(code);
     }
     return formatCodes;
+}
+
+void Parameters::setSeedSubstitutionMatrices(std::string aminoacids, std::string nucleotides) {
+    for(size_t i = 0 ; i < substitutionMatrices.size(); i++) {
+        bool isSeedAminoAcid   = aminoacids == substitutionMatrices[i].name;
+        bool isSeedNucleotide  = nucleotides == substitutionMatrices[i].name;
+        if (isSeedAminoAcid || isSeedNucleotide) {
+            std::string matrixData((const char *)substitutionMatrices[i].subMatData, substitutionMatrices[i].subMatDataLen);
+            std::string matrixName = substitutionMatrices[i].name;
+            if(isSeedAminoAcid) {
+                seedScoringMatrixFile.aminoacids = BaseMatrix::serialize(matrixName, matrixData);
+            }
+            if(isSeedNucleotide) {
+                seedScoringMatrixFile.nucleotides = BaseMatrix::serialize(matrixName, matrixData);
+            }
+        }
+    }
+}
+
+void Parameters::setDBFields(int no, std::string path) {
+    if (no == 1) {
+        db1 = path;
+        db1Index = path + ".index";
+        db1dbtype = path + ".dbtype";
+        hdr1 = path + "_h";
+        hdr1Index = path + "_h.index";
+        hdr1dbtype = path + "_h.dbtype";
+    } else if (no == 2) {
+        db2 = path;
+        db2Index = path + ".index";
+        db2dbtype = path + ".dbtype";
+        hdr2 = path + "_h";
+        hdr2Index = path + "_h.index";
+        hdr2dbtype = path + "_h.dbtype";
+    } else if (no == 3) {
+        db3 = path;
+        db3Index = path + ".index";
+        db3dbtype = path + ".dbtype";
+        hdr3 = path + "_h";
+        hdr3Index = path + "_h.index";
+        hdr3dbtype = path + "_h.dbtype";
+    } else if (no == 4) {
+        db4 = path;
+        db4Index = path + ".index";
+        db4dbtype = path + ".dbtype";
+        hdr4 = path + "_h";
+        hdr4Index = path + "_h.index";
+        hdr4dbtype = path + "_h.dbtype";
+    } else if (no == 5) {
+        db5 = path;
+        db5Index = path + ".index";
+        db5dbtype = path + ".dbtype";
+        hdr5 = path + "_h";
+        hdr5Index = path + "_h.index";
+        hdr5dbtype = path + "_h.dbtype";
+    } else if (no == 6) {
+        db6 = path;
+        db6Index = path + ".index";
+        db6dbtype = path + ".dbtype";
+        hdr6 = path + "_h";
+        hdr6Index = path + "_h.index";
+        hdr6dbtype = path + "_h.dbtype";
+    }
 }

@@ -14,10 +14,10 @@
 #include <omp.h>
 #endif
 
-int profile2cs(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    par.alphabetSize = 8;
-    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_PROFILE);
+int profile2cs(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.alphabetSize = 8;
+//    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_PROFILE);
 
     DBReader<unsigned int> profileReader(par.db1.c_str(), par.db1Index.c_str(), par.threads, DBReader<unsigned int>::USE_INDEX|DBReader<unsigned int>::USE_DATA);
     profileReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);

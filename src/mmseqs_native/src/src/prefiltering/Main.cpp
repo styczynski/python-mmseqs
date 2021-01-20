@@ -11,11 +11,11 @@
 #include <omp.h>
 #endif
 
-int prefilter(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    MMseqsMPI::init(argc, argv);
-
-    Parameters& par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_PREFILTER);
+int prefilter(mmseqs_output* out, Parameters &par) {
+//    MMseqsMPI::init(argc, argv);
+//
+//    Parameters& par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_PREFILTER);
 
     Timer timer;
     int queryDbType = FileUtil::parseDbType(par.db1.c_str());
@@ -51,7 +51,7 @@ int prefilter(mmseqs_output* out, int argc, const char **argv, const Command& co
         queryDbType = Parameters::DBTYPE_PROFILE_STATE_PROFILE;
     }
 
-    Prefiltering pref(par.db1, par.db1Index, par.db2, par.db2Index, queryDbType, targetDbType, par);
+    Prefiltering pref(out, par.db1, par.db1Index, par.db2, par.db2Index, queryDbType, targetDbType, par);
 
 #ifdef HAVE_MPI
     int runRandomId = 0;
@@ -60,9 +60,9 @@ int prefilter(mmseqs_output* out, int argc, const char **argv, const Command& co
         runRandomId = std::rand();
         runRandomId = runRandomId / 2; // to avoid the unlikely case of overflowing later
     }
-    pref.runMpiSplits(par.db3, par.db3Index, par.localTmp, runRandomId);
+    pref.runMpiSplits(out, par.db3, par.db3Index, par.localTmp, runRandomId);
 #else
-    pref.runAllSplits(par.db3, par.db3Index);
+    pref.runAllSplits(out, par.db3, par.db3Index);
 #endif
 
     return EXIT_SUCCESS;

@@ -104,24 +104,24 @@ void setClusterAutomagicParameters(Parameters& par) {
     }
 }
 
-int clusteringworkflow(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters &par = Parameters::getInstance();
-    setWorkflowDefaults(&par);
-    par.PARAM_MAX_SEQS.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_RESCORE_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_MAX_REJECTED.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_MAX_ACCEPT.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_ZDROP.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_KMER_PER_SEQ.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_S.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_INCLUDE_ONLY_EXTENDABLE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.parseParameters(argc, argv, command, false, 0, 0);
+int clusteringworkflow(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    setWorkflowDefaults(&par);
+//    par.PARAM_MAX_SEQS.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_RESCORE_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_MAX_REJECTED.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_MAX_ACCEPT.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_ZDROP.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_KMER_PER_SEQ.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_S.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_INCLUDE_ONLY_EXTENDABLE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.parseParameters(argc, argv, command, false, 0, 0);
     const int dbType = FileUtil::parseDbType(par.db1.c_str());
     bool isNucleotideDb = (Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_NUCLEOTIDES));
     if (isNucleotideDb) {
         setNuclClusterDefaults(&par);
     }
-    par.printParameters(command.cmd, argc, argv, *command.params);
+    // par.printParameters(command.cmd, argc, argv, *command.params);
 
     const bool isUngappedMode = par.alignmentMode == Parameters::ALIGNMENT_MODE_UNGAPPED;
     if (isUngappedMode && Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_HMM_PROFILE)) {
@@ -131,11 +131,11 @@ int clusteringworkflow(mmseqs_output* out, int argc, const char **argv, const Co
     setClusterAutomagicParameters(par);
 
     std::string tmpDir = par.db3;
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, par.clusterworkflow));
+    std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames, par.clusterworkflow));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
-    tmpDir = FileUtil::createTemporaryDirectory(tmpDir, hash);
+    tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
     par.filenames.push_back(tmpDir);
 

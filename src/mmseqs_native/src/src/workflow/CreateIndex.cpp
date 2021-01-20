@@ -4,6 +4,7 @@
 #include "CommandCaller.h"
 #include "Debug.h"
 #include "FileUtil.h"
+#include "Application.h"
 
 #include "createindex.sh.h"
 #include "output.h"
@@ -12,7 +13,7 @@
 #include <cassert>
 #include <climits>
 
-int createindex(mmseqs_output* out, Parameters &par, const Command &command, const std::string &indexerModule, const std::string &flag) {
+int createindex(mmseqs_output* out, Parameters &par, const std::string &indexerModule, const std::string &flag) {
     bool sensitivity = false;
     // only set kmerScore  to INT_MAX if -s was used
     for (size_t i = 0; i < par.createindex.size(); i++) {
@@ -31,11 +32,12 @@ int createindex(mmseqs_output* out, Parameters &par, const Command &command, con
     }
 
     std::string tmpDir = par.db2;
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, par.createindex));
+    // TODO: Implement correct hash?
+    std::string hash = "some_hash__1"; //SSTR(par.hashParameter(par.databases_types, par.filenames, par.createindex));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
-    tmpDir = FileUtil::createTemporaryDirectory(tmpDir, hash);
+    tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
     par.filenames.push_back(tmpDir);
 
@@ -54,38 +56,106 @@ int createindex(mmseqs_output* out, Parameters &par, const Command &command, con
         out->output_string(flag, "1");
     }
 
-    //std::string program(tmpDir + "/createindex.sh");
-    //FileUtil::writeFile(program, createindex_sh, createindex_sh_len);
-    //cmd.execProgram(program.c_str(), par.filenames);
+    std::string tmp_db_path = "";
+    if (flag == "TRANSLATED") {
+        tmp_db_path = tmpDir + "/orfs_aa";
+        if (FileUtil::fileExists((tmp_db_path + ".dbtype").c_str())) {
+            Parameters extractorfs_par;
+            extractorfs_par.setDBFields(1, par.db1);
+            extractorfs_par.setDBFields(2, tmp_db_path + ".dbtype");
+            extractorfs_par.orfMinLength = 30;
+            extractorfs_par.orfMaxLength = 32734;
+            extractorfs_par.orfMaxGaps = 2147483647;
+            extractorfs_par.contigStartMode = 2;
+            extractorfs_par.contigEndMode = 2;
+            extractorfs_par.orfStartMode = 1;
+            extractorfs_par.forwardFrames = "1,2,3";
+            extractorfs_par.reverseFrames = "1,2,3";
+            extractorfs_par.translationTable = 1;
+            extractorfs_par.translate = 0;
+            extractorfs_par.useAllTableStarts = true;
+            extractorfs_par.identifierOffset = 0;
+            extractorfs_par.createLookup = 0;
+            extractorfs_par.threads = 1;
+            extractorfs_par.compressed = 0;
+            subcall_mmseqs(out, "extractorfs", extractorfs_par);
+        }
+    } else if (flag == "LIN_NUCL") {
+        tmp_db_path = tmpDir + "/nucl_split_seq";
+        if (FileUtil::fileExists((tmp_db_path + ".dbtype").c_str())) {
+            Parameters extractorfs_par;
+            extractorfs_par.maxSeqLen = 65535;
+            extractorfs_par.sequenceOverlap = 0;
+            extractorfs_par.sequenceSplitMode = 1;
+            extractorfs_par.headerSplitMode = 0;
+            extractorfs_par.createLookup = 0;
+            extractorfs_par.threads = 1;
+            extractorfs_par.compressed = 0;
+            subcall_mmseqs(out, "extractorfs", extractorfs_par);
+        }
+    }
+
+    Parameters indexer_par;
+    indexer_par.setDBFields(1, tmp_db_path);
+    indexer_par.setDBFields(2, par.db1);
+    indexer_par.setSeedSubstitutionMatrices("nucleotide.out", "VTML80.out");
+    indexer_par.kmerSize = 0;
+    indexer_par.alphabetSize = MultiParam<int>(21, 5);
+    indexer_par.compBiasCorrection = 1;
+    indexer_par.maxSeqLen = 65535;
+    indexer_par.maxResListLen = 300;
+    indexer_par.maskMode = 1;
+    indexer_par.maskLowerCaseMode = 0;
+    indexer_par.spacedKmer = 1;
+    indexer_par.sensitivity = 7.5;
+    indexer_par.kmerScore = 0;
+    indexer_par.checkCompatible = 0;
+    indexer_par.searchType = 3;
+    indexer_par.split = 0;
+    indexer_par.splitMemoryLimit = 0;
+    indexer_par.threads = 1;
+
+    if (flag != "TRANSLATED" && flag != "LIN_NUCL") {
+        indexer_par.setDBFields(1, par.db1);
+    }
+
+    subcall_mmseqs(out, indexerModule, indexer_par);
+
+    if (par.removeTmpFiles) {
+        Parameters rmdb_par;
+        rmdb_par.setDBFields(1, tmp_db_path);
+        subcall_mmseqs(out, "rmdb", rmdb_par);
+    }
+
     return 0;
 }
 
 
-int createlinindex(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    par.orfStartMode = 1;
-    par.orfMinLength = 30;
-    par.orfMaxLength = 32734;
-    par.kmerScore = 0; // extract all k-mers
-    par.maskMode = 0;
-    par.spacedKmer = false;
-    // VTML has a slightly lower sensitivity in the regression test
-    par.seedScoringMatrixFile = MultiParam<char*>("blosum62.out", "nucleotide.out");
-
-    par.PARAM_COV_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_C.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_MIN_SEQ_ID.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    for (size_t i = 0; i < par.extractorfs.size(); i++) {
-        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.translatenucs.size(); i++) {
-        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    par.PARAM_COMPRESSED.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int createlinindex(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    par.orfStartMode = 1;
+//    par.orfMinLength = 30;
+//    par.orfMaxLength = 32734;
+//    par.kmerScore = 0; // extract all k-mers
+//    par.maskMode = 0;
+//    par.spacedKmer = false;
+//    // VTML has a slightly lower sensitivity in the regression test
+//    par.seedScoringMatrixFile = MultiParam<char*>("blosum62.out", "nucleotide.out");
+//
+//    par.PARAM_COV_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_C.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_MIN_SEQ_ID.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    for (size_t i = 0; i < par.extractorfs.size(); i++) {
+//        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.translatenucs.size(); i++) {
+//        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    par.PARAM_COMPRESSED.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//
+//    par.parseParameters(argc, argv, command, true, 0, 0);
     int dbType = FileUtil::parseDbType(par.db1.c_str());
     bool isNucl = Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_NUCLEOTIDES);
     if(isNucl && par.searchType == Parameters::SEARCH_TYPE_NUCLEOTIDES && par.PARAM_MAX_SEQ_LEN.wasSet == false){
@@ -93,48 +163,48 @@ int createlinindex(mmseqs_output* out, int argc, const char **argv, const Comman
             par.maxSeqLen = 10000;
         }
     }
-    par.printParameters(command.cmd, argc, argv, *command.params);
+    //// par.printParameters(command.cmd, argc, argv, *command.params);
 
     if(isNucl && par.searchType == Parameters::SEARCH_TYPE_AUTO){
         Debug(Debug::WARNING) << "Database " << par.db1 << " is a nucleotide database. \n"
                             << "Please provide the parameter --search-type 2 (translated) or 3 (nucleotide)\n";
         return EXIT_FAILURE;
     }
-    return createindex(out, par, command, "kmerindexdb", (isNucl == false) ? "" : (par.searchType == Parameters::SEARCH_TYPE_TRANSLATED||
+    return createindex(out, par, "kmerindexdb", (isNucl == false) ? "" : (par.searchType == Parameters::SEARCH_TYPE_TRANSLATED||
                                                                                            par.searchType == Parameters::SEARCH_TYPE_TRANS_NUCL_ALN) ? "TRANSLATED" : "LIN_NUCL");
 }
 
-int createindex(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    par.orfStartMode = 1;
-    par.orfMinLength = 30;
-    par.orfMaxLength = 32734;
-    par.kmerScore = 0; // extract all k-mers
-    par.sensitivity = 7.5;
-    par.maskMode = 1;
-
-    par.PARAM_COV_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_C.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_MIN_SEQ_ID.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_MAX_SEQS.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_SPLIT.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    for (size_t i = 0; i < par.splitsequence.size(); i++) {
-        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.extractorfs.size(); i++) {
-        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.splitsequence.size(); i++) {
-        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.translatenucs.size(); i++) {
-        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    par.PARAM_COMPRESSED.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int createindex(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    par.orfStartMode = 1;
+//    par.orfMinLength = 30;
+//    par.orfMaxLength = 32734;
+//    par.kmerScore = 0; // extract all k-mers
+//    par.sensitivity = 7.5;
+//    par.maskMode = 1;
+//
+//    par.PARAM_COV_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_C.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_MIN_SEQ_ID.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_MAX_SEQS.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_SPLIT.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    for (size_t i = 0; i < par.splitsequence.size(); i++) {
+//        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.extractorfs.size(); i++) {
+//        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.splitsequence.size(); i++) {
+//        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.translatenucs.size(); i++) {
+//        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    par.PARAM_COMPRESSED.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     int dbType = FileUtil::parseDbType(par.db1.c_str());
     bool isNucl = Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_NUCLEOTIDES);
@@ -166,12 +236,12 @@ int createindex(mmseqs_output* out, int argc, const char **argv, const Command& 
                 break;
         }
     }
-    par.printParameters(command.cmd, argc, argv, *command.params);
+    //// par.printParameters(command.cmd, argc, argv, *command.params);
     if(isNucl && par.searchType == Parameters::SEARCH_TYPE_AUTO){
         Debug(Debug::WARNING) << "Database " << par.db1 << " is a nucleotide database. \n"
                             << "Please provide the parameter --search-type 2 (translated) or 3 (nucleotide)\n";
         return EXIT_FAILURE;
     }
-    return createindex(out, par, command, "indexdb",  (isNucl == false) ? "" : (par.searchType == Parameters::SEARCH_TYPE_TRANSLATED||
+    return createindex(out, par, "indexdb",  (isNucl == false) ? "" : (par.searchType == Parameters::SEARCH_TYPE_TRANSLATED||
                                                                   par.searchType == Parameters::SEARCH_TYPE_TRANS_NUCL_ALN) ? "TRANSLATED" : "NUCL");
 }

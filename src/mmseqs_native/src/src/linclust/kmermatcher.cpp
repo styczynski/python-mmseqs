@@ -761,12 +761,12 @@ std::vector<std::pair<size_t, size_t>> setupKmerSplits(Parameters &par, BaseMatr
     return hashRanges;
 }
 
-int kmermatcher(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    MMseqsMPI::init(argc, argv);
-
-    Parameters &par = Parameters::getInstance();
-    setLinearFilterDefault(&par);
-    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_CLUSTLINEAR);
+int kmermatcher(mmseqs_output* out, Parameters &par) {
+//    MMseqsMPI::init(argc, argv);
+//
+//    Parameters &par = Parameters::getInstance();
+//    setLinearFilterDefault(&par);
+//    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_CLUSTLINEAR);
 
     DBReader<unsigned int> seqDbr(par.db1.c_str(), par.db1Index.c_str(), par.threads,
                                   DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
@@ -774,8 +774,8 @@ int kmermatcher(mmseqs_output* out, int argc, const char **argv, const Command &
     int querySeqType = seqDbr.getDbtype();
 
     setKmerLengthAndAlphabet(par, seqDbr.getAminoAcidDBSize(), querySeqType);
-    std::vector<MMseqsParameter *> *params = command.params;
-    par.printParameters(command.cmd, argc, argv, *params);
+//    std::vector<MMseqsParameter *> *params = command.params;
+//    par.printParameters(command.cmd, argc, argv, *params);
     Debug(Debug::INFO) << "Database size: " << seqDbr.getSize() << " type: " << seqDbr.getDbTypeName() << "\n";
 
     if (seqDbr.getMaxSeqLen() < SHRT_MAX) {

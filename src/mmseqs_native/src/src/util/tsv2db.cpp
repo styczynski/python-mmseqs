@@ -7,9 +7,9 @@
 #include "Util.h"
 #include "output.h"
 
-int tsv2db(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int tsv2db(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     Debug(Debug::INFO) << "Output database type: " << Parameters::getDbTypeName(par.outputDbType) << "\n";
     if (par.PARAM_OUTPUT_DBTYPE.wasSet == false) {

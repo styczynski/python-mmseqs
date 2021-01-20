@@ -11,9 +11,9 @@
 #include <omp.h>
 #endif
 
-int orftocontig(mmseqs_output* out, int argn, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    par.parseParameters(argn, argv, command, true, true, 0);
+int orftocontig(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    par.parseParameters(argn, argv, command, true, true, 0);
 
     // contig length is needed for computation:
     DBReader<unsigned int> contigsReader(par.db1.c_str(), par.db1Index.c_str(), par.threads, DBReader<unsigned int>::USE_INDEX|DBReader<unsigned int>::USE_DATA);

@@ -14,14 +14,14 @@
 #include <omp.h>
 #endif
 
-int result2msa(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    MMseqsMPI::init(argc, argv);
+int result2msa(mmseqs_output* out, Parameters &par) {
+    //MMseqsMPI::init(argc, argv);
 
-    Parameters &par = Parameters::getInstance();
-    // do not filter by default
-    par.filterMsa = 0;
-    par.pca = 0.0;
-    par.parseParameters(argc, argv, command, true, 0, 0);
+//    Parameters &par = Parameters::getInstance();
+//    // do not filter by default
+//    par.filterMsa = 0;
+//    par.pca = 0.0;
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     const bool isCA3M = par.msaFormatMode == Parameters::FORMAT_MSA_CA3M || par.msaFormatMode == Parameters::FORMAT_MSA_CA3M_CONSENSUS;
     const bool shouldWriteNullByte = par.msaFormatMode != Parameters::FORMAT_MSA_STOCKHOLM_FLAT;

@@ -4,9 +4,9 @@
 #include "MemoryMapped.h"
 #include "output.h"
 
-int touchdb(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int touchdb(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     std::string db = par.db1;
 

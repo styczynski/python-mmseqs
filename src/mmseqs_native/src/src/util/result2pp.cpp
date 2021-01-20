@@ -18,11 +18,11 @@ float computeNeff(float neffA, float maxNeffA, float neffB, float maxNeffB, floa
     return avgNewNeff + 1 - exp(log(avgNewNeff) * (1 - w));
 }
 
-int result2pp(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    MMseqsMPI::init(argc, argv);
-
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int result2pp(mmseqs_output* out, Parameters &par) {
+//    MMseqsMPI::init(argc, argv);
+//
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     DBReader<unsigned int> qDbr(par.db1.c_str(), par.db1Index.c_str(), par.threads, DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     qDbr.open(DBReader<unsigned int>::NOSORT);

@@ -5,9 +5,9 @@
 #include "Util.h"
 #include "output.h"
 
-int splitdb(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int splitdb(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     if (par.split < 1) {
         Debug(Debug::ERROR) << "Cannot split databases into 0 or negative chunks.";

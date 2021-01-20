@@ -4,6 +4,7 @@
 #include "ExtendedSubstitutionMatrix.h"
 #include "SubstitutionMatrixProfileStates.h"
 #include "DBWriter.h"
+#include "output.h"
 
 #include "PatternCompiler.h"
 #include "FileUtil.h"
@@ -19,7 +20,8 @@
 #include <omp.h>
 #endif
 
-Prefiltering::Prefiltering(const std::string &queryDB,
+Prefiltering::Prefiltering(mmseqs_output* out,
+                           const std::string &queryDB,
                            const std::string &queryDBIndex,
                            const std::string &targetDB,
                            const std::string &targetDBIndex,
@@ -205,7 +207,7 @@ Prefiltering::Prefiltering(const std::string &queryDB,
 
     if (splitMode == Parameters::QUERY_DB_SPLIT) {
         // create the whole index table
-        getIndexTable(0, 0, tdbr->getSize());
+        getIndexTable(out, 0, 0, tdbr->getSize());
     } else if (splitMode == Parameters::TARGET_DB_SPLIT) {
         sequenceLookup = NULL;
         indexTable = NULL;
@@ -496,7 +498,7 @@ ScoreMatrix Prefiltering::getScoreMatrix(const BaseMatrix& matrix, const size_t 
 
 }
 
-void Prefiltering::getIndexTable(int split, size_t dbFrom, size_t dbSize) {
+void Prefiltering::getIndexTable(mmseqs_output* out, int split, size_t dbFrom, size_t dbSize) {
     if (templateDBIsIndex == true) {
         indexTable = PrefilteringIndexReader::getIndexTable(split, tidxdbr, preloadMode);
         // only the ungapped alignment needs the sequence lookup, we can save quite some memory here
@@ -530,7 +532,7 @@ void Prefiltering::getIndexTable(int split, size_t dbFrom, size_t dbSize) {
             sequenceLookup = NULL;
         }
 
-        indexTable->printStatistics(kmerSubMat->num2aa);
+        indexTable->printStatistics(out, kmerSubMat->num2aa);
         tdbr->remapData();
         Debug(Debug::INFO) << "Time for index table init: " << timer.lap() << "\n";
     }
@@ -551,12 +553,12 @@ bool Prefiltering::isSameQTDB() {
     return (queryDB.compare(targetDB) == 0 || (match == true));
 }
 
-void Prefiltering::runAllSplits(const std::string &resultDB, const std::string &resultDBIndex) {
-    runSplits(resultDB, resultDBIndex, 0, splits, false);
+void Prefiltering::runAllSplits(mmseqs_output* out, const std::string &resultDB, const std::string &resultDBIndex) {
+    runSplits(out, resultDB, resultDBIndex, 0, splits, false);
 }
 
 #ifdef HAVE_MPI
-void Prefiltering::runMpiSplits(const std::string &resultDB, const std::string &resultDBIndex, const std::string &localTmpPath, const int runRandomId) {
+void Prefiltering::runMpiSplits(mmseqs_output* out, const std::string &resultDB, const std::string &resultDBIndex, const std::string &localTmpPath, const int runRandomId) {
     if(compressed == true && splitMode == Parameters::TARGET_DB_SPLIT){
             Debug(Debug::WARNING) << "The output of the prefilter cannot be compressed during target split mode. "
                                      "Prefilter result will not be compressed.\n";
@@ -603,7 +605,7 @@ void Prefiltering::runMpiSplits(const std::string &resultDB, const std::string &
     std::pair<std::string, std::string> result = Util::createTmpFileNames(procTmpResultDB, procTmpResultDBIndex, MMseqsMPI::rank + runRandomId);
     bool merge = (splitMode == Parameters::QUERY_DB_SPLIT);
 
-    int hasResult = runSplits(result.first, result.second, fromSplit, splitCount, merge) == true ? 1 : 0;
+    int hasResult = runSplits(out, result.first, result.second, fromSplit, splitCount, merge) == true ? 1 : 0;
 
     if (localTmpPath != "") {
         std::pair<std::string, std::string> resultShared = Util::createTmpFileNames(resultDB, resultDBIndex, MMseqsMPI::rank);
@@ -643,7 +645,7 @@ void Prefiltering::runMpiSplits(const std::string &resultDB, const std::string &
 }
 #endif
 
-int Prefiltering::runSplits(const std::string &resultDB, const std::string &resultDBIndex,
+int Prefiltering::runSplits(mmseqs_output* out, const std::string &resultDB, const std::string &resultDBIndex,
                             size_t fromSplit, size_t splitProcessCount, bool merge) {
     if (fromSplit + splitProcessCount > static_cast<size_t>(splits)) {
         Debug(Debug::ERROR) << "Start split " << fromSplit << " plus split count " << splitProcessCount << " cannot be larger than splits " << splits << "\n";
@@ -670,7 +672,7 @@ int Prefiltering::runSplits(const std::string &resultDB, const std::string &resu
         std::vector<std::pair<std::string, std::string> > splitFiles;
         for (size_t i = fromSplit; i < (fromSplit + splitProcessCount); i++) {
             std::pair<std::string, std::string> filenamePair = Util::createTmpFileNames(resultDB, resultDBIndex, i);
-            if (runSplit(filenamePair.first.c_str(), filenamePair.second.c_str(), i, merge)) {
+            if (runSplit(out, filenamePair.first.c_str(), filenamePair.second.c_str(), i, merge)) {
                 splitFiles.push_back(filenamePair);
 
             }
@@ -693,7 +695,7 @@ int Prefiltering::runSplits(const std::string &resultDB, const std::string &resu
             hasResult = true;
         }
     } else if (splitProcessCount == 1) {
-        if (runSplit(resultDB.c_str(), resultDBIndex.c_str(), fromSplit, merge)) {
+        if (runSplit(out, resultDB.c_str(), resultDBIndex.c_str(), fromSplit, merge)) {
             hasResult = true;
         }
     }
@@ -701,7 +703,7 @@ int Prefiltering::runSplits(const std::string &resultDB, const std::string &resu
     return hasResult;
 }
 
-bool Prefiltering::runSplit(const std::string &resultDB, const std::string &resultDBIndex, size_t split, bool merge) {
+bool Prefiltering::runSplit(mmseqs_output* out, const std::string &resultDB, const std::string &resultDBIndex, size_t split, bool merge) {
     Debug(Debug::INFO) << "Process prefiltering step " << (split + 1) << " of " << splits << "\n\n";
 
     size_t dbFrom = 0;
@@ -726,7 +728,7 @@ bool Prefiltering::runSplit(const std::string &resultDB, const std::string &resu
             sequenceLookup = NULL;
         }
 
-        getIndexTable(split, dbFrom, dbSize);
+        getIndexTable(out, split, dbFrom, dbSize);
     } else if (splitMode == Parameters::QUERY_DB_SPLIT) {
         qdbr->decomposeDomainByAminoAcid(split, splits, &queryFrom, &querySize);
         if (querySize == 0) {

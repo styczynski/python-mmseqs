@@ -16,19 +16,19 @@
 
 extern const char* version;
 
-int kmerindexdb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    MMseqsMPI::init(argc, argv);
-
-    Parameters &par = Parameters::getInstance();
-    setLinearFilterDefault(&par);
-    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_CLUSTLINEAR);
+int kmerindexdb(mmseqs_output* out, Parameters &par) {
+//    MMseqsMPI::init(argc, argv);
+//
+//    Parameters &par = Parameters::getInstance();
+//    setLinearFilterDefault(&par);
+//    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_CLUSTLINEAR);
 
     DBReader<unsigned int> seqDbr(par.db1.c_str(), par.db1Index.c_str(), par.threads, DBReader<unsigned int>::USE_INDEX|DBReader<unsigned int>::USE_DATA);
     seqDbr.open(DBReader<unsigned int>::NOSORT);
     int querySeqType = seqDbr.getDbtype();
 
     setKmerLengthAndAlphabet(par, seqDbr.getAminoAcidDBSize(), querySeqType);
-    par.printParameters(command.cmd, argc, argv, *command.params);
+    // par.printParameters(command.cmd, argc, argv, *command.params);
 
     Debug(Debug::INFO) << "Database size: "  << seqDbr.getSize() << " type: " << seqDbr.getDbTypeName() << "\n";
     std::string indexDB = LinsearchIndexReader::indexName(par.db2);

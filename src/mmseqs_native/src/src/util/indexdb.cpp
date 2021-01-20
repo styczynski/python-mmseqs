@@ -40,10 +40,10 @@ std::string findIncompatibleParameter(DBReader<unsigned int>& index, const Param
     return "";
 }
 
-int indexdb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    setIndexDbDefaults(&par);
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int indexdb(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    setIndexDbDefaults(&par);
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     const bool sameDB = (par.db1 == par.db2);
 
@@ -131,7 +131,7 @@ int indexdb(mmseqs_output* out, int argc, const char **argv, const Command &comm
         }
 
         DBReader<unsigned int>::removeDb(indexDB);
-        PrefilteringIndexReader::createIndexFile(indexDB, &dbr, dbr2, &hdbr1, hdbr2, seedSubMat, par.maxSeqLen,
+        PrefilteringIndexReader::createIndexFile(out, indexDB, &dbr, dbr2, &hdbr1, hdbr2, seedSubMat, par.maxSeqLen,
                                                  par.spacedKmer, par.spacedKmerPattern, par.compBiasCorrection,
                                                  seedSubMat->alphabetSize, par.kmerSize, par.maskMode, par.maskLowerCaseMode,
                                                  par.kmerScore, par.split);

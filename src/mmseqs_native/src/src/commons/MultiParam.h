@@ -35,8 +35,15 @@ template <>
 class MultiParam<char*> {
 
 public:
-    char* aminoacids;
-    char* nucleotides;
+    char* aminoacids = NULL;
+    char* nucleotides = NULL;
+
+    MultiParam() {
+        aminoacids = (char*) malloc(sizeof(char));
+        nucleotides = (char*) malloc(sizeof(char));
+        aminoacids[0] = '\0';
+        nucleotides[0] = '\0';
+    }
 
     MultiParam(const char* aminoacids, const char* nucleotides);
     MultiParam(const char* parametercstring);

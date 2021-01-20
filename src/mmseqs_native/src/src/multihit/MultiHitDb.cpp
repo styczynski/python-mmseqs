@@ -12,10 +12,10 @@ void setMultiHitDbWorkflowDefaults(Parameters *p) {
     p->orfMinLength = 30;
 }
 
-int multihitdb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    setMultiHitDbWorkflowDefaults(&par);
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int multihitdb(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    setMultiHitDbWorkflowDefaults(&par);
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     std::string tmpDir = par.filenames.back();
     par.filenames.pop_back();
@@ -29,7 +29,7 @@ int multihitdb(mmseqs_output* out, int argc, const char **argv, const Command &c
             Debug(Debug::INFO) << "Created dir " << tmpDir << "\n";
         }
     }
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, par.multihitdb));
+    std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames, par.multihitdb));
     if(par.reuseLatest == true){
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest" );
     }

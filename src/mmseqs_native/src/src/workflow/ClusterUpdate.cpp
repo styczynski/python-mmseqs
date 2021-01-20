@@ -17,39 +17,39 @@ void setClusterUpdateDefaults(Parameters *p) {
 void setClusterUpdateMustPassAlong(Parameters *p) {
     p->PARAM_ALIGNMENT_MODE.wasSet = true;
 }
-int clusterupdate(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    setClusterUpdateDefaults(&par);
-    par.PARAM_ADD_BACKTRACE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_ALT_ALIGNMENT.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_RESCORE_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_MAX_REJECTED.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_MAX_ACCEPT.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_KMER_PER_SEQ_SCALE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_KMER_PER_SEQ.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_START_SENS.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_SENS_STEPS.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_CLUSTER_REASSIGN.addCategory(MMseqsParameter::COMMAND_EXPERT);
-
-    par.PARAM_INCLUDE_ONLY_EXTENDABLE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_NUM_ITERATIONS.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    for (size_t i = 0; i < par.extractorfs.size(); i++) {
-        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.translatenucs.size(); i++) {
-        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.splitsequence.size(); i++) {
-        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.result2profile.size(); i++){
-        par.result2profile[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int clusterupdate(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    setClusterUpdateDefaults(&par);
+//    par.PARAM_ADD_BACKTRACE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_ALT_ALIGNMENT.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_RESCORE_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_MAX_REJECTED.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_MAX_ACCEPT.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_KMER_PER_SEQ_SCALE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_KMER_PER_SEQ.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_START_SENS.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_SENS_STEPS.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_CLUSTER_REASSIGN.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//
+//    par.PARAM_INCLUDE_ONLY_EXTENDABLE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_NUM_ITERATIONS.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    for (size_t i = 0; i < par.extractorfs.size(); i++) {
+//        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.translatenucs.size(); i++) {
+//        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.splitsequence.size(); i++) {
+//        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.result2profile.size(); i++){
+//        par.result2profile[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//
+//    par.parseParameters(argc, argv, command, true, 0, 0);
     setClusterUpdateMustPassAlong(&par);
     setClusterAutomagicParameters(par);
 
@@ -72,11 +72,11 @@ int clusterupdate(mmseqs_output* out, int argc, const char **argv, const Command
     par.maxAccept = maxAccept;
 
     std::string tmpDir = par.db6;
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, par.clusterUpdate));
+    std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames, par.clusterUpdate));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
-    tmpDir = FileUtil::createTemporaryDirectory(tmpDir, hash);
+    tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
     par.filenames.push_back(tmpDir);
 

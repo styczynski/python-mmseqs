@@ -199,26 +199,26 @@ void setNuclSearchDefaults(Parameters *p) {
 }
 
 
-int search(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters &par = Parameters::getInstance();
-    setSearchDefaults(&par);
-    par.PARAM_COV_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_C.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_MIN_SEQ_ID.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    for (size_t i = 0; i < par.extractorfs.size(); i++) {
-        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.translatenucs.size(); i++) {
-        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.splitsequence.size(); i++) {
-        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-
-    par.parseParameters(argc, argv, command, false, 0, MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
+int search(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    setSearchDefaults(&par);
+//    par.PARAM_COV_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_C.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_MIN_SEQ_ID.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    for (size_t i = 0; i < par.extractorfs.size(); i++) {
+//        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.translatenucs.size(); i++) {
+//        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.splitsequence.size(); i++) {
+//        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//
+//    par.parseParameters(argc, argv, command, false, 0, MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
 
     std::string indexStr = PrefilteringIndexReader::searchForIndex(par.db2);
 
@@ -254,13 +254,13 @@ int search(mmseqs_output* out, int argc, const char **argv, const Command& comma
 
     const bool isUngappedMode = par.alignmentMode == Parameters::ALIGNMENT_MODE_UNGAPPED;
     if (isUngappedMode && (searchMode & (Parameters::SEARCH_MODE_FLAG_QUERY_PROFILE |Parameters::SEARCH_MODE_FLAG_TARGET_PROFILE ))) {
-        par.printUsageMessage(command, MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
+        // par.printUsageMessage(command, MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
         Debug(Debug::ERROR) << "Cannot use ungapped alignment mode with profile databases\n";
         EXIT(EXIT_FAILURE);
     }
 
     if (isUngappedMode && par.lcaSearch) {
-        par.printUsageMessage(command, MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
+        // par.printUsageMessage(command, MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
         Debug(Debug::ERROR) << "Cannot use ungapped alignment mode with lca search\n";
         EXIT(EXIT_FAILURE);
     }
@@ -268,7 +268,7 @@ int search(mmseqs_output* out, int argc, const char **argv, const Command& comma
     // validate and set parameters for iterative search
     if (par.numIterations > 1) {
         if (searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_PROFILE) {
-            par.printUsageMessage(command, MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
+            // par.printUsageMessage(command, MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
             Debug(Debug::ERROR) << "Iterative target-profile searches are not supported.\n";
             EXIT(EXIT_FAILURE);
         }
@@ -277,8 +277,8 @@ int search(mmseqs_output* out, int argc, const char **argv, const Command& comma
         if (searchMode & Parameters::SEARCH_MODE_FLAG_QUERY_PROFILE) {
             for (size_t i = 0; i < par.searchworkflow.size(); i++) {
                 if (par.searchworkflow[i]->uniqid == par.PARAM_REALIGN.uniqid && par.searchworkflow[i]->wasSet) {
-                    par.printUsageMessage(command,
-                                          MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
+                    // par.printUsageMessage(command,
+                    //                      MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
                     Debug(Debug::ERROR) << "Cannot realign query profiles.\n";
                     EXIT(EXIT_FAILURE);
                 }
@@ -287,14 +287,14 @@ int search(mmseqs_output* out, int argc, const char **argv, const Command& comma
             par.realign = false;
         }
     }
-    par.printParameters(command.cmd, argc, argv, par.searchworkflow);
+    //par.printParameters(command.cmd, argc, argv, par.searchworkflow);
 
     std::string tmpDir = par.db4;
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, par.searchworkflow));
+    std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames, par.searchworkflow));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
-    tmpDir = FileUtil::createTemporaryDirectory(tmpDir, hash);
+    tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
     par.filenames.push_back(tmpDir);
 

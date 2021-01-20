@@ -13,9 +13,9 @@
 #include "itoa.h"
 #include "output.h"
 
-int createdb(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
+int createdb(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
 
     std::vector<std::string> filenames(par.filenames);
     std::string dataFile = filenames.back();

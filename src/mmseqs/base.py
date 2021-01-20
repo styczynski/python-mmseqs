@@ -15,6 +15,7 @@ class MMSeqsSettings:
     """Class for keeping track of an item in inventory."""
     storage_directory: str
     seq_storage_directory: str
+    tmp_directory: str
     meta_db: Optional[MetaDatabase]
 
 
@@ -39,7 +40,7 @@ class MetaDatabaseConnection:
         list_vals.append(obj)
         self.connection[name] = list_vals
 
-    def list_filter(self, name, base, filter_fn):
+    def list_filter(self, name, base, filter_fn, save_back=False):
         removed_objs = []
         left_objs = []
         for obj in self.connection[name]:
@@ -48,8 +49,9 @@ class MetaDatabaseConnection:
             else:
                 setattr(obj, '_base', base)
                 removed_objs.append(obj)
-        self.connection[name] = left_objs
-        return removed_objs
+        if save_back:
+            self.connection[name] = left_objs
+        return removed_objs, left_objs
 
     def list_get(self, name, base):
         results = []

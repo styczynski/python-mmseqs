@@ -36,9 +36,9 @@ Command *getCommandByName(const char *s) {
     return NULL;
 }
 
-int runCommand(mmseqs_output* out, Command *p, int argc, const char **argv) {
+int runCommand(mmseqs_output* out, Command* c, Parameters &par) {
     Timer timer;
-    int status = p->commandFunction(out, argc, argv, *p);
+    int status = c->commandFunction(out, par);
     Debug(Debug::INFO) << "Time for processing: " << timer.lap() << "\n";
     return status;
 }
@@ -180,45 +180,62 @@ int shellcompletion(int argc, const char **argv) {
     return EXIT_SUCCESS;
 }
 
-mmseqs_output call_mmseqs(mmseqs_call_args args) {
+
+void subcall_mmseqs(mmseqs_output* out, std::string command_name, Parameters args) {
+
+    Parameters par(args);
+
+//    const int argc = args.cli_args.size();
+//    char** argvp = (char**) malloc(argc * sizeof(char*));
+//
+//    for (int i=0; i<argc; ++i) {
+//        const int len = args.cli_args[i].size();
+//        argvp[i] = (char*) malloc((len+1) * sizeof(char));
+//        for (int j=0;j<len;++j) {
+//            argvp[i][j] = args.cli_args[i][j];
+//        }
+//        argvp[i][len] = '\0';
+//    }
+//    const char** argv = (const char**) argvp;
+//
+//    std::cout << "We will execute:\n";
+//    for (int i=0;i<argc;++i) {
+//        std::cout << "[" << std::string(argv[i]) << "] ";
+//    }
+//    std::cout << "\n-- END --\n";
+//
+//    if (argc < 2) {
+//        printUsage(false);
+//        return out;
+//    }
+//
+//    if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
+//        printUsage(true);
+//        return out;
+//    }
+//
+//    setenv("MMSEQS", argv[0], true);
+    Command *c = getCommandByName(command_name.c_str());
+    runCommand(out, c, par);
+
+//
+//    if (strncmp(argv[1], "shellcompletion", strlen("shellcompletion")) == 0) {
+//        shellcompletion(argc - 2, argv + 2);
+//        return out;
+//    } else if ((c = getCommandByName(argv[1])) != NULL) {
+//        runCommand(&out, c, argc - 2, argv + 2);
+//        return out;
+//    } else {
+//        printUsage(true);
+//        Debug(Debug::INFO) << "\nInvalid Command: " << argv[1] << "\n";
+//        return out;
+//    }
+//
+//    return out;
+}
+
+mmseqs_output call_mmseqs(std::string command_name, Parameters args) {
     mmseqs_output out;
-
-    const int argc = args.cli_args.size();
-    char** argvp = (char**) malloc(argc * sizeof(char*));
-
-    for (int i=0; i<argc; ++i) {
-        const int len = args.cli_args[i].size();
-        argvp[i] = (char*) malloc((len+1) * sizeof(char));
-        for (int j=0;j<len;++j) {
-            argvp[i][j] = args.cli_args[i][j];
-        }
-        argvp[i][len] = '\0';
-    }
-    const char** argv = (const char**) argvp;
-
-    if (argc < 2) {
-        printUsage(false);
-        return out;
-    }
-
-    if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0){
-        printUsage(true);
-        return out;
-    }
-
-    setenv("MMSEQS", argv[0], true);
-    Command *c = NULL;
-    if (strncmp(argv[1], "shellcompletion", strlen("shellcompletion")) == 0) {
-        shellcompletion(argc - 2, argv + 2);
-        return out;
-    } else if ((c = getCommandByName(argv[1])) != NULL) {
-        runCommand(&out, c, argc - 2, argv + 2);
-        return out;
-    } else {
-        printUsage(true);
-        Debug(Debug::INFO) << "\nInvalid Command: " << argv[1] << "\n";
-        return out;
-    }
-
+    subcall_mmseqs(&out, command_name, args);
     return out;
 }

@@ -1,4 +1,5 @@
 #include "Command.h"
+#include "Parameters.h"
 
 const char* binary_name = "mmseqs";
 const char* tool_name = "MMseqs2";

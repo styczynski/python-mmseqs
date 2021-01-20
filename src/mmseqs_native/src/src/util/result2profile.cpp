@@ -15,23 +15,23 @@
 #include <omp.h>
 #endif
 
-int result2profile(mmseqs_output* out, int argc, const char **argv, const Command &command, bool returnAlnRes) {
-    MMseqsMPI::init(argc, argv);
-
-    Parameters &par = Parameters::getInstance();
-    // default for result2profile to filter MSA
-    par.filterMsa = 1;
-    par.pca = 0.0;
-    if (returnAlnRes) {
-        par.PARAM_FILTER_MAX_SEQ_ID.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-        par.PARAM_FILTER_QID.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-        par.PARAM_FILTER_QSC.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-        par.PARAM_FILTER_COV.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-        par.PARAM_FILTER_NDIFF.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    par.parseParameters(argc, argv, command, false, 0, 0);
+int result2profile(mmseqs_output* out, Parameters &par, bool returnAlnRes) {
+//    MMseqsMPI::init(argc, argv);
+//
+//    Parameters &par = Parameters::getInstance();
+//    // default for result2profile to filter MSA
+//    par.filterMsa = 1;
+//    par.pca = 0.0;
+//    if (returnAlnRes) {
+//        par.PARAM_FILTER_MAX_SEQ_ID.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//        par.PARAM_FILTER_QID.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//        par.PARAM_FILTER_QSC.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//        par.PARAM_FILTER_COV.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//        par.PARAM_FILTER_NDIFF.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    par.parseParameters(argc, argv, command, false, 0, 0);
     par.evalProfile = (par.evalThr < par.evalProfile || returnAlnRes) ? par.evalThr : par.evalProfile;
-    par.printParameters(command.cmd, argc, argv, *command.params);
+    // par.printParameters(command.cmd, argc, argv, *command.params);
 
     DBReader<unsigned int> resultReader(par.db3.c_str(), par.db3Index.c_str(), par.threads, DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
     resultReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
@@ -272,11 +272,11 @@ int result2profile(mmseqs_output* out, int argc, const char **argv, const Comman
     return EXIT_SUCCESS;
 }
 
-int result2profile(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    return result2profile(out, argc, argv, command, false);
+int result2profile(mmseqs_output* out, Parameters &par) {
+    return result2profile(out, par, false);
 }
 
-int filterresult(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    return result2profile(out, argc, argv, command, true);
+int filterresult(mmseqs_output* out, Parameters &par) {
+    return result2profile(out, par, true);
 }
 

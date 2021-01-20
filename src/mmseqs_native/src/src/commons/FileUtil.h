@@ -61,7 +61,7 @@ public:
 
     static int parseDbType(const char *name);
 
-    static std::string createTemporaryDirectory(const std::string& basePath, const std::string& subDirectory);
+    static std::string createTemporaryDirectory(std::string baseTmpPath, const std::string& basePath, const std::string& subDirectory);
 
     static void fixRlimitNoFile();
 };

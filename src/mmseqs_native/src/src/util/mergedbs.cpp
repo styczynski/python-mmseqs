@@ -6,9 +6,9 @@
 #include "Util.h"
 #include "output.h"
 
-int mergedbs(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
+int mergedbs(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
 
     if (par.filenames.size() <= 2) {
         Debug(Debug::ERROR) << "Need at least two databases for merging\n";

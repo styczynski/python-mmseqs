@@ -360,11 +360,11 @@ int doExtract(Parameters &par) {
     return status;
 }
 
-int extractdomains(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    MMseqsMPI::init(argc, argv);
-
-    Parameters& par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int extractdomains(mmseqs_output* out, Parameters &par) {
+//    MMseqsMPI::init(argc, argv);
+//
+//    Parameters& par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
 #ifdef HAVE_MPI
     int status = doExtract(par, MMseqsMPI::rank, MMseqsMPI::numProc);

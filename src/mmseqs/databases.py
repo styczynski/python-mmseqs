@@ -7,6 +7,8 @@ from datetime import date
 from .utils import remove_paths, to_args
 from .base import MMSeqsBase
 
+from .mmseqs_native import MMSeqsMultiParamString
+
 PARAM_DB_TYPE_MAPPING = dict(
     auto=0,
     amino_acid=1,
@@ -18,124 +20,93 @@ PARAM_CREATEDB_MODE_MAPPING = dict(
     soft_link=1,
 )
 
-# INPUT="$1"
-# if [ -n "$TRANSLATED" ]; then
-#     # 1. extract orf
-#     if notExists "$2/orfs_aa.dbtype"; then
-#         # shellcheck disable=SC2086
-#         "$MMSEQS" extractorfs "$INPUT" "$2/orfs_aa" ${ORF_PAR} \
-#             || fail "extractorfs died"
-#     fi
-#
-#     # shellcheck disable=SC2086
-#     "$MMSEQS" $INDEXER "$2/orfs_aa" "$INPUT" ${INDEX_PAR} \
-#         || fail "indexdb died"
-#
-#     if [ -n "$REMOVE_TMP" ]; then
-#         # shellcheck disable=SC2086
-#         "$MMSEQS" rmdb "$2/orfs_aa" ${VERBOSITY}
-#         rm -f "$2/createindex.sh"
-#     fi
-# elif [ -n "$LIN_NUCL" ] || [ -n "$NUCL" ]; then
-#       # 1. extract orf
-#     if notExists "$2/nucl_split_seq.dbtype"; then
-#         # shellcheck disable=SC2086
-#         "$MMSEQS" splitsequence "$INPUT" "$2/nucl_split_seq" ${SPLIT_SEQ_PAR} \
-#             || fail "splitsequence died"
-#     fi
-#
-#     # shellcheck disable=SC2086
-#     "$MMSEQS" $INDEXER "$2/nucl_split_seq" "$INPUT" ${INDEX_PAR} \
-#         || fail "indexdb died"
-#
-#     if [ -n "$REMOVE_TMP" ]; then
-#         # shellcheck disable=SC2086
-#         "$MMSEQS" rmdb "$2/nucl_split_seq" ${VERBOSITY}
-#         rm -f "$2/createindex.sh"
-#     fi
-# else
-#     # shellcheck disable=SC2086
-#     "$MMSEQS" $INDEXER "$INPUT" "$INPUT" ${INDEX_PAR} \
-#         || fail "indexdb died"
-# fi
+PARAM_DB_SEARCH_TYPE_MAPPING = dict(
+    auto=0,
+    protein=1,
+    translated=2,
+    nucleotides=3,
+    translated_nucleotides_aligned=4,
+)
 
-
+@dataclass
+class IndexStats:
+    db_size: int
+    index_entries: int
+    avg_kmer_size: float
 
 @dataclass
 class Database:
     """Class for keeping track of an item in inventory."""
     name: str
+    description: str
     input_files: List[str]
     database_type: str
     created_on: date
 
-    def delete(self):
+    def copy(self, name):
         with self._base.settings.meta_db.open() as meta_db:
-            removed_dbs = meta_db.list_filter('databases', self._base, lambda db: db.name != self.name)
-            for db in removed_dbs:
-                remove_paths([
-                    f'{db.name}',
-                    f'{db.name}.*',
-                    f'{db.name}_h',
-                    f'{db.name}_h.*',
-                ], base_path=self._base.settings.seq_storage_directory, is_glob=True)
+            src_dbs, _ = meta_db.list_filter('databases', self._base, lambda db: db.name != self.name)
+            src_db = src_dbs[0]
+            db_path = os.path.join(self._base.settings.seq_storage_directory, src_db.name)
+            db_copy_path = os.path.join(self._base.settings.seq_storage_directory, name)
+            self._base._execute_cli("cpdb", dict(db1=db_path, db2=db_copy_path))
+            new_db = Database(
+                name=name,
+                description=src_db.description,
+                input_files=src_db.input_files,
+                created_on=date.today(),
+                database_type=src_db.database_type,
+            )
+            meta_db.list_append('databases', new_db)
+        return new_db
 
-    def create_index(self):
+    def remove(self):
+        with self._base.settings.meta_db.open() as meta_db:
+            removed_dbs, left_dbs = meta_db.list_filter('databases', self._base, lambda db: db.name != self.name)
+            for db in removed_dbs:
+                db_path = os.path.join(self._base.settings.seq_storage_directory, db.name)
+                self._base._execute_cli("rmdb", dict(db1=db_path))
+                self._base._execute_cli("rmdb", dict(db1=f'{db_path}_h'))
+            meta_db.set('databases', left_dbs)
+
+    def search(self, search_input: str):
+        pass
+
+    def create_index(self, search_type: str = 'nucleotides') -> IndexStats:
         tmp_dir = 'tmp'
         seq_db_path = os.path.join(self._base.settings.seq_storage_directory, self.name)
 
-        out = self._base._execute_cli(['createindex', seq_db_path, tmp_dir, '--search-type', 3])
-        print(out.vars_str)
-
-        if not os.path.isfile(f'{seq_db_path}.dbtype'):
-            raise Exception('Invalid database state')
-        if not os.path.isdir(tmp_dir):
-            raise Exception('Missing temporary directory')
-
-        if 'TRANSLATED' in out.vars_str and len(out.vars_str['TRANSLATED']) > 0:
-            if not os.path.exists(os.path.join(tmp_dir, 'orfs_aa.dbtype')):
-                self._base._execute_cli([
-                    "extractorfs",
-                    seq_db_path,
-                    os.path.join(tmp_dir, 'orfs_aa'),
-                    *to_args(out.vars_str['ORF_PAR'])])
-
-            self._base._execute_cli([
-                out.vars_str['INDEXER'],
-                os.path.join(tmp_dir, 'orfs_aa'),
-                seq_db_path,
-                *to_args(out.vars_str['INDEX_PAR'])])
-
-            if 'REMOVE_TMP' in out.vars_str and len(out.vars_str['REMOVE_TMP']) > 0:
-                self._base._execute_cli([
-                    'rmdb',
-                    os.path.join(tmp_dir, 'orfs_aa')])
-
-        elif ('LIN_NUCL' in out.vars_str and len(out.vars_str['LIN_NUCL']) > 0) or ('NUCL' in out.vars_str and len(out.vars_str['NUCL']) > 0):
-            if not os.path.exists(os.path.join(tmp_dir, 'nucl_split_seq.dbtype')):
-                self._base._execute_cli([
-                    "splitsequence",
-                    seq_db_path,
-                    os.path.join(tmp_dir, 'nucl_split_seq'),
-                    *to_args(out.vars_str['SPLIT_SEQ_PAR'])])
-            self._base._execute_cli([
-                out.vars_str['INDEXER'],
-                os.path.join(tmp_dir, 'nucl_split_seq'),
-                seq_db_path,
-                *to_args(out.vars_str['INDEX_PAR'])])
-
-            if 'REMOVE_TMP' in out.vars_str and len(out.vars_str['REMOVE_TMP']) > 0:
-                self._base._execute_cli([
-                    'rmdb',
-                    os.path.join(tmp_dir, 'nucl_split_seq')])
-
-        else:
-            self._base._execute_cli([
-                out.vars_str['INDEXER'],
-                seq_db_path,
-                seq_db_path,
-                *to_args(out.vars_str['INDEX_PAR'])])
-
+        # par.orfStartMode = 1;
+        # //    par.orfMinLength = 30;
+        # //    par.orfMaxLength = 32734;
+        # //    par.kmerScore = 0; // extract all k-mers
+        # //    par.maskMode = 0;
+        # //    par.spacedKmer = false;
+        # //    // VTML has a slightly lower sensitivity in the regression test
+        # //    par.seedScoringMatrixFile = MultiParam<char*>("blosum62.out", "nucleotide.out");
+        # //
+        seed_scoring_matrix_file = MMSeqsMultiParamString()
+        seed_scoring_matrix_file.aminoacids = "blosum62.out"
+        seed_scoring_matrix_file.nucleotides = "nucleotide.out"
+        out = self._base._execute_cli('createindex', dict(
+            db1=seq_db_path,
+            db2=tmp_dir,
+            filenames=[tmp_dir],
+            searchType=PARAM_DB_SEARCH_TYPE_MAPPING[search_type],
+            orfStartMode=1,
+            orfMinLength=30,
+            orfMaxLength=32734,
+            kmerScore=0,
+            maskMode=1,
+            sensitivity=7.5,
+            removeTmpFiles=True,
+        ))
+        print("WELP DONE!")
+        return IndexStats(
+            db_size=int(out.vars_str['INDEX_TABLE_DB_SIZE']),
+            index_entries=int(out.vars_str['INDEX_TABLE_ENTRIES']),
+            avg_kmer_size=float(out.vars_str['INDEX_AVG_KMER_SIZE']),
+        )
 
 def inject_base(objs: List[any]):
     for obj in objs:
@@ -155,6 +126,7 @@ class Databases(MMSeqsBase):
 
     def create(self,
                name: str,
+               description: str,
                input_files: Sequence[str],
                mode: str = "copy",
                database_type: str = "auto",
@@ -165,6 +137,7 @@ class Databases(MMSeqsBase):
         Create a sequence database from multiple FASTA file
 
         :param name: Name of the new database
+        :param description: Description of the new database
         :param input_files: FASTA/Q input files
         :param mode: Database creation mode
             copy - Default mode
@@ -178,16 +151,17 @@ class Databases(MMSeqsBase):
         :return:
         """
         input_files = list(input_files)
-        self._execute_cli([
-            'createdb', *input_files, os.path.join(self.settings.seq_storage_directory, name),
-            '--shuffle', int(shuffle),
-            '--createdb-mode', PARAM_CREATEDB_MODE_MAPPING[mode],
-            '--dbtype', PARAM_DB_TYPE_MAPPING[database_type],
-            '--id-offset', offset
-        ])
+        self._execute_cli("createdb", dict(
+            filenames=[*input_files, os.path.join(self.settings.seq_storage_directory, name)],
+            identifierOffset=offset,
+            dbType=PARAM_DB_TYPE_MAPPING[database_type],
+            createdbMode=PARAM_CREATEDB_MODE_MAPPING[mode],
+            shuffleDatabase=int(shuffle),
+        ))
         with self.settings.meta_db.open() as meta_db:
             new_db = Database(
                 name=name,
+                description=description,
                 input_files=input_files,
                 created_on=date.today(),
                 database_type=database_type,

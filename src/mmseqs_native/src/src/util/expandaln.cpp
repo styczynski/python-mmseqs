@@ -81,9 +81,9 @@ static bool compareHitsByKeyScore(const Matcher::result_t &first, const Matcher:
     return false;
 }
 
-int expandaln(mmseqs_output* out, int argc, const char **argv, const Command& command, bool returnAlnRes) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int expandaln(mmseqs_output* out, Parameters &par, bool returnAlnRes) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     DBReader<unsigned int> aReader(par.db1.c_str(), par.db1Index.c_str(), par.threads, DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     aReader.open(DBReader<unsigned int>::NOSORT);
@@ -359,10 +359,10 @@ int expandaln(mmseqs_output* out, int argc, const char **argv, const Command& co
     return EXIT_SUCCESS;
 }
 
-int expandaln(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    return expandaln(out, argc, argv, command, true);
+int expandaln(mmseqs_output* out, Parameters &par) {
+    return expandaln(out, par, true);
 }
 
-int expand2profile(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    return expandaln(out, argc, argv, command, false);
+int expand2profile(mmseqs_output* out, Parameters &par) {
+    return expandaln(out, par, false);
 }

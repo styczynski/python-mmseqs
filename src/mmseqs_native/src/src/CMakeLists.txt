@@ -42,6 +42,8 @@ add_library(mmseqs-framework
         MMseqsBase.cpp
         )
 
+set_target_properties(mmseqs-framework PROPERTIES LINK_FLAGS "-Wl,-undefined,error")
+
 target_include_directories(mmseqs-framework PUBLIC ${CMAKE_BINARY_DIR}/generated)
 target_include_directories(mmseqs-framework PUBLIC ${PROJECT_BINARY_DIR}/generated)
 target_include_directories(mmseqs-framework PUBLIC alignment)

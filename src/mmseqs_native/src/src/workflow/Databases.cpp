@@ -171,7 +171,7 @@ void appendPadded(std::string& dst, const std::string& value, size_t n, int dire
     }
 }
 
-std::string listDatabases(const Command &command, bool detailed) {
+std::string listDatabases(Parameters &par, bool detailed) {
     size_t nameWidth = 4, urlWidth = 3, dbTypeWidth = 4;
     for (size_t i = 0; i < downloads.size(); ++i) {
         nameWidth = std::max(nameWidth, strlen(downloads[i].name));
@@ -183,7 +183,7 @@ std::string listDatabases(const Command &command, bool detailed) {
     description.reserve(1024);
     if (detailed) {
         description += " By ";
-        description += command.author;
+        description += "??"; // TODO: Fix. Before it was command.author
         description += "\n";
     }
 
@@ -224,13 +224,13 @@ std::string listDatabases(const Command &command, bool detailed) {
     return description;
 }
 
-int databases(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, false, Parameters::PARSE_ALLOW_EMPTY, 0);
+int databases(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, false, Parameters::PARSE_ALLOW_EMPTY, 0);
 
-    std::string description = listDatabases(command, par.help);
+    std::string description = listDatabases(par, par.help);
     if (par.filenames.size() == 0 || par.help) {
-        par.printUsageMessage(command, par.help ? MMseqsParameter::COMMAND_EXPERT : 0, description.c_str());
+        // par.printUsageMessage(par, par.help ? MMseqsParameter::COMMAND_EXPERT : 0, description.c_str());
         EXIT(EXIT_SUCCESS);
     }
 
@@ -242,17 +242,17 @@ int databases(mmseqs_output* out, int argc, const char **argv, const Command &co
         }
     }
     if (downloadIdx == -1) {
-        par.printUsageMessage(command, par.help ? MMseqsParameter::COMMAND_EXPERT : 0, description.c_str());
+        // par.printUsageMessage(par, par.help ? MMseqsParameter::COMMAND_EXPERT : 0, description.c_str());
         Debug(Debug::ERROR) << "Selected database " << par.db1 << " was not found\n";
         EXIT(EXIT_FAILURE);
     }
-    par.printParameters(command.cmd, argc, argv, par.databases);
+//    par.printParameters(command.cmd, argc, argv, par.databases);
     std::string tmpDir = par.db3;
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, par.databases));
+    std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames, par.databases));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
-    tmpDir = FileUtil::createTemporaryDirectory(tmpDir, hash);
+    tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
     par.filenames.push_back(tmpDir);
 

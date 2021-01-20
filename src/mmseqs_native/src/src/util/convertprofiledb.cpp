@@ -128,9 +128,9 @@ void parseHMM(char *data, std::string *sequence, std::string *header, char *prof
     *size = curr_pos;
 }
 
-int convertprofiledb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int convertprofiledb(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     std::string data = par.db1;
     std::string index = par.db1Index;

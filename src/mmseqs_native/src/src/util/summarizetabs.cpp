@@ -217,11 +217,11 @@ int doAnnotate(Parameters &par) {
     return status;
 }
 
-int summarizetabs(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int summarizetabs(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
-    MMseqsMPI::init(argc, argv);
+    //MMseqsMPI::init(argc, argv);
 
 #ifdef HAVE_MPI
     int status = doAnnotate(par, MMseqsMPI::rank, MMseqsMPI::numProc);

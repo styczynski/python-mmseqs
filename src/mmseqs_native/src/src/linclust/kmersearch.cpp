@@ -132,10 +132,10 @@ void KmerSearch::writeResult(DBWriter & dbw, KmerPosition<short> *kmers, size_t 
 template void KmerSearch::writeResult<0>(DBWriter & dbw, KmerPosition<short> *kmers, size_t kmerCount);
 template void KmerSearch::writeResult<1>(DBWriter & dbw, KmerPosition<short> *kmers, size_t kmerCount);
 
-int kmersearch(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    setLinearFilterDefault(&par);
-    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_CLUSTLINEAR);
+int kmersearch(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    setLinearFilterDefault(&par);
+//    par.parseParameters(argc, argv, command, true, 0, MMseqsParameter::COMMAND_CLUSTLINEAR);
     int targetSeqType;
     int adjustedKmerSize = 0;
     if (Parameters::isEqualDbtype(FileUtil::parseDbType(par.db2.c_str()), Parameters::DBTYPE_INDEX_DB) == false) {
@@ -185,7 +185,7 @@ int kmersearch(mmseqs_output* out, int argc, const char **argv, const Command &c
 
     setKmerLengthAndAlphabet(par, queryDbr.getAminoAcidDBSize(), querySeqType);
 
-    par.printParameters(command.cmd, argc, argv, *command.params);
+    // par.printParameters(command.cmd, argc, argv, *command.params);
 
     //queryDbr.readMmapedDataInMemory();
 

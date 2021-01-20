@@ -19,10 +19,10 @@
 #include <omp.h>
 #endif
 
-int alignbykmer(mmseqs_output* out, int argc, const char **argv, const Command &command) {
+int alignbykmer(mmseqs_output* out, Parameters &par) {
     Debug(Debug::INFO) << "Rescore diagonals.\n";
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     bool touch = (par.preloadMode != Parameters::PRELOAD_MODE_MMAP);
     IndexReader * tDbrIdx = new IndexReader(par.db2, par.threads, IndexReader::SEQUENCES, (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0 );
@@ -62,7 +62,7 @@ int alignbykmer(mmseqs_output* out, int argc, const char **argv, const Command &
         gapOpen = par.gapOpen.aminoacids;
         gapExtend = par.gapExtend.aminoacids;
     }
-    par.printParameters(command.cmd, argc, argv, *command.params);
+    // par.printParameters(command.cmd, argc, argv, *command.params);
 
     DBReader<unsigned int> dbr_res(par.db3.c_str(), par.db3Index.c_str(), par.threads, DBReader<unsigned int>::USE_INDEX|DBReader<unsigned int>::USE_DATA);
     dbr_res.open(DBReader<unsigned int>::LINEAR_ACCCESS);

@@ -8,6 +8,7 @@
 #include "ScoreMatrix.h"
 #include "PrefilteringIndexReader.h"
 #include "QueryMatcher.h"
+#include "output.h"
 
 #include <string>
 #include <list>
@@ -16,6 +17,7 @@
 class Prefiltering {
 public:
     Prefiltering(
+            mmseqs_output* out,
             const std::string &queryDB,
             const std::string &queryDBIndex,
             const std::string &targetDB,
@@ -25,13 +27,13 @@ public:
 
     ~Prefiltering();
 
-    void runAllSplits(const std::string &resultDB, const std::string &resultDBIndex);
+    void runAllSplits(mmseqs_output* out, const std::string &resultDB, const std::string &resultDBIndex);
 
 #ifdef HAVE_MPI
-    void runMpiSplits(const std::string &resultDB, const std::string &resultDBIndex, const std::string &localTmpPath, const int runRandomId);
+    void runMpiSplits(mmseqs_output* out, const std::string &resultDB, const std::string &resultDBIndex, const std::string &localTmpPath, const int runRandomId);
 #endif
 
-    int runSplits(const std::string &resultDB, const std::string &resultDBIndex, size_t fromSplit, size_t splitProcessCount, bool merge);
+    int runSplits(mmseqs_output* out, const std::string &resultDB, const std::string &resultDBIndex, size_t fromSplit, size_t splitProcessCount, bool merge);
 
     // merge file
     void mergePrefilterSplits(const std::string &outDb, const std::string &outDBIndex,
@@ -98,7 +100,7 @@ private:
     const unsigned int threads;
     int compressed;
 
-    bool runSplit(const std::string &resultDB, const std::string &resultDBIndex, size_t split, bool merge);
+    bool runSplit(mmseqs_output* out, const std::string &resultDB, const std::string &resultDBIndex, size_t split, bool merge);
 
     // compute kmer size and split size for index table
     static std::pair<int, int> optimizeSplit(size_t totalMemoryInByte, DBReader<unsigned int> *tdbr, int alphabetSize, int kmerSize,
@@ -116,7 +118,7 @@ private:
 
 
     // needed for index lookup
-    void getIndexTable(int split, size_t dbFrom, size_t dbSize);
+    void getIndexTable(mmseqs_output* out, int split, size_t dbFrom, size_t dbSize);
 
     void printStatistics(const statistics_t &stats, std::list<int> **reslens,
                          unsigned int resLensSize, size_t empty, size_t maxResults);

@@ -17,37 +17,38 @@ void setEasyTaxonomyMustPassAlong(Parameters *p) {
     p->PARAM_WRITE_LOOKUP.wasSet = true;
 }
 
-int easytaxonomy(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-
-    for (size_t i = 0; i < par.createdb.size(); i++){
-        par.createdb[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.searchworkflow.size(); i++){
-        par.searchworkflow[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.convertalignments.size(); i++){
-        par.convertalignments[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.createtsv.size(); i++){
-        par.createtsv[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    par.PARAM_S.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_E.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-
-    setEasyTaxonomyDefaults(&par);
-    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
+int easytaxonomy(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//
+//    for (size_t i = 0; i < par.createdb.size(); i++){
+//        par.createdb[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.searchworkflow.size(); i++){
+//        par.searchworkflow[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.convertalignments.size(); i++){
+//        par.convertalignments[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.createtsv.size(); i++){
+//        par.createtsv[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    par.PARAM_S.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_E.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//
+//    setEasyTaxonomyDefaults(&par);
+//    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
     setEasyTaxonomyMustPassAlong(&par);
 
     std::string tmpDir = par.filenames.back();
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, *command.params));
+    //TODO: Fix
+    std::string hash = "abc"; //SSTR(par.hashParameter(par.databases_types, par.filenames, *command.params));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
-    tmpDir = FileUtil::createTemporaryDirectory(tmpDir, hash);
+    tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
 
     CommandCaller cmd;

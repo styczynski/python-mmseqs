@@ -11,8 +11,9 @@
 #include <cstddef>
 #include <utility>
 
-#include "Command.h"
 #include "MultiParam.h"
+#include "Command.h"
+
 
 #define PARAMETER(x) const static int x##_ID = __COUNTER__; \
     				 MMseqsParameter x;
@@ -280,6 +281,8 @@ public:
     // result direction
     static const int PARAM_RESULT_DIRECTION_QUERY  = 0;
     static const int PARAM_RESULT_DIRECTION_TARGET = 1;
+
+    std::string baseTmpPath = "";
 
     // path to databases
     std::string db1;
@@ -649,13 +652,13 @@ public:
     }
 
     void setDefaults();
-    void parseParameters(int argc, const char *pargv[], const Command &command, bool printPar, int parseFlags,
-                         int outputFlags);
-    void printUsageMessage(const Command& command, unsigned int outputFlag, const char* extraText = NULL);
-    void printParameters(const std::string &module, int argc, const char* pargv[],
-                         const std::vector<MMseqsParameter*> &par);
-
-    void checkIfDatabaseIsValid(const Command& command, int argc, const char** argv, bool isStartVar, bool isMiddleVar, bool isEndVar);
+//    void parseParameters(int argc, const char *pargv[], const Command &command, bool printPar, int parseFlags,
+//                         int outputFlags);
+//    void printUsageMessage(const Command& command, unsigned int outputFlag, const char* extraText = NULL);
+//    void printParameters(const std::string &module, int argc, const char* pargv[],
+//                         const std::vector<MMseqsParameter*> &par);
+//
+//    void checkIfDatabaseIsValid(const Command& command, int argc, const char** argv, bool isStartVar, bool isMiddleVar, bool isEndVar);
 
     std::vector<MMseqsParameter*> removeParameter(const std::vector<MMseqsParameter*>& par, const MMseqsParameter& x);
 
@@ -1066,6 +1069,8 @@ public:
     std::vector<MMseqsParameter*> databases;
     std::vector<MMseqsParameter*> tar2db;
 
+    std::vector<DbType> databases_types;
+
     std::vector<MMseqsParameter*> combineList(const std::vector<MMseqsParameter*> &par1,
                                              const std::vector<MMseqsParameter*> &par2);
 
@@ -1081,6 +1086,9 @@ public:
     static bool isEqualDbtype(const int type1, const int type2) {
         return ((type1 & 0x3FFFFFFF) == (type2 & 0x3FFFFFFF));
     }
+
+    void setSeedSubstitutionMatrices(std::string aminoacids, std::string nucleotides);
+    void setDBFields(int no, std::string path);
 
     static const char* getDbTypeName(int dbtype) {
         switch (dbtype & 0x7FFFFFFF) {
@@ -1108,13 +1116,25 @@ public:
     }
 
 protected:
-    Parameters();
     static Parameters* instance;
-    virtual ~Parameters() {};
 
-private:
-    Parameters(Parameters const&);
+public:
+    Parameters();
     void operator=(Parameters const&);
+    virtual ~Parameters() {};
+};
+
+struct Command {
+    const char *cmd;
+    int (*commandFunction)(mmseqs_output* out, Parameters &par);
+    std::vector<MMseqsParameter*>* params;
+    CommandMode mode;
+    const char *description;
+    const char *examples;
+    const char *author;
+    const char *usage;
+    unsigned int citations;
+    std::vector<DbType> databases;
 };
 
 #endif

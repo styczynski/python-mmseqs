@@ -375,10 +375,10 @@ int doRescorediagonal(Parameters &par,
     return 0;
 }
 
-int rescorediagonal(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    MMseqsMPI::init(argc, argv);
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int rescorediagonal(mmseqs_output* out, Parameters &par) {
+//    MMseqsMPI::init(argc, argv);
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     if (par.wrappedScoring && par.rescoreMode != Parameters::RESCORE_MODE_HAMMING) {
         Debug(Debug::ERROR) << "ERROR: wrapped scoring is only allowed with RESCORE_MODE_HAMMING\n";

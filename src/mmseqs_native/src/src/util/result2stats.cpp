@@ -331,9 +331,9 @@ int StatsComputer::sequenceWise(typename PerSequence<T>::type call, bool onlyRes
     return 0;
 }
 
-int result2stats(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int result2stats(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     StatsComputer computeStats(par);
     return computeStats.run();

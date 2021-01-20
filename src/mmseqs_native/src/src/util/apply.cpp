@@ -6,7 +6,7 @@
 #include "output.h"
 
 #if defined(__CYGWIN__) || defined(__EMSCRIPTEN__)
-int apply(mmseqs_output* out, int argc, const char **argv, const Command& command) {
+int apply(mmseqs_output* out, Parameters &par) {
     Debug(Debug::ERROR) << "apply is not supported on Windows/Cygwin\n";
     EXIT(EXIT_FAILURE);
 }
@@ -277,11 +277,11 @@ void free_local_environment(char** local_environ) {
     free(local_environ);
 }
 
-int apply(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    MMseqsMPI::init(argc, argv);
-
-    Parameters& par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, Parameters::PARSE_REST, 0);
+int apply(mmseqs_output* out, Parameters &par) {
+//    MMseqsMPI::init(argc, argv);
+//
+//    Parameters& par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, Parameters::PARSE_REST, 0);
 
 #ifdef OPENMP
     // forking does not play well with OpenMP threads

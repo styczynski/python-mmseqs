@@ -16,9 +16,9 @@ static bool compareToFirstInt(const std::pair<unsigned int, unsigned int>& lhs, 
     return (lhs.first <= rhs.first);
 }
 
-int dolca(mmseqs_output* out, int argc, const char **argv, const Command& command, bool majority) {
-    Parameters& par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int dolca(mmseqs_output* out, Parameters &par, bool majority) {
+//    Parameters& par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
     NcbiTaxonomy * t = NcbiTaxonomy::openTaxonomy(par.db1);
 
     std::vector<std::pair<unsigned int, unsigned int>> mapping;
@@ -212,10 +212,10 @@ int dolca(mmseqs_output* out, int argc, const char **argv, const Command& comman
     return EXIT_SUCCESS;
 }
 
-int lca(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    return dolca(out, argc, argv, command, false);
+int lca(mmseqs_output* out, Parameters &par) {
+    return dolca(out, par, false);
 }
 
-int majoritylca(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    return dolca(out, argc, argv, command, true);
+int majoritylca(mmseqs_output* out, Parameters &par) {
+    return dolca(out, par, true);
 }

@@ -9,37 +9,37 @@
 #include "easyrbh.sh.h"
 #include "output.h"
 
-int easyrbh(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    par.PARAM_ADD_BACKTRACE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_MAX_REJECTED.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_ZDROP.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_DB_OUTPUT.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_OVERLAP.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_DB_OUTPUT.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_RESCORE_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    for (size_t i = 0; i < par.createdb.size(); i++){
-        par.createdb[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.extractorfs.size(); i++){
-        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.translatenucs.size(); i++){
-        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.result2profile.size(); i++){
-        par.result2profile[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-
-    par.sensitivity = 5.7;
-    par.removeTmpFiles = true;
-    par.alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV_SEQID;
-    par.writeLookup = false;
-    par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_SOFT;
-    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
+int easyrbh(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.PARAM_ADD_BACKTRACE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_MAX_REJECTED.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_ZDROP.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_DB_OUTPUT.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_OVERLAP.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_DB_OUTPUT.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_RESCORE_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    for (size_t i = 0; i < par.createdb.size(); i++){
+//        par.createdb[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.extractorfs.size(); i++){
+//        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.translatenucs.size(); i++){
+//        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.result2profile.size(); i++){
+//        par.result2profile[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//
+//    par.sensitivity = 5.7;
+//    par.removeTmpFiles = true;
+//    par.alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV_SEQID;
+//    par.writeLookup = false;
+//    par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_SOFT;
+//    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
     par.PARAM_S.wasSet = true;
     par.PARAM_REMOVE_TMP_FILES.wasSet = true;
     par.PARAM_ALIGNMENT_MODE.wasSet = true;
@@ -66,11 +66,12 @@ int easyrbh(mmseqs_output* out, int argc, const char **argv, const Command &comm
     }
 
     std::string tmpDir = par.filenames.back();
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, *command.params));
+    //TODO: Fix
+    std::string hash = "abc"; //SSTR(par.hashParameter(par.databases_types, par.filenames, *command.params));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
-    tmpDir = FileUtil::createTemporaryDirectory(tmpDir, hash);
+    tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
 
     CommandCaller cmd;

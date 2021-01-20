@@ -50,9 +50,9 @@ int mtar_gzopen(mtar_t *tar, const char *filename) {
 #include <bzlib.h>
 #endif
 
-int tar2db(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
+int tar2db(mmseqs_output* out,Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
 
     std::vector<std::string> filenames(par.filenames);
     for (size_t i = 0; i < filenames.size(); i++) {

@@ -4,9 +4,9 @@
 #include "NcbiTaxonomy.h"
 #include "output.h"
 
-int createbintaxonomy(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, false, 0, 0);
+int createbintaxonomy(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, false, 0, 0);
     NcbiTaxonomy taxonomy(par.db1, par.db2, par.db3);
     std::pair<char*, size_t> serialized = NcbiTaxonomy::serialize(taxonomy);
     FILE* handle = fopen(par.db4.c_str(), "w");

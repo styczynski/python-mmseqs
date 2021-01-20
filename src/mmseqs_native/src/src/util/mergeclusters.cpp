@@ -11,9 +11,9 @@
 #include <omp.h>
 #endif
 
-int mergeclusters(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, true, 0);
+int mergeclusters(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, true, 0);
 
     std::list<std::string> clusterings;
     for (size_t i = 2; i < par.filenames.size(); i++) {

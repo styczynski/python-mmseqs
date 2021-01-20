@@ -63,13 +63,13 @@ void setConvertKbDefaults(Parameters *par, unsigned int maxColumns) {
     par->kbColumns = ss.str();
 }
 
-int convertkb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
+int convertkb(mmseqs_output* out, Parameters &par) {
     UniprotKB kb;
     size_t columns = static_cast<unsigned int>(kb.getColumnCount());
 
-    Parameters &par = Parameters::getInstance();
-    setConvertKbDefaults(&par, columns);
-    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
+//    Parameters &par = Parameters::getInstance();
+//    setConvertKbDefaults(&par, columns);
+//    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
 
     std::string outputBase = par.filenames.back();
     par.filenames.pop_back();

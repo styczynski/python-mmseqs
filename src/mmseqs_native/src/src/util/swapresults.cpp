@@ -348,14 +348,12 @@ int doswap(Parameters& par, bool isGeneralMode) {
     return EXIT_SUCCESS;
 }
 
-int swapdb(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int swapdb(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
     return doswap(par, true);
 }
 
-int swapresults(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int swapresults(mmseqs_output* out, Parameters &par) {
     return doswap(par, false);
 }

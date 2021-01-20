@@ -17,37 +17,37 @@ void setRbhDefaults(Parameters *p) {
     p->orfMaxLength = 32734;
 }
 
-int rbh(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    setRbhDefaults(&par);
-
-    // set a lot of possibly misleading comments to EXPERT mode
-    par.PARAM_OVERLAP.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_DB_OUTPUT.addCategory(MMseqsParameter::COMMAND_EXPERT);
-
-    for (size_t i = 0; i < par.extractorfs.size(); i++){
-        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.translatenucs.size(); i++){
-        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.splitsequence.size(); i++) {
-        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    // restore threads and verbosity
-    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int rbh(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    setRbhDefaults(&par);
+//
+//    // set a lot of possibly misleading comments to EXPERT mode
+//    par.PARAM_OVERLAP.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_DB_OUTPUT.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//
+//    for (size_t i = 0; i < par.extractorfs.size(); i++){
+//        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.translatenucs.size(); i++){
+//        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.splitsequence.size(); i++) {
+//        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    // restore threads and verbosity
+//    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
 
     std::string tmpDir = par.db4;
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, par.searchworkflow));
+    std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames, par.searchworkflow));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
-    tmpDir = FileUtil::createTemporaryDirectory(tmpDir, hash);
+    tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
     par.filenames.push_back(tmpDir);
 

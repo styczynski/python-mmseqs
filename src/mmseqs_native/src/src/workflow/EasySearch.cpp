@@ -28,36 +28,36 @@ void setEasySearchMustPassAlong(Parameters *p, bool linsearch) {
     p->PARAM_ALIGNMENT_MODE.wasSet = true;
 }
 
-int doeasysearch(mmseqs_output* out, int argc, const char **argv, const Command &command, bool linsearch) {
-    Parameters &par = Parameters::getInstance();
-    par.PARAM_ADD_BACKTRACE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_MAX_REJECTED.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_ZDROP.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_DB_OUTPUT.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_OVERLAP.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_DB_OUTPUT.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_RESCORE_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
-    for (size_t i = 0; i < par.createdb.size(); i++){
-        par.createdb[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.extractorfs.size(); i++){
-        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.translatenucs.size(); i++){
-        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.splitsequence.size(); i++) {
-        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    for (size_t i = 0; i < par.result2profile.size(); i++){
-        par.result2profile[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
+//    Parameters &par = Parameters::getInstance();
+//    par.PARAM_ADD_BACKTRACE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_MAX_REJECTED.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_ZDROP.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_DB_OUTPUT.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_OVERLAP.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_DB_OUTPUT.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_RESCORE_MODE.addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    for (size_t i = 0; i < par.createdb.size(); i++){
+//        par.createdb[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.extractorfs.size(); i++){
+//        par.extractorfs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.translatenucs.size(); i++){
+//        par.translatenucs[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.splitsequence.size(); i++) {
+//        par.splitsequence[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    for (size_t i = 0; i < par.result2profile.size(); i++){
+//        par.result2profile[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
 
-    setEasySearchDefaults(&par, linsearch);
-    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
+//    setEasySearchDefaults(&par, linsearch);
+//    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
     setEasySearchMustPassAlong(&par, linsearch);
 
     bool needBacktrace = false;
@@ -86,11 +86,12 @@ int doeasysearch(mmseqs_output* out, int argc, const char **argv, const Command 
     }
 
     std::string tmpDir = par.filenames.back();
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, *command.params));
+    // TODO: Fix
+    std::string hash = "abc"; //SSTR(par.hashParameter(par.databases_types, par.filenames, *command.params));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
-    tmpDir = FileUtil::createTemporaryDirectory(tmpDir, hash);
+    tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
 
     CommandCaller cmd;
@@ -147,10 +148,10 @@ int doeasysearch(mmseqs_output* out, int argc, const char **argv, const Command 
     return EXIT_FAILURE;
 }
 
-int easysearch(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    return doeasysearch(out, argc, argv, command, false);
+int easysearch(mmseqs_output* out, Parameters &par) {
+    return doeasysearch(out, par, false);
 }
 
-int easylinsearch(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    return doeasysearch(out, argc, argv, command, true);
+int easylinsearch(mmseqs_output* out, Parameters &par) {
+    return doeasysearch(out, par, true);
 }

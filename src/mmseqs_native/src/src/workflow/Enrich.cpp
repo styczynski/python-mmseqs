@@ -14,17 +14,17 @@ void setEnrichWorkflowDefaults(Parameters *p) {
     p->expansionMode = 1;
 }
 
-int enrich(mmseqs_output* out, int argc, const char **argv, const Command &command) {
-    Parameters &par = Parameters::getInstance();
-    setEnrichWorkflowDefaults(&par);
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int enrich(mmseqs_output* out, Parameters &par) {
+//    Parameters &par = Parameters::getInstance();
+//    setEnrichWorkflowDefaults(&par);
+////    par.parseParameters(argc, argv, command, true, 0, 0);
 
     std::string tmpDir = par.db6;
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, par.enrichworkflow));
+    std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames, par.enrichworkflow));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
-    tmpDir = FileUtil::createTemporaryDirectory(tmpDir, hash);
+    tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
     par.filenames.push_back(tmpDir);
 

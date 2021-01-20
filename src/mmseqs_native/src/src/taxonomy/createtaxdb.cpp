@@ -8,9 +8,9 @@
 #include "createtaxdb.sh.h"
 #include "output.h"
 
-int createtaxdb(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int createtaxdb(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     std::string tmp = par.filenames.back();
     if (FileUtil::directoryExists(tmp.c_str())==false){

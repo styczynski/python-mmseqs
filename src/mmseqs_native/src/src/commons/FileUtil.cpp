@@ -417,7 +417,8 @@ int FileUtil::parseDbType(const char *name) {
     return dbtype;
 }
 
-std::string FileUtil::createTemporaryDirectory(const std::string& basePath, const std::string& subDirectory) {
+std::string FileUtil::createTemporaryDirectory(std::string baseTmpPath, const std::string& tmpPath, const std::string& subDirectory) {
+    std::string basePath = baseTmpPath + tmpPath;
     std::string tmpDir(basePath);
     if (FileUtil::directoryExists(tmpDir.c_str()) == false) {
         Debug(Debug::INFO) << "Path " << tmpDir << " does not exist or is not a directory.\n";

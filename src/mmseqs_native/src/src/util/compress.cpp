@@ -8,9 +8,9 @@
 #include <omp.h>
 #endif
 
-int doCompression(mmseqs_output* out, int argc, const char **argv, const Command& command, bool shouldCompress) {
-    Parameters& par = Parameters::getInstance();
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int doCompression(mmseqs_output* out, Parameters &par, bool shouldCompress) {
+//    Parameters& par = Parameters::getInstance();
+//    par.parseParameters(argc, argv, command, true, 0, 0);
 
     DBReader<unsigned int> reader(par.db1.c_str(), par.db1Index.c_str(), par.threads, DBReader<unsigned int>::USE_INDEX|DBReader<unsigned int>::USE_DATA);
     reader.open(DBReader<unsigned int>::NOSORT);
@@ -48,10 +48,10 @@ int doCompression(mmseqs_output* out, int argc, const char **argv, const Command
     return EXIT_SUCCESS;
 }
 
-int compress(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    return doCompression(out, argc, argv, command, true);
+int compress(mmseqs_output* out, Parameters &par) {
+    return doCompression(out, par, true);
 }
 
-int decompress(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    return doCompression(out, argc, argv, command, false);
+int decompress(mmseqs_output* out, Parameters &par) {
+    return doCompression(out, par, false);
 }

@@ -44,6 +44,7 @@ class CMakeBuild(build_ext):
             "-DCMAKE_LIBRARY_OUTPUT_DIRECTORY=" + extdir,
             "-DPYTHON_EXECUTABLE=" + sys.executable,
             "-DREQUIRE_OPENMP=0",
+            "-DCMAKE_BUILD_TYPE=Debug",
         ]
 
         cfg = "Debug" if self.debug else "Release"

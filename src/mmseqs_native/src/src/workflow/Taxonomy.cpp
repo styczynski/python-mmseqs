@@ -35,20 +35,20 @@ void setTaxonomyMustPassAlong(Parameters *p) {
     p->PARAM_ORF_MAX_LENGTH.wasSet = true;
 }
 
-int taxonomy(mmseqs_output* out, int argc, const char **argv, const Command& command) {
-    Parameters& par = Parameters::getInstance();
-
-    for (size_t i = 0; i < par.searchworkflow.size(); i++) {
-        par.searchworkflow[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
-    }
-    par.PARAM_S.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_E.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
-
-    setTaxonomyDefaults(&par);
-    par.parseParameters(argc, argv, command, true, 0, 0);
+int taxonomy(mmseqs_output* out, Parameters &par) {
+//    Parameters& par = Parameters::getInstance();
+//
+//    for (size_t i = 0; i < par.searchworkflow.size(); i++) {
+//        par.searchworkflow[i]->addCategory(MMseqsParameter::COMMAND_EXPERT);
+//    }
+//    par.PARAM_S.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_E.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_COMPRESSED.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_THREADS.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
+//
+//    setTaxonomyDefaults(&par);
+//    par.parseParameters(argc, argv, command, true, 0, 0);
     setTaxonomyMustPassAlong(&par);
 
     if (par.taxonomySearchMode == Parameters::TAXONOMY_2BLCA) {
@@ -83,11 +83,11 @@ int taxonomy(mmseqs_output* out, int argc, const char **argv, const Command& com
     }
 
     std::string tmpDir = par.db4;
-    std::string hash = SSTR(par.hashParameter(command.databases, par.filenames, par.taxonomy));
+    std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames, par.taxonomy));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
     }
-    tmpDir = FileUtil::createTemporaryDirectory(tmpDir, hash);
+    tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
     par.filenames.push_back(tmpDir);
 

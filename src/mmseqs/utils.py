@@ -1,6 +1,7 @@
 import os
 from typing import List, Optional
 from glob import glob
+import shutil
 
 def to_args(args_str: str) -> List[str]:
    return [param.strip() for param in args_str.split(' ') if len(param.strip()) > 0]
@@ -15,4 +16,4 @@ def remove_paths(paths: List[str], base_path: Optional[str] = None, is_glob=Fals
         else:
             evaluated_paths = [glob_pattern]
         for file_path in evaluated_paths:
-            os.unlink(file_path)
+            shutil.rmtree(file_path)
