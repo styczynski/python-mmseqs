@@ -1,8 +1,10 @@
 import mmseqs
 
 client = mmseqs.MMSeqs()
-client.databases.create("test", "Test database", ["input.fasta"])
-client.databases[0].create_index()
+# client.databases.create("test", "Test database", ["input.fasta"])
+# client.databases[0].create_index()
+client.databases[0].search('query.fasta')
+
 
 # print(client.databases.list())
 # client.databases.create("test", "Test database", ["input.fasta"])

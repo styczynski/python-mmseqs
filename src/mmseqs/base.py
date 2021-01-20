@@ -15,6 +15,7 @@ class MMSeqsSettings:
     """Class for keeping track of an item in inventory."""
     storage_directory: str
     seq_storage_directory: str
+    seq_results_directory: str
     tmp_directory: str
     meta_db: Optional[MetaDatabase]
 

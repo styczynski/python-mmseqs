@@ -4,6 +4,7 @@
 #include "FileUtil.h"
 #include "CommandCaller.h"
 #include "Util.h"
+#include "Application.h"
 #include "Debug.h"
 #include "Parameters.h"
 #include "easysearch.sh.h"
@@ -58,8 +59,8 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
 
 //    setEasySearchDefaults(&par, linsearch);
 //    par.parseParameters(argc, argv, command, true, Parameters::PARSE_VARIADIC, 0);
-    setEasySearchMustPassAlong(&par, linsearch);
-
+    //setEasySearchMustPassAlong(&par, linsearch);
+    
     bool needBacktrace = false;
     bool needTaxonomy = false;
     bool needTaxonomyMapping = false;
@@ -72,21 +73,25 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
         Parameters::getOutputFormat(par.formatAlignmentMode, par.outfmt, needSequenceDB, needBacktrace, needFullHeaders,
                 needLookup, needSource, needTaxonomyMapping, needTaxonomy);
     }
+    
 
     if (par.formatAlignmentMode == Parameters::FORMAT_ALIGNMENT_SAM || par.greedyBestHits) {
         needBacktrace = true;
     }
+    
     if (needBacktrace) {
         Debug(Debug::INFO) << "Alignment backtraces will be computed, since they were requested by output format.\n";
         par.addBacktrace = true;
         par.PARAM_ADD_BACKTRACE.wasSet = true;
     }
+    
     if(needLookup){
         par.writeLookup = true;
     }
 
     std::string tmpDir = par.filenames.back();
     // TODO: Fix
+    
     std::string hash = "abc"; //SSTR(par.hashParameter(par.databases_types, par.filenames, *command.params));
     if (par.reuseLatest) {
         hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
@@ -94,58 +99,129 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
     tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
     par.filenames.pop_back();
 
-    CommandCaller cmd;
-    cmd.addVariable("TMP_PATH", tmpDir.c_str());
-    cmd.addVariable("RESULTS", par.filenames.back().c_str());
+    out->output_string("TMP_PATH", tmpDir);
+    out->output_string("RESULTS", par.filenames.back());
     par.filenames.pop_back();
-    std::string target = par.filenames.back().c_str();
-    cmd.addVariable("TARGET", target.c_str());
+    std::string target = par.filenames.back();
+    out->output_string("TARGET", target);
     par.filenames.pop_back();
 
     if (needTaxonomy || needTaxonomyMapping) {
         std::vector<std::string> missingFiles = Parameters::findMissingTaxDbFiles(target);
         if (missingFiles.empty() == false) {
             Parameters::printTaxDbError(target, missingFiles);
-            EXIT(EXIT_FAILURE);
+            return 1;
         }
     }
 
+    std::string search_module = "";
     if (linsearch) {
+        search_module = "linsearch";
         const bool isIndex = LinsearchIndexReader::searchForIndex(target).empty() == false;
-        cmd.addVariable("INDEXEXT", isIndex ? ".linidx" : NULL);
-        cmd.addVariable("SEARCH_MODULE", "linsearch");
-        cmd.addVariable("LINSEARCH", "TRUE");
-        cmd.addVariable("CREATELININDEX_PAR", par.createParameterString(par.createlinindex).c_str());
-        cmd.addVariable("SEARCH_PAR", par.createParameterString(par.linsearchworkflow, true).c_str());
+        out->output_string("INDEXEXT", isIndex ? ".linidx" : "");
+        out->output_string("SEARCH_MODULE", "linsearch");
+        out->output_string("LINSEARCH", "TRUE");
+        out->output_string("CREATELININDEX_PAR", par.createParameterString(par.createlinindex));
+        out->output_string("SEARCH_PAR", par.createParameterString(par.linsearchworkflow, true));
     } else {
+        search_module = "search";
         const bool isIndex = PrefilteringIndexReader::searchForIndex(target).empty() == false;
-        cmd.addVariable("INDEXEXT", isIndex ? ".idx" : NULL);
-        cmd.addVariable("SEARCH_MODULE", "search");
-        cmd.addVariable("LINSEARCH", NULL);
-        cmd.addVariable("CREATELININDEX_PAR", NULL);
-        cmd.addVariable("SEARCH_PAR", par.createParameterString(par.searchworkflow, true).c_str());
+        out->output_string("INDEXEXT", isIndex ? ".idx" : "");
+        out->output_string("SEARCH_MODULE", "search");
+        out->output_string("LINSEARCH", "");
+        out->output_string("CREATELININDEX_PAR", "");
+        out->output_string("SEARCH_PAR", par.createParameterString(par.searchworkflow, true));
 
     }
-    cmd.addVariable("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : NULL);
-    cmd.addVariable("GREEDY_BEST_HITS", par.greedyBestHits ? "TRUE" : NULL);
-    cmd.addVariable("LEAVE_INPUT", par.dbOut ? "TRUE" : NULL);
+    out->output_string("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : "");
+    out->output_string("GREEDY_BEST_HITS", par.greedyBestHits ? "TRUE" : "");
+    out->output_string("LEAVE_INPUT", par.dbOut ? "TRUE" : "");
 
-    cmd.addVariable("RUNNER", par.runner.c_str());
-    cmd.addVariable("VERBOSITY", par.createParameterString(par.onlyverbosity).c_str());
+    out->output_string("RUNNER", par.runner);
+    out->output_string("VERBOSITY", par.createParameterString(par.onlyverbosity));
 
-    cmd.addVariable("CREATEDB_QUERY_PAR", par.createParameterString(par.createdb).c_str());
+    out->output_string("CREATEDB_QUERY_PAR", par.createParameterString(par.createdb));
     par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_HARD;
-    cmd.addVariable("CREATEDB_PAR", par.createParameterString(par.createdb).c_str());
-    cmd.addVariable("CONVERT_PAR", par.createParameterString(par.convertalignments).c_str());
-    cmd.addVariable("SUMMARIZE_PAR", par.createParameterString(par.summarizeresult).c_str());
+    out->output_string("CREATEDB_PAR", par.createParameterString(par.createdb));
+    out->output_string("CONVERT_PAR", par.createParameterString(par.convertalignments));
+    out->output_string("SUMMARIZE_PAR", par.createParameterString(par.summarizeresult));
 
-    std::string program = tmpDir + "/easysearch.sh";
-    FileUtil::writeFile(program, easysearch_sh, easysearch_sh_len);
-    cmd.execProgram(program.c_str(), par.filenames);
+    std::string query_file_path = par.filenames.back();
 
-    // Should never get here
-    assert(false);
-    return EXIT_FAILURE;
+    if (!FileUtil::fileExists((tmpDir + "/query.dbtype").c_str())) {
+        Parameters createdb_par;
+        std::vector<std::string> createdb_filenames = {query_file_path, tmpDir + "/query"};
+        createdb_par.filenames = createdb_filenames;
+        createdb_par.dbType = 0;
+        createdb_par.shuffleDatabase = 0;
+        createdb_par.createdbMode = 0;
+        createdb_par.identifierOffset = 0;
+        createdb_par.writeLookup = 0;
+        createdb_par.compressed = 0;
+        subcall_mmseqs(out, "createdb", createdb_par);
+    }
+
+    if (!FileUtil::fileExists((target + ".dbtype").c_str())) {
+        if (!FileUtil::fileExists((tmpDir + "/target").c_str())) {
+            Parameters createdb_par;
+            std::vector<std::string> createdb_filenames = {target, tmpDir + "/target"};
+            createdb_par.filenames = createdb_filenames;
+            createdb_par.dbType = 0;
+            createdb_par.shuffleDatabase = 0;
+            createdb_par.createdbMode = 0;
+            createdb_par.identifierOffset = 0;
+            createdb_par.writeLookup = 0;
+            createdb_par.compressed = 0;
+            subcall_mmseqs(out, "createdb", createdb_par);
+        }
+        target = tmpDir + "/target";
+    }
+
+    if (linsearch) {
+        if (!FileUtil::fileExists((target + ".linidx").c_str())) {
+            Parameters createlinindex_par;
+            std::vector<std::string> createlinindex_filenames = {tmpDir + "/index_tmp"};
+            createlinindex_par.filenames = createlinindex_filenames;
+            createlinindex_par.setDBFields(1, target);
+            createlinindex_par.setDBFields(2, tmpDir + "/index_tmp");
+            createlinindex_par.orfStartMode=1;
+            createlinindex_par.orfMinLength=30;
+            createlinindex_par.orfMaxLength=32734;
+            createlinindex_par.kmerScore=0;
+            createlinindex_par.maskMode=1;
+            createlinindex_par.sensitivity=7.5;
+            createlinindex_par.removeTmpFiles=true;
+            subcall_mmseqs(out, "createlinindex", createlinindex_par);
+        }
+    }
+
+    std::string intermediate = tmpDir + "/result";
+    if (!FileUtil::fileExists((intermediate + ".dbtype").c_str())) {
+        //search_module
+        Parameters search_par;
+        std::vector<std::string> search_filenames = {
+            tmpDir + "/query",
+            target,
+            intermediate,
+            tmpDir + "/search_tmp",
+        };
+        search_par.filenames = search_filenames;
+        search_par.setDBFields(1, tmpDir + "/query");
+        search_par.setDBFields(2, target);
+        search_par.setDBFields(3, intermediate);
+        search_par.setDBFields(4, tmpDir + "/search_tmp");
+        subcall_mmseqs(out, search_module, search_par);
+    }
+
+    return 0;
+
+//    std::string program = tmpDir + "/easysearch.sh";
+//    FileUtil::writeFile(program, easysearch_sh, easysearch_sh_len);
+//    cmd.execProgram(program.c_str(), par.filenames);
+//
+//    // Should never get here
+//    assert(false);
+//    return EXIT_FAILURE;
 }
 
 int easysearch(mmseqs_output* out, Parameters &par) {

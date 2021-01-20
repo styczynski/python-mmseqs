@@ -6,6 +6,8 @@ set(ENABLE_WERROR 0 CACHE BOOL "Enable Warnings as Errors")
 #set(DISABLE_LTO 0 CACHE BOOL "Disable link-time optimization in non-debug builds")
 set(REQUIRE_OPENMP 1 CACHE BOOL "Require availability of OpenMP")
 
+set(CMAKE_BUILD_TYPE Debug)
+add_compile_options(-g)
 include(AppendTargetProperty)
 
 add_subdirectory(alignment)
@@ -70,7 +72,7 @@ add_dependencies(mmseqs-framework generated)
 #    endif ()
 #endif ()
 
-append_target_property(mmseqs-framework COMPILE_FLAGS ${MMSEQS_CXX_FLAGS} -pedantic -Wall -Wextra -Wdisabled-optimization)
+append_target_property(mmseqs-framework COMPILE_FLAGS ${MMSEQS_CXX_FLAGS} -pedantic -Wall -Wextra -Wdisabled-optimization -g)
 append_target_property(mmseqs-framework LINK_FLAGS ${MMSEQS_CXX_FLAGS} -pedantic -Wall -Wextra -Wdisabled-optimization)
 
 

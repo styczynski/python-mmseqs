@@ -59,7 +59,7 @@ int createindex(mmseqs_output* out, Parameters &par, const std::string &indexerM
     std::string tmp_db_path = "";
     if (flag == "TRANSLATED") {
         tmp_db_path = tmpDir + "/orfs_aa";
-        if (FileUtil::fileExists((tmp_db_path + ".dbtype").c_str())) {
+        if (!FileUtil::fileExists((tmp_db_path + ".dbtype").c_str())) {
             Parameters extractorfs_par;
             extractorfs_par.setDBFields(1, par.db1);
             extractorfs_par.setDBFields(2, tmp_db_path + ".dbtype");
@@ -82,7 +82,7 @@ int createindex(mmseqs_output* out, Parameters &par, const std::string &indexerM
         }
     } else if (flag == "LIN_NUCL") {
         tmp_db_path = tmpDir + "/nucl_split_seq";
-        if (FileUtil::fileExists((tmp_db_path + ".dbtype").c_str())) {
+        if (!FileUtil::fileExists((tmp_db_path + ".dbtype").c_str())) {
             Parameters extractorfs_par;
             extractorfs_par.maxSeqLen = 65535;
             extractorfs_par.sequenceOverlap = 0;

@@ -70,7 +70,18 @@ class Database:
             meta_db.set('databases', left_dbs)
 
     def search(self, search_input: str):
-        pass
+        tmp_dir = 'tmp'
+        results_path = os.path.join(self._base.settings.seq_results_directory, f'{self.name}.query_results.m8')
+        seq_db_path = os.path.join(self._base.settings.seq_storage_directory, self.name)
+        out = self._base._execute_cli('easy-search', dict(
+            filenames=[search_input, seq_db_path, results_path, tmp_dir],
+            shuffleDatabase=False,
+            sensitivity=5.7,
+            removeTmpFiles=True,
+            writeLookup=False,
+            alignmentMode=3,
+        ))
+        print(out.vars_str)
 
     def create_index(self, search_type: str = 'nucleotides') -> IndexStats:
         tmp_dir = 'tmp'

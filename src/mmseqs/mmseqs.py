@@ -14,10 +14,15 @@ class MMSeqs:
             storage_directory=storage_directory,
             seq_storage_directory=os.path.join(storage_directory, 'databases'),
             tmp_directory=os.path.join(storage_directory, 'workdir', ''),
+            seq_results_directory=os.path.join(storage_directory, 'results', ''),
             meta_db=MetaDatabase(os.path.join(storage_directory, 'mmseqs_meta.sqlite')),
         )
         self.databases = Databases(self.execute, self.settings)
-        for directory in [self.settings.storage_directory, self.settings.seq_storage_directory, self.settings.tmp_directory]:
+        for directory in [
+            self.settings.storage_directory,
+            self.settings.seq_storage_directory,
+            self.settings.tmp_directory,
+            self.settings.seq_results_directory]:
             if not os.path.isdir(directory):
                 pathlib.Path(directory).mkdir(parents=True, exist_ok=True)
         with self.settings.meta_db.open() as meta_db:
