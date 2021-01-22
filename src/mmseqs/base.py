@@ -46,6 +46,26 @@ class MetaDatabaseConnection:
         list_vals.append(obj)
         self.connection[name] = list_vals
 
+    def list_replace(self, name, base, replacement, filter_fn, save_back=False):
+        result_objs = []
+        called_once = False
+        for obj in self.connection[name]:
+            if filter_fn(obj):
+                if not called_once:
+                    if hasattr(replacement, '_base'):
+                        delattr(replacement, '_base')
+                    result_objs.append(replacement)
+                called_once = True
+            else:
+                if hasattr(obj, '_base'):
+                    delattr(obj, '_base')
+                result_objs.append(obj)
+        if save_back:
+            self.connection[name] = result_objs
+        for obj in result_objs:
+            setattr(obj, '_base', base)
+        return result_objs
+
     def list_filter(self, name, base, filter_fn, save_back=False):
         removed_objs = []
         left_objs = []

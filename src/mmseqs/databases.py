@@ -86,18 +86,142 @@ class SearchResults:
             'bit_score',
         ])
 
-@dataclass
+class ComputedDatabase(ObjectWithBaseRef):
+    _operation: str
+    _args: List[any]
+    _computed_db: any
+
+    def __init__(self, operation, args):
+        super().__init__()
+        self._operation = operation
+        self._args = args
+        self._computed_db = None
+
+    def __add__(self, other):
+        db = ComputedDatabase(operation='merge', args=[self, other])
+        setattr(db, '_base', self._base)
+        return db
+
+    def __sub__(self, other):
+        db = ComputedDatabase(operation='substract', args=[self, other])
+        setattr(db, '_base', self._base)
+        return db
+
+    def __truediv__(self, chunks_no):
+        db = ComputedDatabase(operation='split', args=[self, chunks_no])
+        setattr(db, '_base', self._base)
+        return db
+
+    @property
+    def _name(self):
+        if self._operation == 'merge':
+            return f'{self._args[0].name}_merge_{self._args[1].name}'
+        elif self._operation == 'substract':
+            return f'{self._args[0].name}_substract_{self._args[1].name}'
+        elif self._operation == 'split':
+            return f'{self._args[0].name}_split_{self._args[1]}'
+
+    def _compute(self):
+        if self._computed_db is not None:
+            return self._computed_db
+        new_db = None
+        if self._operation == 'merge':
+            # merge dbs
+            with self._base.settings.meta_db.open() as meta_db:
+                path_in_a = os.path.join(self._base.settings.seq_storage_directory, self._args[0].name)
+                path_out = os.path.join(self._base.settings.seq_storage_directory, self._name)
+                path_in_b = os.path.join(self._base.settings.seq_storage_directory, self._args[1].name)
+                self._base._execute_cli("mergedbs", dict(
+                    db1=path_in_a,
+                    db2=path_out,
+                    db3=path_in_b,
+                    filenames=[path_in_a, path_out, path_in_b]))
+                new_db = Database(
+                    name=self._name,
+                    description="Merged database",
+                    input_files=[*self._args[0].input_files, *self._args[1].input_files],
+                    created_on=date.today(),
+                    database_type=self._args[0].database_type,
+                )
+                meta_db.list_append('databases', new_db)
+        elif self._operation == 'substract':
+            # substract dbs
+            with self._base.settings.meta_db.open() as meta_db:
+                path_in_a = os.path.join(self._base.settings.seq_storage_directory, self._args[0].name)
+                path_out = os.path.join(self._base.settings.seq_storage_directory, self._name)
+                path_in_b = os.path.join(self._base.settings.seq_storage_directory, self._args[1].name)
+                self._base._execute_cli("subtractdbs", dict(
+                    db1=path_in_a,
+                    db2=path_in_b,
+                    db3=path_out,
+                    filenames=[path_in_a, path_in_b, path_out]))
+                new_db = Database(
+                    name=self._name,
+                    description="Substracted databases",
+                    input_files=[*self._args[0].input_files, *self._args[1].input_files],
+                    created_on=date.today(),
+                    database_type=self._args[0].database_type,
+                )
+                meta_db.list_append('databases', new_db)
+        elif self._operation == 'split':
+            # substract dbs
+            with self._base.settings.meta_db.open() as meta_db:
+                path_in_a = os.path.join(self._base.settings.seq_storage_directory, self._args[0].name)
+                path_out = os.path.join(self._base.settings.seq_storage_directory, self._name)
+                self._base._execute_cli("splitdb", dict(
+                    db1=path_in_a,
+                    db2=path_out,
+                    filenames=[path_in_a, path_out],
+                    split=int(self._args[1])))
+                new_db = Database(
+                    name=self._name,
+                    description="Splitted database",
+                    input_files=[self._args[0].input_files],
+                    created_on=date.today(),
+                    database_type=self._args[0].database_type,
+                )
+                meta_db.list_append('databases', new_db)
+        self._computed_db = new_db
+        return self._computed_db
+
+    def __getattr__(self, name):
+        return getattr(self._compute(), name)
+
 class Database(ObjectWithBaseRef):
     """Class for keeping track of an item in inventory."""
-    name: str
     description: str
     input_files: List[str]
     database_type: str
     created_on: date
+    _name: str
+
+    def __init__(self, description="", input_files=None, database_type="", created_on=None, name=""):
+        self.description = description
+        self.input_files = input_files
+        self.database_type = database_type
+        self.created_on = created_on
+        self._name = name
+
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        original_name = self._name
+        with self._base.settings.meta_db.open() as meta_db:
+            path_in = os.path.join(self._base.settings.seq_storage_directory, original_name)
+            path_out = os.path.join(self._base.settings.seq_storage_directory, name)
+            self._base._execute_cli("mvdb", dict(
+                db1=path_in,
+                db2=path_out,
+                filenames=[path_in, path_out]))
+            self._name = name
+            meta_db.list_replace('databases', self._base, self, lambda x: x.name == original_name, save_back=True)
 
     @property
     def records(self):
-        db_path = os.path.join(self._base.settings.seq_storage_directory, self.name)
+        db_path = os.path.join(self._base.settings.seq_storage_directory, self._name)
         with open(f'{db_path}', 'r') as db_file, open(f'{db_path}_h', 'r') as h_file:
             for seq_contents, header in zip(db_file, h_file):
                 if len(seq_contents) > 1:
@@ -106,6 +230,21 @@ class Database(ObjectWithBaseRef):
     def to_fasta(self, output_path):
         with open(output_path, 'w') as output_handle:
             SeqIO.write(self.records, output_handle, "fasta")
+
+    def __add__(self, other):
+        db = ComputedDatabase(operation='merge', args=[self, other])
+        setattr(db, '_base', self._base)
+        return db
+
+    def __sub__(self, other):
+        db = ComputedDatabase(operation='substract', args=[self, other])
+        setattr(db, '_base', self._base)
+        return db
+
+    def __truediv__(self, chunks_no):
+        db = ComputedDatabase(operation='split', args=[self, chunks_no])
+        setattr(db, '_base', self._base)
+        return db
 
     def copy(self, name):
         with self._base.settings.meta_db.open() as meta_db:
@@ -126,7 +265,7 @@ class Database(ObjectWithBaseRef):
 
     def remove(self):
         with self._base.settings.meta_db.open() as meta_db:
-            removed_dbs, left_dbs = meta_db.list_filter('databases', self._base, lambda db: db.name != self.name)
+            removed_dbs, left_dbs = meta_db.list_filter('databases', self._base, lambda db: db.name != self._name)
             for db in removed_dbs:
                 db_path = os.path.join(self._base.settings.seq_storage_directory, db.name)
                 self._base._execute_cli("rmdb", dict(db1=db_path))
@@ -139,8 +278,8 @@ class Database(ObjectWithBaseRef):
     ) -> SearchResults:
         with GenericSequencesFilePathConverter(search_input) as input_file_paths:
             tmp_dir = 'tmp'
-            results_path = os.path.join(self._base.settings.seq_results_directory, f'{self.name}.query_results.m8')
-            seq_db_path = os.path.join(self._base.settings.seq_storage_directory, self.name)
+            results_path = os.path.join(self._base.settings.seq_results_directory, f'{self._name}.query_results.m8')
+            seq_db_path = os.path.join(self._base.settings.seq_storage_directory, self._name)
             out = self._base._execute_cli('easy-search', dict(
                 filenames=[*input_file_paths, seq_db_path, results_path, tmp_dir],
                 shuffleDatabase=False,
@@ -155,7 +294,7 @@ class Database(ObjectWithBaseRef):
 
     def create_index(self, search_type: str = 'nucleotides') -> IndexStats:
         tmp_dir = 'tmp'
-        seq_db_path = os.path.join(self._base.settings.seq_storage_directory, self.name)
+        seq_db_path = os.path.join(self._base.settings.seq_storage_directory, self._name)
         seed_scoring_matrix_file = MMSeqsMultiParamString()
         seed_scoring_matrix_file.aminoacids = "blosum62.out"
         seed_scoring_matrix_file.nucleotides = "nucleotide.out"
@@ -233,6 +372,7 @@ class Databases(MMSeqsBase):
                     created_on=date.today(),
                     database_type=database_type,
                 )
+                setattr(new_db, '_base', self)
                 meta_db.list_append('databases', new_db)
             return new_db
 
