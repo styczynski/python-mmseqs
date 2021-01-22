@@ -1,5 +1,10 @@
-# Unafold bindings for Python
+# MMseqs2 bindings for Python
 
-![version_badge](https://s3.eu-central-1.amazonaws.com/pypi.covidgenomics.com/__public__/unafold-python/badge_version.svg)
+This project is work in progress, but you can try to build it and run:
 
-Python bindings for [UNAFold tools](https://github.com/rcallahan/UNAFold/tree/master/src) ([see documentation here](http://www.unafold.org/Dinamelt/unafold-man-pages/unafold-man-pages.php)).
+```python
+    $ poetry install
+    $ poetry shell
+    $ nano DB.fasta # Create a fasta database with input sequences
+    $ python3 example/example.py
+```
