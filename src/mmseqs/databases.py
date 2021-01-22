@@ -326,6 +326,10 @@ class Databases(MMSeqsBase):
         return self.list()[index]
 
     def list(self) -> List[Database]:
+        """
+        List all available databases
+        :return: List of databases
+        """
         with self.settings.meta_db.open() as meta_db:
             return meta_db.list_get('databases', self)
 

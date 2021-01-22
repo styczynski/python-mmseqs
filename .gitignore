@@ -9,3 +9,4 @@ unafold/.DS_Store
 **/*.so
 mmseqs_storage/
 mmseqs_native.cpython-*/
+**/pydoc-markdown.yml
