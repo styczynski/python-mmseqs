@@ -67,6 +67,7 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
     bool needTaxonomy = false;
     bool needTaxonomyMapping = false;
     bool needLookup = false;
+    std::string results;
 
     {
         bool needSequenceDB = false;
@@ -103,7 +104,8 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
     par.filenames.pop_back();
 
     out->output_string("TMP_PATH", tmpDir);
-    out->output_string("RESULTS", par.filenames.back());
+    results = par.filenames.back();
+    out->output_string("RESULTS", results);
     par.filenames.pop_back();
     std::string target = par.filenames.back();
     out->output_string("TARGET", target);
@@ -118,10 +120,12 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
     }
 
     std::string search_module = "";
+    std::string index_ext = "";
     if (linsearch) {
         search_module = "linsearch";
         const bool isIndex = LinsearchIndexReader::searchForIndex(target).empty() == false;
         out->output_string("INDEXEXT", isIndex ? ".linidx" : "");
+        index_ext = isIndex ? ".linidx" : "";
         out->output_string("SEARCH_MODULE", "linsearch");
         out->output_string("LINSEARCH", "TRUE");
         out->output_string("CREATELININDEX_PAR", par.createParameterString(par.createlinindex));
@@ -130,6 +134,7 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
         search_module = "search";
         const bool isIndex = PrefilteringIndexReader::searchForIndex(target).empty() == false;
         out->output_string("INDEXEXT", isIndex ? ".idx" : "");
+        index_ext = isIndex ? ".idx" : "";
         out->output_string("SEARCH_MODULE", "search");
         out->output_string("LINSEARCH", "");
         out->output_string("CREATELININDEX_PAR", "");
@@ -152,7 +157,7 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
     std::string query_file_path = par.filenames.back();
 
     if (!FileUtil::fileExists((tmpDir + "/query.dbtype").c_str())) {
-        Parameters createdb_par;
+        Parameters createdb_par(par);
         std::vector<std::string> createdb_filenames = {query_file_path, tmpDir + "/query"};
         createdb_par.filenames = createdb_filenames;
         createdb_par.dbType = 0;
@@ -166,7 +171,7 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
 
     if (!FileUtil::fileExists((target + ".dbtype").c_str())) {
         if (!FileUtil::fileExists((tmpDir + "/target").c_str())) {
-            Parameters createdb_par;
+            Parameters createdb_par(par);
             std::vector<std::string> createdb_filenames = {target, tmpDir + "/target"};
             createdb_par.filenames = createdb_filenames;
             createdb_par.dbType = 0;
@@ -182,7 +187,7 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
 
     if (linsearch) {
         if (!FileUtil::fileExists((target + ".linidx").c_str())) {
-            Parameters createlinindex_par;
+            Parameters createlinindex_par(par);
             std::vector<std::string> createlinindex_filenames = {tmpDir + "/index_tmp"};
             createlinindex_par.filenames = createlinindex_filenames;
             createlinindex_par.setDBFields(1, target);
@@ -193,7 +198,7 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
             createlinindex_par.kmerScore=0;
             createlinindex_par.maskMode=1;
             createlinindex_par.sensitivity=7.5;
-            createlinindex_par.removeTmpFiles=true;
+            //createlinindex_par.removeTmpFiles=true;
             subcall_mmseqs(out, "createlinindex", createlinindex_par);
         }
     }
@@ -201,7 +206,7 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
     std::string intermediate = tmpDir + "/result";
     if (!FileUtil::fileExists((intermediate + ".dbtype").c_str())) {
         //search_module
-        Parameters search_par;
+        Parameters search_par(par);
         std::vector<std::string> search_filenames = {
             tmpDir + "/query",
             target,
@@ -222,10 +227,73 @@ int doeasysearch(mmseqs_output* out, Parameters &par, bool linsearch) {
         search_par.orfMaxLength = 32734;
         search_par.evalProfile = 0.1;
         search_par.baseTmpPath = par.baseTmpPath;
+        search_par.searchType = par.searchType;
+        search_par.alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV_SEQID;
+        search_par.exactKmerMatching = true;
+        search_par.strand = 2;
+        search_par.kmerSize = 15;
+        search_par.maxSeqLen = 10000;
 
         std::cout << "Call search\n" << std::flush;
         subcall_mmseqs(out, search_module, search_par);
         std::cout << "Calling search doneA\n" << std::flush;
+    }
+    
+    /*
+    if [ -n "${GREEDY_BEST_HITS}" ]; then
+        if notExists "${TMP_PATH}/result_best.dbtype"; then
+            # shellcheck disable=SC2086
+            $RUNNER "$MMSEQS" summarizeresult "${TMP_PATH}/result" "${TMP_PATH}/result_best" ${SUMMARIZE_PAR} \
+                || fail "Search died"
+        fi
+        INTERMEDIATE="${TMP_PATH}/result_best"
+    fi
+    */
+    out->print();
+    if (false) {
+        std::cout << "Call summarizeresult\n" << std::flush;
+        Parameters summarizeresult_par(par);
+        std::vector<std::string> summarizeresult_filenames = {
+            tmpDir + "/result",
+            tmpDir + "/result_best"
+        };
+        summarizeresult_par.filenames = summarizeresult_filenames;
+        summarizeresult_par.setDBFields(1, tmpDir + "/result");
+        summarizeresult_par.setDBFields(2, tmpDir + "/result_best");
+        subcall_mmseqs(out, "summarizeresult", summarizeresult_par);
+        std::cout << "Call summarizeresult ended\n" << std::flush;
+    }
+    
+    // "$MMSEQS" convertalis "${TMP_PATH}/query" "${TARGET}${INDEXEXT}" "${INTERMEDIATE}" "${RESULTS}" ${CONVERT_PAR}
+    if (true) {
+        std::cout << "Call convertalis\n" << std::flush;
+        //--db-output 0 --db-load-mode 0 --search-type 3 --threads 1 --compressed 0 -v 3 ]
+        Parameters convertalis_par(par);
+        std::vector<std::string> convertalis_filenames = {
+            tmpDir + "/query",
+            target + index_ext,
+            intermediate,
+            results,
+        };
+        out->print();
+        std::cout << "convertalis " << (tmpDir + "/query") << " " << (target+index_ext) << " " << intermediate << " " << results << "\n" << std::flush;
+        convertalis_par.filenames = convertalis_filenames;
+        convertalis_par.setDBFields(1, tmpDir + "/query");
+        convertalis_par.setDBFields(2, target+index_ext);
+        convertalis_par.setDBFields(3, intermediate);
+        convertalis_par.setDBFields(4, results);
+        convertalis_par.setSubstitutionMatrices("blosum62.out", "nucleotide.out");
+        convertalis_par.formatAlignmentMode = 0;
+        convertalis_par.outfmt = par.outfmt;
+        convertalis_par.translationTable = 1;
+        convertalis_par.gapOpen = MultiParam<int>(11, 5);
+        convertalis_par.gapExtend = MultiParam<int>(1, 2);
+        convertalis_par.dbOut = 0;
+        convertalis_par.preloadMode = 0;
+        convertalis_par.threads = 1;
+        convertalis_par.compressed = 0;
+
+        subcall_mmseqs(out, "convertalis", convertalis_par);
     }
 
     return 0;

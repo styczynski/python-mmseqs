@@ -98,7 +98,7 @@ int createindex(mmseqs_output* out, Parameters &par, const std::string &indexerM
     Parameters indexer_par;
     indexer_par.setDBFields(1, tmp_db_path);
     indexer_par.setDBFields(2, par.db1);
-    indexer_par.setSeedSubstitutionMatrices("nucleotide.out", "VTML80.out");
+    indexer_par.setSeedSubstitutionMatrices("VTML80.out", "nucleotide.out");
     indexer_par.kmerSize = 0;
     indexer_par.alphabetSize = MultiParam<int>(21, 5);
     indexer_par.compBiasCorrection = 1;

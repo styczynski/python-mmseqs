@@ -1087,6 +1087,7 @@ public:
         return ((type1 & 0x3FFFFFFF) == (type2 & 0x3FFFFFFF));
     }
 
+    void setSubstitutionMatrices(std::string aminoacids, std::string nucleotides);
     void setSeedSubstitutionMatrices(std::string aminoacids, std::string nucleotides);
     void setDBFields(int no, std::string path);
 

@@ -24,7 +24,7 @@
 #endif
 
 
-void printSeqBasedOnAln(std::string &out, const char *seq, unsigned int offset,
+void printSeqBasedOnAln(mmseqs_output* mmout, std::string &out, const char *seq, unsigned int offset,
                         const std::string &bt, bool reverse, bool isReverseStrand,
                         bool translateSequence, const TranslateNucl &translateNucl) {
     unsigned int seqPos = 0;
@@ -367,6 +367,8 @@ int convertalignments(mmseqs_output* out, Parameters &par) {
                 }
             }
 
+            std::vector<mmseqs_blast_tab_record> results_row;
+
             size_t qHeaderId = qDbrHeader.sequenceReader->getId(queryKey);
             const char *qHeader = qDbrHeader.sequenceReader->getData(qHeaderId, thread_idx);
             size_t qHeaderLen = qDbrHeader.sequenceReader->getSeqLen(qHeaderId);
@@ -394,6 +396,7 @@ int convertalignments(mmseqs_output* out, Parameters &par) {
 
             char *data = alnDbr.getData(i, thread_idx);
             while (*data != '\0') {
+                mmseqs_blast_tab_record record;
                 Matcher::result_t res = Matcher::parseAlignmentRecord(data, true);
                 data = Util::skipLine(data);
 
@@ -460,7 +463,7 @@ int convertalignments(mmseqs_output* out, Parameters &par) {
                                 Debug(Debug::WARNING) << "Truncated line in entry" << i << "!\n";
                                 continue;
                             }
-                            result.append(buffer, count);
+                            //results_row.push_back(std::string(buffer, count));
                         } else {
                             char *targetSeqData = NULL;
                             targetProfData.clear();
@@ -493,100 +496,111 @@ int convertalignments(mmseqs_output* out, Parameters &par) {
                             for(size_t i = 0; i < outcodes.size(); i++) {
                                 switch (outcodes[i]) {
                                     case Parameters::OUTFMT_QUERY:
-                                        result.append(queryId);
+                                        //results_row.push_back(queryId);
+                                        record.query_sequence_id = queryId;
                                         break;
                                     case Parameters::OUTFMT_TARGET:
-                                        result.append(targetId);
+                                        record.target_sequence_id = targetId;
+                                        //results_row.push_back(targetId);
                                         break;
                                     case Parameters::OUTFMT_EVALUE:
-                                        result.append(SSTR(res.eval));
+                                        record.e_value = res.eval;
+                                        //results_row.push_back(SSTR(res.eval));
                                         break;
                                     case Parameters::OUTFMT_GAPOPEN:
-                                        result.append(SSTR(gapOpenCount));
+                                        record.number_of_gap_openings = gapOpenCount;
+                                        //results_row.push_back(SSTR(gapOpenCount));
                                         break;
                                     case Parameters::OUTFMT_FIDENT:
-                                        result.append(SSTR(res.seqId));
+                                        record.sequence_identity = res.seqId;
+                                        //results_row.push_back(SSTR(res.seqId));
                                         break;
                                     case Parameters::OUTFMT_PIDENT:
-                                        result.append(SSTR(res.seqId*100));
+                                        //results_row.push_back(SSTR(res.seqId*100));
                                         break;
                                     case Parameters::OUTFMT_NIDENT:
-                                        result.append(SSTR(identical));
+                                        //results_row.push_back(SSTR(identical));
                                         break;
                                     case Parameters::OUTFMT_QSTART:
-                                        result.append(SSTR(res.qStartPos + 1));
+                                        record.domain_start_index_query = res.qStartPos + 1;
+                                        //results_row.push_back(SSTR(res.qStartPos + 1));
                                         break;
                                     case Parameters::OUTFMT_QEND:
-                                        result.append(SSTR(res.qEndPos + 1));
+                                        record.domain_end_index_query = res.qEndPos + 1;
+                                        //results_row.push_back(SSTR(res.qEndPos + 1));
                                         break;
                                     case Parameters::OUTFMT_QLEN:
-                                        result.append(SSTR(res.qLen));
+                                        //results_row.push_back(SSTR(res.qLen));
                                         break;
                                     case Parameters::OUTFMT_TSTART:
-                                        result.append(SSTR(res.dbStartPos + 1));
+                                        record.domain_start_index_target = res.dbStartPos + 1;
+                                        //results_row.push_back(SSTR(res.dbStartPos + 1));
                                         break;
                                     case Parameters::OUTFMT_TEND:
-                                        result.append(SSTR(res.dbEndPos + 1));
+                                        record.domain_end_index_target = res.dbEndPos + 1;
+                                        //results_row.push_back(SSTR(res.dbEndPos + 1));
                                         break;
                                     case Parameters::OUTFMT_TLEN:
-                                        result.append(SSTR(res.dbLen));
+                                        //results_row.push_back(SSTR(res.dbLen));
                                         break;
                                     case Parameters::OUTFMT_ALNLEN:
-                                        result.append(SSTR(alnLen));
+                                        record.alignment_length = alnLen;
+                                        //results_row.push_back(SSTR(alnLen));
                                         break;
                                     case Parameters::OUTFMT_RAW:
-                                        result.append(SSTR(static_cast<int>(evaluer->computeRawScoreFromBitScore(res.score) + 0.5)));
+                                        //results_row.push_back(SSTR(static_cast<int>(evaluer->computeRawScoreFromBitScore(res.score) + 0.5)));
                                         break;
                                     case Parameters::OUTFMT_BITS:
-                                        result.append(SSTR(res.score));
+                                        record.bit_score = res.score;
+                                        //results_row.push_back(SSTR(res.score));
                                         break;
                                     case Parameters::OUTFMT_CIGAR:
                                         if(isTranslatedSearch == true && targetNucs == true && queryNucs == true ){
                                             Matcher::result_t::protein2nucl(res.backtrace, newBacktrace);
                                             res.backtrace = newBacktrace;
                                         }
-                                        result.append(SSTR(res.backtrace));
+                                        //results_row.push_back(SSTR(res.backtrace));
                                         newBacktrace.clear();
                                         break;
                                     case Parameters::OUTFMT_QSEQ:
                                         if (queryProfile) {
-                                            result.append(queryProfData.c_str(), res.qLen);
+                                            //results_row.push_back(std::string(queryProfData.c_str(), res.qLen));
                                         } else {
-                                            result.append(querySeqData, res.qLen);
+                                            //results_row.push_back(std::string(querySeqData, res.qLen));
                                         }
                                         break;
                                     case Parameters::OUTFMT_TSEQ:
                                         if (targetProfile) {
-                                            result.append(targetProfData.c_str(), res.dbLen);
+                                            //results_row.push_back(std::string(targetProfData.c_str(), res.dbLen));
                                         } else {
-                                            result.append(targetSeqData, res.dbLen);
+                                            //results_row.push_back(std::string(targetSeqData, res.dbLen));
                                         }
                                         break;
                                     case Parameters::OUTFMT_QHEADER:
-                                        result.append(qHeader, qHeaderLen);
+                                        //results_row.push_back(std::string(qHeader, qHeaderLen));
                                         break;
                                     case Parameters::OUTFMT_THEADER:
-                                        result.append(tHeader, tHeaderLen);
+                                        //results_row.push_back(std::string(tHeader, tHeaderLen));
                                         break;
                                     case Parameters::OUTFMT_QALN:
                                         if (queryProfile) {
-                                            printSeqBasedOnAln(result, queryProfData.c_str(), res.qStartPos,
+                                            printSeqBasedOnAln(out, result, queryProfData.c_str(), res.qStartPos,
                                                                Matcher::uncompressAlignment(res.backtrace), false, (res.qStartPos > res.qEndPos),
                                                                (isTranslatedSearch == true && queryNucs == true), translateNucl);
                                         } else {
-                                            printSeqBasedOnAln(result, querySeqData, res.qStartPos,
+                                            printSeqBasedOnAln(out, result, querySeqData, res.qStartPos,
                                                                Matcher::uncompressAlignment(res.backtrace), false, (res.qStartPos > res.qEndPos),
                                                                (isTranslatedSearch == true && queryNucs == true), translateNucl);
                                         }
                                         break;
                                     case Parameters::OUTFMT_TALN: {
                                         if (targetProfile) {
-                                            printSeqBasedOnAln(result, targetProfData.c_str(), res.dbStartPos,
+                                            printSeqBasedOnAln(out, result, targetProfData.c_str(), res.dbStartPos,
                                                                Matcher::uncompressAlignment(res.backtrace), true,
                                                                (res.dbStartPos > res.dbEndPos),
                                                                (isTranslatedSearch == true && targetNucs == true), translateNucl);
                                         } else {
-                                            printSeqBasedOnAln(result, targetSeqData, res.dbStartPos,
+                                            printSeqBasedOnAln(out, result, targetSeqData, res.dbStartPos,
                                                                Matcher::uncompressAlignment(res.backtrace), true,
                                                                (res.dbStartPos > res.dbEndPos),
                                                                (isTranslatedSearch == true && targetNucs == true), translateNucl);
@@ -594,49 +608,50 @@ int convertalignments(mmseqs_output* out, Parameters &par) {
                                         break;
                                     }
                                     case Parameters::OUTFMT_MISMATCH:
-                                        result.append(SSTR(missMatchCount));
+                                        record.number_of_mismatches = missMatchCount;
+                                        //results_row.push_back(SSTR(missMatchCount));
                                         break;
                                     case Parameters::OUTFMT_QCOV:
-                                        result.append(SSTR(res.qcov));
+                                        //results_row.push_back(SSTR(res.qcov));
                                         break;
                                     case Parameters::OUTFMT_TCOV:
-                                        result.append(SSTR(res.dbcov));
+                                        //results_row.push_back(SSTR(res.dbcov));
                                         break;
                                     case Parameters::OUTFMT_QSET:
-                                        result.append(SSTR(qSetToSource[qKeyToSet[queryKey]]));
+                                        //results_row.push_back(SSTR(qSetToSource[qKeyToSet[queryKey]]));
                                         break;
                                     case Parameters::OUTFMT_QSETID:
-                                        result.append(SSTR(qKeyToSet[queryKey]));
+                                        //results_row.push_back(SSTR(qKeyToSet[queryKey]));
                                         break;
                                     case Parameters::OUTFMT_TSET:
-                                        result.append(SSTR(tSetToSource[tKeyToSet[res.dbKey]]));
+                                        //results_row.push_back(SSTR(tSetToSource[tKeyToSet[res.dbKey]]));
                                         break;
                                     case Parameters::OUTFMT_TSETID:
-                                        result.append(SSTR(tKeyToSet[res.dbKey]));
+                                        //results_row.push_back(SSTR(tKeyToSet[res.dbKey]));
                                         break;
                                     case Parameters::OUTFMT_TAXID:
-                                        result.append(SSTR(taxon));
+                                        //results_row.push_back(SSTR(taxon));
                                         break;
                                     case Parameters::OUTFMT_TAXNAME:
-                                        result.append((taxonNode != NULL) ? t->getString(taxonNode->nameIdx) : "unclassified");
+                                        //results_row.push_back((taxonNode != NULL) ? t->getString(taxonNode->nameIdx) : "unclassified");
                                         break;
                                     case Parameters::OUTFMT_TAXLIN:
-                                        result.append((taxonNode != NULL) ? t->taxLineage(taxonNode, true) : "unclassified");
+                                        //results_row.push_back((taxonNode != NULL) ? t->taxLineage(taxonNode, true) : "unclassified");
                                         break;
                                     case Parameters::OUTFMT_EMPTY:
-                                        result.push_back('-');
+                                        //results_row.push_back("-");
                                         break;
                                     case Parameters::OUTFMT_QORFSTART:
-                                        result.append(SSTR(res.queryOrfStartPos));
+                                        //results_row.push_back(SSTR(res.queryOrfStartPos));
                                         break;
                                     case Parameters::OUTFMT_QORFEND:
-                                        result.append(SSTR(res.queryOrfEndPos));
+                                        //results_row.push_back(SSTR(res.queryOrfEndPos));
                                         break;
                                     case Parameters::OUTFMT_TORFSTART:
-                                        result.append(SSTR(res.dbOrfStartPos));
+                                        //results_row.push_back(SSTR(res.dbOrfStartPos));
                                         break;
                                     case Parameters::OUTFMT_TORFEND:
-                                        result.append(SSTR(res.dbOrfEndPos));
+                                        //results_row.push_back(SSTR(res.dbOrfEndPos));
                                         break;
                                 }
                                 if (i < outcodes.size() - 1) {
@@ -717,11 +732,11 @@ int convertalignments(mmseqs_output* out, Parameters &par) {
                         }
                         result.append(buffer, count);
                         if (queryProfile) {
-                            printSeqBasedOnAln(result, queryProfData.c_str(), res.qStartPos,
+                            printSeqBasedOnAln(out, result, queryProfData.c_str(), res.qStartPos,
                                                Matcher::uncompressAlignment(res.backtrace), false, (res.qStartPos > res.qEndPos),
                                                (isTranslatedSearch == true && queryNucs == true), translateNucl);
                         } else {
-                            printSeqBasedOnAln(result, querySeqData, res.qStartPos,
+                            printSeqBasedOnAln(out, result, querySeqData, res.qStartPos,
                                                Matcher::uncompressAlignment(res.backtrace), false, (res.qStartPos > res.qEndPos),
                                                (isTranslatedSearch == true && queryNucs == true), translateNucl);
                         }
@@ -730,12 +745,12 @@ int convertalignments(mmseqs_output* out, Parameters &par) {
                         char* targetSeqData = tDbr->sequenceReader->getData(tId, thread_idx);
                         if (targetProfile) {
                             Sequence::extractProfileConsensus(targetSeqData, *subMat, targetProfData);
-                            printSeqBasedOnAln(result, targetProfData.c_str(), res.dbStartPos,
+                            printSeqBasedOnAln(out, result, targetProfData.c_str(), res.dbStartPos,
                                                Matcher::uncompressAlignment(res.backtrace), true,
                                                (res.dbStartPos > res.dbEndPos),
                                                (isTranslatedSearch == true && targetNucs == true), translateNucl);
                         } else {
-                            printSeqBasedOnAln(result, targetSeqData, res.dbStartPos,
+                            printSeqBasedOnAln(out, result, targetSeqData, res.dbStartPos,
                                                Matcher::uncompressAlignment(res.backtrace), true,
                                                (res.dbStartPos > res.dbEndPos),
                                                (isTranslatedSearch == true && targetNucs == true), translateNucl);
@@ -771,11 +786,13 @@ int convertalignments(mmseqs_output* out, Parameters &par) {
                         Debug(Debug::ERROR) << "Not implemented yet";
                         EXIT(EXIT_FAILURE);
                 }
+                results_row.push_back(record);
             }
 
             if (format == Parameters::FORMAT_ALIGNMENT_HTML) {
                 result.append("]},\n");
             }
+            out->blast_tab_records.push_back(results_row);
             resultWriter.writeData(result.c_str(), result.size(), queryKey, thread_idx, isDb);
             result.clear();
         }

@@ -2,6 +2,7 @@
 #include "Util.h"
 #include "Debug.h"
 
+#include <fstream>
 #include <cstddef>
 #include <cstring>
 #include <climits>
@@ -20,6 +21,17 @@
 bool FileUtil::fileExists(const char* fileName) {
     struct stat st;
     return stat(fileName, &st) == 0;
+}
+
+bool FileUtil::fileExistsAndIsNotEmpty(const char* fileName) {
+    if (!fileExists(fileName)) {
+        return false;
+    }
+    std::ifstream file(fileName);
+    if (!file) {
+        return false;
+    }
+    return file.peek() != std::ifstream::traits_type::eof();
 }
 
 bool FileUtil::directoryExists(const char* directoryName) {

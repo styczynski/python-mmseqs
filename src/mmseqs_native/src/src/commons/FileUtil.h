@@ -14,6 +14,8 @@ class FileUtil {
 public:
     static bool fileExists(const char *fileName);
 
+    static bool fileExistsAndIsNotEmpty(const char *fileName);
+
     static bool directoryExists(const char *directoryName);
 
     static FILE* openFileOrDie(const char *fileName, const char *mode, bool shouldExist);

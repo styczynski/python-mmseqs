@@ -3,9 +3,14 @@ import os
 from dataclasses import dataclass
 from glob import glob
 from datetime import date
+from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+import pandas as pd
 
 from .utils import remove_paths, to_args
-from .base import MMSeqsBase
+from .base import MMSeqsBase, ObjectWithBaseRef
+from .convert import GenericSequencesFilePathConverter, GenericSequences
 
 from .mmseqs_native import MMSeqsMultiParamString
 
@@ -29,19 +34,78 @@ PARAM_DB_SEARCH_TYPE_MAPPING = dict(
 )
 
 @dataclass
+class SearchRecord:
+    query_sequence_id: str
+    target_sequence_id: str
+    sequence_identity: float
+    alignment_length: int
+    number_of_mismatches: int
+    number_of_gap_openings: int
+    domain_start_index_query: int
+    domain_end_index_query: int
+    domain_start_index_target: int
+    domain_end_index_target: int
+    e_value: float
+    bit_score: int
+
+@dataclass
 class IndexStats:
     db_size: int
     index_entries: int
     avg_kmer_size: float
 
 @dataclass
-class Database:
+class SearchResults:
+    records: Sequence[Sequence[SearchRecord]]
+
+    @property
+    def dataframe(self):
+        return pd.DataFrame([[record.query_sequence_id,
+                            record.target_sequence_id,
+                            record.sequence_identity,
+                            record.alignment_length,
+                            record.number_of_mismatches,
+                            record.number_of_gap_openings,
+                            record.domain_start_index_query,
+                            record.domain_end_index_query,
+                            record.domain_start_index_target,
+                            record.domain_end_index_target,
+                            record.e_value,
+                            record.bit_score] for alignments in self.records for record in alignments], columns=[
+            'query_sequence_id',
+            'target_sequence_id',
+            'sequence_identity',
+            'alignment_length',
+            'number_of_mismatches',
+            'number_of_gap_openings',
+            'domain_start_index_query',
+            'domain_end_index_query',
+            'domain_start_index_target',
+            'domain_end_index_target',
+            'e_value',
+            'bit_score',
+        ])
+
+@dataclass
+class Database(ObjectWithBaseRef):
     """Class for keeping track of an item in inventory."""
     name: str
     description: str
     input_files: List[str]
     database_type: str
     created_on: date
+
+    @property
+    def records(self):
+        db_path = os.path.join(self._base.settings.seq_storage_directory, self.name)
+        with open(f'{db_path}', 'r') as db_file, open(f'{db_path}_h', 'r') as h_file:
+            for seq_contents, header in zip(db_file, h_file):
+                if len(seq_contents) > 1:
+                    yield SeqRecord(Seq(seq_contents[:-1].lstrip('\x00')), id=header[:-1].lstrip('\x00'))
+
+    def to_fasta(self, output_path):
+        with open(output_path, 'w') as output_handle:
+            SeqIO.write(self.records, output_handle, "fasta")
 
     def copy(self, name):
         with self._base.settings.meta_db.open() as meta_db:
@@ -69,33 +133,29 @@ class Database:
                 self._base._execute_cli("rmdb", dict(db1=f'{db_path}_h'))
             meta_db.set('databases', left_dbs)
 
-    def search(self, search_input: str):
-        tmp_dir = 'tmp'
-        results_path = os.path.join(self._base.settings.seq_results_directory, f'{self.name}.query_results.m8')
-        seq_db_path = os.path.join(self._base.settings.seq_storage_directory, self.name)
-        out = self._base._execute_cli('easy-search', dict(
-            filenames=[search_input, seq_db_path, results_path, tmp_dir],
-            shuffleDatabase=False,
-            sensitivity=5.7,
-            removeTmpFiles=True,
-            writeLookup=False,
-            alignmentMode=3,
-        ))
-        print(out.vars_str)
+    def search(self,
+       search_input: GenericSequences,
+       search_type: str = 'auto',
+    ) -> SearchResults:
+        with GenericSequencesFilePathConverter(search_input) as input_file_paths:
+            tmp_dir = 'tmp'
+            results_path = os.path.join(self._base.settings.seq_results_directory, f'{self.name}.query_results.m8')
+            seq_db_path = os.path.join(self._base.settings.seq_storage_directory, self.name)
+            out = self._base._execute_cli('easy-search', dict(
+                filenames=[*input_file_paths, seq_db_path, results_path, tmp_dir],
+                shuffleDatabase=False,
+                sensitivity=5.7,
+                removeTmpFiles=False,
+                writeLookup=False,
+                outfmt="query,target,fident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits",
+                searchType=PARAM_DB_SEARCH_TYPE_MAPPING[search_type],
+                alignmentMode=3,
+            ))
+            return SearchResults(out.blast_tab_records)
 
     def create_index(self, search_type: str = 'nucleotides') -> IndexStats:
         tmp_dir = 'tmp'
         seq_db_path = os.path.join(self._base.settings.seq_storage_directory, self.name)
-
-        # par.orfStartMode = 1;
-        # //    par.orfMinLength = 30;
-        # //    par.orfMaxLength = 32734;
-        # //    par.kmerScore = 0; // extract all k-mers
-        # //    par.maskMode = 0;
-        # //    par.spacedKmer = false;
-        # //    // VTML has a slightly lower sensitivity in the regression test
-        # //    par.seedScoringMatrixFile = MultiParam<char*>("blosum62.out", "nucleotide.out");
-        # //
         seed_scoring_matrix_file = MMSeqsMultiParamString()
         seed_scoring_matrix_file.aminoacids = "blosum62.out"
         seed_scoring_matrix_file.nucleotides = "nucleotide.out"
@@ -112,16 +172,11 @@ class Database:
             sensitivity=7.5,
             removeTmpFiles=True,
         ))
-        print("WELP DONE!")
         return IndexStats(
             db_size=int(out.vars_str['INDEX_TABLE_DB_SIZE']),
             index_entries=int(out.vars_str['INDEX_TABLE_ENTRIES']),
             avg_kmer_size=float(out.vars_str['INDEX_AVG_KMER_SIZE']),
         )
-
-def inject_base(objs: List[any]):
-    for obj in objs:
-        setattr(obj, '_base')
 
 
 class Databases(MMSeqsBase):
@@ -138,7 +193,7 @@ class Databases(MMSeqsBase):
     def create(self,
                name: str,
                description: str,
-               input_files: Sequence[str],
+               source: GenericSequences,
                mode: str = "copy",
                database_type: str = "auto",
                offset: int = 0,
@@ -161,22 +216,23 @@ class Databases(MMSeqsBase):
         :param shuffle: Shuffle the input database
         :return:
         """
-        input_files = list(input_files)
-        self._execute_cli("createdb", dict(
-            filenames=[*input_files, os.path.join(self.settings.seq_storage_directory, name)],
-            identifierOffset=offset,
-            dbType=PARAM_DB_TYPE_MAPPING[database_type],
-            createdbMode=PARAM_CREATEDB_MODE_MAPPING[mode],
-            shuffleDatabase=int(shuffle),
-        ))
-        with self.settings.meta_db.open() as meta_db:
-            new_db = Database(
-                name=name,
-                description=description,
-                input_files=input_files,
-                created_on=date.today(),
-                database_type=database_type,
-            )
-            meta_db.list_append('databases', new_db)
-        return new_db
+        with GenericSequencesFilePathConverter(source) as input_files:
+            input_files = list(input_files)
+            self._execute_cli("createdb", dict(
+                filenames=[*input_files, os.path.join(self.settings.seq_storage_directory, name)],
+                identifierOffset=offset,
+                dbType=PARAM_DB_TYPE_MAPPING[database_type],
+                createdbMode=PARAM_CREATEDB_MODE_MAPPING[mode],
+                shuffleDatabase=int(shuffle),
+            ))
+            with self.settings.meta_db.open() as meta_db:
+                new_db = Database(
+                    name=name,
+                    description=description,
+                    input_files=input_files,
+                    created_on=date.today(),
+                    database_type=database_type,
+                )
+                meta_db.list_append('databases', new_db)
+            return new_db
 

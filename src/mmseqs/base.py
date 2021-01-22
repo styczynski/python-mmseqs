@@ -21,10 +21,15 @@ class MMSeqsSettings:
 
 
 class MMSeqsBase:
+    _execute_cli: any
+    settings: any
+
     def __init__(self, execute_cli, settings):
         self._execute_cli = execute_cli
         self.settings = settings
 
+class ObjectWithBaseRef:
+    _base: MMSeqsBase
 
 @dataclass
 class MetaDatabaseConnection:

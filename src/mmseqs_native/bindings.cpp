@@ -31,7 +31,8 @@ PYBIND11_PLUGIN(mmseqs_native) {
 
     pybind11::class_<mmseqs_output>(m, "MMSeqsCallOutput")
     .def(pybind11::init<>())
-    .def_readwrite("vars_str", &mmseqs_output::vars_str);
+    .def_readwrite("vars_str", &mmseqs_output::vars_str)
+    .def_readwrite("blast_tab_records", &mmseqs_output::blast_tab_records);
 
     pybind11::class_<MultiParam<char*>>(m, "MMSeqsMultiParamString")
     .def(pybind11::init<>())
@@ -42,6 +43,22 @@ PYBIND11_PLUGIN(mmseqs_native) {
     .def(pybind11::init<>())
     .def_readwrite("aminoacids", &MultiParam<int>::aminoacids)
     .def_readwrite("nucleotides", &MultiParam<int>::nucleotides);
+
+    pybind11::class_<mmseqs_blast_tab_record>(m, "MMSeqsSearchRecord")
+    .def(pybind11::init<>())
+    .def_readwrite("query_sequence_id", &mmseqs_blast_tab_record::query_sequence_id)
+    .def_readwrite("target_sequence_id", &mmseqs_blast_tab_record::target_sequence_id)
+    .def_readwrite("sequence_identity", &mmseqs_blast_tab_record::sequence_identity)
+    .def_readwrite("alignment_length", &mmseqs_blast_tab_record::alignment_length)
+    .def_readwrite("number_of_mismatches", &mmseqs_blast_tab_record::number_of_mismatches)
+    .def_readwrite("number_of_gap_openings", &mmseqs_blast_tab_record::number_of_gap_openings)
+    .def_readwrite("domain_start_index_query", &mmseqs_blast_tab_record::domain_start_index_query)
+    .def_readwrite("domain_end_index_query", &mmseqs_blast_tab_record::domain_end_index_query)
+    .def_readwrite("domain_start_index_target", &mmseqs_blast_tab_record::domain_start_index_target)
+    .def_readwrite("domain_end_index_target", &mmseqs_blast_tab_record::domain_end_index_target)
+    .def_readwrite("e_value", &mmseqs_blast_tab_record::e_value)
+    .def_readwrite("bit_score", &mmseqs_blast_tab_record::bit_score)
+    .def("__repr__", &mmseqs_blast_tab_record::toString);
 
     pybind11::class_<Parameters>(m, "MMSeqsCallConfig")
     .def(pybind11::init<>())

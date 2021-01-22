@@ -8,6 +8,8 @@ build = "build.py"
 [tool.poetry.dependencies]
 python = "^3.8"
 sqlitedict = "^1.7.0"
+biopython = "^1.78"
+pandas = "^1.2.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.1"

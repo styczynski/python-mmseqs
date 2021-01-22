@@ -44,6 +44,10 @@ unsigned int CommandCaller::getCallDepth() {
     return depth + 1;
 }
 
+void CommandCaller::addVar(std::string key, std::string value) {
+    addVariable(key.c_str(), value.c_str());
+}
+
 void CommandCaller::addVariable(const char* key, const char* value) {
     if (value == NULL) {
         unsetenv(key);
@@ -86,4 +90,19 @@ void CommandCaller::execProgram(const char* program, const std::vector<std::stri
     // should not be reached in the normal case
     delete[] pArgv;
     EXIT(EXIT_FAILURE);
+}
+
+int CommandCaller::callProgram(const char* program, const std::vector<std::string> &argv) {
+    std::stringstream argStream;
+    argStream << "bash " << std::string(program);
+    for (size_t i = 0; i < argv.size(); i++) {
+        argStream << " " << argv[i];
+    }
+
+    std::string argString = argStream.str();
+    if (std::system(argString.c_str()) != EXIT_SUCCESS) {
+        EXIT(EXIT_FAILURE);
+    }
+
+    return 0;
 }

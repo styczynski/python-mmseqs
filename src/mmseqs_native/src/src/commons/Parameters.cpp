@@ -350,8 +350,8 @@ Parameters::Parameters():
     align.push_back(&PARAM_PCB);
     align.push_back(&PARAM_SCORE_BIAS);
     align.push_back(&PARAM_REALIGN);
-    align.push_back(&PARAM_REALIGN_SCORE_BIAS);
-    align.push_back(&PARAM_REALIGN_MAX_SEQS);
+    //align.push_back(&PARAM_REALIGN_SCORE_BIAS);
+    //align.push_back(&PARAM_REALIGN_MAX_SEQS);
     align.push_back(&PARAM_GAP_OPEN);
     align.push_back(&PARAM_GAP_EXTEND);
     align.push_back(&PARAM_ZDROP);
@@ -2604,6 +2604,23 @@ std::vector<int> Parameters::getOutputFormat(int formatMode, const std::string &
         formatCodes.push_back(code);
     }
     return formatCodes;
+}
+
+void Parameters::setSubstitutionMatrices(std::string aminoacids, std::string nucleotides) {
+    for(size_t i = 0 ; i < substitutionMatrices.size(); i++) {
+        bool isAminoAcid   = aminoacids == substitutionMatrices[i].name;
+        bool isNucleotide  = nucleotides == substitutionMatrices[i].name;
+        if (isAminoAcid || isNucleotide) {
+            std::string matrixData((const char *)substitutionMatrices[i].subMatData, substitutionMatrices[i].subMatDataLen);
+            std::string matrixName = substitutionMatrices[i].name;
+            if(isAminoAcid) {
+                scoringMatrixFile.aminoacids = BaseMatrix::serialize(matrixName, matrixData);
+            }
+            if(isNucleotide) {
+                scoringMatrixFile.nucleotides = BaseMatrix::serialize(matrixName, matrixData);
+            }
+        }
+    }
 }
 
 void Parameters::setSeedSubstitutionMatrices(std::string aminoacids, std::string nucleotides) {
