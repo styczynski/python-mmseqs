@@ -179,9 +179,11 @@ class ComputedDatabase(ObjectWithBaseRef):
                     input_files=[self._args[0].input_files],
                     created_on=date.today(),
                     database_type=self._args[0].database_type,
+                    chunks=[],
                 )
                 meta_db.list_append('databases', new_db)
         self._computed_db = new_db
+        setattr(self._computed_db, '_base', self._base)
         return self._computed_db
 
     def __getattr__(self, name):
@@ -228,8 +230,15 @@ class Database(ObjectWithBaseRef):
                     yield SeqRecord(Seq(seq_contents[:-1].lstrip('\x00')), id=header[:-1].lstrip('\x00'))
 
     def to_fasta(self, output_path):
-        with open(output_path, 'w') as output_handle:
-            SeqIO.write(self.records, output_handle, "fasta")
+        # convert2fasta
+        db_path = os.path.join(self._base.settings.seq_storage_directory, self.name)
+        self._base._execute_cli('convert2fasta', dict(
+            db1=db_path,
+            db2=output_path,
+            filenames=[db_path, output_path],
+        ))
+        #with open(output_path, 'w') as output_handle:
+        #    SeqIO.write(self.records, output_handle, "fasta")
 
     def __add__(self, other):
         db = ComputedDatabase(operation='merge', args=[self, other])

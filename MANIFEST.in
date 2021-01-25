@@ -3,3 +3,4 @@ include lib
 include CMakeLists.txt
 include Makefile
 include README.md
+include src

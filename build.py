@@ -121,6 +121,7 @@ datafiles = [
     "Makefile",
     "lib",
     "lib/pybind11",
+    "src",
 ]
 
 

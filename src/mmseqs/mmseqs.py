@@ -39,6 +39,7 @@ class MMSeqs:
                 setattr(cli_args, f"{key}Index", f'{args[key]}.index')
                 setattr(cli_args, f"{key}dbtype", f'{args[key]}.dbtype')
                 hdr_key = f'hdr{key.replace("db", "")}'
+                setattr(cli_args, f"{hdr_key}", f'{args[key]}_h')
                 setattr(cli_args, f"{hdr_key}Index", f'{args[key]}_h.index')
                 setattr(cli_args, f"{hdr_key}dbtype", f'{args[key]}_h.dbtype')
         print(f'execute ==> {args}')
