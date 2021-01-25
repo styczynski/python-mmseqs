@@ -7,15 +7,21 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# set(CMAKE_C_COMPILER "/usr/bin/gcc")
+# set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+
 set(CMAKE_BUILD_TYPE Debug)
 add_compile_options(-g)
-set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,-z,defs")
 
 SET(SOURCE_DIR "src/mmseqs_native")
 
 message("-- Source Directory: ${CMAKE_CURRENT_SOURCE_DIR}")
 message("-- Project Directory: ${PROJECT_SOURCE_DIR}")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/src/mmseqs_native/src/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/lib/cppfs/cmake")
+
+include(GenerateExportHeader)
+include(Custom)
+include(HealthCheck)
 
 set(FRAMEWORK_ONLY 0 CACHE BOOL "Framework mode (don't create mmseqs executable)")
 set(HAVE_SANITIZER 0 CACHE BOOL "Have sanitizers")
@@ -153,7 +159,7 @@ endif ()
 
 if (CYGWIN)
     # default cygwin allocator (dlmalloc) locks on every allocation and destroys MT performance
-    add_subdirectory(src/mmseqs_native/src/lib/nedmalloc)
+    add_subdirectory(lib/nedmalloc)
     # IPS4O seems to deadlock on cygwin
     set(DISABLE_IPS4O 1)
 endif()
@@ -182,9 +188,9 @@ endif ()
 # zstd
 # We use ZSTD_findDecompressedSize which is only available with ZSTD_STATIC_LINKING_ONLY
 # Thus we cannot use a system provided libzstd
-set(ZSTD_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/src/mmseqs_native/src/lib/zstd")
+set(ZSTD_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/zstd")
 set(CMAKE_INSTALL_LIBDIR bin)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/src/mmseqs_native/src/lib/zstd/build/cmake/CMakeModules")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/lib/zstd/build/cmake/CMakeModules")
 option(ZSTD_LEGACY_SUPPORT "LEGACY SUPPORT" OFF)
 option(ZSTD_BUILD_STATIC "BUILD STATIC LIBRARIES" ON)
 option(ZSTD_BUILD_SHARED "BUILD SHARED LIBRARIES" OFF)
@@ -192,62 +198,65 @@ option(ZSTD_MULTITHREAD_SUPPORT "MULTITHREADING SUPPORT" OFF)
 option(ZSTD_BUILD_PROGRAMS "BUILD PROGRAMS" OFF)
 option(ZSTD_BUILD_CONTRIB "BUILD CONTRIB" OFF)
 option(ZSTD_BUILD_TESTS "BUILD TESTS" OFF)
-include_directories(src/mmseqs_native/src/lib/zstd/lib)
-add_subdirectory(src/mmseqs_native/src/lib/zstd/build/cmake/lib EXCLUDE_FROM_ALL)
+include_directories(lib/zstd/lib)
+add_subdirectory(lib/zstd/build/cmake/lib EXCLUDE_FROM_ALL)
 set_target_properties(libzstd_static PROPERTIES COMPILE_FLAGS "${MMSEQS_C_FLAGS}" LINK_FLAGS "${MMSEQS_C_FLAGS}")
 
+# cppfs
+add_subdirectory(lib/cppfs/source/cppfs)
+
 # tinyexpr
-include_directories(src/mmseqs_native/src/lib/tinyexpr)
-add_subdirectory(src/mmseqs_native/src/lib/tinyexpr EXCLUDE_FROM_ALL)
+include_directories(lib/tinyexpr)
+add_subdirectory(lib/tinyexpr EXCLUDE_FROM_ALL)
 
 # microtar
-include_directories(src/mmseqs_native/src/lib/microtar)
-add_subdirectory(src/mmseqs_native/src/lib/microtar)
+include_directories(lib/microtar)
+add_subdirectory(lib/microtar)
 
 # simde
-include_directories(src/mmseqs_native/src/lib/simde)
+include_directories(lib/simde)
 
 include_directories(lib)
-include_directories(src/mmseqs_native/src/lib)
-include_directories(src/mmseqs_native/src/lib/gzstream)
-include_directories(src/mmseqs_native/src/lib/alp)
-include_directories(src/mmseqs_native/src/lib/cacode)
-include_directories(src/mmseqs_native/src/lib/ksw2)
-include_directories(src/mmseqs_native/src/lib/xxhash)
+include_directories(lib)
+include_directories(lib/gzstream)
+include_directories(lib/alp)
+include_directories(lib/cacode)
+include_directories(lib/ksw2)
+include_directories(lib/xxhash)
 if (NOT DISABLE_IPS4O)
-    include_directories(src/mmseqs_native/src/lib/ips4o)
+    include_directories(lib/ips4o)
 endif ()
 
-add_subdirectory(src/mmseqs_native/src/lib/cacode)
-add_subdirectory(src/mmseqs_native/src/lib/alp)
-add_subdirectory(src/mmseqs_native/src/lib/ksw2)
-add_subdirectory(src/mmseqs_native/src/data)
-add_subdirectory(src/mmseqs_native/src/src)
-if (NOT FRAMEWORK_ONLY AND INSTALL_UTIL)
-    add_subdirectory(src/mmseqs_native/src/util)
-endif ()
+add_subdirectory(lib/cacode)
+add_subdirectory(lib/alp)
+add_subdirectory(lib/ksw2)
+add_subdirectory(data)
+add_subdirectory(src/mmseqs_native/src)
+# if (NOT FRAMEWORK_ONLY AND INSTALL_UTIL)
+#     add_subdirectory(src/mmseqs_native/src/util)
+# endif ()
 
 
-file(GLOB BINDINGS_COMMON_SRCS "src/mmseqs_native/src/src/commons/*.cpp"
-                               "src/mmseqs_native/src/src/*.cpp")
+file(GLOB BINDINGS_COMMON_SRCS "src/mmseqs_native/src/commons/*.cpp"
+                               "src/mmseqs_native/src/*.cpp")
 
 # Generate python module
 
-add_subdirectory(src/mmseqs_native/src/src/version)
 add_subdirectory(lib/pybind11)
 pybind11_add_module(mmseqs_native ${SOURCES} "${SOURCE_DIR}/bindings.cpp" ${BINDINGS_COMMON_SRCS})
-set_target_properties(mmseqs_native PROPERTIES LINK_FLAGS "-Wl,-undefined,error")
+#set_target_properties(mmseqs_native PROPERTIES LINK_FLAGS "-Wl,-undefined,error")
 target_include_directories(mmseqs_native PUBLIC ${CMAKE_BINARY_DIR}/generated)
 target_include_directories(mmseqs_native PUBLIC ${PROJECT_BINARY_DIR}/generated)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/alignment)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/clustering)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/commons)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/multihit)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/prefiltering)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/linclust)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/taxonomy)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src/util)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/src)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/alignment)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/clustering)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/commons)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/multihit)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/prefiltering)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/linclust)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/taxonomy)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/util)
+target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src)
+target_include_directories(mmseqs_native PUBLIC lib/cppfs/source/cppfs/include)
 get_target_property(COMPILE_TMP mmseqs-framework COMPILE_FLAGS)
 get_target_property(LINK_TMP mmseqs-framework LINK_FLAGS)
 get_target_property(DEF_TMP mmseqs-framework COMPILE_DEFINITIONS)
@@ -257,5 +266,6 @@ append_target_property(mmseqs_native COMPILE_FLAGS ${COMPILE_TMP})
 append_target_property(mmseqs_native LINK_FLAGS ${LINK_TMP})
 set_property(TARGET mmseqs_native APPEND PROPERTY COMPILE_DEFINITIONS ${DEF_TMP})
 set_property(TARGET mmseqs_native APPEND PROPERTY INCLUDE_DIRECTORIES ${INCL_TMP})
-target_link_libraries(mmseqs_native PRIVATE version)
+target_link_libraries(mmseqs_native PRIVATE cppfs)
+
 

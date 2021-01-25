@@ -1,9 +1,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "src/src/commons/Application.h"
-#include "src/src/commons/Parameters.h"
-#include "src/src/output.h"
+#include "Application.h"
+#include "Parameters.h"
+#include "output.h"
 
 namespace py = pybind11;
 
