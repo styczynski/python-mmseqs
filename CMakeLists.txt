@@ -190,7 +190,7 @@ endif ()
 # Thus we cannot use a system provided libzstd
 set(ZSTD_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/lib/zstd")
 set(CMAKE_INSTALL_LIBDIR bin)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/lib/zstd/build/cmake/CMakeModules")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/lib/zstd/build_utils/cmake/CMakeModules")
 option(ZSTD_LEGACY_SUPPORT "LEGACY SUPPORT" OFF)
 option(ZSTD_BUILD_STATIC "BUILD STATIC LIBRARIES" ON)
 option(ZSTD_BUILD_SHARED "BUILD SHARED LIBRARIES" OFF)
@@ -199,7 +199,7 @@ option(ZSTD_BUILD_PROGRAMS "BUILD PROGRAMS" OFF)
 option(ZSTD_BUILD_CONTRIB "BUILD CONTRIB" OFF)
 option(ZSTD_BUILD_TESTS "BUILD TESTS" OFF)
 include_directories(lib/zstd/lib)
-add_subdirectory(lib/zstd/build/cmake/lib EXCLUDE_FROM_ALL)
+add_subdirectory(lib/zstd/build_utils/cmake/lib EXCLUDE_FROM_ALL)
 set_target_properties(libzstd_static PROPERTIES COMPILE_FLAGS "${MMSEQS_C_FLAGS}" LINK_FLAGS "${MMSEQS_C_FLAGS}")
 
 # cppfs
