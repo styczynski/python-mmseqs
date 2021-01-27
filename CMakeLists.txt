@@ -205,6 +205,9 @@ set_target_properties(libzstd_static PROPERTIES COMPILE_FLAGS "${MMSEQS_C_FLAGS}
 # cppfs
 add_subdirectory(lib/cppfs/source/cppfs)
 
+# spdlog
+add_subdirectory(lib/spdlog)
+
 # tinyexpr
 include_directories(lib/tinyexpr)
 add_subdirectory(lib/tinyexpr EXCLUDE_FROM_ALL)
@@ -257,12 +260,14 @@ target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/taxonomy)
 target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/util)
 target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src)
 target_include_directories(mmseqs_native PUBLIC lib/toml11)
+target_include_directories(mmseqs_native PUBLIC lib/spdlog/include)
 target_include_directories(mmseqs_native PUBLIC lib/cppfs/source/cppfs/include)
 get_target_property(COMPILE_TMP mmseqs-framework COMPILE_FLAGS)
 get_target_property(LINK_TMP mmseqs-framework LINK_FLAGS)
 get_target_property(DEF_TMP mmseqs-framework COMPILE_DEFINITIONS)
 get_target_property(INCL_TMP mmseqs-framework INCLUDE_DIRECTORIES)
 target_link_libraries(mmseqs_native PRIVATE mmseqs-framework)
+target_link_libraries(mmseqs_native PRIVATE spdlog)
 append_target_property(mmseqs_native COMPILE_FLAGS ${COMPILE_TMP})
 append_target_property(mmseqs_native LINK_FLAGS ${LINK_TMP})
 set_property(TARGET mmseqs_native APPEND PROPERTY COMPILE_DEFINITIONS ${DEF_TMP})
