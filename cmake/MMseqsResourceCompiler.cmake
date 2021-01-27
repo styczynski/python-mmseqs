@@ -37,13 +37,15 @@ function(compile_resource INPUT_FILE OUTPUT_FILE)
     get_filename_component(INPUT_FILE_DIRECTORY ${INPUT_FILE} DIRECTORY)
     string(REGEX REPLACE "/+$" "" INPUT_PATH_NO_TRAILING_SLASH "${PROJECT_SOURCE_DIR}/data/${INPUT_FILE_DIRECTORY}")
     set(INPUT_PATH ${INPUT_PATH_NO_TRAILING_SLASH}/)
-    string(REGEX REPLACE "[/\\-]" "_" OUTPUT_FILE_PREFIX ${INPUT_PATH})
+    string(REGEX REPLACE "/+$" "" OUTPUT_FILE_PREFIX "data/${INPUT_FILE_DIRECTORY}")
+    set(OUTPUT_FILE_PREFIX ${OUTPUT_FILE_PREFIX}/)
+    string(REGEX REPLACE "[/\\-]" "_" OUTPUT_FILE_PREFIX "${OUTPUT_FILE_PREFIX}")
     set(OUTPUT_FILE ${PROJECT_BINARY_DIR}/generated/${INPUT_FILE_NAME}.h)
     set(OUTPUT_FILE ${OUTPUT_FILE} PARENT_SCOPE)
     add_custom_command(OUTPUT ${OUTPUT_FILE}
             COMMAND ${compile_resource__internal_dir}/checkshell.sh ${SHELLCHECK_EXECUTABLE} ${INPUT_FILE_NAME}
             COMMAND mkdir -p ${PROJECT_BINARY_DIR}/generated
-            COMMAND ${XXD_EXECUTABLE} ${XXD_PARAMS} ${PROJECT_SOURCE_DIR}/data/${INPUT_FILE} > ${OUTPUT_FILE}
+            COMMAND cd ${PROJECT_SOURCE_DIR} && ${XXD_EXECUTABLE} ${XXD_PARAMS} data/${INPUT_FILE} > ${OUTPUT_FILE}
             COMMAND ${SED_EXECUTABLE} 's!unsigned char!static const unsigned char!' < ${OUTPUT_FILE} > ${OUTPUT_FILE}.tmp
             COMMAND ${SED_EXECUTABLE} 's!${OUTPUT_FILE_PREFIX}!!' < ${OUTPUT_FILE}.tmp > ${OUTPUT_FILE}
             WORKING_DIRECTORY ${INPUT_FILE_DIRECTORY}
