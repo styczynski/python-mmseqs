@@ -48,7 +48,7 @@ class CMakeBuild(build_ext):
         ]
 
         cfg = "Debug" if self.debug else "Release"
-        build_args = ["--config", cfg]
+        build_args = ["--config", cfg, "--target", "check"]
 
         if platform.system() == "Windows":
             cmake_args += [
@@ -58,7 +58,6 @@ class CMakeBuild(build_ext):
             ]
             if sys.maxsize > 2 ** 32:
                 cmake_args += ["-A", "x64"]
-                build_args += ["-A", "x64"]
             build_args += ["--", "/m"]
         else:
             cmake_args += ["-DCMAKE_BUILD_TYPE=" + cfg]
@@ -70,6 +69,10 @@ class CMakeBuild(build_ext):
         )
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
+
+        print(f'The cmake config will use the following args: {" ".join(cmake_args)}')
+        print(f'The cmake build will use the following args: {" ".join(build_args)}')
+
         subprocess.check_call(
             ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env,
             stdout=sys.stdout,
