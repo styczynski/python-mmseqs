@@ -58,6 +58,7 @@ class CMakeBuild(build_ext):
             ]
             if sys.maxsize > 2 ** 32:
                 cmake_args += ["-A", "x64"]
+                build_args += ["-A", "x64"]
             build_args += ["--", "/m"]
         else:
             cmake_args += ["-DCMAKE_BUILD_TYPE=" + cfg]
