@@ -69,7 +69,7 @@ class CMakeBuild(build_ext):
 
         if "MMSEQ_CMAKE_GENERATOR" in os.environ:
             if len(os.environ["MMSEQ_CMAKE_GENERATOR"]) > 0:
-                build_args += ["-G", os.environ["MMSEQ_CMAKE_GENERATOR"]]
+                cmake_args += ["-G", os.environ["MMSEQ_CMAKE_GENERATOR"]]
 
         env = os.environ.copy()
         env["CXXFLAGS"] = '{} -DVERSION_INFO=\\"{}\\"'.format(
