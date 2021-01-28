@@ -50,6 +50,7 @@ class CMakeBuild(build_ext):
 
         cfg = "Debug" if self.debug else "Release"
         build_args = ["--config", cfg]
+        arch = None
 
         if platform.system() == "Windows":
             cmake_args += [
@@ -58,9 +59,9 @@ class CMakeBuild(build_ext):
                 )
             ]
             if (sys.maxsize > 2 ** 32) or (8 * ctypes.sizeof(ctypes.c_voidp) == 64):
-                cmake_args += ["-A", "x64"]
+                arch = "x64"
             else:
-                cmake_args += ["-A", "Win32"]
+                arch = "x86"
 
             build_args += ["--", "/m"]
         else:
@@ -70,6 +71,13 @@ class CMakeBuild(build_ext):
         if "MMSEQ_CMAKE_GENERATOR" in os.environ:
             if len(os.environ["MMSEQ_CMAKE_GENERATOR"]) > 0:
                 cmake_args += ["-G", os.environ["MMSEQ_CMAKE_GENERATOR"]]
+
+        if "MMSEQ_CMAKE_ARCH" in os.environ:
+            if len(os.environ["MMSEQ_CMAKE_ARCH"]) > 0:
+                arch = os.environ["MMSEQ_CMAKE_ARCH"]
+
+        if arch is not None:
+            cmake_args += ["-A", arch]
 
         env = os.environ.copy()
         env["CXXFLAGS"] = '{} -DVERSION_INFO=\\"{}\\"'.format(
