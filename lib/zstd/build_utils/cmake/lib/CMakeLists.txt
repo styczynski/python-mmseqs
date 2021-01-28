@@ -165,13 +165,6 @@ IF (ZSTD_BUILD_STATIC)
             OUTPUT_NAME ${STATIC_LIBRARY_BASE_NAME})
 ENDIF (ZSTD_BUILD_STATIC)
 
-IF (ZSTD_BUILD_SHARED)
-    target_compile_options(libzstd_shared PRIVATE -fPIC)
-ENDIF (ZSTD_BUILD_SHARED)
-IF (ZSTD_BUILD_STATIC)
-    target_compile_options(libzstd_static PRIVATE -fPIC)
-ENDIF (ZSTD_BUILD_STATIC)
-
 IF (UNIX)
     # pkg-config
     SET(PREFIX "${CMAKE_INSTALL_PREFIX}")

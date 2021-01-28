@@ -56,8 +56,6 @@ target_include_directories(mmseqs-framework PUBLIC taxonomy)
 target_include_directories(mmseqs-framework PUBLIC util)
 target_include_directories(mmseqs-framework PUBLIC .)
 
-target_compile_options(mmseqs-framework PRIVATE -fPIC)
-
 add_dependencies(mmseqs-framework generated)
 
 #if (NOT DISABLE_LTO)
