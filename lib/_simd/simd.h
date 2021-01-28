@@ -9,6 +9,32 @@
 #include <algorithm>
 #include <iostream>
 
+
+// Check windows
+#if _WIN32 || _WIN64
+#if _WIN64
+//ENVIRONMENT64
+#else
+//ENVIRONMENT32
+#define OVERRIDE_SIMD_X32
+#endif
+#endif
+
+// Check GCC
+#if __GNUC__
+#if __x86_64__ || __ppc64__
+//ENVIRONMENT64
+#else
+//ENVIRONMENT32
+#define OVERRIDE_SIMD_X32
+#endif
+#endif
+
+#ifdef OVERRIDE_SIMD_X32
+#define _mm_cvtsi64_si128 _mm_cvtsi32_si128
+#define _mm_cvtsi128_si64 _mm_cvtsi128_si32
+#endif
+
 #define AVX512_ALIGN_DOUBLE		64
 #define AVX512_VECSIZE_DOUBLE	8
 #define AVX512_ALIGN_FLOAT		64
