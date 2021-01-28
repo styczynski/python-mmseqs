@@ -48,7 +48,7 @@ class CMakeBuild(build_ext):
         ]
 
         cfg = "Debug" if self.debug else "Release"
-        build_args = ["--config", cfg, "--target", "check"]
+        build_args = ["--config", cfg]
 
         if platform.system() == "Windows":
             cmake_args += [
