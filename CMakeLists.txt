@@ -245,6 +245,7 @@ file(GLOB BINDINGS_COMMON_SRCS "src/mmseqs_native/src/commons/*.cpp"
 add_subdirectory(lib/pybind11)
 pybind11_add_module(mmseqs_native ${SOURCES} "${SOURCE_DIR}/bindings.cpp" ${BINDINGS_COMMON_SRCS})
 #set_target_properties(mmseqs_native PROPERTIES LINK_FLAGS "-Wl,-undefined,error")
+target_compile_options(mmseqs_native PRIVATE -fPIC)
 target_include_directories(mmseqs_native PUBLIC ${CMAKE_BINARY_DIR}/generated)
 target_include_directories(mmseqs_native PUBLIC ${PROJECT_BINARY_DIR}/generated)
 target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/alignment)
