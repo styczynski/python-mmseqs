@@ -61,10 +61,15 @@ class CMakeBuild(build_ext):
                 cmake_args += ["-A", "x64"]
             else:
                 cmake_args += ["-A", "Win32"]
+
             build_args += ["--", "/m"]
         else:
             cmake_args += ["-DCMAKE_BUILD_TYPE=" + cfg]
             build_args += ["--", "-j2"]
+
+        if "MMSEQ_CMAKE_GENERATOR" in os.environ:
+            if len(os.environ["MMSEQ_CMAKE_GENERATOR"]) > 0:
+                build_args += ["-G", os.environ["MMSEQ_CMAKE_GENERATOR"]]
 
         env = os.environ.copy()
         env["CXXFLAGS"] = '{} -DVERSION_INFO=\\"{}\\"'.format(
