@@ -3,6 +3,7 @@ import platform
 import re
 import subprocess
 import sys
+import ctypes
 from distutils.version import LooseVersion
 from shutil import copyfile, copymode
 
@@ -56,7 +57,7 @@ class CMakeBuild(build_ext):
                     cfg.upper(), extdir
                 )
             ]
-            if sys.maxsize > 2 ** 32:
+            if (sys.maxsize > 2 ** 32) or (8 * ctypes.sizeof(ctypes.c_voidp) == 64):
                 cmake_args += ["-A", "x64"]
             build_args += ["--", "/m"]
         else:
