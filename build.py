@@ -60,7 +60,7 @@ class CMakeBuild(build_ext):
             if (sys.maxsize > 2 ** 32) or (8 * ctypes.sizeof(ctypes.c_voidp) == 64):
                 cmake_args += ["-A", "x64"]
             else:
-                cmake_args += ["-A", "x86"]
+                cmake_args += ["-A", "Win32"]
             build_args += ["--", "/m"]
         else:
             cmake_args += ["-DCMAKE_BUILD_TYPE=" + cfg]
