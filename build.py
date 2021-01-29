@@ -62,7 +62,7 @@ class CMakeBuild(build_ext):
             if (sys.maxsize > 2 ** 32) or (8 * ctypes.sizeof(ctypes.c_voidp) == 64):
                 arch = "x64"
             else:
-                arch = "x86"
+                arch = "Win32"
                 force_x86 = True
 
             build_args += ["--", "/m"]
