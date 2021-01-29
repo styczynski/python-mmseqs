@@ -82,7 +82,7 @@ class CMakeBuild(build_ext):
                     force_x86 = True
 
         if force_x86:
-            cmake_args += ["-DFORCE_X86"]
+            cmake_args += ["-DFORCE_X86=1"]
 
         if arch is not None:
             cmake_args += ["-A", arch]
