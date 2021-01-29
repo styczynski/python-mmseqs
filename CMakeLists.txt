@@ -20,13 +20,6 @@ else ()
     add_compile_options(-g)
 endif ()
 
-# No VLA
-if (MSVC)
-    # Nothing
-else()
-    add_compile_options(-Werror=vla)
-endif()
-
 SET(SOURCE_DIR "src/mmseqs_native")
 
 message("-- Source Directory: ${CMAKE_CURRENT_SOURCE_DIR}")
