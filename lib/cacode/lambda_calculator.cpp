@@ -4,7 +4,7 @@
 /**
  * See lambda_calculator.h
  */
-#include <commons/alloc.h>
+#include <mmseqs/commons/alloc.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>

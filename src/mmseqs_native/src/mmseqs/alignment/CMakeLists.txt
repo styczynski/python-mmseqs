@@ -1,0 +1,28 @@
+set(alignment_header_files
+        mmseqs/alignment/Alignment.h
+        mmseqs/alignment/CompressedA3M.h
+        mmseqs/alignment/EvalueComputation.h
+        mmseqs/alignment/Matcher.h
+        mmseqs/alignment/MsaFilter.h
+        mmseqs/alignment/MultipleAlignment.h
+        mmseqs/alignment/PSSMCalculator.h
+        mmseqs/alignment/PSSMMasker.h
+        mmseqs/alignment/StripedSmithWaterman.h
+        mmseqs/alignment/BandedNucleotideAligner.h
+        mmseqs/alignment/DistanceCalculator.h
+        PARENT_SCOPE
+        )
+
+set(alignment_source_files
+        mmseqs/alignment/Alignment.cpp
+        mmseqs/alignment/CompressedA3M.cpp
+        mmseqs/alignment/Main.cpp
+        mmseqs/alignment/Matcher.cpp
+        mmseqs/alignment/MsaFilter.cpp
+        mmseqs/alignment/MultipleAlignment.cpp
+        mmseqs/alignment/PSSMCalculator.cpp
+        mmseqs/alignment/StripedSmithWaterman.cpp
+        mmseqs/alignment/BandedNucleotideAligner.cpp
+        mmseqs/alignment/rescorediagonal.cpp
+        PARENT_SCOPE
+        )

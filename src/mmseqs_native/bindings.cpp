@@ -1,9 +1,9 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "application.h"
-#include "parameters.h"
-#include "output.h"
+#include <mmseqs/commons/application.h>
+#include <mmseqs/commons/parameters.h>
+#include <mmseqs/output.h>
 
 namespace py = pybind11;
 

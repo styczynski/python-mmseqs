@@ -250,8 +250,8 @@ add_subdirectory(src/mmseqs_native/src)
 # endif ()
 
 
-file(GLOB BINDINGS_COMMON_SRCS "src/mmseqs_native/src/commons/*.cpp"
-                               "src/mmseqs_native/src/*.cpp")
+file(GLOB BINDINGS_COMMON_SRCS "src/mmseqs_native/src/mmseqs/commons/*.cpp"
+                               "src/mmseqs_native/src/mmseqs/*.cpp")
 
 # Generate python module
 
@@ -260,14 +260,6 @@ pybind11_add_module(mmseqs_native ${SOURCES} "${SOURCE_DIR}/bindings.cpp" ${BIND
 #set_target_properties(mmseqs_native PROPERTIES LINK_FLAGS "-Wl,-undefined,error")
 target_include_directories(mmseqs_native PUBLIC ${CMAKE_BINARY_DIR}/generated)
 target_include_directories(mmseqs_native PUBLIC ${PROJECT_BINARY_DIR}/generated)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/alignment)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/clustering)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/commons)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/multihit)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/prefiltering)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/linclust)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/taxonomy)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/util)
 target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src)
 target_include_directories(mmseqs_native PUBLIC lib/toml11)
 target_include_directories(mmseqs_native PUBLIC lib/spdlog/include)
