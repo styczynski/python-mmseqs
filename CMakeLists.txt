@@ -16,6 +16,13 @@ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_BUILD_TYPE Debug)
 add_compile_options(-g)
 
+# No VLA
+if (MSVC)
+    # Nothing
+else()
+    add_compile_options(-Werror=vla)
+endif()
+
 SET(SOURCE_DIR "src/mmseqs_native")
 
 message("-- Source Directory: ${CMAKE_CURRENT_SOURCE_DIR}")
@@ -205,6 +212,9 @@ include_directories(lib/zstd/lib)
 add_subdirectory(lib/zstd/build_utils/cmake/lib EXCLUDE_FROM_ALL)
 set_target_properties(libzstd_static PROPERTIES COMPILE_FLAGS "${MMSEQS_C_FLAGS}" LINK_FLAGS "${MMSEQS_C_FLAGS}")
 
+# global utils
+include_directories(src/mmseqs_native/src)
+
 # cppfs
 add_subdirectory(lib/cppfs/source/cppfs)
 
@@ -276,5 +286,14 @@ append_target_property(mmseqs_native LINK_FLAGS ${LINK_TMP})
 set_property(TARGET mmseqs_native APPEND PROPERTY COMPILE_DEFINITIONS ${DEF_TMP})
 set_property(TARGET mmseqs_native APPEND PROPERTY INCLUDE_DIRECTORIES ${INCL_TMP})
 target_link_libraries(mmseqs_native PRIVATE cppfs)
+
+# Pedantic
+if (MSVC)
+    # warning level 4 and all warnings as errors
+    target_compile_options(mmseqs_native PRIVATE /W4 /WX)
+else()
+    # lots of warnings and all warnings as errors
+    target_compile_options(mmseqs_native PRIVATE -Wall -Wextra -pedantic -Werror -Wno-unused-parameter)
+endif()
 
 

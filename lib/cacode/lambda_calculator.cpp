@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <commons/alloc.h>
 #include "nrutil.h"
 
 int Alphsize;
@@ -199,9 +200,9 @@ Sum Check_root(const double **mat_b, double **a, double lambda, double *p, doubl
 
     y = dmatrix(1, Alphsize, 1, Alphsize);
     //indx = ivector(1,Alphsize);
-    int indx[Alphsize + 1];
+    VLA(int, indx, Alphsize + 1);
     //col = dvector(1,Alphsize);
-    double col[Alphsize + 1];
+    VLA(double, col, Alphsize + 1);
 
     makematrix(mat_b, a, lambda);
     ludcmp(a, Alphsize, indx, &d);
@@ -257,8 +258,8 @@ double *Locate_det_zero(const double **mat_b, int *N_root_add) {
     dlambda = (Lambda_UB) / (N * 1.0);
     //l_here = (double *)malloc((N+1)*sizeof(double));
     //s_here = (double *)malloc((N+1)*sizeof(double));
-    double l_here[N + 1];
-    double s_here[N + 1];
+    VLA(double, l_here, N + 1);
+    VLA(double, s_here, N + 1);
 
     for (i = 0; i < N; i++) {
         lambda = (i + 1) * dlambda;
@@ -343,8 +344,8 @@ Lambda Find_JP(const double **mat_b, double la_min, double la_max, double **JP, 
     dlambda = (lambda_max - lambda_min) / (N * 1.0);
     //l_here = (double *)malloc((N+1)*sizeof(double));
     //s_here = (double *)malloc((N+1)*sizeof(double));
-    double l_here[N + 1];
-    double s_here[N + 1];
+    VLA(double, l_here, N + 1);
+    VLA(double, s_here, N + 1);
     //printf("lambda_min enter = %12.10e, lambda_max = %12.10f\n", lambda_min, lambda_max);
     for (i = 0; i < N - 1; i++) {
         lambda = lambda_min + (i + 1) * dlambda;

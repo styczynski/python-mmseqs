@@ -13,17 +13,8 @@ mmseqs_output call_mmseqs_proxy(std::string command_name, Parameters args) {
 }
 
 
-PYBIND11_PLUGIN(mmseqs_native) {
-  py::module m("mmseqs_native", R"doc(
-        Python module
-        -----------------------
-        .. currentmodule:: unafold_python
-        .. autosummary::
-           :toctree: _generate
-           
-           add
-           subtract
-    )doc");
+PYBIND11_MODULE(mmseqs_native, m) {
+    m.doc() = "documentation string"; // optional
 
     pybind11::class_<mmseqs_call_args>(m, "MMSeqsCallArgs")
     .def(pybind11::init<>())
@@ -298,5 +289,4 @@ PYBIND11_PLUGIN(mmseqs_native) {
         Run mmseqs2
     )doc");
 
-  return m.ptr();
 }
