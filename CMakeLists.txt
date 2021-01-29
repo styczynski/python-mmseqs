@@ -3,6 +3,11 @@ project(mmseqs_native)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
+if (FORCE_X86)
+    message("-- Force compilation for x86")
+    set (CMAKE_C_FLAGS "-m32")
+endif ()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
