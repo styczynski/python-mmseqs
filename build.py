@@ -71,6 +71,7 @@ class CMakeBuild(build_ext):
         if "MMSEQ_CMAKE_GENERATOR" in os.environ:
             if len(os.environ["MMSEQ_CMAKE_GENERATOR"]) > 0:
                 cmake_args += ["-G", os.environ["MMSEQ_CMAKE_GENERATOR"]]
+                arch = None
 
         if "MMSEQ_CMAKE_ARCH" in os.environ:
             if len(os.environ["MMSEQ_CMAKE_ARCH"]) > 0:
