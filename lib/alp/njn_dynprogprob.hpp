@@ -1,6 +1,8 @@
 #ifndef INCLUDED_NJN_DYNPROGPROB
 #define INCLUDED_NJN_DYNPROGPROB
 
+#include <cassert>
+
 /* $Id: $
  * ===========================================================================
  *

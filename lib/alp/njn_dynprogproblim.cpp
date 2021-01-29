@@ -33,8 +33,8 @@ Contents:
 
 ******************************************************************************/
 
+#include <cassert>
 #include "njn_dynprogproblim.hpp"
-#include <assert.h>
 #include "njn_memutil.hpp"
 
 using namespace Njn;

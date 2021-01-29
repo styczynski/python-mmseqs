@@ -36,6 +36,7 @@ Contents:
 
 ******************************************************************************/
 
+#include <cassert>
 #include "njn_dynprogprob.hpp"
 
 namespace Njn {
