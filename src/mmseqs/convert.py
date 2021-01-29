@@ -1,5 +1,5 @@
-from tempfile import NamedTemporaryFile
 import collections
+from tempfile import NamedTemporaryFile
 from typing import Iterator, Sequence, Union
 
 from Bio import SeqIO
@@ -79,7 +79,7 @@ class GenericSequencesFilePathConverter:
         if isinstance(self.input, str):
             return [self.input]
         else:
-            self.tmp_file = NamedTemporaryFile(suffix='.fasta', mode='w')
+            self.tmp_file = NamedTemporaryFile(suffix=".fasta", mode="w")
             output_handle = self.tmp_file.__enter__()
             output_handle.seek(0)
             records = convert_to_biopython_sequences(self.input)
@@ -87,6 +87,6 @@ class GenericSequencesFilePathConverter:
             output_handle.seek(0)
             return [self.tmp_file.name]
 
-    def __exit__(self ,type, value, traceback):
+    def __exit__(self, type, value, traceback):
         if self.tmp_file is not None:
             self.tmp_file.__exit__(type, value, traceback)

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
-import pytest
+
 import sys
 
 import env  # noqa: F401
-
-from pybind11_tests import pytypes as m
+import pytest
 from pybind11_tests import debug_enabled
+from pybind11_tests import pytypes as m
 
 
 def test_int(doc):
@@ -120,7 +120,9 @@ def test_str(doc):
     assert s1 == s2
 
     malformed_utf8 = b"\x80"
-    assert m.str_from_object(malformed_utf8) is malformed_utf8  # To be fixed; see #2380
+    assert (
+        m.str_from_object(malformed_utf8) is malformed_utf8
+    )  # To be fixed; see #2380
     if env.PY2:
         # with pytest.raises(UnicodeDecodeError):
         #     m.str_from_object(malformed_utf8)
@@ -274,8 +276,10 @@ def test_non_converting_constructors():
         for move in [True, False]:
             with pytest.raises(TypeError) as excinfo:
                 m.nonconverting_constructor(t, v, move)
-            expected_error = "Object of type '{}' is not an instance of '{}'".format(
-                type(v).__name__, t
+            expected_error = (
+                "Object of type '{}' is not an instance of '{}'".format(
+                    type(v).__name__, t
+                )
             )
             assert str(excinfo.value) == expected_error
 

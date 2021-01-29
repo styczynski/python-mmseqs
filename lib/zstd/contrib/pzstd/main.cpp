@@ -15,12 +15,12 @@ using namespace pzstd;
 int main(int argc, const char** argv) {
   Options options;
   switch (options.parse(argc, argv)) {
-  case Options::Status::Failure:
-    return 1;
-  case Options::Status::Message:
-    return 0;
-  default:
-    break;
+    case Options::Status::Failure:
+      return 1;
+    case Options::Status::Message:
+      return 0;
+    default:
+      break;
   }
 
   return pzstdMain(options);

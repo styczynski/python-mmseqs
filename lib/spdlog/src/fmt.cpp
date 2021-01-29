@@ -9,7 +9,6 @@
 #if !defined(SPDLOG_FMT_EXTERNAL)
 #include <spdlog/fmt/bundled/format-inl.h>
 
-
 FMT_BEGIN_NAMESPACE
 namespace detail {
 
@@ -100,4 +99,4 @@ template FMT_API wchar_t detail::decimal_point_impl(locale_ref);
 template FMT_API void detail::buffer<wchar_t>::append(const wchar_t*,
                                                       const wchar_t*);
 FMT_END_NAMESPACE
-#endif // !SPDLOG_FMT_EXTERNAL
+#endif  // !SPDLOG_FMT_EXTERNAL

@@ -4,10 +4,9 @@
 #define TOML11_FROM_HPP
 #include "traits.hpp"
 
-namespace toml
-{
+namespace toml {
 
-template<typename T>
+template <typename T>
 struct from;
 // {
 //     static T from_toml(const toml::value& v)
@@ -16,5 +15,5 @@ struct from;
 //     }
 // };
 
-} // toml
-#endif // TOML11_FROM_HPP
+}  // namespace toml
+#endif  // TOML11_FROM_HPP

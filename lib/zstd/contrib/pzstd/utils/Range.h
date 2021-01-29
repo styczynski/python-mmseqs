@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree) and the GPLv2 (found
  * in the COPYING file in the root directory of this source tree).
  */
- 
+
 /**
  * A subset of `folly/Range.h`.
  * All code copied verbatiam modulo formatting
@@ -27,7 +27,7 @@ namespace detail {
 /*
  *Use IsCharPointer<T>::type to enable const char* or char*.
  *Use IsCharPointer<T>::const_type to enable only const char*.
-*/
+ */
 template <class T>
 struct IsCharPointer {};
 
@@ -42,7 +42,7 @@ struct IsCharPointer<const char*> {
   typedef int type;
 };
 
-} // namespace detail
+}  // namespace detail
 
 template <typename Iter>
 class Range {
@@ -71,12 +71,10 @@ class Range {
 
   // Allow implicit conversion from Range<From> to Range<To> if From is
   // implicitly convertible to To.
-  template <
-      class OtherIter,
-      typename std::enable_if<
-          (!std::is_same<Iter, OtherIter>::value &&
-           std::is_convertible<OtherIter, Iter>::value),
-          int>::type = 0>
+  template <class OtherIter, typename std::enable_if<
+                                 (!std::is_same<Iter, OtherIter>::value &&
+                                  std::is_convertible<OtherIter, Iter>::value),
+                                 int>::type = 0>
   constexpr /* implicit */ Range(const Range<OtherIter>& other)
       : b_(other.begin()), e_(other.end()) {}
 
@@ -86,21 +84,11 @@ class Range {
   Range& operator=(const Range&) & = default;
   Range& operator=(Range&&) & = default;
 
-  constexpr size_type size() const {
-    return e_ - b_;
-  }
-  bool empty() const {
-    return b_ == e_;
-  }
-  Iter data() const {
-    return b_;
-  }
-  Iter begin() const {
-    return b_;
-  }
-  Iter end() const {
-    return e_;
-  }
+  constexpr size_type size() const { return e_ - b_; }
+  bool empty() const { return b_ == e_; }
+  Iter data() const { return b_; }
+  Iter begin() const { return b_; }
+  Iter end() const { return e_; }
 
   void advance(size_type n) {
     if (UNLIKELY(n > size())) {
@@ -128,4 +116,4 @@ class Range {
 using ByteRange = Range<const unsigned char*>;
 using MutableByteRange = Range<unsigned char*>;
 using StringPiece = Range<const char*>;
-}
+}  // namespace pzstd

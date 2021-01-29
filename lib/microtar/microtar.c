@@ -20,9 +20,9 @@
  * IN THE SOFTWARE.
  */
 
+#include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stddef.h>
 #include <string.h>
 
 #include "microtar.h"
@@ -40,14 +40,13 @@ typedef struct {
   char _padding[255];
 } mtar_raw_header_t;
 
-
 static unsigned round_up(unsigned n, unsigned incr) {
   return n + (incr - n % incr) % incr;
 }
 
-static unsigned checksum(const mtar_raw_header_t* rh) {
+static unsigned checksum(const mtar_raw_header_t *rh) {
   unsigned i;
-  unsigned char *p = (unsigned char*) rh;
+  unsigned char *p = (unsigned char *)rh;
   unsigned res = 256;
   for (i = 0; i < offsetof(mtar_raw_header_t, checksum); i++) {
     res += p[i];
@@ -58,32 +57,40 @@ static unsigned checksum(const mtar_raw_header_t* rh) {
   return res;
 }
 
-const char* mtar_strerror(int err) {
+const char *mtar_strerror(int err) {
   switch (err) {
-    case MTAR_ESUCCESS     : return "success";
-    case MTAR_EFAILURE     : return "failure";
-    case MTAR_EOPENFAIL    : return "could not open";
-    case MTAR_EREADFAIL    : return "could not read";
-    case MTAR_ESEEKFAIL    : return "could not seek";
-    case MTAR_EBADCHKSUM   : return "bad checksum";
-    case MTAR_ENULLRECORD  : return "null record";
-    case MTAR_ENOTFOUND    : return "file not found";
+    case MTAR_ESUCCESS:
+      return "success";
+    case MTAR_EFAILURE:
+      return "failure";
+    case MTAR_EOPENFAIL:
+      return "could not open";
+    case MTAR_EREADFAIL:
+      return "could not read";
+    case MTAR_ESEEKFAIL:
+      return "could not seek";
+    case MTAR_EBADCHKSUM:
+      return "bad checksum";
+    case MTAR_ENULLRECORD:
+      return "null record";
+    case MTAR_ENOTFOUND:
+      return "file not found";
   }
   return "unknown error";
 }
 
 static int file_read(mtar_t *tar, void *data, size_t size) {
-  size_t res = fread(data, 1, size, (FILE*)tar->stream);
+  size_t res = fread(data, 1, size, (FILE *)tar->stream);
   return (res == size) ? MTAR_ESUCCESS : MTAR_EREADFAIL;
 }
 
 static int file_seek(mtar_t *tar, long offset, int whence) {
-  int res = fseek((FILE*)tar->stream, offset, whence);
+  int res = fseek((FILE *)tar->stream, offset, whence);
   return (res == 0) ? MTAR_ESUCCESS : MTAR_ESEEKFAIL;
 }
 
 static int file_close(mtar_t *tar) {
-  fclose((FILE*)tar->stream);
+  fclose((FILE *)tar->stream);
   return MTAR_ESUCCESS;
 }
 
@@ -104,9 +111,7 @@ int mtar_open(mtar_t *tar, const char *filename) {
   return MTAR_ESUCCESS;
 }
 
-int mtar_close(mtar_t *tar) {
-  return tar->close(tar);
-}
+int mtar_close(mtar_t *tar) { return tar->close(tar); }
 
 int mtar_read_header(mtar_t *tar, mtar_header_t *h) {
   mtar_raw_header_t rh;
@@ -121,14 +126,14 @@ int mtar_read_header(mtar_t *tar, mtar_header_t *h) {
 
   /* If the checksum starts with a null byte we assume the record is NULL */
   if (*(rh.checksum) == '\0') {
-      return MTAR_ENULLRECORD;
+    return MTAR_ENULLRECORD;
   }
 
   /* Build and compare checksum */
   chksum1 = checksum(&rh);
   sscanf(rh.checksum, "%o", &chksum2);
   if (chksum1 != chksum2) {
-      return MTAR_EBADCHKSUM;
+    return MTAR_EBADCHKSUM;
   }
 
   /* Load raw header into header */
@@ -154,7 +159,7 @@ int mtar_read_data(mtar_t *tar, void *ptr, size_t size) {
   int n = round_up(tar->curr_size, 512) - tar->curr_size;
   err = tar->seek(tar, n, SEEK_CUR);
   if (err) {
-      return err;
+    return err;
   }
   return MTAR_ESUCCESS;
 }

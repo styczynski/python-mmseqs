@@ -1,47 +1,48 @@
 #ifndef RESULT2PROFILE_H
 #define RESULT2PROFILE_H
 
-#include "Parameters.h"
 #include "DBReader.h"
 #include "DBWriter.h"
+#include "Parameters.h"
 #include "output.h"
 
 #include <unordered_map>
 
 class StatsComputer {
-public:
-    StatsComputer(const Parameters &par);
-    ~StatsComputer();
+ public:
+  StatsComputer(const Parameters &par);
+  ~StatsComputer();
 
-    int run();
-private:
-    int stat;
+  int run();
 
-    std::string queryDb;
-    std::string queryDbIndex;
+ private:
+  int stat;
 
-    std::string targetDb;
-    std::string targetDbIndex;
+  std::string queryDb;
+  std::string queryDbIndex;
 
-    const bool tsvOut;
+  std::string targetDb;
+  std::string targetDbIndex;
 
-    DBReader<unsigned int> *resultReader;
-    DBWriter *statWriter;
+  const bool tsvOut;
 
-    int threads;
+  DBReader<unsigned int> *resultReader;
+  DBWriter *statWriter;
 
-    template<typename T>
-    struct PerSequence {
-        typedef T(*type)(const char *);
-    };
+  int threads;
 
-    template<typename T>
-    int sequenceWise(typename PerSequence<T>::type call, bool onlyResultDb = false);
+  template <typename T>
+  struct PerSequence {
+    typedef T (*type)(const char *);
+  };
 
-    int countNumberOfLines();
-    int meanValue();
-    int sumValue();
+  template <typename T>
+  int sequenceWise(typename PerSequence<T>::type call,
+                   bool onlyResultDb = false);
+
+  int countNumberOfLines();
+  int meanValue();
+  int sumValue();
 };
-
 
 #endif

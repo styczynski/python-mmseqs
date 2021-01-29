@@ -23,14 +23,15 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ *ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ *LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ *CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #pragma once
@@ -50,22 +51,22 @@ namespace detail {
  */
 template <class It, class Comp>
 void insertionSort(const It begin, const It end, Comp comp) {
-    IPS4O_ASSUME_NOT(begin >= end);
+  IPS4O_ASSUME_NOT(begin >= end);
 
-    for (It it = begin + 1; it < end; ++it) {
-        typename std::iterator_traits<It>::value_type val = std::move(*it);
-        if (comp(val, *begin)) {
-            std::move_backward(begin, it, it + 1);
-            *begin = std::move(val);
-        } else {
-            auto cur = it;
-            for (auto next = it - 1; comp(val, *next); --next) {
-                *cur = std::move(*next);
-                cur = next;
-            }
-            *cur = std::move(val);
-        }
+  for (It it = begin + 1; it < end; ++it) {
+    typename std::iterator_traits<It>::value_type val = std::move(*it);
+    if (comp(val, *begin)) {
+      std::move_backward(begin, it, it + 1);
+      *begin = std::move(val);
+    } else {
+      auto cur = it;
+      for (auto next = it - 1; comp(val, *next); --next) {
+        *cur = std::move(*next);
+        cur = next;
+      }
+      *cur = std::move(val);
     }
+  }
 }
 
 /**
@@ -73,8 +74,9 @@ void insertionSort(const It begin, const It end, Comp comp) {
  */
 template <class It, class Comp>
 inline void baseCaseSort(It begin, It end, Comp&& comp) {
-    if (begin == end) return;
-    detail::insertionSort(std::move(begin), std::move(end), std::forward<Comp>(comp));
+  if (begin == end) return;
+  detail::insertionSort(std::move(begin), std::move(end),
+                        std::forward<Comp>(comp));
 }
 
 template <class It, class Comp>
@@ -82,7 +84,7 @@ inline bool sortedCaseSort(It begin, It end, Comp&& comp) {
   if (begin == end) {
     return true;
   }
-  
+
   // If last element is not smaller than first element,
   // test if input is sorted (input is not reverse sorted).
   if (!comp(*(end - 1), *begin)) {
@@ -92,7 +94,7 @@ inline bool sortedCaseSort(It begin, It end, Comp&& comp) {
   } else {
     // Check whether the input is reverse sorted.
     for (It it = begin; (it + 1) != end; ++it) {
-      if (comp(*it , *(it + 1))) {
+      if (comp(*it, *(it + 1))) {
         return false;
       }
     }
@@ -102,7 +104,6 @@ inline bool sortedCaseSort(It begin, It end, Comp&& comp) {
 
   return false;
 }
-
 
 }  // namespace detail
 }  // namespace ips4o

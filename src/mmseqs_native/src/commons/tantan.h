@@ -66,42 +66,30 @@ namespace tantan {
 
 typedef const double *const_double_ptr;
 
-int maskSequences(char *seqBeg,
-                   char *seqEnd,
-                   int maxRepeatOffset,
-                   const const_double_ptr *likelihoodRatioMatrix,
-                   double repeatProb,
-                   double repeatEndProb,
-                   double repeatOffsetProbDecay,
-                   double firstGapProb,
-                   double otherGapProb,
-                   double minMaskProb,
-                   const char *maskTable);
+int maskSequences(char *seqBeg, char *seqEnd, int maxRepeatOffset,
+                  const const_double_ptr *likelihoodRatioMatrix,
+                  double repeatProb, double repeatEndProb,
+                  double repeatOffsetProbDecay, double firstGapProb,
+                  double otherGapProb, double minMaskProb,
+                  const char *maskTable);
 
 // The following routine gets the posterior probability that each
 // letter is repetitive.  It stores the results in "probabilities",
 // which must point to enough pre-allocated space to fit the results.
 
-void getProbabilities(const char *seqBeg,
-                      const char *seqEnd,
+void getProbabilities(const char *seqBeg, const char *seqEnd,
                       int maxRepeatOffset,
                       const const_double_ptr *likelihoodRatioMatrix,
-                      double repeatProb,
-                      double repeatEndProb,
-                      double repeatOffsetProbDecay,
-                      double firstGapProb,
-                      double otherGapProb,
-                      float *probabilities);
+                      double repeatProb, double repeatEndProb,
+                      double repeatOffsetProbDecay, double firstGapProb,
+                      double otherGapProb, float *probabilities);
 
 // The following routine masks each letter whose corresponding entry
 // in "probabilities" is >= minMaskProb.
 
-int maskProbableLetters(char *seqBeg,
-                         char *seqEnd,
-                         const float *probabilities,
-                         double minMaskProb,
-                         const char *maskTable);
+int maskProbableLetters(char *seqBeg, char *seqEnd, const float *probabilities,
+                        double minMaskProb, const char *maskTable);
 
-}
+}  // namespace tantan
 
 #endif

@@ -88,7 +88,9 @@ def test_move_and_copy_load_optional():
     # The extra move/copy constructions below come from the std::optional move (which has to move
     # its arguments):
     assert m.move_optional(10) == 10  # c_m: 1 move assign, 2 move construct
-    assert m.move_or_copy_optional(11) == 11  # c_mc: 1 move assign, 2 move construct
+    assert (
+        m.move_or_copy_optional(11) == 11
+    )  # c_mc: 1 move assign, 2 move construct
     assert m.copy_optional(12) == 12  # c_c: 1 copy assign, 2 copy construct
     # 1 move assign + move construct moves each of c_m, c_mc, 1 c_c copy
     # +1 move/copy construct each from moving the tuple

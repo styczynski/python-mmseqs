@@ -77,9 +77,8 @@ inline bool is_directory(StringPiece path, std::error_code& ec) noexcept {
 }
 
 /// http://en.cppreference.com/w/cpp/filesystem/file_size
-inline std::uintmax_t file_size(
-    StringPiece path,
-    std::error_code& ec) noexcept {
+inline std::uintmax_t file_size(StringPiece path,
+                                std::error_code& ec) noexcept {
   auto stat = status(path, ec);
   if (ec) {
     return -1;
@@ -91,4 +90,4 @@ inline std::uintmax_t file_size(
   ec.clear();
   return stat.st_size;
 }
-}
+}  // namespace pzstd

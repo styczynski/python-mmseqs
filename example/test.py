@@ -1,6 +1,4 @@
 import mmseqs
-from Bio.SeqRecord import SeqRecord
-from Bio.Seq import Seq
 
 #
 # Demonstration of basic mmseqs2 operations

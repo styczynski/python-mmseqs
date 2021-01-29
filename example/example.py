@@ -1,6 +1,7 @@
-import mmseqs
-from Bio.SeqRecord import SeqRecord
 from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
+
+import mmseqs
 
 #
 # Demonstration of basic mmseqs2 operations
@@ -26,7 +27,7 @@ client.databases[0].to_fasta("dump.fasta")
 print(client.databases)
 
 # Clone a database
-cloned_db = client.databases[0].copy('new_db')
+cloned_db = client.databases[0].copy("new_db")
 
 # Remove the clone
 cloned_db.remove()
@@ -36,12 +37,22 @@ client.databases[0].create_index()
 
 # Perform search on a database
 # Note that the search queries can be a string with a patch to the FASTA file with queries
-results = client.databases[0].search([
-    SeqRecord(Seq("ACACACAAAACTACACACAAAACTACACACAAAAAAA"), id="q1"),
-    SeqRecord(Seq("TACACACAAAACTAACAAAACTAACAAAACTAACAAAACTTTAGAA"), id="q2"),
-    SeqRecord(Seq("CAAAACTAACAAAACTACACAAAACTACACACGGGAGAGCGA"), id="q3"),
-    SeqRecord(Seq("CACGGGAGAGAAAACACGTAACTCTAGTCTAGTAACAAACAAAAACAAAACGTAACTCTAGTCTAGTA"), id="q4"),
-], search_type='nucleotides')
+results = client.databases[0].search(
+    [
+        SeqRecord(Seq("ACACACAAAACTACACACAAAACTACACACAAAAAAA"), id="q1"),
+        SeqRecord(
+            Seq("TACACACAAAACTAACAAAACTAACAAAACTAACAAAACTTTAGAA"), id="q2"
+        ),
+        SeqRecord(Seq("CAAAACTAACAAAACTACACAAAACTACACACGGGAGAGCGA"), id="q3"),
+        SeqRecord(
+            Seq(
+                "CACGGGAGAGAAAACACGTAACTCTAGTCTAGTAACAAACAAAAACAAAACGTAACTCTAGTCTAGTA"
+            ),
+            id="q4",
+        ),
+    ],
+    search_type="nucleotides",
+)
 
 # results.records is a list of lists. Each item contains alignments for each query.
 # Each list of alignments consists of single result
@@ -62,4 +73,3 @@ print(results.records[0])
 #     e_value: float
 #     bit_score: int
 print(results.dataframe)
-

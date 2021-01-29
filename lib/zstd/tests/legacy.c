@@ -14,126 +14,130 @@
 */
 
 /*===========================================
-*   Dependencies
-*==========================================*/
-#include <stddef.h>     /* size_t */
-#include <stdlib.h>     /* malloc, free */
-#include <stdio.h>      /* fprintf */
-#include <string.h>     /* strlen */
+ *   Dependencies
+ *==========================================*/
+#include <stddef.h> /* size_t */
+#include <stdio.h>  /* fprintf */
+#include <stdlib.h> /* malloc, free */
+#include <string.h> /* strlen */
 #include "zstd.h"
 #include "zstd_errors.h"
 
 /*===========================================
-*   Macros
-*==========================================*/
-#define DISPLAY(...)          fprintf(stderr, __VA_ARGS__)
+ *   Macros
+ *==========================================*/
+#define DISPLAY(...) fprintf(stderr, __VA_ARGS__)
 
 /*===========================================
-*   Precompressed frames
-*==========================================*/
+ *   Precompressed frames
+ *==========================================*/
 const char* const COMPRESSED; /* content is at end of file */
 size_t const COMPRESSED_SIZE = 917;
 const char* const EXPECTED; /* content is at end of file */
 
+static int testSimpleAPI(void) {
+  size_t const size = strlen(EXPECTED);
+  char* const output = malloc(size);
 
-static int testSimpleAPI(void)
-{
-    size_t const size = strlen(EXPECTED);
-    char* const output = malloc(size);
+  if (!output) {
+    DISPLAY("ERROR: Not enough memory!\n");
+    return 1;
+  }
 
-    if (!output) {
-        DISPLAY("ERROR: Not enough memory!\n");
+  {
+    size_t const ret =
+        ZSTD_decompress(output, size, COMPRESSED, COMPRESSED_SIZE);
+    if (ZSTD_isError(ret)) {
+      if (ret == ZSTD_error_prefix_unknown) {
+        DISPLAY(
+            "ERROR: Invalid frame magic number, was this compiled "
+            "without legacy support?\n");
+      } else {
+        DISPLAY("ERROR: %s\n", ZSTD_getErrorName(ret));
+      }
+      return 1;
+    }
+    if (ret != size) {
+      DISPLAY("ERROR: Wrong decoded size\n");
+    }
+  }
+  if (memcmp(EXPECTED, output, size) != 0) {
+    DISPLAY("ERROR: Wrong decoded output produced\n");
+    return 1;
+  }
+
+  free(output);
+  DISPLAY("Simple API OK\n");
+  return 0;
+}
+
+static int testStreamingAPI(void) {
+  size_t const outBuffSize = ZSTD_DStreamOutSize();
+  char* const outBuff = malloc(outBuffSize);
+  ZSTD_DStream* const stream = ZSTD_createDStream();
+  ZSTD_inBuffer input = {COMPRESSED, COMPRESSED_SIZE, 0};
+  size_t outputPos = 0;
+  int needsInit = 1;
+
+  if (outBuff == NULL) {
+    DISPLAY("ERROR: Could not allocate memory\n");
+    return 1;
+  }
+  if (stream == NULL) {
+    DISPLAY("ERROR: Could not create dstream\n");
+    return 1;
+  }
+
+  while (1) {
+    ZSTD_outBuffer output = {outBuff, outBuffSize, 0};
+    if (needsInit) {
+      size_t const ret = ZSTD_initDStream(stream);
+      if (ZSTD_isError(ret)) {
+        DISPLAY("ERROR: ZSTD_initDStream: %s\n", ZSTD_getErrorName(ret));
         return 1;
+      }
     }
 
     {
-        size_t const ret = ZSTD_decompress(output, size, COMPRESSED, COMPRESSED_SIZE);
-        if (ZSTD_isError(ret)) {
-            if (ret == ZSTD_error_prefix_unknown) {
-                DISPLAY("ERROR: Invalid frame magic number, was this compiled "
-                        "without legacy support?\n");
-            } else {
-                DISPLAY("ERROR: %s\n", ZSTD_getErrorName(ret));
-            }
-            return 1;
-        }
-        if (ret != size) {
-            DISPLAY("ERROR: Wrong decoded size\n");
-        }
-    }
-    if (memcmp(EXPECTED, output, size) != 0) {
-        DISPLAY("ERROR: Wrong decoded output produced\n");
+      size_t const ret = ZSTD_decompressStream(stream, &output, &input);
+      if (ZSTD_isError(ret)) {
+        DISPLAY("ERROR: ZSTD_decompressStream: %s\n", ZSTD_getErrorName(ret));
         return 1;
+      }
+
+      if (ret == 0) {
+        needsInit = 1;
+      }
     }
 
-    free(output);
-    DISPLAY("Simple API OK\n");
-    return 0;
+    if (memcmp(outBuff, EXPECTED + outputPos, output.pos) != 0) {
+      DISPLAY("ERROR: Wrong decoded output produced\n");
+      return 1;
+    }
+    outputPos += output.pos;
+    if (input.pos == input.size && output.pos < output.size) {
+      break;
+    }
+  }
+
+  free(outBuff);
+  ZSTD_freeDStream(stream);
+  DISPLAY("Streaming API OK\n");
+  return 0;
 }
 
+int main(void) {
+  {
+    int const ret = testSimpleAPI();
+    if (ret) return ret;
+  }
+  {
+    int const ret = testStreamingAPI();
+    if (ret) return ret;
+  }
 
-static int testStreamingAPI(void)
-{
-    size_t const outBuffSize = ZSTD_DStreamOutSize();
-    char* const outBuff = malloc(outBuffSize);
-    ZSTD_DStream* const stream = ZSTD_createDStream();
-    ZSTD_inBuffer input = { COMPRESSED, COMPRESSED_SIZE, 0 };
-    size_t outputPos = 0;
-    int needsInit = 1;
-
-    if (outBuff == NULL) {
-        DISPLAY("ERROR: Could not allocate memory\n");
-        return 1;
-    }
-    if (stream == NULL) {
-        DISPLAY("ERROR: Could not create dstream\n");
-        return 1;
-    }
-
-    while (1) {
-        ZSTD_outBuffer output = {outBuff, outBuffSize, 0};
-        if (needsInit) {
-            size_t const ret = ZSTD_initDStream(stream);
-            if (ZSTD_isError(ret)) {
-                DISPLAY("ERROR: ZSTD_initDStream: %s\n", ZSTD_getErrorName(ret));
-                return 1;
-        }   }
-
-        {   size_t const ret = ZSTD_decompressStream(stream, &output, &input);
-            if (ZSTD_isError(ret)) {
-                DISPLAY("ERROR: ZSTD_decompressStream: %s\n", ZSTD_getErrorName(ret));
-                return 1;
-            }
-
-            if (ret == 0) {
-                needsInit = 1;
-        }   }
-
-        if (memcmp(outBuff, EXPECTED + outputPos, output.pos) != 0) {
-            DISPLAY("ERROR: Wrong decoded output produced\n");
-            return 1;
-        }
-        outputPos += output.pos;
-        if (input.pos == input.size && output.pos < output.size) {
-            break;
-        }
-    }
-
-    free(outBuff);
-    ZSTD_freeDStream(stream);
-    DISPLAY("Streaming API OK\n");
-    return 0;
-}
-
-int main(void)
-{
-    {   int const ret = testSimpleAPI();
-        if (ret) return ret; }
-    {   int const ret = testStreamingAPI();
-        if (ret) return ret; }
-
-    DISPLAY("OK\n");
-    return 0;
+  DISPLAY("OK\n");
+  return 0;
 }
 
 /* Consists of the "EXPECTED" string compressed with default settings on
@@ -204,22 +208,37 @@ const char* const COMPRESSED =
     "\x01\xD2\x2F\x21\x80";
 
 const char* const EXPECTED =
-    "snowden is snowed in / he's now then in his snow den / when does the snow end?\n"
-    "goodbye little dog / you dug some holes in your day / they'll be hard to fill.\n"
-    "when life shuts a door, / just open it. it’s a door. / that is how doors work.\n"
+    "snowden is snowed in / he's now then in his snow den / when does the snow "
+    "end?\n"
+    "goodbye little dog / you dug some holes in your day / they'll be hard to "
+    "fill.\n"
+    "when life shuts a door, / just open it. it’s a door. / that is how doors "
+    "work.\n"
 
-    "snowden is snowed in / he's now then in his snow den / when does the snow end?\n"
-    "goodbye little dog / you dug some holes in your day / they'll be hard to fill.\n"
-    "when life shuts a door, / just open it. it’s a door. / that is how doors work.\n"
+    "snowden is snowed in / he's now then in his snow den / when does the snow "
+    "end?\n"
+    "goodbye little dog / you dug some holes in your day / they'll be hard to "
+    "fill.\n"
+    "when life shuts a door, / just open it. it’s a door. / that is how doors "
+    "work.\n"
 
-    "snowden is snowed in / he's now then in his snow den / when does the snow end?\n"
-    "goodbye little dog / you dug some holes in your day / they'll be hard to fill.\n"
-    "when life shuts a door, / just open it. it’s a door. / that is how doors work.\n"
+    "snowden is snowed in / he's now then in his snow den / when does the snow "
+    "end?\n"
+    "goodbye little dog / you dug some holes in your day / they'll be hard to "
+    "fill.\n"
+    "when life shuts a door, / just open it. it’s a door. / that is how doors "
+    "work.\n"
 
-    "snowden is snowed in / he's now then in his snow den / when does the snow end?\n"
-    "goodbye little dog / you dug some holes in your day / they'll be hard to fill.\n"
-    "when life shuts a door, / just open it. it’s a door. / that is how doors work.\n"
+    "snowden is snowed in / he's now then in his snow den / when does the snow "
+    "end?\n"
+    "goodbye little dog / you dug some holes in your day / they'll be hard to "
+    "fill.\n"
+    "when life shuts a door, / just open it. it’s a door. / that is how doors "
+    "work.\n"
 
-    "snowden is snowed in / he's now then in his snow den / when does the snow end?\n"
-    "goodbye little dog / you dug some holes in your day / they'll be hard to fill.\n"
-    "when life shuts a door, / just open it. it’s a door. / that is how doors work.\n";
+    "snowden is snowed in / he's now then in his snow den / when does the snow "
+    "end?\n"
+    "goodbye little dog / you dug some holes in your day / they'll be hard to "
+    "fill.\n"
+    "when life shuts a door, / just open it. it’s a door. / that is how doors "
+    "work.\n";

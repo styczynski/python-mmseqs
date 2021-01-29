@@ -46,19 +46,15 @@ class SkippableFrame {
   static constexpr std::uint32_t kFrameContentsSize = kSize - 8;
 
  public:
-   // Write the skippable frame to data_ in LE format.
+  // Write the skippable frame to data_ in LE format.
   explicit SkippableFrame(std::uint32_t size);
 
   // Read the skippable frame from bytes in LE format.
   static std::size_t tryRead(ByteRange bytes);
 
-  ByteRange data() const {
-    return {data_.data(), data_.size()};
-  }
+  ByteRange data() const { return {data_.data(), data_.size()}; }
 
   // Size of the next frame.
-  std::size_t frameSize() const {
-    return frameSize_;
-  }
+  std::size_t frameSize() const { return frameSize_; }
 };
-}
+}  // namespace pzstd

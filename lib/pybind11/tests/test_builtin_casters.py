@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-import pytest
-
 import env  # noqa: F401
-
+import pytest
+from pybind11_tests import IncType, UserType
 from pybind11_tests import builtin_casters as m
-from pybind11_tests import UserType, IncType
 
 
 def test_simple_string():
@@ -60,7 +58,9 @@ def test_single_char_arguments():
         m.ord_char(u"é") == 0xE9
     )  # requires 2 bytes in utf-8, but can be stuffed in a char
     with pytest.raises(ValueError) as excinfo:
-        assert m.ord_char(u"Ā") == 0x100  # requires 2 bytes, doesn't fit in a char
+        assert (
+            m.ord_char(u"Ā") == 0x100
+        )  # requires 2 bytes, doesn't fit in a char
     assert str(excinfo.value) == toobig_message(0x100)
     with pytest.raises(ValueError) as excinfo:
         assert m.ord_char(u"ab")
@@ -112,7 +112,9 @@ def test_single_char_arguments():
             m.ord_char8(u"é") == 0xE9
         )  # requires 2 bytes in utf-8, but can be stuffed in a char
         with pytest.raises(ValueError) as excinfo:
-            assert m.ord_char8(u"Ā") == 0x100  # requires 2 bytes, doesn't fit in a char
+            assert (
+                m.ord_char8(u"Ā") == 0x100
+            )  # requires 2 bytes, doesn't fit in a char
         assert str(excinfo.value) == toobig_message(0x100)
         with pytest.raises(ValueError) as excinfo:
             assert m.ord_char8(u"ab")
@@ -138,7 +140,9 @@ def test_bytes_to_string():
     assert m.string_length(u"💩".encode("utf8")) == 4
 
 
-@pytest.mark.skipif(not hasattr(m, "has_string_view"), reason="no <string_view>")
+@pytest.mark.skipif(
+    not hasattr(m, "has_string_view"), reason="no <string_view>"
+)
 def test_string_view(capture):
     """Tests support for C++17 string_view arguments and return values"""
     assert m.string_view_chars("Hi") == [72, 105]
@@ -147,7 +151,15 @@ def test_string_view(capture):
     assert m.string_view32_chars(u"Hi 🎂") == [72, 105, 32, 127874]
     if hasattr(m, "has_u8string"):
         assert m.string_view8_chars("Hi") == [72, 105]
-        assert m.string_view8_chars(u"Hi 🎂") == [72, 105, 32, 0xF0, 0x9F, 0x8E, 0x82]
+        assert m.string_view8_chars(u"Hi 🎂") == [
+            72,
+            105,
+            32,
+            0xF0,
+            0x9F,
+            0x8E,
+            0x82,
+        ]
 
     assert m.string_view_return() == u"utf8 secret 🎂"
     assert m.string_view16_return() == u"utf16 secret 🎂"
@@ -293,7 +305,9 @@ def test_int_convert():
         # Before Python 3.8, `int(obj)` does not pick up on `obj.__index__`
         assert convert(IndexedThought()) == 42
         assert noconvert(IndexedThought()) == 42
-        cant_convert(RaisingThought())  # no fall-back to `__int__`if `__index__` raises
+        cant_convert(
+            RaisingThought()
+        )  # no fall-back to `__int__`if `__index__` raises
 
 
 def test_numpy_int_convert():

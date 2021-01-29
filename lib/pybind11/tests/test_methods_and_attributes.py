@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
-import pytest
-
 import env  # noqa: F401
-
-from pybind11_tests import methods_and_attributes as m
+import pytest
 from pybind11_tests import ConstructorStats
+from pybind11_tests import methods_and_attributes as m
 
 
 def test_methods_and_attributes():
@@ -301,7 +299,10 @@ def test_dynamic_attributes():
 
     with pytest.raises(TypeError) as excinfo:
         instance.__dict__ = []
-    assert str(excinfo.value) == "__dict__ must be set to a dictionary, not a 'list'"
+    assert (
+        str(excinfo.value)
+        == "__dict__ must be set to a dictionary, not a 'list'"
+    )
 
     cstats = ConstructorStats.get(m.DynamicClass)
     assert cstats.alive() == 1

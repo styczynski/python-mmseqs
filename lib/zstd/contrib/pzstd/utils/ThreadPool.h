@@ -51,8 +51,6 @@ class ThreadPool {
    *
    * @param task  The task to execute.
    */
-  void add(std::function<void()> task) {
-    tasks_.push(std::move(task));
-  }
+  void add(std::function<void()> task) { tasks_.push(std::move(task)); }
 };
-}
+}  // namespace pzstd

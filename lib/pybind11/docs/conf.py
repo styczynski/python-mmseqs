@@ -13,12 +13,12 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys
 import os
+import re
 import shlex
 import subprocess
+import sys
 from pathlib import Path
-import re
 
 DIR = Path(__file__).parent.resolve()
 
@@ -270,7 +270,13 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "pybind11.tex", "pybind11 Documentation", "Wenzel Jakob", "manual"),
+    (
+        master_doc,
+        "pybind11.tex",
+        "pybind11 Documentation",
+        "Wenzel Jakob",
+        "manual",
+    ),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -360,7 +366,9 @@ def prepare(app):
         contents = contents[contents.find(r".. start") :]
 
         # Filter out section titles for index.rst for LaTeX
-        contents = re.sub(r"^(.*)\n[-~]{3,}$", r"**\1**", contents, flags=re.MULTILINE)
+        contents = re.sub(
+            r"^(.*)\n[-~]{3,}$", r"**\1**", contents, flags=re.MULTILINE
+        )
 
     with open(DIR / "readme.rst", "w") as f:
         f.write(contents)

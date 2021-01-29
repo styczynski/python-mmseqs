@@ -9,8 +9,7 @@
 #define MICROTAR_H
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #include <stdio.h>
@@ -19,24 +18,24 @@ extern "C"
 #define MTAR_VERSION "0.1.0"
 
 enum {
-  MTAR_ESUCCESS     =  0,
-  MTAR_EFAILURE     = -1,
-  MTAR_EOPENFAIL    = -2,
-  MTAR_EREADFAIL    = -3,
-  MTAR_ESEEKFAIL    = -5,
-  MTAR_EBADCHKSUM   = -6,
-  MTAR_ENULLRECORD  = -7,
-  MTAR_ENOTFOUND    = -8
+  MTAR_ESUCCESS = 0,
+  MTAR_EFAILURE = -1,
+  MTAR_EOPENFAIL = -2,
+  MTAR_EREADFAIL = -3,
+  MTAR_ESEEKFAIL = -5,
+  MTAR_EBADCHKSUM = -6,
+  MTAR_ENULLRECORD = -7,
+  MTAR_ENOTFOUND = -8
 };
 
 enum {
-  MTAR_TREG   = '0',
-  MTAR_TLNK   = '1',
-  MTAR_TSYM   = '2',
-  MTAR_TCHR   = '3',
-  MTAR_TBLK   = '4',
-  MTAR_TDIR   = '5',
-  MTAR_TFIFO  = '6'
+  MTAR_TREG = '0',
+  MTAR_TLNK = '1',
+  MTAR_TSYM = '2',
+  MTAR_TCHR = '3',
+  MTAR_TBLK = '4',
+  MTAR_TDIR = '5',
+  MTAR_TFIFO = '6'
 };
 
 typedef struct {
@@ -49,7 +48,6 @@ typedef struct {
   char linkname[100];
 } mtar_header_t;
 
-
 typedef struct mtar_t mtar_t;
 
 struct mtar_t {
@@ -61,8 +59,7 @@ struct mtar_t {
   int isFinished;
 };
 
-
-const char* mtar_strerror(int err);
+const char *mtar_strerror(int err);
 
 int mtar_open(mtar_t *tar, const char *filename);
 int mtar_close(mtar_t *tar);

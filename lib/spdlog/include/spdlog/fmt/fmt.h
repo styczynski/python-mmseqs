@@ -21,7 +21,7 @@
 #define FMT_DEPRECATED_N_SPECIFIER
 #include <spdlog/fmt/bundled/core.h>
 #include <spdlog/fmt/bundled/format.h>
-#else // SPDLOG_FMT_EXTERNAL is defined - use external fmtlib
+#else  // SPDLOG_FMT_EXTERNAL is defined - use external fmtlib
 #include <fmt/core.h>
 #include <fmt/format.h>
 #endif

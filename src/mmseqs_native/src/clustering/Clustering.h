@@ -7,32 +7,33 @@
 #include "DBWriter.h"
 
 class Clustering {
-public:
-    Clustering(const std::string &seqDB, const std::string &seqDBIndex,
-               const std::string &alnResultsDB, const std::string &alnResultsDBIndex,
-               const std::string &outDB, const std::string &outDBIndex,
-               unsigned int maxIteration, int similarityScoreType, int threads, int compressed);
+ public:
+  Clustering(const std::string &seqDB, const std::string &seqDBIndex,
+             const std::string &alnResultsDB,
+             const std::string &alnResultsDBIndex, const std::string &outDB,
+             const std::string &outDBIndex, unsigned int maxIteration,
+             int similarityScoreType, int threads, int compressed);
 
-    void run(int mode);
+  void run(int mode);
 
+  ~Clustering();
 
-    ~Clustering();
+ private:
+  void writeData(DBWriter *dbw,
+                 const std::pair<unsigned int, unsigned int> *ret,
+                 size_t dbSize);
 
-private:
+  DBReader<unsigned int> *seqDbr;
+  DBReader<unsigned int> *alnDbr;
 
-    void writeData(DBWriter *dbw, const std::pair<unsigned int, unsigned int> * ret, size_t dbSize);
+  // values for affinity clustering
+  unsigned int maxIteration;
+  int similarityScoreType;
 
-    DBReader<unsigned int> *seqDbr;
-    DBReader<unsigned int> *alnDbr;
-
-    //values for affinity clustering
-    unsigned int maxIteration;
-    int similarityScoreType;
-
-    int threads;
-    int compressed;
-    std::string outDB;
-    std::string outDBIndex;
+  int threads;
+  int compressed;
+  std::string outDB;
+  std::string outDBIndex;
 };
 
 #endif

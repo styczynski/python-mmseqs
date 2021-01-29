@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 import sys
 
-import pytest
-
-from pybind11_tests import exceptions as m
 import pybind11_cross_module_tests as cm
+import pytest
+from pybind11_tests import exceptions as m
 
 
 def test_std_exception(msg):
@@ -53,7 +52,9 @@ def test_python_call_in_catch():
 def ignore_pytest_unraisable_warning(f):
     unraisable = "PytestUnraisableExceptionWarning"
     if hasattr(pytest, unraisable):  # Python >= 3.8 and pytest >= 6
-        dec = pytest.mark.filterwarnings("ignore::pytest.{}".format(unraisable))
+        dec = pytest.mark.filterwarnings(
+            "ignore::pytest.{}".format(unraisable)
+        )
         return dec(f)
     else:
         return f
@@ -85,7 +86,9 @@ def test_python_alreadyset_in_destructor(monkeypatch, capsys):
 
     _, captured_stderr = capsys.readouterr()
     # Error message is different in Python 2 and 3, check for words that appear in both
-    assert "ignored" in captured_stderr and "already_set demo" in captured_stderr
+    assert (
+        "ignored" in captured_stderr and "already_set demo" in captured_stderr
+    )
 
 
 def test_exception_matches():
@@ -103,7 +106,10 @@ def test_custom(msg):
     # Can we translate to standard Python exceptions?
     with pytest.raises(RuntimeError) as excinfo:
         m.throws2()
-    assert msg(excinfo.value) == "this error should go to a standard Python exception"
+    assert (
+        msg(excinfo.value)
+        == "this error should go to a standard Python exception"
+    )
 
     # Can we handle unknown exceptions?
     with pytest.raises(RuntimeError) as excinfo:
@@ -119,7 +125,8 @@ def test_custom(msg):
     with pytest.raises(RuntimeError) as excinfo:
         m.throws_logic_error()
     assert (
-        msg(excinfo.value) == "this error should fall through to the standard handler"
+        msg(excinfo.value)
+        == "this error should fall through to the standard handler"
     )
 
     # OverFlow error translation.
@@ -129,7 +136,9 @@ def test_custom(msg):
     # Can we handle a helper-declared exception?
     with pytest.raises(m.MyException5) as excinfo:
         m.throws5()
-    assert msg(excinfo.value) == "this is a helper-defined translated exception"
+    assert (
+        msg(excinfo.value) == "this is a helper-defined translated exception"
+    )
 
     # Exception subclassing:
     with pytest.raises(m.MyException5) as excinfo:
@@ -146,7 +155,9 @@ def test_custom(msg):
             m.throws5()
         except m.MyException5_1:
             raise RuntimeError("Exception error: caught child from parent")
-    assert msg(excinfo.value) == "this is a helper-defined translated exception"
+    assert (
+        msg(excinfo.value) == "this is a helper-defined translated exception"
+    )
 
 
 def test_nested_throws(capture):
@@ -196,7 +207,9 @@ def test_nested_throws(capture):
     # Python -> C++ -> Python -> C++
     with pytest.raises(m.MyException5) as excinfo:
         m.try_catch(m.MyException, pycatch, m.MyException, m.throws5)
-    assert str(excinfo.value) == "this is a helper-defined translated exception"
+    assert (
+        str(excinfo.value) == "this is a helper-defined translated exception"
+    )
 
 
 # This can often happen if you wrap a pybind11 class in a Python wrapper

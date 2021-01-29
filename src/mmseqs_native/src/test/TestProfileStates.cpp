@@ -4,642 +4,2274 @@
 //  Copyright (c) 2012 -. All rights reserved.
 //
 
-#include <iostream>
 #include <fstream>
-#include "ProfileStates.h"
-#include "Parameters.h"
-#include "StripedSmithWaterman.h"
+#include <iostream>
 #include "MsaFilter.h"
-#include "PSSMCalculator.h"
-#include "Sequence.h"
-#include "SubstitutionMatrix.h"
 #include "MultipleAlignment.h"
+#include "PSSMCalculator.h"
+#include "Parameters.h"
+#include "ProfileStates.h"
+#include "Sequence.h"
+#include "StripedSmithWaterman.h"
+#include "SubstitutionMatrix.h"
 
 const char* binary_name = "test_profilestates";
 
+int main(int, const char**) {
+  Parameters& par = Parameters::getInstance();
+  SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
 
-int main (int, const char**) {
-    Parameters& par = Parameters::getInstance();
-    SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+  std::cout << "Subustitution matrix:";
+  SubstitutionMatrix::print(subMat.subMatrix, subMat.num2aa,
+                            subMat.alphabetSize);
+  //   BaseMatrix::print(subMat.subMatrix, subMat.alphabetSize);
+  const char* seqs[1001];
+  int counter = 0;
 
+  seqs[counter++] =
+      "QDELTAGPCATVHVITVQMAKSGELQAIAPEVAQSLAEFFAVLADPNRLRLLSLLARSELCVGDLAQAIGVS"
+      "ESAVSHQLRSLRNLRLVSYRKQGRHVYYQLQDHHIVALYQNALDHLQECR";
+  seqs[counter++] =
+      "-----------------"
+      "EIAPLAELQAIAPEVAQSLAEFFAVLADPNRLRLLSLLARSELCVGDLAQAIGVSESAVSHQLRSLRNLRLV"
+      "SYRKQGRHVYYQLQDHHIVALYQNALDHLQECR";
+  seqs[counter++] =
+      "---------------------"
+      "AAELQAIAPEVAQSLAEFFAVLADPNRLRLLSLLARSELCVGDLAQAIGVSESAVSHQLRSLRNLRLVSYRK"
+      "-----------------------------";
+  seqs[counter++] =
+      "------------------------"
+      "LQGLELEKAQKMAEFFSLLGDANRLRILSLLAKQELCVCDLADDLGMSESAVSHQLRTLRALRLVKYQKQGR"
+      "RVFYRLADHHVLDLYYAVSEHLEE--";
+  seqs[counter++] =
+      "---------------------"
+      "SQEIQVLSSEKAQRMAEFFSFLGDANRLRILSLLAEKEFCVSDLAARLDMSESAVSHQLRNLRAMRLVNYRK"
+      "QGRRVFYRLHDNHVLHLYQAVAEHLDE--";
+  seqs[counter++] =
+      "-----------------------"
+      "QVRQVQPEVAQQMAEFFSALADPSRLRLMSALARQELCVCDLAAAMKVSESAVSHQLRILRSQRLVKYRRVG"
+      "RNVYYSLADNHVMNLYREVADHLQE--";
+  seqs[counter++] =
+      "--------------------------------"
+      "AQQMAEFFSALADPSRLRLMSALARQELCVCDLAAAMKVSESAVSHQLRILRSQRLVKYRRVGRNVYYSLAD"
+      "NHVMNLYREVADHLQE--";
+  seqs[counter++] =
+      "-------------------------"
+      "EVLSTEKSQRMAEFFSFLGDANRLRILSFLATKELCVSDIATLLEMSESAVSHQLRNLRAMRLVSYRKQGRH"
+      "VFYRLHDNHILELYQAVAEHLDE--";
+  seqs[counter++] =
+      "------------------------------"
+      "EKAQRMAQFFGLLADTNRLRIVDLLAQGEFCVRDIAVALEMSESAVSHQLRMLKALRLVRFRRQGRHIFYQL"
+      "LDHHVLTLYKAAAEHLDE--";
+  seqs[counter++] =
+      "-----------------------"
+      "QTQVLNSQKAQRMAEFFSLLGDANRLRLLSVLAAQELCVCDLAATLEMSESAVSHQLRALRALRLVSYRKQG"
+      "RQVFYSLLDRHVLELYRAVAEHLDE--";
+  seqs[counter++] =
+      "--------------------------------"
+      "AQQMAEFFAVLADPNRLRLISALASQELCVCDLAALMKMTESAVSHQLRLLKAMRLVSYRREGRNIYYSLAD"
+      "NHVISLYREVAVHLDE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FAALGDPTRFRIIAALQVQELCVGDLAAAIGLSQSAVSHQLRALRDLGLVRSRREGRLVYYALDDEHVVTLV"
+      "AQALDHVREER";
+  seqs[counter++] =
+      "-------------------------------"
+      "VTRQMAEFFKSLSDPTRLRIVQALLEEELCVCDISAIVDISISAISHQLRLLRSMHIVKFRKQGKMVYYSLE"
+      "DEHISRMLEIALEHLNE--";
+  seqs[counter++] =
+      "------------------------------"
+      "DITNRLAETFKVLGDPTRLKILLAVSLDELCVCDIASLLGTTKSAVSHQLRLLRSLRVVKYRKDGRIVYYSL"
+      "DDSHVGNLLSEGLDHI----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "MAETFKILADPTRVKILHALAHKELCVCDIAVTLDMKVSAVSHQLRLLKSARLVKQRREGKNVYYQLDDHHV"
+      "EQLFEKTLEHIKQ--";
+  seqs[counter++] =
+      "--------------------------------"
+      "AGRLADLFKALADPTRVRIIAALLHTELCVDDLANLLDMSQSAISHQLRLLRNLHLVQFRRSGKHAFYRLVD"
+      "DHVRDLFQRSREHL----";
+  seqs[counter++] =
+      "------------------------------"
+      "ELLYELAELFKIFGDSSRIRILSLLQKERLCVSEISTLLNLSQSAISHQLRILRQARLVRYKKIGKEVFYEL"
+      "DDDHIEKIFEQGLEHIQE--";
+  seqs[counter++] =
+      "--------------------------------"
+      "ATRLAAAFQALSDPTRVRLISALLEQELCVHDLAAVLGMSQSATSHQLRVLRALGLVRTRKEGRIVYYALDD"
+      "EHIRELFQRGLEHI----";
+  seqs[counter++] =
+      "---------------------------------"
+      "EEMASFFRMMGDPTRIRILSLLFDEELCVHTLAERLEMTHSAVSHQLALLKHARLVRSRREGRHVYYRLADE"
+      "HVQKVYELAREHLEE--";
+  seqs[counter++] =
+      "-DEFKKGSDLNCHVMNIQDCKEVELKSVTEETIFDLSEFFKVFSDSTRIKILSSLLVSEMCVCDLAAVLGTS"
+      "QSAISHQLRLLKVFRLVKSRKAGKVVYYSLSDDHVKSIIELGLAHLSE--";
+  seqs[counter++] =
+      "------------------------------"
+      "ELIFNLADFFKTFGDSTRIKIICALMETELCVCDLANVINTSQSAVSHQLRVLRQSRLVKYRKDGKTVYYSL"
+      "DDDHIKLLISQGLDHL----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "MAEVFKALNDPTRLKIINILIVSELCVNDIANLLEISQPAISHHLKELRQLKLIKYHKKGRSVFYSLDDEHI"
+      "HPLFQQCLEHVNE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAELFKILGDPTRLKIVELLLENEMCVNHIAETMGMGQSAISHQLRVLRQARLVTYRKDGKTAYYSLNDNHV"
+      "ECLVRMGMEHV----";
+  seqs[counter++] =
+      "---------------------------------"
+      "EDLALLFKMFADPTRLKVLKALFEREMCVGDLAVLLKMTHSAVSHQLASLKKTRLVRSRKDGKVVYYSLDDD"
+      "HIEEIFQKALDHVRE--";
+  seqs[counter++] =
+      "-------------------------------------------"
+      "ADQTRLRILCLLRDREVCVHDIVEALDMSQSAISHQLRVLRDARLVSHRREGRHVYYRLADDHVREMLENAL"
+      "SH-----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSMLFKMFADPTRLRIFTILSHQTVCVDDLAEILGMTQSAVSHQLASLRKMNLVRSSKVGKNAYYQLADSHV"
+      "MQIFSQALDHVKE--";
+  seqs[counter++] =
+      "-------PCAEVTALHLRL--"
+      "SPATRAVDKGALQRAAAIFRALGDPARLHLLALLAAGEQCVSQLATETGDSLPAISQRLKLLRSERLVSQRR"
+      "DGKHIYYQLADQHVVQLIEAGIDHAVESR";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSEVYKSLGDGTRLKILLALKEKESCVCDLAAALSMSQSAISHQLRVLRNVRLVKYRREGKMVYYSLDDEHI"
+      "LKILQEGLNHI----";
+  seqs[counter++] =
+      "------------------------------"
+      "EEVQKLSAIYKALGDPTRFKILFCLKQEEMCVCDISAILDMSQSAISHQLRVLRNLRIVKYRKEGKMVFYSL"
+      "DDKHIFRILDEGINHIRE--";
+  seqs[counter++] =
+      "------------------------------"
+      "ETMDAIAELFKGFADSTRVHILALLSRQELCVTDIAETVDVSQSAISHQLRILKQMHLIKFRREGKNILYSL"
+      "ADDHVKTILQMGLEHVLE--";
+  seqs[counter++] =
+      "-------------------------------------"
+      "ELLKAVGDPTRMRILCALADRELCVCDLQAVLGLSQSAVSHQLRTLRNARLVTYRREGKMAYYTLADDHVRR"
+      "LLDLSLEHV----";
+  seqs[counter++] =
+      "-------------------------"
+      "EAKADQIASPLANFFKTLSDPTRLRIILAIGTTSLSVNEISTIINMSQSSVSHQLRILRDNHLVISQRFGQH"
+      "IHYQLTDQHVLTILENSLDHISE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAATFRLLGDRTRVRILEALAGDELCVCDLAAVVGHSQSAVSHQLRLLRAAKLVRVRRDGKNAFYSLDDDHV"
+      "RHLFRQALDHVQE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "MAQLFKILGDPTRVRILQALSISEMCVCDIAALLEMTQSAISHQLRLLKQGRLVKYRRDGKVVYYSLNDNHV"
+      "RLIFDQALSHITE--";
+  seqs[counter++] =
+      "--------------------------"
+      "ALTEKTAKELSELFKVVSDPTRIKILWAIGGGEVCVCCISELLGMSVSAVSHQLKTLRQAHLVKARREGRNI"
+      "YYSLDDHHVKILLDVLLEHMEE--";
+  seqs[counter++] =
+      "---------------------------------"
+      "ENLGEFFKVLTDASRLKILYALGAGELCVFDLSVTIGASVSSVSHHLAALKRVRLVKGRRDGRIIYYSLDDD"
+      "HVKSIIRYAREHLEE--";
+  seqs[counter++] =
+      "---------------------------------"
+      "QKLSNMFKLFSDETRLKIICSLLKEELCVCDLCELLGLNQSQVSHQLQLLRNSKLVKFRREGKQIFYSLDDE"
+      "HVELIIQMALDHILE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSETFGALADSNRAKILHSLLNQELCVCDIACVVGISESAISQHLRILRTLRLVKQRKQGRMMYYSLNDNHI"
+      "RQLLEICLEH-----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAQLFAAFGDPTRLRILTALRSGDLCVCDLTAVLGMTASAVSHQLRLLRNLRLVRSRKVGRVVYYHLDDEHV"
+      "LNL------------";
+  seqs[counter++] =
+      "------------------------------"
+      "EILGDLSDFFKVIGDGTRIRILWALDVSEMCVCDIANVLNMTKSAVSHQLRALRDADLVKFRKSGKEVLYSL"
+      "SDNHVKEIFEQGLIHIQE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LADLFKMFADSTRLKILCILCESEMCVNDIANLISMSQSAVSHQLRILKQSKLIRGRREGKIVFYSLADSHI"
+      "NTIINNGLEHIQE--";
+  seqs[counter++] =
+      "--------------------"
+      "QSQEREVLAAPLAWRVADIFKALGDPTRVKIIALLDAGEMCVGEMCLTLGMSQPAISSQLRLLRTLGIVSVR"
+      "REGKHAYYRLADEHVRHLFHQGLAH-----";
+  seqs[counter++] =
+      "------------------------------"
+      "EYIQELSAFFKVFGEENRTRILYALSIREMCVNDLVTLLGMSQSSVSHQLQILRAHGQVKFRKEGRNVFYSL"
+      "DDKHVVDVFQEALQHI----";
+  seqs[counter++] =
+      "------------------------------"
+      "KVIYELSEFFKILSDQTRLKILVLLFEKEQNVSELQRQIGVTQSNISHQLRILRQANLVRYRKIGRNVYYRL"
+      "YDEHVEIIIKYAMEHLKE--";
+  seqs[counter++] =
+      "------------------------------"
+      "EVMFDLSEFFKVFSDSTRIKILSSLLVSEMCVCDLAAVLNTSQSAISHQLRLLKAFRLVKSRKVGKVVYYSL"
+      "SDDHVKSIIELGLTHLSE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAELFKIFGDATRIRILCALSEGEICVSDLAETLSMTQPAISHQLRILKNTRLVKARRDGKQIYYSLADAHV"
+      "SSIIGTALEHVEE--";
+  seqs[counter++] =
+      "------------------------------"
+      "ETLYDLADLFKVLGDSTRIKILCTLFEAEMCVCDIAAVLGMTQSAISHQLRVLKQARLVKYKRSGKVVYYSL"
+      "DDEHVKHIFDQGLIHISENR";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSDFYKVFGDPTRLKILFALESRELCVCDLAQILQMTKSAVSHQLKILRQTELVNFKKLGRSVFYRLSDAHI"
+      "QGILDQGADHINE--";
+  seqs[counter++] =
+      "------------------------------"
+      "ECVMDLADFFSIFSDSTRIRILWVLYGRELCVRDISDTLGISMSACSHQLKTLRNSGAVEARRDGKMIYYKL"
+      "ADEHVEILLRTGLEHIQE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LADMYKALGDPSRLRIVMALSQGEMCVCDLAAYLEISESAVSHQLRRLRSLALVKNRRDGKILYYSLDDDHV"
+      "SSLVALGLEHVRE--";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DLFKTLGDPSRLRIIEVLSQEELSVDDLANQVGLTQSAASHQLRRLKLDRVVKYRKEGKFIYYSLADQHLLY"
+      "LFNIARDHVQE--";
+  seqs[counter++] =
+      "-----------------------------"
+      "PDQIESLSNFYKIMGDPTRLMLLMALEAGELCASDLANVTNMSRSAVSHQLKTLKQACLVRSRRDGKTIFYE"
+      "LDDEHIYSVLKVAFEHIQE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSDFFKVLGDSTRARIISALDINEMCVCDLAVLLNMTKSAISHQLRSLKEANLVKFRKEGKVVFYSLTDDHV"
+      "KDIFEKGLEHIRE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSEFFKVFSDSTRVKILSALLISEMCVCDLAALLQVTQSAISHQLRLLKAFRLVKSRKEGKVVYYSLNDDHV"
+      "KSILELGLLHLSEAK";
+  seqs[counter++] =
+      "-----------------------------"
+      "PDIIDDLSELFKILGDQTRSKILFVLEQGEFCVSDISEAVGMTKYAVSHQLRTLKQAKLVKCRREGKEVIYS"
+      "LDDDHVSTLFSCALAHVTE--";
+  seqs[counter++] =
+      "------------------------------------"
+      "AELFKVFADSTRVKIINVLLENKLCVGDIAALVGGTQSAISHQLRILKSAKLVKYTKIGKTVYYELSDDHVK"
+      "KLFSVGKEHINE--";
+  seqs[counter++] =
+      "------------------------------"
+      "ETMSDLAAIFKLMGEPVRITILHALSIRDLCVCDLAELLGMSHSAVSHQLRLLRTARMVRFEKQGRKAIYSL"
+      "NDRHVETIMQTALAHMQ---";
+  seqs[counter++] =
+      "---------------------------------"
+      "QELANNFKVLGDPTRLRILQALMHGERCVRELADGIQMEQSAVSHQLRTLRDAGLVNFRRDGKVVYYSLADA"
+      "HVFTLLSVGIEHVAE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSELFKILGDYTRIKIIYSLSKKELCVCDISEVVQMSQSAISHQLRILKAARLVKFRREGKSVYYSLDDEHI"
+      "DRLFNAGLEHVE---";
+  seqs[counter++] =
+      "------------------------------"
+      "EIINELSEFFKVFSDTTRLRILEVLLNEETSVGVIANKINVSNSAVSHQLSYLRSTNLVKTRKEGQVIYYSI"
+      "ADNHIKVIIEYGLEHIKELK";
+  seqs[counter++] =
+      "-----------------------------------"
+      "MSNFFKAISDPTRLRILQAVRQKTICVGDLAIALQMTKSAISHQLRYLRDCQLVKGEKKGKMTYYELADDHV"
+      "AAVLSLTLKHLKE--";
+  seqs[counter++] =
+      "------------------------------"
+      "DVVASLSELFKALGDPTRVKILSCLQISDMNVGDIADKLGMTTSAVSHQLRVLRAIKLVKGTKEGKEVRYSL"
+      "DDDHVTLIMQCGLTHVNE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAELFKVLGDYTRIKIIYALLKKELCVCDIAELLDMSQSSISHQLRTLKAARLVKFRKEGKVVYYSLDDEHI"
+      "EHILNASLEHVE---";
+  seqs[counter++] =
+      "----------------------------------"
+      "SIADFFAVFGDRTRIKILLALDQSPMCVCDLAVLLDMTKSVISHQLSSLKKINLVSSHKEGKHSYYALADDH"
+      "IKKIIEMAVEHLEE--";
+  seqs[counter++] =
+      "------------------------"
+      "VKSIDADTAQHLADLFKTLGDPTRIKILSLLTKTEMRVYDIADSLTMGQSAISHQLRVLRSARLVKFRRDGK"
+      "EVLYSIDDDHVMKLLGQGLEHVQ---";
+  seqs[counter++] =
+      "---------------------------------"
+      "KDLADTFKLLSDFTRVKILYVLSLSELCVQDISELTGVSQSAVSHQLRILRNSRLVSWKKTGKQVFYSLNSD"
+      "AVRALIEKGMEHV----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAELFKVFGDTTRVKILFALFTAEMCVCDLTALLGLTQSAVSHQLRVLKQARLVKYRKDGKMVYYSLDDDHV"
+      "KQIFDQGLAHI----";
+  seqs[counter++] =
+      "--------------------KSNE-"
+      "QMLAPDDVDVTAEFFKALADPTRINIVNALQIHELCVTDLAEILGMTKSAVSHQLCYLRLNNLVMVKREGQR"
+      "VYYALCDEHVEKVFEMAISHIKE--";
+  seqs[counter++] =
+      "------------------------------------"
+      "ADIFRALGDPSRLRMLSLLIHDELCVTEIAEALGDNLSAVSQRLKLLKSERIVGARREGKHIFYRLSDHHV-"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------"
+      "DIVAKLSDFIKVLGDGTRIKIIWILEENEMCVNDLAVALNMSQSAVSHQLKTLKTANVVKSKREGKNIFYSL"
+      "SDDHVKDIFLKTLEHIQE--";
+  seqs[counter++] =
+      "------------------------------"
+      "ETMSDLSDFFKNFGDSTRIKIVSALISGELCVADIAEVLEMSVSAISHQLRILRQAKIVRARRNGKQMYYSI"
+      "DDEHVAILYSLGLEHIRE--";
+  seqs[counter++] =
+      "------------------------------"
+      "ETFNSLSDNFKVLSDPTRLKILYALMLKEICVCDLAAVLEMTDSAVSHQLRLLRNRNLVKFRKKGKMAYYSI"
+      "SDHKIV--------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AELFKMFGDPTRLKLLAALLGQEVCVCDLSDLLGISQSAVSHQLRLLRASHLVKNRREGKSVFYSLDDEHVA"
+      "TILAQGMEHV----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSETFKIFGNPTRLKILSLLSVEDLCVCDICEILNMSQSAVSHQLRTLRSKNLVKYTKEGKQARYSLADKHV"
+      "VQILKIGIEHVLE--";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DIFKILGDPSRMRIVAALRIKELCVGDISALMEISLSGVSHQLRLLKKSRIIKSRREGKLIYYSLDDDHIES"
+      "LIDIALDHVRD--";
+  seqs[counter++] =
+      "---------------------------"
+      "LSPQIVEEASRILKAISDPTRMKILYLLFQEECSVGHMVEVLGVSQSAISHQLTHLRHLRLVKYRREGNTYF"
+      "YTYDDEHVVGILHQVIQHVE---";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAELYKVFGDSTRIRILYALLESEMCVGDMAQLLGLTPTACSHQLRVLKNSKLVRFRREGKIMFYSLADDHV"
+      "RSILALGMEHILE--";
+  seqs[counter++] =
+      "------------------------LRPVAEEAAK-"
+      "LAPIFKALSDETRVKIIYALAQAELCVCDIAELTGCTLPAVSHHLRILRNIGLAKSRKEGKFIYYNIDDHHV"
+      "SQIINAAFAHLRE--";
+  seqs[counter++] =
+      "----------------------------------"
+      "ALSELFKILADPSRLRILHALQSPERCVCDLAALLDMSQSALSHQLAILRRARLVRPVKIGKIVYYQLDDHH"
+      "VDALIALAMEHVSE--";
+  seqs[counter++] =
+      "----------------------------"
+      "APEGTRRVAEVFGVLSDPTRARIVCALSIEELCVCDVAAVAGLSVSAASHQLKRLRDRGVVDYRKEGRLAFY"
+      "RLVDDHVRSLMEEGVE------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAELFKVFGDPTRIRILWTLNEAEMCVCDIAVLLNMTQSAISHQLRVLKQANLVKNRKEGKAVYYSLVDDHV"
+      "REIFDQGLIHINE--";
+  seqs[counter++] =
+      "----------------------------------"
+      "AVAELFKALGDGSRMSILNALLCSELCVCDLTMILKMTQSAVSHQLRVLRGAKIVKSRKEGKNVYYSLDDPH"
+      "IAMLIETGFEHVRE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LEELFKVMGSQTRLRIIALMEANELCVEHLADTVNISVSAISHQLKGLRQLRLVKTRKQAQSVYYSLDDEHI"
+      "ALLFNTARTHLSE--";
+  seqs[counter++] =
+      "------------------------------"
+      "QVIEELAQFFKAVADASRLKLLLYLMKQEANVNELAEATGLTLSGVSQQLKLLKLMKLVKSSKQGKYVYYSL"
+      "DDHHVKHIINDSLIHLSE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LADLFNIFGDTTRIKILHVLSKSEMCVCDISSLINMNRSSVSHQLKTLRQAKLVKYRKEGTIVYYSLSNDHV"
+      "KQVFNQGLIHLIE--";
+  seqs[counter++] =
+      "------------------------------"
+      "EVVQTLSTYFKALADDNRLKIIHALSREELCVRDVADIIGTTMQVASHHLRVLRDIGLVKNRKEGKHVFYSL"
+      "KDRKTAEFVQNVIEDLED--";
+  seqs[counter++] =
+      "---------------------------------"
+      "ERLAGVFRTFGDGTRLRILFALLRKEMCVNDLAQNLGMTVSAVSHQLRILRQGELVRTRREGKTVYYAIADH"
+      "HVSLIIRSGAEHVLE--";
+  seqs[counter++] =
+      "-------------------------------------"
+      "KLFKIYSDFTRLRIIDLLIEKEHCVQDIADSLDASQSAISHQLKLLRDLHVVKTRKQGKQVFYSLQDNHIKE"
+      "IFLIGYSHATEC-";
+  seqs[counter++] =
+      "---------------------------------"
+      "QKLSKLFKVLSDETRIKILYTISKHEVCVNDIANVLNLSQSAISHQLKTLKDANLIKSRREKQTIYYTLVDD"
+      "HVHLIYNQALSHIKE--";
+  seqs[counter++] =
+      "------------------------------"
+      "EAIQEVSKIFKMISDPTRLSILFLLQKEELSVGAIAQSLSMEQSAISHQLKTLRTSRLVKSKRAGKNMIYSL"
+      "DDLHVFSILEQVLTHIEE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FSMFADGTRLKIMSALFVSEMCVGDLAILLNMSTSAISHQLASLKKTKLVRMRKEGKNVFYSMDDEHIEKIF"
+      "QVTYLHVKE--";
+  seqs[counter++] =
+      "------------------------------------"
+      "AALLGVISDPTRLKIMDALRLGELCVCDLAAVLSMSVSAISHQLRLLRTARLVRGRRAGKVIFYTIHDGHVE"
+      "KLIDMALDHCRQC-";
+  seqs[counter++] =
+      "------------"
+      "HTVTLEILVQGELRESIPEERQNVADIFSLLGDPARLRILIALSVRRLRVCDLVKVVGASESSVSHALRILR"
+      "AHRVVDVIRRGREAHYALADSHVRALLELAIDHV----";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DFFDALGNPTRLKILALMEAGELCTCDLSAITKLSVSAISHQLRILKDRKIVTYRKDGKNVFYRLDDEHIRE"
+      "ILRTALNHLSEVR";
+  seqs[counter++] =
+      "------------------------------------"
+      "AEFFKVLGDPTRIKIVSLFENGELCVNDIVDVVDVSRTAVSHQLRILKDKRIISFRKEGQMKFYHLDDAHVE"
+      "VIVLLTITHLQ---";
+  seqs[counter++] =
+      "---------------------------------"
+      "EQLAELHKAMGDYTRIRILWYLMQKEYCVSDLAQKMEITESAISHQLRALRIARLVQSHKAGKNVIYSLQDE"
+      "HIRWILEKTYDHISE--";
+  seqs[counter++] =
+      "---------------------------"
+      "ISKELIGSAAAFFKVLGDETRMKILCTIADSEVCVNDIAEAVDMTKSAVSHQLKLLKDDDLVKSRREGKNIF"
+      "YSLDDQHVMDILDIAFVHI----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LCDIFKVLSDPTRMRIILTLVDSEMCVCDIAGAVECSQSNVSHQLRLMRQSGIVKFRKDGKSVYYSLDDDHV"
+      "KTIIVQAVNHI----";
+  seqs[counter++] =
+      "------------------------------"
+      "QAAVQFADWFKAFSDPTRVKIISALLKRELCVHDLTVLLEMGQSAVSHQLRYLRNLRIVKRRKVGKTVYYSL"
+      "DDTHI---------------";
+  seqs[counter++] =
+      "------------------------------"
+      "EILFDLADLFKVFGDSTRIRIMNVLFSGPTSVGEIAEVLDMSQSAISHQLKSLKDNNLVSSKRSGRSMYYEL"
+      "ADDHVKTIFMTGLEHIKE--";
+  seqs[counter++] =
+      "-------------------------"
+      "QQIEKNIIDSTSEFFKILADNTRLHIINLLLDREMFVNDIANALNMTNSSISHQLKKMKDNDVVKSRKDGKE"
+      "VYYSLNDDHVKSIFLTTIDHI----";
+  seqs[counter++] =
+      "----------------------------"
+      "AEEILYDVAELFKVFGDSTRIRIICALFESEMCVYDLAACLDMTQSAISHQLRILKQANLVKFRRDGKLMYY"
+      "SLDDEHVKQIFDAGYKHIE---";
+  seqs[counter++] =
+      "----------------------------------"
+      "SITQIFKAMADPTRVQILYLLSDKEYSVGEIARSLGFNQTTVSHQLRFLKNLRLVKSRREGTSIYYTQDDKH"
+      "VLELLKQTIRHVE---";
+  seqs[counter++] =
+      "-------------------------------------"
+      "QIFKALSDPNRVKIAYYLQHQELCVCDIADLLDVSVATASHHLRQLKALHIAKSRKEGKNVYYSLSDHHIQT"
+      "LVAMTLEHQKEMR";
+  seqs[counter++] =
+      "------------------------------"
+      "ETLYDVAELFKAFADTTRIKIIAILKEETLCVGAISEILNISQSAISHQLKALKNAKIVKSKREGKWIYYSL"
+      "DDEHIKRIFDMGFEHI----";
+  seqs[counter++] =
+      "---------------"
+      "TVEQETSTEHKNLPPEKVMPLADFFKVFGDSTRLKIIGILRHTSLSVCCIADCLGMEQSAISHQLKVLRNNH"
+      "IVKVEKKGKQSFYSLDDLHVELLYQMGLEHIME--";
+  seqs[counter++] =
+      "---------------------------"
+      "VTPEEATQLADLFRLLGDPTRAQLLALLEAGELCVCDLTETVEVSDTAVSHALRLLRTAGIVASRRAGRMIY"
+      "YRLADVHVRMLLDLSREHL----";
+  seqs[counter++] =
+      "-----------------------------"
+      "PAAAGKVAETLQALASPNRLRILTRLRQSPCSVTELSAAVGMEQPAVSHQLRLLRNLGLVAGDRSGRNIVYR"
+      "LYDSHVASLLDEAVYHIE---";
+  seqs[counter++] =
+      "---------------------------"
+      "IQAETLSAAAEIFKALGDVTRLRILDVLERREMKVQEIAAALGMTQSAISHQLGTLRTLRIVKARREGRSTF"
+      "YSIDDGHVKQLFDLCVEHV----";
+  seqs[counter++] =
+      "---------------------------IAKEVS-"
+      "GLSDLFKVIADETRTKIVFLLSETELCTCDLAEILRLSLPTISHHLKQLKSYRLVKSRREGKSVFYSLEDFH"
+      "VVELIKLAKEHFQE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAEVFRLMADPGRIRILALLEAGEVCVHDLASVSGLSESSVSQALRLMRAQRVVAGRRAGRHVFYRLDDSHV"
+      "RMLLDLAITHV----";
+  seqs[counter++] =
+      "------------------------------"
+      "EVLYDLAELFKVFGDSTRIRILYVLFETEMCVYDLSKILNVTQSAISHQLRVLKQNKLVKFRREGKNIFYSL"
+      "ADEH----------------";
+  seqs[counter++] =
+      "------------------------------"
+      "KVLNHLSGIFKVLADPTRLRIIYTLSMGELCVTDISETLEMTQSSISHQLAILKSRDLIKVRKVGRKSYYSL"
+      "DDDHVLSLFEGGYEH-----";
+  seqs[counter++] =
+      "-------------------------------------"
+      "QLFKLLGDNTRLNIITLLTRKELCVEDLMKCTGMEQSAISHQLKKLRAHHIVKAEKVGKHVWYSLEDHHVLQ"
+      "LYNLADEH-----";
+  seqs[counter++] =
+      "--------------------------------------"
+      "FFKVLADDTRIRILYALKEQEMCAGDIAVFLDMTKSAVSHQLAVMRKMHQVRARREGKNVFYSLDDQHIVDI"
+      "MEEALIHM----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "MSEFFHMFDDPTRLKIIGALIISEMCVCDIAAVTGMSQSVISHHLKILRQERVIQFRRQGKMAYYSLCDDHI"
+      "GGIFYQGRIHVQEER";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALSDPTRIRILNLLCADEHSVNDIAEILDLGQSTVSHQLRFLKNLRLVKFRREGTTLFYSKDDDHIMNLL"
+      "KQAIEH-----";
+  seqs[counter++] =
+      "------------------------"
+      "MQVLSPEQVGDVAEVFRLLGEPNRLRIVLACLETERTVGEIGEALGLSQSLTSHHLRLLRTARILRAIRHGR"
+      "HVAYAIDDDHVRDVLRNMVAHLTE--";
+  seqs[counter++] =
+      "------------------------------------"
+      "ADVFGLLGDPRRLKLLVALLEGELCVCDLAAVTGMSESATSHALRLLRAHRVVSVRRDGRMAYYRLDDAHV-"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------"
+      "ETVYNMATLFSTFSDSTRLKILLCLSRAKLCSCDISAAVNISKSATSHQMRILKMTKLVKAERKGKQIFYSL"
+      "SDEHVSILLQAALEHVKE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FQALGDSTRLQILYALMHHTLCVRDLAILVGVSESAVSHQLRLLRDRRLVRQRRSGNIIYYSLDDEHLAVLF"
+      "REA--------";
+  seqs[counter++] =
+      "------------------------------"
+      "DVFEEMSGFYKLFSDRTRLKILWALRNGPLCVCDLCAVVGMSQPAVSQQLQKLRNGRIVKSRREGKVVYYSL"
+      "DDEHIEAALDMAMEHVEE--";
+  seqs[counter++] =
+      "-----------------------------PEALNQAAEMFRAMGDPERLRLLTMLQGGERCVGEL---"
+      "VGENDSTVSARLQSLHRARLLHRRREARHIFYRLADEHVAELLNNALEHASE--";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LATPSRLYILARLQEGPCSVGDLAEAVGMEASACSHQLRLLRNLGLVTGERQGRSIVYALYDHHVAELLDQA"
+      "LFHVE---";
+  seqs[counter++] =
+      "------------------------------------"
+      "AQTFKALSDPTRIRILHLLSQGEHAVNGIAEKLNLLQSTVSHQLRFLKNLRLVKSRREGTSIYYSPEDEHVL"
+      "DVLQQMIHHTQD--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAVIFGLLSDPGRVRILIALLEGEMCVCDLAATTGLSESGVSHALRLLRGPRVVQVRRSGRMAYYSLADSHV"
+      "RMLLDLGLTHV----";
+  seqs[counter++] =
+      "--------------------------------"
+      "AAKLAPLFKALSDETRVKIIYALAQQELCVCDIAELTGCTLPAVSHHLRLLRTMGLARCRKEGKFIYYTIDD"
+      "HHVWQIINAAFEHMKE--";
+  seqs[counter++] =
+      "----------------------------"
+      "AEHLVSAAAALFKVIGHPTRVRILLALAAEELCVCDLAQVLDATVSATSHQLRNMRAMGLVYFRTEGKLAYY"
+      "RASDPVMVSLLQQGVEH-----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LASLFKLFGDGTRVQILHALEQSEMCVCDLAVLLGVTKSAISHQLKALRLANLVKFRKEAQIVYYSLADDHV"
+      "KEIIDKGFEHL----";
+  seqs[counter++] =
+      "---------------------------------"
+      "KQVSQLYKVLSDPTRLRILLLLKEGEHNVTAISEQLGMEQSAVSHQLKLLRDSRVVKARREGKTIFYTLDDH"
+      "HVIDILNQTFEHIE---";
+  seqs[counter++] =
+      "-----------------------------------"
+      "MADLFKIFGDSTRIRILWALHESEMCVRGISKSLDLSMSAVSHQLKALKDADLVQSRRDGKNIYYSLCDEHV"
+      "EILLNTALTHLKE--";
+  seqs[counter++] =
+      "----------------------------"
+      "AEPVTEGLSTFFKALADDTRLKVIHALSQDELCVCDVANILGSTVQAASHHLRVLRNIGLAKYRKEGKRVFY"
+      "SIRDRKTAGFIQKVIEDLKK--";
+  seqs[counter++] =
+      "------------------------------"
+      "EMIEHLSEFFSMFSNPTRLRILLLLSKKEMCVGKIAEILRMDQSAVSAQLKVLRHLNLVKAKRHGRYMRYKL"
+      "NNKHV---------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ADIFKALADETRLKIFALTQENELCVCDVANIIGTSNATASHHLRHLRNLRIAKSRKEGKLVFYSLDDPHVI"
+      "TLVTMAMAHGQE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAELFKVFGDSTRIRILFVLFEAEVCVCDLAEALHMTQPAISHQLKILKQAKLVRSRREGKSVFYSLADGHV"
+      "RTIIAQGREHIEE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LADVFSVLGDPGRLRLLYALRDGEVSVGALSTLTGQSDSAVSHALQLLRAHRIVRVRREGRRAYYRLDDPHV"
+      "QMLLEVARSH-----";
+  seqs[counter++] =
+      "---------------------------------"
+      "QQIAQIMRLFGDPARLRLLVLLEVDEMCVGDLAQLAQMNESATSHALRLLRAHHVVAVRREGRMAYYRIIDT"
+      "HVKASLQLTLDHV----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "MAETFRALADSTRVKIVGCLLEQELCTADLAAILNYSESAVSQHLRVLRQLRLVKQRREGKLVFYSLDDDHV"
+      "RVLVLVCLNHI----";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALGDPTRARIIYALAVSKLSVGELATGLALTQSNVSHQLTVLKQLKLVVGTRNGRNVHYQLADKHIISIF"
+      "QQVAAHAEE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LADVFGLLGEPNRVRLLIALLNGPMCVRDLAATIEMSESAVSHALRLLRAHRVVDVHRKGRVASYELADLHV"
+      "LTLLKLGLEHV----";
+  seqs[counter++] =
+      "---------------------------------"
+      "QKVSNLFKVIADPTRIDILYTLKDSRLSVSEIKDKLNMSQSAISHQLRVLKDVNLVKDERVGKNIFYSLSDN"
+      "HVYDIFNQAIDHVRE--";
+  seqs[counter++] =
+      "----------------------------------"
+      "SIAQIFKTLSDPTRLKILYVLSKKDLCVSDISELLSMSQSSISHQLALLRHQQLIKVNRVGRMAIYSLDDDH"
+      "VLSIFNQGKTH-----";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKVLGNQSRIRILLEIADEEKCVHEISEETDQSFSNASHHLKTLRDNRLVDYRKEGRHKYYRIKDDHVLKIL"
+      "QECIDH-----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSELFKILGDKTRINIIWTLDNREMCVCDIANVLNMTKSSISHQLAILKNAGIVKYYKSGKEVYYTLDDEHI"
+      "NKLYEIGLLHIEK--";
+  seqs[counter++] =
+      "---------------------------------"
+      "EELANFYKIFSDPTKIKILWALDISEMCGCDLAAITGVTKSAISHQLSSLKELNLVKARKQGKIVYYSLSD-"
+      "-----------------";
+  seqs[counter++] =
+      "----------------------------------"
+      "SLANLYKIFGDATRIKIVYILFEHECCVCDIAATLGTTQSNVSHQLQILKSNDLVSYRREGKQIIYSLKDSH"
+      "VKDIFEKGYEHITE--";
+  seqs[counter++] =
+      "--------------------------------"
+      "AEALAESMRAFATGSRLRLLWALLDGELTVEELAERTELSQSAVSHQLRLLRQGRLVSVRRSGRHAHYRLHD"
+      "PHVVDL------------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LADLFKVFSDATRIKILFTLLETARCVADIAEATGASQSAVSHQLRILKQAHLVTFKRCGRSIEYSLADDHV"
+      "YTMLLQGMNHICE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LADFFTAFSDTTRLKILFELLESEKTVTEICDNTDFSQSAASHQLSKLRILKLVKVRKQGKFAYYSLDDEHI"
+      "EHIIETALEHFEE--";
+  seqs[counter++] =
+      "-----------------------------"
+      "PGVDERVAALMGALASPTRLRLFALLESGELSAGELSKAVGMRPSATSHQLRVLRDLGLVRRRREGRRCYYS"
+      "LADAHLGVLLREAL-------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSELFKLLSDPTRMKLVLALSCGEMCVCDLGAALGMTKSAISHQLKTMKQCSVVKSRREGKNVFYSLHDQHM"
+      "---------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ADFFKVFGDPTRLKILFLLEQGEKGVNAISEELGMQQSTISQQLKLLRACRLVRFRKDGRNVLYRLNDEHIH"
+      "EILALGTEHYQE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAGFFSVFSDPTRLKIISALSEKELCVHELSSLLDMKQPSISQHLKMLWQARVVKKRKVGLHVFYRLDDEHI"
+      "EKIYTWGYEHVKE--";
+  seqs[counter++] =
+      "------------------------------"
+      "EAAASVATTLQALATPSRLLILTELRHGPLPVTKLAEAVGMEQSAVSHQLRLLRNLGLVTGTRSGRSIVYSL"
+      "YDNHVAQLLDEAVYH-----";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKVIADQTRMRILLALSETSLSVNEIADILTMSQSSISHQLRVLKDNRLVKGTRLGKQIHYQLTDDHIVQIF"
+      "KQIIEHIEE--";
+  seqs[counter++] =
+      "-EHLSADPLQT-HLIT-----"
+      "SGLFEPMAPQEFQTSAELFGLLSDESRLRIFWILCHYEECVINLSSLVGMSSPAVSHHLRQLKTRRLIVSHR"
+      "SGKEVYYKPAD------------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AKIFKALADDTRIKIAYILAEEELCVCDIAAIIDASTATTSHHLRLLRKMGLTKYRKEGKQVYYSLDDDHVK"
+      "DLIKIAFEHQQE--";
+  seqs[counter++] =
+      "--------------------------------"
+      "ASRLADFFALFSDCSRLRVISALAISRMCVTDLADVCRMNQTTVSHQLRSLKSMGIVESERQGKIVFYRLAD"
+      "NKI---------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALGDPTRLGIVLELMETEKCVSEISSSLSISDSSTSHHLRSLRQLKLVKRRREGQKLFYSLDDHHVYLIL"
+      "TIGLEH-----";
+  seqs[counter++] =
+      "-----------------------------------------------"
+      "RMRMISLLASGELCVGNLAIALHMSDSAVSHQRKTVRALRLVGYRKQNRHVF--------------------"
+      "---";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALGDEARLRTLEMLVNREACVSEIAEASKEQISTVSHRLKLLRAEGLVNRRREGRHIYYSLADEHVMELI"
+      "HNAFEH-----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "MALLYKTFGDATRLRIMYLLLQKEMAVCDIAACLNMTHSAISHQLSVLKNLNLVKYRKFGKTVIYSLADYHV"
+      "SILIATAYEHITE--";
+  seqs[counter++] =
+      "-------------------------------------"
+      "KLFKVLSDATRLRIYALTVEEELCVCDVSASVDCSIATASHHLRTLLKQGLVKYRKEGKVVYYSLDDHHISS"
+      "LVHLAMEHVNE--";
+  seqs[counter++] =
+      "--------------------------------"
+      "ATELGEMFRLLGDPNRLRIVASCLSQPMSVGDIADTLDLSPSLTSHHLRLLRSARLLKGTRHGKQVFYDLPD"
+      "CHVRQMLTNMIEHVTE--";
+  seqs[counter++] =
+      "------------------------------"
+      "QAAAQVASTLQALATPSRLMILTQLRNGPLPVTDLAEAIGMEQSAVSHQLRVLRNLGLVVGDRAGRSIVYSL"
+      "YDTHVAQLLDEAIYH-----";
+  seqs[counter++] =
+      "---------------------------"
+      "VSEEVVIKISNFYKALSDPSRLKIMSLLNEKGLCVSCIVEKVGMTQTAVSNQLKSLRDVNLVKSERKGKNII"
+      "YKLNDDHVRDILNLTMTHMEE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSRMFGAFGDANRLKIMLAVADQDLCVCELGELLGMSAPAVSHHLRRLKDLSLVKTRRQGKLVYYSLDDQHI"
+      "RDLLVIGQAHLQ---";
+  seqs[counter++] =
+      "------------------------------"
+      "EETQRSVQIFKAFGDYTRYKILYLLYERELSVSEITSKIGVSQSAISHQLKLLRQTGLVSGRRDGQRILYSL"
+      "ADKHIIMIFKQVKEHISE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKTMSDPTRMRIILAIAQGPITVNDLAAMLDLGQSTVSHQLRLLKQARLVAGERSGKQIYYHLVDDHVLEIY"
+      "ALTKAHIEE--";
+  seqs[counter++] =
+      "---------------------------"
+      "VTPAESSRIADAFALLSDPGRVRVLALLEAGETCVCDLAEMVDMSPSALSHGLRLLRTAGVVTNRRDGRMVR"
+      "YRLADSHVRLLLDVTREHL----";
+  seqs[counter++] =
+      "---------------------------------"
+      "QRAAALFRALGDVERLKLLESLAQREVCVTELAETSRARMPTVSQRLRVLRAEGLVVQRREGKHIFYALADQ"
+      "HVVELVHNALQHASE--";
+  seqs[counter++] =
+      "------------------------------------"
+      "AKIFALLGDAGRLQLVLRCMEKPQTVGELAEASGMSQSLTSHHLRQLRDQRILASERNGRHIFYQIDDEHIS"
+      "CVVRDVFAHV----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAETFRLLGDQSRLKILLQCMRGSVAVGDIAGSLDLSQSLVSHHLRLLRGARLVRGERQAKHIFYGIADQHV"
+      "SQVLQDMAVHISE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAEMFRLMGDPSRLKIIAACLGAPMCVSDIAAKYGMSQPLVSHHLRLLRAARVLRSERRGKQIFYEAADHHV"
+      "KRVIGNMVEHVCE--";
+  seqs[counter++] =
+      "-------------------"
+      "AKMNEPSILDPETLTSVSKIFKILQNEARLSIIYLLKDQELSVGEITNLINMEQSAVSHKLNALKKAHLVKT"
+      "RRDGKTIFYSLDDDHVFNLLEQVITHSKE--";
+  seqs[counter++] =
+      "--------------------------------"
+      "SEKLAEFYKTLGDKTRLRILSLLKVDERCVCELVEILGISQPTVSQHMRRLKSVHLVKERRQGRWVYYSL--"
+      "------------------";
+  seqs[counter++] =
+      "------------------------------"
+      "KTADDLAQLFSILGDGTRMRILFLLRNEETTVQSLADSLDMTHSAVSHHLRLIRPYQLVKSRKKGRNVFYSL"
+      "YDDCVWHLLEEGLIHLRK--";
+  seqs[counter++] =
+      "--------------------------------"
+      "AERLAEIMQALASPARLRILSMLSARPSTVTELSEQLQIGQTTVSNHLRLLRHLSLVTGSRAGRHIHYSLFD"
+      "DHVTELLDEAIGHLE---";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSEFFKFFGDTTRIRVIHLLLSGEMSVSAIAEKLNLEQSVVSHQLRILRTANLVKPTRDGRKIYYSLDDEHI"
+      "GEIFNTGLAHI----";
+  seqs[counter++] =
+      "------------------------------"
+      "ELLENVSDFFKALGNGTRLQIIWCLSRGELKSSELAAILQMSPSAISHQLTLLKNLKIVSVRREGKNQIYAL"
+      "ADKHISQVLDSVVEHYEE--";
+  seqs[counter++] =
+      "---------------------"
+      "TGELKHVLPEFAIETASLFGLLSDSTRLRILYLLYHREVCVRNIAEAIEMSPPAVSHHLRSLKQLGVITSRR"
+      "IGKEVHYTIAD------------------";
+  seqs[counter++] =
+      "------------------------------"
+      "EEVQGMAQMFKALSDPTRMKMAWLLDEGELCVCDMSILTKQSIATASHHLRLMKSLGIATSRKEGKNVFYSL"
+      "ADHHIRTLIRMTLEHMRE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FSALANPIRARIVNRLTDGEASVGELSEIVGVKQPLVSHHLKVLRSAHLVSARKDGQKAMYSLIDDHVASIF"
+      "LDAFNHMKE--";
+  seqs[counter++] =
+      "--------------------------------------FHALRSEP-"
+      "RLTIMYLLLEKDMCVCELERALGMTQSAISHNLRTLRQLDLVRVRKDGRFAVYSVADEHVRALLELSRSHVM"
+      "GCQ";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LTEFFKMLGNPARIRILLLLMEQDANVSDLAEQLGMTQSAVSHQLNLLKLNKLVRGCRVGKMVFYALVDEHV"
+      "QMVIEKGTEHIGRC-";
+  seqs[counter++] =
+      "--------------------------------------"
+      "YFAALSEPNRLKILYILKNGEYCPCELSEILGCTKSALSHQLRILKDKNLIKNRKDGKFIYYSIKD------"
+      "------------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSDFFGLLSESTRLKIILELIKGEKNVSQISKNLDMSQSAVLHQLRILRQGRIVKFKKAGKNVFYSIDDEHV"
+      "EGIINKAIEHL----";
+  seqs[counter++] =
+      "----------------------------------"
+      "SVAQLFKALADENRAKIFALCQDDELCVCDVANIIGSSVATASHHLRTLHKQGIVKYRKEGKLAFYSLDDDH"
+      "IKQLFTLALAH-----";
+  seqs[counter++] =
+      "------------------------------"
+      "EVLSGLADFFSIFSDATRMKIISALTITEMCVTDISEILGINQTTVSHQLKIMRQAGVVGFRREGKILFY--"
+      "--------------------";
+  seqs[counter++] =
+      "------------------------------"
+      "EALYSEARIFKALADPNRLKIVKLLKEGELCACELTIALSSSQSTVSHHLSVLKSAGLVKERKEGKWSYFRL"
+      "SEGAVIEILNQALKH-----";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FHLLRNKTRFKILLLLMEKERNVSELEEIIGGTQSAISHQLAELRNMKLVKDRQEKRMRYYSIYDSHVTSII"
+      "EAAVSHINEC-";
+  seqs[counter++] =
+      "---------------------------"
+      "ISNEVLTEIVHIHKILANPSRVKILLLLSEGQQNVSQISDAIGLEQSAVSHQLKMLKAHQLVTQARNGKAIN"
+      "YQIGDSHILQLLKLSIAHAQE--";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DIFKILSEPTRLKILMALSLDSLCVCELASLLDVTQSAVSHQLRILRNAGMVDYERDGKMARYYLRDNMVV-"
+      "-------------";
+  seqs[counter++] =
+      "-----------------------"
+      "EMELINKKEITELAELFKIFSSETRLKILYLLIDTEMCVHDIAKLINMNQSAVSHQLAVLREAHLVRYERKG"
+      "RVLFYSL--------------------";
+  seqs[counter++] =
+      "-----------------------------------------"
+      "VLANSTRVQILYLLEQSELNVSELTDILKIEQSNVSHQLQRLRDYQLISQKRKGKSIYYSLDDPHIITTLNQ"
+      "LMNHVQ---";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LEKIFKLLGNKQRLIILELLRERSYSVSEIINSLGMEQSAVSHQLKLLREAQLVETEKRGREVLYGLSDSHI"
+      "LILLDNALKHV----";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKLLSNPSRLQMLKVLEQRELNVGELGDLLGLEQSVVSHQLALLRKHQLVSSERVGKANYYRLDDPHILDVV"
+      "NEMLEH-----";
+  seqs[counter++] =
+      "------------------------------"
+      "EILQKMSGLLKIAGDPTRLKMLYVLVRGPKCVCDLQEEIQASQSLVSHQLKILRDNGLVKCEKIGNRALYTL"
+      "SDDHVVALLSIVHEHVME--";
+  seqs[counter++] =
+      "------------------------------"
+      "ENAETAAEALKLLAEPTRLSILALLKDNEMAVGAIAEELGRPTPAISQHLAKLRAAKLVTFRKEGTTTYYSQ"
+      "KDEHVDMLVTNAL-------";
+  seqs[counter++] =
+      "-------------------------------"
+      "VTEGMADLFKVLADDTRLKIVYALCRDELCVCDVATILGITNANASHHLRLLSHMGLAASRREGKMVFYRLQ"
+      "SPHVRHLLQEVLSRGEEDR";
+  seqs[counter++] =
+      "-----------------------------"
+      "PEYITRMSAVFQALQSDTRLKILFLLRQKEMCVCELEQALEVTQSAVSHGLRTLRQLDLVRVRREGKFTVYY"
+      "IADEHV---------------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LADCHKALGDKTRLRILALLREEDLCVGELVEILKITQPAVSQHVRKLRNARLVKERRQGQWVYYSL-----"
+      "---------------";
+  seqs[counter++] =
+      "--------------------------------"
+      "AEKIAELFKLISDGTRLRVLVLLCISEKCVSEIADAFGMSLPAVSHHLRVLKQAEIISSHRDGKEVYYSL--"
+      "------------------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LEKIFKILGNKQRLTILELLRSRSYSVSEIVDILNMEQSAVSHQLRVLREAQLVQAEKRGREVLYYLSDSHI"
+      "LILLDNALKHV----";
+  seqs[counter++] =
+      "------------------------------"
+      "ELLDDLTDLFSVFSDKTRLRIVCALAMSRTCVTDLSGVLGINQTTVSHQLRLLRNLGVVRSERDGKIIYYSI"
+      "KN------------------";
+  seqs[counter++] =
+      "---------------------------------"
+      "EQVTDIFKALSDGNRLRIMHLLIQGESSVGHIAHALDLSQSNVSHQLRILKQAHLVKGNRDGQSMIYTIDDT"
+      "HVTTLLKQAIHH-----";
+  seqs[counter++] =
+      "-----------------------------"
+      "PKIFEMSTDLFSILSDVSRVRILWLLCHTEDCVANIADAVDMSSPAVSHHLKLLKSANILKYTKKGKEVYYT"
+      "LAD------------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AAMFKLLGDPTRARLLALLEAGELCVCDLAAATGTQEATVSQSLRMLRASGVVTGRRQGRLVFYRLADAHV-"
+      "--------------";
+  seqs[counter++] =
+      "---------------------------------"
+      "ERLAGRFKGLADANRIKIAYLLTREELCVHDIARLVGISIANASHHLRLMRSLGVTKTRKKGTTVFYSLADR"
+      "HVHTIVLLGMEHMEE--";
+  seqs[counter++] =
+      "------------------------------"
+      "QVIVNLSSLYKVFADKTRLEILYALHENEMCVCDLAVLLNMTKSAISHQLKTLRLANLVKNRRVGKVVYYSL"
+      "ADEKVYEIFNQSFKQLTE--";
+  seqs[counter++] =
+      "---------------------------------"
+      "QKVSQLYKVLSDPTRLKILLYLKQGELNVTALSEKLNMEQSAVSHQLKLLRENHVVKTDRVGKTIFYILDDH"
+      "HVLDILNQTIQHI----";
+  seqs[counter++] =
+      "----------------------------------"
+      "ALSDFFRIFGDQTRLRILYALAKTELCVCDLAKLLGASQSAVSHQLQVLRSHRLV-----------------"
+      "----------------";
+  seqs[counter++] =
+      "------------------------------"
+      "DVAEKLAGAFKLLSVEARIRIVQVLKRRALCVTELTSQLGISQSATSQHLRVLKDARIVKFQKRGFHVYYHL"
+      "--------------------";
+  seqs[counter++] =
+      "--------------------------------------------"
+      "DPTRLKILLSLKEGELCSCDISEISKISISATSHQLRLLRDRKLVKYRKEGKFVYYELYDEKI---------"
+      "------";
+  seqs[counter++] =
+      "---------------------------"
+      "ISDHTATHLADTFSLLGDPSRIRVLGTLLDGPKRVLDIAQACGHTQSATSHSLRLLKAHHVVAGERHGREIH"
+      "YALADDHVRALLTLALAHI----";
+  seqs[counter++] =
+      "---------------------------------"
+      "QKILEILKILSDETRLKIVSLLAENELCVCELMEALRMSQSRISNHLRILRNTRIIEAKREGKWIFYSL---"
+      "-----------------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LADFFDIFGDTSRIKILLALHDKSLPVSSIAELTGLSASAVSHHLSLLRGRRVVKVERKGKYRVYELDDDHV"
+      "SSVLKMAISHIQEVK";
+  seqs[counter++] =
+      "---------------------------------"
+      "EGIAVIFKALADDTRLKIVYALSQAELCVCDVAALINSTKSTASYHLRLLNHMGLAKFRKDGKLVYYRLADQ"
+      "HI---------------";
+  seqs[counter++] =
+      "--------------------------"
+      "AIDAEAVQGVSALFKALGDETRLKVLALYKGEELCVCDVANIVGSTVATASHHLRLLRNIGIANYRKEGKLA"
+      "FYSLRDAHI---------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LGDPTRLKIIYTLSETSMCVSDIAKTLDLSQSLVSHQLALLREAELVKVKRVSRNAIYSLDDAHVLTIFKQA"
+      "HEH-----";
+  seqs[counter++] =
+      "-----------------------------PQLAAA-"
+      "ANTFAMLASPARLHLVTLMSGGRFDVGTLAEKVGLSLPTTSQHLSKLRLAGIVSARRAGRHSYYTVEDPHVL"
+      "SLVEQIFEHI----";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKVLGDPTRTKIVLALDNREVCVCTLADTLGMTKSAVSHQLAILKANNIVKSRRDGKQVYYSFDDEHITDII"
+      "EIAQAHIKD--";
+  seqs[counter++] =
+      "------------------------------------"
+      "ARLFKGLGDETRFRIYALYLEAELCVCDVAGILGTSVATASHHLRLMKNLGLTRSRKEGKMVYYSLDDDHVR"
+      "LLVKLAIDHAAE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FQALGDPERLRLMIRLSEQEICVSELAELAQEQLTTVSARLKSLYAARLVKRRRQAKHVFYSIADDHVLQMI"
+      "RGAVAHAAE--";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DIFKIIGDPTRLMILHAIEFHELCVCDLGHLVGVTKSAISHQMKLLKKYGLVKGRKVGKMVYYSVIDDNVKN"
+      "LIHAGYNHV----";
+  seqs[counter++] =
+      "-------------------------------------"
+      "ETFRLLGDPTRLKILLACLSEPKCVNDVASEVGITGSLTSHHLRLLRGARLVRAERQGRQIFYVAADSHVNA"
+      "MLAEMVAHIRQ--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAEVFKVFGDSTRIKILYDLFEGEKNVTEICQDLEMNQSAISHQLKILRTARLVSGKRMGKSILYSLADEHV"
+      "KTIIAMGIEHIEE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FSALADRSRLKILYALSETELCVCDVASLLGMKIATASHHLRKLRDLQILKYRNDGKLAYYSLKDQRVAEIL"
+      "HHTLNQLVE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LADLFKVFSDSTRMKIMYKLFDGEVSVGQIATSLDMSQSAISHQLKYLKESNLVKSKRNGKSMLYYLADDHV"
+      "KIIIKTGLEHIEE--";
+  seqs[counter++] =
+      "-----------------------------------LVEFFKTLGDFTRLRIV-"
+      "LELKTKRCVGELAEELEMSHSAVSHQLNILKANGIVKSQRQGKYIYYIVQDEYV----QNAIE------";
+  seqs[counter++] =
+      "----------------------------------"
+      "AVAEVFKLISDGSRLRILWLLCHREVSVGDIAEMMDMSNPAVSHHLKLLKQSGLVDSRREGKEVFYRLAD--"
+      "----------------";
+  seqs[counter++] =
+      "--------------------------------------"
+      "FFKQLGYSTRVRILCYLIQEPRKVSDIAVHLNMTLSSVSHQLRVLREAGLVSGQRQGKTITYQKKDDHVATI"
+      "IQNTLDHL----";
+  seqs[counter++] =
+      "---------------------------"
+      "VSPDVLELIAERFRVLADPARLQILNVLQGGEQTVTELMRTTGFRQAKVSKHLQLLYNLGFVDRRKEGLHVY"
+      "YRL--------------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKMLSDKTRLSIMLLIKEQEMNVSEISRALNMEQSAISHQLSALRSERLVKSRREKRSVFYSPNDQHVYDIL"
+      "TQVIDHLETC-";
+  seqs[counter++] =
+      "------------------MARAGDV----"
+      "PSDYEPVSALFKALANPVRAAIVHLLSDRERTVGQLVEALGLPQPLVSQHLRVLRGALMVATRRQGQEIWYS"
+      "VCDQHVAHILGDAMKHTQE--";
+  seqs[counter++] =
+      "---------------------------------"
+      "KDIAEFFKLFSNDGRLKIISSLATDNLTVNEIVERTKLSQSLVSQQLKLLKNARILTNEKIGKTVTYSIYDR"
+      "HILHLLKDVAEHLDE--";
+  seqs[counter++] =
+      "----------------------------------"
+      "SVAQMLKAIADENRAKIYALCQDEELCVCDIANIIGITVANASHHLRTLHKQGIVRYRKEGKLAFYSLDDEH"
+      "IRQIMMIVLEHKKE--";
+  seqs[counter++] =
+      "-----------------------------PDVGE-"
+      "MVQIFKALADETRLRIYSLTLESEMCVCDVAAVIQSSSATASHHLRYLREHSLAKSERRGKMVYYALADKHV"
+      "ADLYEHAIEHTME--";
+  seqs[counter++] =
+      "---------------------------"
+      "VSQEVVQQVAEYFSLLSEPMRLRLLHLLRDEEKCVQELVDATQTSQANVSKHLKVMWQAGILSRRSEGTSAY"
+      "YRVEDEMIFELCNRVCDRL----";
+  seqs[counter++] =
+      "---------------------------------"
+      "EKVSQLFKMLSDPTRLKILLYLKDGEQNVTAITQAVEMEQSAVSHQLRLLRENHVVKSHREGKAILYSLDDS"
+      "HVLDILNQTLKHVEQ--";
+  seqs[counter++] =
+      "-------------------------------"
+      "IAEHAAEVLKAIAHPVRLQIVELLQAEEMCVGDIVNALGAKQAITSQQLNMMKAKGVLSCRRDGARVYYRIE"
+      "NRNVIKLLDCIYDHCEK--";
+  seqs[counter++] =
+      "---------------------------------"
+      "ERIAETLKALSDPTRLRIVSLLRHGELCVCDLTEALQTPQSKVSRHLAFLKNAGWVRARRSGKWVYYQILD-"
+      "-----------------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSELFWVLSDATRIRILYALSEKEMCVCELARLLNNKQSSISHKLRILRNSKLVGFKRNGK-----------"
+      "---------------";
+  seqs[counter++] =
+      "--------------------------------------------"
+      "NPTRLRILLLLSKKDMCVGKIAEILRMDQSAVSAQLKVLRHLNLVKAKRHGRYMRYKLNNKHV---------"
+      "------";
+  seqs[counter++] =
+      "------------------------------"
+      "EHSQIAAETFRMLADATRVRILWALFHDELSVNALAEHVGAVPTAVSQHLAKLRLAGLVSSRREGTFVYYSA"
+      "SDAHVKALVAQAL-------";
+  seqs[counter++] =
+      "----------------------"
+      "GEIMVILPDRLQAQSELFKPLSDPTRLKILYLLRNGELCVCEIIFALKKPQSTISHHLNILKKAGFIKGRKE"
+      "GVWIHYRLADAEIVGVIDNLTSILNE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALADETRVKIIALLQEPNLCVCDLAQITELTISGASHHLRLLKNMGLARSHKEGKHVRYCIHDEHVKIIL"
+      "EEALNH-----";
+  seqs[counter++] =
+      "------------------------------"
+      "EQLQSLADTFKLMGDKTRLTILALLRERELCVCDLVDVTGMSQPSISQHLRKMKDAGLVSETRKGQWIYYSL"
+      "--------------------";
+  seqs[counter++] =
+      "-------------------------------------------------------------------"
+      "ALGTSESAVSHQLRRLRDQNLVLPRKEGRVVYYRLADAHVTDLLRNVLEHVGE--";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DLLGALANANRLKILSLIIDGELCVSAINAHVDLSEAALSHRLAKLRKLRLIESRRQGTTIYY---------"
+      "-------------";
+  seqs[counter++] =
+      "------------------------------"
+      "EQAEELAGMFHLLGDVNRLRLICACLEEAVCVQDLADRFSLTPSLVSHHLRLLKAARLMRAERRGKQVFYTV"
+      "NDEHV---------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AKIFALLGDAGRLQLVLRCMEKPQTVSELAEATNMSQSLCSHHLRHLRDQRILASERRGRHILYRIDDDHIS"
+      "RVVRDTFAHVHE--";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EVFRMLADSTRIQLLWALIDRELSVNELAGEVGKLPASVSQHLAKLRMSRLVHTRREGTQIYYRLENEHIAR"
+      "LVTDALD------";
+  seqs[counter++] =
+      "---------------------------------"
+      "KKIAEFYKALGDEVRLKILQMLSEQEMCVCEIIERLDMSQPAVSHHLKILRQVGLVKDSREGKWIYYSLHD-"
+      "-----------------";
+  seqs[counter++] =
+      "-----------------------"
+      "ELPALDDQHIASLAHLFHLLGDEGRIRLVLACMAGPVPVSELSAVTGMSQSLTSHHLRHLREARILRSERQG"
+      "KQILYRLDDHHI---------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DIFKLLSHPMRLQIIYMLEQQTMNVGEIVERLGLEQSAVSHQLTLLRKGHLISTCQIGKIVCYSLNDKHILD"
+      "IVNEALEHTQ---";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LSDPTRLRLLALLVREELSVAELQEILGMGQSRVSSQLALLRQVDLVTDRRDGKKAFYSIRSNRTLALLKSA"
+      "IDSVSE--";
+  seqs[counter++] =
+      "------------------------"
+      "IQPLSRKNAQSAEKLFKCLASASRLKILFVLLESEKSVGDITVDCDMSQPLVSQHLRHLRDNNLVYTKRHGK"
+      "QVYYSIADEHIKHVVADCIQHVQ---";
+  seqs[counter++] =
+      "---------------------------IASELAPAVA-"
+      "LFRSLGDPARLAILDRLARGEARVVDLTDELGLAQSTVSKHLACLRDCRLVDFRVEGRQSFYALARPELPAL"
+      "FRSA--------";
+  seqs[counter++] =
+      "------------------------------"
+      "EEAAQLTSVLSLMADPTRARVLALDMVKELCVGDLALALESNEDAVGYALRLLRTAGLVTNRKQGRVVFYRL"
+      "--------------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ADLLKALSNPGRLRILCALVPGEMSVGDLETALGASQSYVSGQLLRLRNEGLVSCTRDGRSIRYQLAD----"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LSTPSRLLILARLREGPLPATELAAEVGMEQSACSHQLRLLRNLGLVVGERRGRSVVYALHDDHVAGLLDQA"
+      "VYHVE---";
+  seqs[counter++] =
+      "------------------------------------"
+      "AEYFKAISDPARVRIIYALANGELCVCELMLIMGMQQTVVSHHLKILKYANIVSDRKSGKWVNYSLADRRVL"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ANIFKLLGDYNRIRIINALKIKELCVCELSILLDMSQSSISHQLRILRHHNIVKNRKENKRVFYSLNNDKIF"
+      "KLIEESI-------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "ELFTQLSSSTRIRLLCILAIEEMCVCELADMLKMSQPSISHHLRLLRQSGVVKYKKSGKRVIYYITD-----"
+      "-------------";
+  seqs[counter++] =
+      "----------------------------------"
+      "TLAELFKALGDPTRLNVLQLLTERQLCVGAIARRLGVTQPAVSQHLKVLKHLGLVKASRDGYHIHYSI-"
+      "NQDMLASYKTHIDEWQ---";
+  seqs[counter++] =
+      "-----------------------------------"
+      "MADILKVLGDPNRLHILSLISRQELCVCEITSILNISQSNASQHLARLRSVDLVKERRNAQWIYYSL-----"
+      "---------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FQALSEPIRLQILDLLQEQELCVCEIREKIKISQSKLSFHLRILREAKLARSRQQGRWVYYSLNPEQLL-"
+      "LLEQYLNQLRE--";
+  seqs[counter++] =
+      "-------------------------"
+      "KALQREHLQSAADLAKSLSDENRLRILDCISRGKQSVGGIAKELSLSQPLVSHHLRELRRTLLVKIERNGAF"
+      "VYYELSD------------------";
+  seqs[counter++] =
+      "-----------------------------------------"
+      "ILGEPSRLKIVLALSEGDMCVYHIVKAVNSNQSAVSHQLRILRENKVIKSFRKGQNIVYSLDDEHIMQIINI"
+      "VKTHVEE--";
+  seqs[counter++] =
+      "----------------------------------"
+      "SLAKYGKAISDPKRIELMDLLVQAEKNVDVLSKETGMSIASTSHHLQILKEARLVSDRRKGRNIFYQIED--"
+      "----------------";
+  seqs[counter++] =
+      "------------------------------"
+      "EHAEDLAQVMQALSSPGRLLILARLDDSPCSVSTLVEDCGMAQATISNHLRILRHLDLVTGQREGRQVIYSL"
+      "YDAHVQEFFRQALGHI----";
+  seqs[counter++] =
+      "-----------------------"
+      "DLSSLSRSQAEVASELFKSLSNPNRLQIVAALALGEHPVGDLETMLGIKQPTLSQQLAELRDAGFVESRREA"
+      "KQVFYRLGDKRLLAL------------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LADFYKLFSDSSRIKILFVLLSGAHCVKHIAEKAEMSQSAVSHQLAVLRRSNIIRQTRSGQNITYSLADDHV"
+      "KLLLELAIAHIRE--";
+  seqs[counter++] =
+      "------------------------------------"
+      "ANLFKALADETRLSIYALTIEEEMCVCDIAAVIGSSMATASHHLRYLRERSLAKSERKGKQIYYSLSDNHVR"
+      "QLVKIAHEHTKE--";
+  seqs[counter++] =
+      "------------------------------"
+      "QAATQTASLLKTLGNPDRLLLLCQLTQGEACVSDLEASLGIQQPTLSQQLTVLRNEELVATRREGKRIYYSI"
+      "AD------------------";
+  seqs[counter++] =
+      "------------------------"
+      "LQMNMTQAATQTASLLKTLGNPDRLLLLCQLTQGEACVSDLEASLGIVQPTLSQQLTVLRNEGLVATRREGK"
+      "RIYYSIADEKLFTL------------";
+  seqs[counter++] =
+      "-----------------------"
+      "EMQDIAAQLQELHARVCKAIADPKRLLIINELRDGELSVGDLCEALGFSQSNASQHLSVLRERGIVNARRSG"
+      "NNVFYSLRSRKIV----QAVDLLRE--";
+  seqs[counter++] =
+      "------------------------------------"
+      "AKFFHGLANPTRLKIVETLLAGEMSVSQIVDAVGVSQSQVSNQLACLKWCGYVTSRKEGKYILYRISDERVR"
+      "AILQLA--------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AEGFRLLADPTRIKILWALLQGESSVACLAEMVGAAPTAVSQHLAKLRLAGLVKGRREGTYVHYSAADGHVR"
+      "ALLAEALFH-----";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALSDFNRVRIMEFLENGEASVGHISHSLNMTQSNVSHQLKLLKSTHLVKSKRQGQSMIYSIDDIHVSTLL"
+      "KQAIHH-----";
+  seqs[counter++] =
+      "----------------------------"
+      "APEVGVTLARALLALTDPSRVRLCRLIARQAMTTADLADRLTMTRPQVSRHLRALRELGLVRMERHGRHVLY"
+      "EL--------------------";
+  seqs[counter++] =
+      "---------------------------------"
+      "QMLDEFFKSLSEPVRLRVMYLLERGELCVCDIVSSLEVSQSVVSRHLAYLRNAGLVSSRRQGVWIYYQL---"
+      "-----------------";
+  seqs[counter++] =
+      "------------------------------"
+      "DLAASVSEKLKVYAQPQRLMILSCLWRGERTVADIGQATGIVQPALSQQLAELRRADLVQTRKEAKQVWYRL"
+      "AD------------------";
+  seqs[counter++] =
+      "---------------------------------"
+      "KKLASFFDVLSDGTRLKILSALAITPMCVSDLSAVLEINQTTVSHQLARMRLAAMVDFRREGK---------"
+      "-----------------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAELYKLLGNVTRLKILLALAQGELCVCDVAHVLGLTVAATSHQLKLLRDQGWLAMRNDGKMVYYRL-----"
+      "---------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "KILSLLKNPVRLQILYILSQQSLSVSEIVELLHLDQSLVSHHLSDLRKYQLVSTKRDGKSIFYELDDPHILD"
+      "IVNETLEH-----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSETFRLLGDPSRLRILLHCEEGPKSVTDISETLELSQSLVSHHLRLLRGARLVTRVRHSKQMFYEISDQHV"
+      "GDVLLDMLSHVRE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAELFAALSDPTRLRLLNLMRDREVCVCDFVEILGQSQPKISRHLAYLRRAGIVCARREGKWMHYRIE----"
+      "---------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FQQLGDPTRLKILWILCHCRECVSDIAAAVGMSDAAVSHHLQLLKRSGLIVGSRVGKEIHYTLSDERRAGLL"
+      "HRMMDALFE--";
+  seqs[counter++] =
+      "-----------------------------------"
+      "MADIFSVVADPTRRELLGTLLSAELSVGQLVERLGVSQPTVSKHLRVLRDIGLVTSREEGQHRYYRL-----"
+      "---------------";
+  seqs[counter++] =
+      "------------------------------"
+      "EYFQTVALVFRQLSDANRVRLFWLLCHCEECVVNLAAMMGMSPPALSHHLRQLRESGLIVSRRDGKEVYY--"
+      "--------------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AEVFNQLSDGTRLRILWLLCHSEECVNDIAAAVRMTAPAVSHHLKTLKQNGIIKSRRLGKEVLYTLED----"
+      "--------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "QIYDALSDFTRFQILGALLLGEKSVTELQELLSVSQSATSHQLRLLRDRGLVTAKRDGRRVIYSLADDHVIT"
+      "LISVGLAH-----";
+  seqs[counter++] =
+      "--------------------------------------"
+      "FLNLIADKRRIDIIYLIMKKRLCVQDIAEIINETVANTSYHLQQLKKGNIVKVEKEGKEVFYSLSDKHVYEI"
+      "LENVLEHI----";
+  seqs[counter++] =
+      "-----------------------------"
+      "PQLLETAAGTLRMLAEPTRLNLLFQLTDGPKTVTELTAAVDVPRTVVSQHLAKLRLSGLVDTRKDGRHVIYS"
+      "LHDGHLIRLIRETINH-----";
+  seqs[counter++] =
+      "--------------------------------"
+      "AQAATALLKVLANENRLMILCTLMGGEMSVGELNTAVPLSQSALSQHLASLREAGLVSTRKEAQTVYYRLQ-"
+      "------------------";
+  seqs[counter++] =
+      "------------------------------"
+      "QAADAAVELLKALANPVRLKLLCFLVEQERSVGEIASRLGVRETLVSQHLSLLRRDKLVAYRRDGQTLWYRL"
+      "AD------------------";
+  seqs[counter++] =
+      "-----------------------------"
+      "PKTSELQAKLFRGFADPSRLAILETLRDGPLTVGEIVQATGLSQSNVSNHLGCLRDCGLVTATQQGRFVSYA"
+      "LSD------------------";
+  seqs[counter++] =
+      "------------------MAESQEMH---"
+      "QEEAQNAASFLRSLGNPHRLQILCRLALGEQSVGQLHQFFDLSPSAFSQHLAVLRQQQLVSIRKESQTVYYS"
+      "IKD------------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LSDAGRLRLLLWLAQREMCVSELVALEQDKVSSVSARLQMLHAVNLVTRRREAKHMFYALADVHVHRLLRNI"
+      "LDHAAE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FAVIAEPSRRRILDLLLQSESNVTDLAQALGLSQPLVSKHLRTLRQSGLVKVRKSQQHIY------------"
+      "-----------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ARFFRVLGDPVRMGILELLLEGEKNVSEIVSRLGMSQSRVSNHLACLRWCGLVSVRRKGSFIYYSLADEQLR"
+      "ELLEIANDRVEK--";
+  seqs[counter++] =
+      "----------------------------------"
+      "TLSDILHLMGEPNRLRLLVTCLEGAKSVSELAQQLQLSVPLTSHHLSLLRSARLLVANREGKHIYYSIYDAH"
+      "VRCILDDMLKHFTE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FELLSDGNRLRLLLCLHHADICVGDLAAALDMTGTAVSHALRLLRNQGWVSATRDGRSMRYRLTD-------"
+      "-----------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DFFKALAHPTRIVLVEDLAEGEKCVCDLAQKIDADISTVSRHLRELRNAGIVANQKRGNQVFYSL-------"
+      "-------------";
+  seqs[counter++] =
+      "-----------------------------"
+      "PEVDREIIEFLKALSNPIRLKILKLTRDNWLCVCLLSEVLGEDQTLISHHLRTLKTLDLVKERREGRMRFY-"
+      "---------------------";
+  seqs[counter++] =
+      "------------------------------"
+      "ENADQAADFLSALANNKRLLILCKLLHNEMSVGALAKAIDLSQSALSQHLAKLRALDLVSTRRDAQTIYYMV"
+      "SSPHI---------------";
+  seqs[counter++] =
+      "---------------------------------"
+      "KNLSSYFKGLADENRLRILNLLFHGELCGCDIQYVLGASQSNVSRHLSYLKNAGLVNDRRKANRVYFSL---"
+      "-----------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AELFKVLSSATRLRLLRTLAEEVSTVSRLAERSGLAQPLVSQHLRTLRSAGLVSVERVGREAHYSVADTHVT"
+      "HIVEDAVHH-----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LAETFGILSDSTRLSIVLACMETEVSAGDIATKLKVSPSLVSHHLRLLRAVRIVRSERRGKQVFYTMTDACV"
+      "RDILTTMINHLPE--";
+  seqs[counter++] =
+      "------------------------------------"
+      "AKFFRGLADPSRLALLLALRPGEKTVSTLSEETGLSQSNVSNHLACLKDCGLVVNRQEWRHVYYRIADSKVL"
+      "TL------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKCLSDPTRLQILHLLMEGEHCVGDIALKIGTTQANISKHLSLLKNAGLVVSNKQGMKVIYSLQ--------"
+      "-----------";
+  seqs[counter++] =
+      "----------------"
+      "VPLPTSTLMQDIAAQLQELHARVCKAIADPKRLLIINELRDGELSVGDLCEALGFSQSNASQHLSVLRERGI"
+      "VNARRSGNNVFYSLRSRKIV----QAVDLLRE--";
+  seqs[counter++] =
+      "---------------------------------"
+      "KSLNEQFSVIANPNRLEMLEFLAQCEYSVDDLAKVMGLSVANTSHHLQQLRLAGLVASRKEAQRVFYRLKGD"
+      "GVVEL------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AEMLKALADPHRLGILLRLSKRELSVGELAEIEQEKVTTMSARLKVLLTAHLVKRRRKGQSVLYSLADTHVL"
+      "NLVDNAIEH-----";
+  seqs[counter++] =
+      "-----------------------------PDVVQ----"
+      "LFKVLADETRLEILRLLALTDLRVGEIVAHLGLPQNAVSYHLKQLRRLRLLRDHRSARDIYYSVDLDHLQAL"
+      "YAAA--------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "ETLKTLANQKRLEIVQLLGQGELTVSEMIEMLGISQSNLSQHLAVLRRYQIVATRKEGLYVYYRLTDGHI--"
+      "-------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKILGDENRLRILNLLRKGELCVCEIELVLETTQSNVSRHLGKLRNEKIISFEKKAQWIYYRI---------"
+      "-----------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ADLFKALSSPARLRILSALIAGPSDVGSLADATELSQPLVSQHLRTLRLAGIVQVERIGRNAVYSLHDEHIA"
+      "HIVGDAVSHVSE--";
+  seqs[counter++] =
+      "------------------------------------"
+      "ARLFKVLGSESRLALLRILQAKPATVGVLVEKSGLTQPLVSQHLRVLRQTGLVTRDRQGKEVTYQIADHHVA"
+      "HLIDDAIIH-----";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LANLFKVFSDSTRIRILFSLFDYEKNVNTISKELNLSQSAISHQLRYLKDSNLVKSQRDGQAMIYALSDRHV"
+      "KFIIKLGLEHLYE--";
+  seqs[counter++] =
+      "-----------------------"
+      "KVEAVKEELAASISQLFKVLADERRFKILYALTKQELCVCDVALIIGATVATTSHHLRTLSKQSILTHEKIG"
+      "KMVYYQLSNPMIQQLVLDAMNQEKE--";
+  seqs[counter++] =
+      "---------------------------------"
+      "KAVVRIFDVLGNRTRLRILLALASEELCVCDIAHALNLSISAASHQLRALHDRDWLRMRNDGKMVYY-----"
+      "-----------------";
+  seqs[counter++] =
+      "---------------------------------"
+      "ENVGEFAKALGHEKRLLIIELLSSHERCVEDLATAMGIGVKSVSAHLKVMRTQGILTTRKEGLRVYYRLRND"
+      "NILKLFQ----------";
+  seqs[counter++] =
+      "---------------------------------"
+      "KELSNFFNAFGNPTRLKILLALKEEELCTCDLSNITGLSVSAISHQLRVLKGRKNVNYRGDGK---------"
+      "-----------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FHALGEPLRLKVIEILHREELCVCDLCERLHLRPSKLSFHLRALRQANLVLSRQQGRWVYYRL---------"
+      "-----------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EVLRLLADRTRLAILAMLDGTEMPVNAIAEALGRPAPAVSQHLARLRAGRLVTSRRDGTTVFYGQPDEHVAA"
+      "LVANVLQHTEPHR";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EVFKAVADPCRLRIVKLLKEGELCVCEIMTALDKPQSTTSHHLSILREAGLVRERKDGKWSYYRLAD-----"
+      "-------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FRALSDPIRLNVINLLQEKEMCVGDICLALKIAQPKLSFHLRVLRESGLLQTRQEGRWIYYRL---------"
+      "-----------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALADANRRKILFLLKESDLTAGEIASEFDISKPSISHHLNILKNAGLVEARREGQQIYYSL---------"
+      "-----------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LGEVNRLSLLALLHAGDLCVSDLAVAVGMSDSAVSHALRLLRAHGMVTAHREGRLVRYRL------------"
+      "--------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKILSDETRLRIIILLAQEELCVCQISGVLNVSQPKVSKSLSRLRDLNLVIDERKEKFVFYKLKTENFVSTI"
+      "RNIMDNLNESR";
+  seqs[counter++] =
+      "----------------------------------"
+      "TLESLFSALADRTRLEIVLFIMRGKASVQEIARGINKSQSLVSHHLACLRNCGIVKTERKGKYVYYSLLDNE"
+      "VVSIIKLAVEH-----";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FQALADPSRRAIFESLTRGEAAVKDLTTRFDISQPAVSQHLAALKDAGLVSGRREGRHVYYRVE--------"
+      "-----------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AALFHALSDAGRLRTLAILAEQSSSVSHLAEVTGERIGTVSARLKVLLQANLVTRRREGQSAIYSIADQHVL"
+      "ELIHNALEHVNE--";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DFFGIVADETRLRIIGLLNQKELCVCEMCEILGLSQPKVSRHLSKLRDAGIVIDSRQGQWVFYYL-------"
+      "-------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALGDNNRLRILSMLNVRELCVCEINAVLKVSMSTISSHLKILRNAGLVTSRKDGRWIIYRLE--------"
+      "-----------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AELFKALATPSRLKILLTLSHGPASVSNIVIATELSQPLVSQHLKVLRGIHLVSVQRDGREAIYSLMDDHVA"
+      "HIILDAMAHVNE--";
+  seqs[counter++] =
+      "------------------------"
+      "MMSVSEETSDEAARQLKAVADPVRLRILYALSKEPLCVCELSVLLNMSMPAVSHHLRILLSAGLLKVRKEGK"
+      "FACYHLRDSH----------------";
+  seqs[counter++] =
+      "-----------------------------"
+      "PQAAHEASDLLKALAHHTRLLILCILAKQERTVGEIENILGIQQAMVSQQLARLRLEGLVNTRRQGRLVYYS"
+      "IGNVSVLAFLESLFD------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LAEPTRLHLLWQLSNGPKTVTELTDASGAARTVVSQHLAKLRLSGLVDTRKDGRHVIYSLHDGHLVRLIRET"
+      "INH-----";
+  seqs[counter++] =
+      "----------------------------------"
+      "TISQIFKILSDETRVKIVALLTENELCVCDLANIVEATVAATSHHLRFLKKQGIANYRKDGKLVYYSL----"
+      "----------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LGDPTRLRVTALLSGEELCVCDLAWVVGLAQNLVSHHLRLLKGAGLVTGRRHGRLVMYAL------------"
+      "--------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AAIFKALGEVNRTRIVKALSLEELCVCDIATIIDATIATTSHHLRSLHGQGIIKSRKEGKMVYYSLDDDHIR"
+      "QIVSMAFLHQEE--";
+  seqs[counter++] =
+      "------------------------------"
+      "EDAEIAAGFLSAMANPKRLLILDSLVKEEMAVGALAHKVGLSQSALSQHLSKLRAQNLVSTRRDAQTIYY--"
+      "--------------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LSDPHRQSILKMLAHQEMGACEIIHSIGLSQPAVSHHLKILRQARLITSQKQGKMVFYSL------------"
+      "--------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AEYFKALSHPTRIKIIELLSKKEMCVCQMMAALNLDQSHVSRHLMVLRANEMVKTRREGTIIFYSLTDENII"
+      "--------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EMFRAFSDRTRLRILNLLLRGEMCVGDLVSILEMSQPRVSQHLSCLRNSGLVVGRREGQWNHYSL-------"
+      "-------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKLLSNPTRLNILMLLEHEQLSVNEIVTQLEITQPQVSHQLAILKEQQLVSAKKIGKKSLYQLSDPHILSV-"
+      "-----------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DIFEALSDPHRRKILDMLKHGELCSSDIASQLDITPASVTHHLNKLRSANLIIKTRKGRNIYY---------"
+      "-------------";
+  seqs[counter++] =
+      "------------------------LERLEPQISEA-"
+      "ARLMEMLSHPARLRILCTMLGGEKSVQELAINASLSQPAMSHHLRKLRDSELVNTRRDKQTIYYSLKGEHVA"
+      "AVLE-VLEHL----";
+  seqs[counter++] =
+      "---------------------------------"
+      "QARAERLRALGEPTRLRIYALHAGAELCVCDLAWIIGSSQGLVSHHLRQLRAAGLVTSRRDGKLVMYRL---"
+      "-----------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ARIFKVLGDRNRTAIYALCENDTLCVCDIATIIDASVATTSHHLRTLYKEGVVTYEKKGKLAMYALDDNHIR"
+      "QLMMTTLEHAEE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FELLSDANRLRLLLCLHHAPICVTDLSVALGMSGTAVSHALRLLRSQGWVSATRDGRSMRYQLAD-------"
+      "-----------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "MADPLRLQVLNLLSKQELCVCDLCDRLQVKQPKLSFHLRQLREAGLIQARPQGRWTYYSL------------"
+      "--------";
+  seqs[counter++] =
+      "-----------------------------"
+      "PDFVETSAALLQAMANPARINILIILAEREVSVGPLSELVGLSQSALSQHLAKLRQAGLVSTRREAHTVYY-"
+      "---------------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ADLFKVLSNPVRIQILDALRLGEQSVGYIAEWLEIEASAVSQQLAVLRSRNLVTSRKQGNYVFYSVRD----"
+      "--------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FQALSDPLRLQILQLLRHQELCVCELRDHLDIAQSKLSFHLKTLKEANLVRSRQEGRWIYYSL---------"
+      "-----------";
+  seqs[counter++] =
+      "---------------------------------"
+      "QTTADIFKQLSDPTRIRIFWILCHCEECVINIASMMEMSSPAVAHHLRLLRSSGLIESRRDGKETYYRAVD-"
+      "-----------------";
+  seqs[counter++] =
+      "-------------------------------------------"
+      "ADEKRLKLVNLLLKQDYCVGALAKELEISKSAVSQHLKVLRESELVIGEKRGYWVHYSVQEDKLIEL-----"
+      "-------";
+  seqs[counter++] =
+      "---------------------------------"
+      "ERLTEIFKLLSDETRLRVVMLLAREETCVCEIVGVLGIPQPKVSKALSKLRDLGLVNDERKEKYVYY-----"
+      "-----------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AELFKALGHPLRLRILELLRTGEKTVGELQRLLMVEASSVSQQLAVMRAHHLVESRKQGTNVFYSVKD----"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AEFFRTLGHPARIRALELLSEREWSVSELVPEIGLEASHLSQQLGVLRRAGLVTTRKQGTTVFYAVASPEIV"
+      "TL------------";
+  seqs[counter++] =
+      "------------------------"
+      "MQTPATTIPHLIAAGFYALCDPLIISVLELLRQQELCVCDLCKALGVNQSKLSFHLKTLKETALVHSRQEGR"
+      "WIY-----------------------";
+  seqs[counter++] =
+      "---------------------------------"
+      "EELSQSFRVLGDPTRLRILRLVAEAPLNVTELVSLVGVAQSSVSHHLGKLKGLGLLREERHAGYSYYSL---"
+      "-----------------";
+  seqs[counter++] =
+      "--------------------------------------------"
+      "DEARLRLLVRLSEGERCVTDLAAGSDERMSTVSQRLKVLKGEGLVTGRREGKHVYYTLADRHV---------"
+      "------";
+  seqs[counter++] =
+      "---------------------------MAVELVQSL----"
+      "KALADDKRMQIIHLLLEGDLCVGALAQSLGISEPAVSQHLKVLREAGLVWGEKRG-----------------"
+      "----------";
+  seqs[counter++] =
+      "-----------------------------------------------------"
+      "MLFLKEYSVNEIAENLHLRQSTVSHQLRFLKNLRLVKYRREGTTLYYSHDDAHVMNMLKETINH-----";
+  seqs[counter++] =
+      "----------------------"
+      "GAMAAAQPPIYRLKADFFRLLGHPARVRILELLRDGERAVGELQAALGLDSSGTSQHLTAMRRQGLLESRRA"
+      "GTSVLYRVKDPRIFQLLEVA--------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AELLALLADRTRLALLHALTGGEADVSTLTQVCGAARPAVSQHLARLRLAGLVNTRKEGRRVIYSLRDGHLR"
+      "RVVDEAL-------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "ETFRLIGDPSRLKILYILSHTEENVRNISAAFDMSPPAVSHHLRLLKSMKIIKSERRGKEVYYTL-------"
+      "-------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "KIYKVLSNMNRIKILYFLENHEADVSRIVDHVQLSQPIVSHQLAILYHYQLVTRHKRGKHVYYCLDDPHILE"
+      "MVDAMLGHV----";
+  seqs[counter++] =
+      "---------------------------------"
+      "KGVSQILKAIADENRAKIYALCQDEELCVCDIANILGVTIANASHHLRTLYKQGVVNFRKEGKLALYSLGDE"
+      "HIRQIMMIALAHKKE--";
+  seqs[counter++] =
+      "------------------------------------"
+      "ARVFKVLSVESRVRLIELLKQRSLCVNALARSLAITPAAVSQHLRVLRDAEVVIADKQGYHVHYRI------"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------"
+      "KVAGQAAKLLAAIANARRLVILDIISQQETSVGSLAEQVGLSQSALSQHLAKLRSAKLVNTRRDAQTIYY--"
+      "--------------------";
+  seqs[counter++] =
+      "-----------------------------------------"
+      "VLANANRLLLMCQLSQGEKCVGELEELLDLHQPTLSQQLGVLRSEGLVSTRRDGKKIYYSVADARVLAL---"
+      "---------";
+  seqs[counter++] =
+      "------------------------------"
+      "EKSEQAARCLRAMAHPARLMILQLLSGSEMSVSELEKALDISQSNLSQHLNLMKDKQLLSSRRSGNQVYYSL"
+      "KDPRLLGL------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ANVFSLLSDPTRLRIILTLKEGEQPVGMIAEKLGRKPTIISQHLAKMRWGKLVRTRQEGTRIFYSLSDEHVS"
+      "ALVDQAI-------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DIFKALGDENRLRIINLLSKGKLCVCDIEAILMMTQSNVSRHLNKLKNVGIISSEKKSQWVYY---------"
+      "-------------";
+  seqs[counter++] =
+      "-----------------------"
+      "ELYQVEREELLSKAELLKVLGHPERLAIVLLTMDGERCVKELVEALGISQPKVSQHVGLMKELGILTFRKEG"
+      "TKVLYRVNDRKVV--------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DIFRALGDPTRLRIVHLLRAMELAVGEIAQVVGQSQPRVSRHVRILAEAGLVERRKEGNWVFLRL-------"
+      "-------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FHILQSDTRLRILFLLSQKQMCVCELEAGLDVTQSAISHSLSIMKNAGIVGVKREGRFAIYFIHDEEIRKMM"
+      "QICRKYAEESR";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FGILSDKTRLRILLLLQNRELCVCEIFGALRMSQPRVSRQLAILKQSRIIKDRRSGKWIYYRIEE-------"
+      "-----------";
+  seqs[counter++] =
+      "--------"
+      "CPMIYALSRNIVISIFLMNISSAALQEIADFFEVLAVPTRLGILLAIGEREVCVCHLEAVLKLRQAAISQHL"
+      "QVFKKNGWVISRRQGRFVYYKLSNPSVLPL------------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "MADIFDVVADPTRRDLLRVLPTGEISVSELVQTLGISQPTVSKHLRVLRDSGLVSVREEGQHRYYRLE----"
+      "---------------";
+  seqs[counter++] =
+      "--------------------------------"
+      "ALSATELFRLLGDETRLRAVVLLRRGELCVCELTETLGVSQPKMSRHLATLRDSGLVETRRSGQWIHYQL--"
+      "------------------";
+  seqs[counter++] =
+      "----------------------------"
+      "APDAPEQAAKFLKSLGHPDRLKVLCSLVGGEQSVASIEAQVGASQSAVSQHLSRLRSEGLLQARRDGRQVYY"
+      "SIAD------------------";
+  seqs[counter++] =
+      "-----------------------------------------"
+      "VLGNPDRLLLLCQLSQGEYAVGELETLLGITQPTLSQQLAVLREEQLVSTRREGKQVFYRIDSEAALALMQ-"
+      "---------";
+  seqs[counter++] =
+      "---------------------------------------------------------------"
+      "DLAQVLQMTPSAISHQLRVLKQMKLVTNRREGKTVFYSLADSHIKTIMNQGMEHIRK--";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EVLRVLADPTRLQLAGLLLDEEKSVSDLASQLDRPATGVSQHLAKMRMARLVSTRRRGTSVLYRVENDHVRQ"
+      "LVVDTIGHVE---";
+  seqs[counter++] =
+      "------------------------------"
+      "EVADRLAGIFKQVGDPTRLKIFWLLCQQEECVTNIAYLLDMSSPAISHHLKSLKLADLIESERKGKEMFY--"
+      "--------------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DIFKQLSDPTRVRIFWLLSHREECVINIAALLDMSSPAVSHHLRSLTQSGLIESRRCGKEVYYKAGD-----"
+      "-------------";
+  seqs[counter++] =
+      "-----------------------------------------"
+      "VFAHPHRLMILSRLLRGECTVGEIDAATGIGQPALSQQLAQLRRAETVRTRREARQIHYSLADAHV------"
+      "---------";
+  seqs[counter++] =
+      "-------------------------"
+      "QLIGPELSRFKAEFFKALAHPLRIRIVDELRNGEVGVTHLCARLEVEQSSLSQQLAVLRARYIVNARKDGLS"
+      "VLYSIRDPEIFSL------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FHALSDPIRLNILDILNNQEMCVGNICDLLSIKQSKVSFHLKILKESGFVETRQQGRCIYYRL---------"
+      "-----------";
+  seqs[counter++] =
+      "------------------------------"
+      "EVFESTARYFSVLGEPTRLKILHVICHKEKCVNDIIRATGLLQANVSRHLGLMYQAGLLSKRRDGTQIFYRV"
+      "--------------------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LADVFRLLGEPNRLRILCAIGSDCKSVSELMSETGIGQSNTSFHLRFLRNAALVNAEPRGRNMYYRVRDKEL"
+      "LKL------------";
+  seqs[counter++] =
+      "--------------------------"
+      "AAAKEELEEIASLLKLLGDKTRLTIFALLKVRELCVCELTELLHVSQPAISQHLRKLKLANLVRERKVGQWV"
+      "HYSLRQRHIVLLEKSA--------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "ELFRILASQIKLEILSLLLENDLCVCQICAIVGTSQPNISQHLNTLRHLGVVDIRKDGTFIYYSL-------"
+      "-------------";
+  seqs[counter++] =
+      "-----------------------"
+      "EFERICPFMLETFETVAKAVADPSRVRILKLLEGGELCVCQITTVLDLAPATISKHLAALKTAGLVQQRRDG"
+      "KWVYYRLAERDFNAYARSFLD------";
+  seqs[counter++] =
+      "--------------------------------------"
+      "FLRAISDPNRLKILCVLQGGSKCVCEIVPLVGISDKLASHHLKQLKNVGLLIEKREGKFIRYNL-"
+      "DKKVIKEYKNV--------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSDILHLMGEVNRLKLLIECLKGPKSVSDLAEQLQLSVPLTSHHLSLLRSARLLMANREGKHIYYSIYDAHV"
+      "RCILEDMLKHFTE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FDLLSDPHRLELLSLHRAPGICVSDLAAALGRSENAVSQALRVLRQQGWVSSTRVGRAVSYRLDD-------"
+      "-----------";
+  seqs[counter++] =
+      "--------------------------------"
+      "AEEVSELLRILAHPERLMVLCQLTKGEVGVGQLQQSSALSQSAFSQHLTVLRKHGLIEARKESQQVFYSLAD"
+      "TRVAQLIQ----------";
+  seqs[counter++] =
+      "--------------IEVEMATDEIMKKNAVEVA----"
+      "ELLRVMAHPERLMVLCQLTHHEMGVGQLQQGSTLSQSAFSQHLTVLRKHGIIQARKESQQVFYRLADSRITA"
+      "L------------";
+  seqs[counter++] =
+      "-----------------------------------------"
+      "VLANPDRLKILCVLVDGEMNVQEIEESTDIHQPTLSQQLTVLRKADMVSTRREGKQIFYRLSDPKVLSLMQK"
+      "LYEALNYC-";
+  seqs[counter++] =
+      "------------------------------------"
+      "AEFFKTLGHPVRIRVLELLGQREHAVSEMLPEVGVEAANLSQQLAVLRRAGLVANRKEGSAVYYSL------"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ADLLLVMANAHRLRMLKTLAEREVAVNNLADIIGISQSALSQHLAKLRSRDLVKTRRDAQTIYY--------"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------"
+      "EVFESVARYFSVLGEPTRLRILHALCQEEKCVNEIIKVTALAQANVSRHLGLMYQAGMLSRRREGTQIFYKV"
+      "AD------------------";
+  seqs[counter++] =
+      "------------------------------"
+      "ETFEKISDLFKQLGDPTRMRIFWILCHHEECVIHISARMDMSSPAVAHHLRLLKTSGLVTSRRQGKETYYRA"
+      "SD------------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LSNEKRIRILYLLENHSFNVSELSEQLELPQPSVSHQLALLRQYQLVQAHRDGKQIFYTLDDPHIIEVLNDM"
+      "LAHVQQ--";
+  seqs[counter++] =
+      "--------------------------------------"
+      "FAKAISDPIRLRILYALREGELCVCELADALELRQSTLSTHLQIIRQAGLVQTRREGRWVYYALE-------"
+      "------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EAFKAIADPTRRKILTLLRTGDLTAGEIASHFDMQKPSVSHHLKILKQADLVQDRREGQYIYYSL-------"
+      "-------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALGQHLRLRIIALLAEQELCVCELEEILGITQPAISQHLRVLKEADLVWEEKVSQWVFYHLKKEKLAAVL"
+      "QSWLAYLQ---";
+  seqs[counter++] =
+      "-----------------------------"
+      "PKITGKWEDFFKVLSDETRLRILMLLNQRELCVCEICQILDLPQPKVSRHLAKMRDLDIVRGKKEDQWVFYY"
+      "L--------------------";
+  seqs[counter++] =
+      "------------------------------"
+      "ELFEEVANYFSLLCEPTRLKILYAVCNGERSVGDIVNEVESTQANVSRQINMLYRAKILARRKEGTQVYYRV"
+      "DDEKTVDL------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EVFSMLADATRIRIILALRDQELSVNHLADIVDKSAPAVSQHLAKLRLARIVSTRQEGTKVFYRLTNEHARQ"
+      "LVADAI-------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "ELLRALASPTRIAIVQSLGSESRCVHELVGELELSQPLVSQHLRVLKDAGVVRGERNGREIMYSLVDHHIVH"
+      "IVDDALVHATE--";
+  seqs[counter++] =
+      "------------------------------"
+      "ELLENAAATLRMLAEPTRLHLLWQLSQGPKSVTELTEAAAVPRTVVSQHLAKLRLSGMVDGRKNGRQVIYSL"
+      "HDGHLVRLIRETINH-----";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EILKALSDENRLRILNLLRWGKLCVGEIQSILGITQSNASRHLNKLKGVGIIKFEKDAQWVHYKL-------"
+      "-------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LSDPARLQMLWALSTEDLSLSDLAQLVGVSSTVASQLLSRLRTAGVLQTRKSGRHVIYSMHD----------"
+      "--------";
+  seqs[counter++] =
+      "--------------------------------"
+      "AEKTARMFKVLSVGSRVRMVELLKERSLCVNALARTLGITAAAVSQHLRVLRDAGLVCPEKHGYYVHYRI--"
+      "------------------";
+  seqs[counter++] =
+      "---------------------------------"
+      "ERLAEIFKALGHPTRVKIVEYLADGEKCVKDIWQEIGVPQPTVSQHINILKNAGIISFRKDG----------"
+      "-----------------";
+  seqs[counter++] =
+      "------------------------"
+      "MENLTPEAMEQVAAYFRALSEPTRLAILNLLREGERNVGELAQLCSCSPANVSRHLSLLSQHGLVRREGRGT"
+      "AVYYRIADDSVYAL------------";
+  seqs[counter++] =
+      "------------------------------"
+      "EKASDISKAFRHLGDPKRLQIFWLLCHRKECVINIAAIMGMSSPAISHHLKILKTAGLISSKREGKEMFYKA"
+      "ND------------------";
+  seqs[counter++] =
+      "---------------------------------"
+      "ENLSPLFHALADPNRLRIIELLRQEDLTVGSIAERLDISQPQTSKQLRVLYDAGLVS---------------"
+      "-----------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "ELLRALSAPIRLAIVSQLAEGERCVHELVNQLGAAQPLVSQHLRVLRGAGVVRGSRRGREIAYTLVDEHVAH"
+      "IVADAVSHASE--";
+  seqs[counter++] =
+      "-------------------------------------"
+      "ELLKIMAHPERMMVLCQLIEGEVAVAQLQQASLLSQSALSQHLALLRRQRLISARKRSQQVFYSLADQRVQQ"
+      "LI-ASLQHIASC-";
+  seqs[counter++] =
+      "-----------------------------"
+      "PEVFDRIAERLRILAHPHRLRMVEMLLAGKYSVGELAESCSIPSHMASEHLRLMQHCGLLGSEKEGRYTYYR"
+      "I--------------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LSDQNRLRVLSLLDGNELTVKEMLEILQLSQSTLSSQLSQLKDSGLVQSRRDGQYVFYKLPRQYETQMVSNP"
+      "ID------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AELLRQLANTNRLLILCHIAAEERSVGQLEADLGIKQPALSQQLAELRQYGLVKTRRQSRSIYYSIAD----"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LSDETRMRILNLLEKGEMCVCEMEEILDISQSNASRHLTKLTNAEIINYNKVSKYVYYKI------------"
+      "--------";
+  seqs[counter++] =
+      "--------------------------------------------------LLYQLKDGERCVGELV-"
+      "VDGNKLSTVSARLQTLLNANLVKRRRDARHLYYRLADQHVVQLIDNALAHVDE--";
+  seqs[counter++] =
+      "--------------------------------"
+      "AEEVAELLRVMAHPERLMVLCQLTQSEMGVGQLQQGSTLSQSAFSQHLTVLRKHGIIQARKESQQVFYRLAD"
+      "SRI---------------";
+  seqs[counter++] =
+      "---------------------------------"
+      "REMAELLGVLSHPCRVQIVEELRDSERNVNALQELLGISHSGVSQHLALLRTRKLLKERRSGRHVYYRL---"
+      "-----------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FALLADPLRLRIVEALSREQLCTCHLVDITGARQTTISNHLRLLREAGVVASEPEGRYTWYRL---------"
+      "-----------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EILKALADETRIRILNLLYRETLCVCDLEEILKLSQSNASRHITKLKQAKLIAGEKQAQWIYYQV-------"
+      "-------------";
+  seqs[counter++] =
+      "---------------------------------"
+      "RNLVKFFAALADPTRLRLLNMMAGGEVCVCHFQGVLQTNQPKISRHLAYLKKAGLVEARRDGKWMHYRL---"
+      "-----------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALGDEKRLRILSLLRQGERCACVLLEHLNLSQPTLSHHMKILCEARLVTGRKEGKWVYYSL---------"
+      "-----------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "KLFKALAHPTRIQILNLLQEGELCVCEIYEALELSQSNISQHLKVLRDQNLVESQKVGVEVHYKIKN-----"
+      "-------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AEILSLLADRTRLALLRRLSLGEADVTTLTRACGVARPAVSQHLARLRLAGLVTTRKEGRRVVYALRHGHLR"
+      "RLIDEALN------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EIFKALSDKNRLLILDMISCGELCACDIMDVLNLTQPTISHHMKVLQKCELVDARKEGKWVFY---------"
+      "-------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EVFRMLADATRVQVLWSLADREMSVNELAEQVGKPAPSVSQHLAKLRMARLVRTRRDGTTIFYRLENEHVRQ"
+      "LVIDAVE------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKLLGNETRLNILLLLEKQPQTVSELVSALHLKQSNVSHQLAQLKHHQLIASTRRGKNLLYSLRDPHVITMI"
+      "ETTYEH-----";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALADENRIRILNLLKNGKLCVCDIEAVLGIKQSNTSRHLNKLKMAGIIVSEKKSQWVYYRLND-------"
+      "-----------";
+  seqs[counter++] =
+      "-------------------------------"
+      "VYQLISEIFKTLAHPLRIQILMMLSEKERCVCELLNEIGVEQSNLSQHLRILKKQGIIDSRKDGQKMFYRI-"
+      "-------------------";
+  seqs[counter++] =
+      "-----------------------"
+      "ELPEMSSEQLARLASLFRLLGDEGRLKLVMACIDAPQPVCCLSEISGMSQPLTSHHLRGLREARILKSSRRG"
+      "KQVLYELDDHHI---------------";
+  seqs[counter++] =
+      "------------------------------"
+      "DMAQEQVTILKALADPNRLAIIQHLTEGEACVCELLQLFSVTQPTLSHHMRILSDADLVKGRREGKWIHY--"
+      "--------------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DIFKALADENRIKIIKMLACCDMCVCDICGNLNLSQPAVSHHLKILSDSGLLNTTRKGKWIYYSL-------"
+      "-------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DLFKALSDPTRRKILELLKEKDMSAGEIAEYFDISKPSISHHLNILKNAKLVLWEKDGQNIIY---------"
+      "-------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "KIFKILGSETRLNILLLLEKKDMTVTDLFNELEVSQPAISKQLAILKEYKIISYDKKGVENIYKLNDLHILN"
+      "VINSTMGH-----";
+  seqs[counter++] =
+      "---------------------------"
+      "MAEQVFAQVASYFGLLADPTRLRILSCLCGEERPVHDVVERIGLTQANISRHLNILYRAGVVDRRREGSSVL"
+      "YKVVD------------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AECLKALASPVRLKILFTLKDKPMCVTDLEQELGISQSSLSQHLRTLRYKGIVAKTRKGNKVYY--------"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ATLFKALAEPIRLRILALLKDGELCVCDLTETLALPQSTVSRHLAVLRTAGWIRGRKGGSWTYYSL------"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ADLFKALADPMRLRILALLRTREACVCELAGLLPITQPAVSQHLRKLRQAGLIHERRHKYWTYY--------"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ADFFKALAHPLRIRILEVLSEGERNVNELQTALGSEGSAVSQQLAVLRAKNLVNSFKEGTTVVYSLRD----"
+      "--------------";
+  seqs[counter++] =
+      "-----------------------------"
+      "PDRAGRIAEVLKAVAHPLRLRIVASLCREELNVSALAERLGASQAIVSQQLRILRSLGLVA-----------"
+      "---------------------";
+  seqs[counter++] =
+      "-----------------------------------------------------"
+      "VLKRRALCVTELTSQLGISQSATSQHLRVLKDARIVKFQKRGLHVYYHL--------------------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LTNFLKIISDKNRLIILYLLSRNILCVCDIQKLIPLTQGALSIQLKNLMSAGLLESFKQGKWVFYKL-----"
+      "---------------";
+  seqs[counter++] =
+      "-----------------------"
+      "DMQMMMKDNANKASSLLKAISHESRLLILCLLLRREMTVGELAEYSSLSQSAFSQHLSVLRNNGLVKCRKEA"
+      "QNVYYSIND------------------";
+  seqs[counter++] =
+      "--------------------------------------"
+      "FFEAFSNKNRFEILMQLRNKELCAGELQQKLKIEQTNLSHDLKCLLNCRFISVRKDGR--------------"
+      "------------";
+  seqs[counter++] =
+      "-----------------------------------------"
+      "ILANEDRLLLLCQLSQGEKAVGELEDALGIHQPTLSQQLGVLRSDGLVNTRREGKRIFYSIADDKVLAL---"
+      "---------";
+  seqs[counter++] =
+      "-------------------------------------------"
+      "ADANRLRILACLKKGEVCVCDFTDFLNISQPAVSQHLRKLKEAGIITERKVGTWKHYRIQE-----------"
+      "-------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LSNIFKALNDPIRVKILFALLEYEICVGEMVNLLQIPQSHVSHQLRILRKYGIVEFTKDKKMSFYYIKNEYI"
+      "KTL------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FDMLSAPNRLHLVWLLATGEFDVSTLAELSGSNVPAASQHLAKLRAAGIVTARRDGRRQLYRVEDPHIVTVI"
+      "EQMFSHI----";
+  seqs[counter++] =
+      "--------------------"
+      "KAKEAQLLSMEILEQAAECLRTLAHPHRLRIVQILLDHEESVGELARACELPSHMVSEHLRLLKDRGFLESR"
+      "RDGRKVFY----------------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EIFKALGDENRIRILNLLIRQELCVCEIETVLDMTQSNASRHLNKLKTSGIITSEKKSQWVYYRV-------"
+      "-------------";
+  seqs[counter++] =
+      "------------------------------"
+      "EVEQYIDRFLDTVCDTRRRAIVELLAISEMRSGDIARAIGLSAATTSEHLRQLAQTGLLTSRRQGNTVYYSL"
+      "CNHKLVQAFRDLLEAL----";
+  seqs[counter++] =
+      "------------------------------"
+      "EMMEATARVLKLLGDPTRLTILAILQKRECCVCELMEVFSSSQPAISQHLRKLKDAGLLQEERRGQWVYYSL"
+      "--------------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AELLAVLGNERRLVILGHLTEGEISVGELAVLVGLSKSALSQHLSKLRKHQLVSTRRHRQTVYY--------"
+      "--------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "ELIRVLGDPLRLKIVTLLARETLCTSHLVEETGARQTNLSNHLRVLREAGVVETEPCGRFTYYKLRPDVIAA"
+      "L------------";
+  seqs[counter++] =
+      "------------------------"
+      "VSAFTEQFARKASDLLKAMSHETRLVILCLLSEKERSVGDIESILSMPQAAVSQQLARLRFDRLVKTRREGR"
+      "TVYYSLASEEVTSL------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ADLFKIMGDRSRLSMVAMMNRRECCVCDFTECFGMSQPAVSQHLKKLRAMGLIKERKEG-------------"
+      "--------------";
+  seqs[counter++] =
+      "--------------------------------"
+      "SQEAAKVMQLLSHPDRLLILCLLSEKEYSVGEIEKQLDIHQPMLSQHLNRLRQQSLVATRREGKYIYYQLCD"
+      "------------------";
+  seqs[counter++] =
+      "--------------------------------"
+      "ASAAAELLKLVANPNRLRILYLLTEGERSVSEIEQRLGIRQPTLSQQLGELRNAGTVTTRRAHKVVFYSL--"
+      "------------------";
+  seqs[counter++] =
+      "--------------------------------------"
+      "FFKALADDSRLKIVGILANQECSVEELAVLLQLKEPTVSHHLAKLKELNLVTMRPEGNSRLYQL--------"
+      "------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "ASILKALGHPIRLKILYLLSEKEHCVCELLSQINTSQPNLSQHLSILRNLKLIKDERNGNMVIYKLQDNKIV"
+      "--------------";
+  seqs[counter++] =
+      "-------------------------------------------------------------"
+      "VGELTEEVGVSQSLVSQHLRLLRAGRLLKQTRSGRNVFYALPDCHVRTMLTNMMDHVLE--";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LASSNRLELLEALAQGERSVDALAQATGMSVANTSHHLQILRDSGLAESRKEGLQVIYRLSDDQIPVL----"
+      "--------";
+  seqs[counter++] =
+      "---------------------------------"
+      "QKLIKFFHALSDETRLKIIKLLEKSELCVCEIVAALDMVQPKVSFHLGVLKEAGLVKIKRKGKWILYSLDD-"
+      "-----------------";
+  seqs[counter++] =
+      "--------------------------------"
+      "AEVASELMKILSNENRLMILCQLVDGEKSVGELVELLDLNQPTVSQQLSRMKNQGLVSYRKNAQTVYYSL--"
+      "------------------";
+  seqs[counter++] =
+      "-----------------------------------------"
+      "LLGDKTRLTILSYLKDQELCVCELVDLLDISQPAISQHLKKLRVAEIIRERKQGTWVYYSL-----------"
+      "---------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LADSTRLKILNLLSRQEMAVCELIEALDLSQPAVSHHLKLLKQACLITDSREGKWVLY--------------"
+      "--------";
+  seqs[counter++] =
+      "----------------------------------------------------------------"
+      "MATEVGMEQSACSHQLRLLRNLGLVVGTRKGRSVVYSLYDNHVAELLDQAIYHIPVC-";
+  seqs[counter++] =
+      "--------------------------------------"
+      "FLKVLGNPLRLQILKILSHVDMCVCAISEILGQQQTLVSHHLSKLKSARIVEERQNGKYRIYSIKDKRVKSL"
+      "------------";
+  seqs[counter++] =
+      "--------------------------------"
+      "AERLADRLRPLAQPQRLMILSLLLAGEHTVGEIETRTGIGQPALSQQLAELRRSGLVTTRRAARQVHYRIAD"
+      "------------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DFLKLLADETRLKIIMMLSQRDMCVCEIMDELAMSQPAVSHHLRILKKSGIVRDDKDGRWVFYSL-------"
+      "-------------";
+  seqs[counter++] =
+      "--------------------"
+      "KTRELELSIPGVSDTLAKFFRAIADPNRLLLLEFLVSCEHTGNECVAHVRLAQSRVSSHLQCLVNCGFVRVR"
+      "REGHFAYYRVVDERVIDL------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LADKNRLKIIQYLSTGQRNVSEVADRLNVEENLASHHLRVLASLGFLKNDKKGREVYYRINETRFVALLKDL"
+      "L-------";
+  seqs[counter++] =
+      "---------------------SHELAAAAPGI-"
+      "EAMAAVLALAGNEVRLKMLFLLLDQQLCVCDLADVLQMNVSAISQHLRKLKDGGVIQARKVGQTVFYSL---"
+      "-----------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LADPTRMRMLWLISGEEYDVASLAAAVDIARPAVSQHLAKLKLAGLVTQRRDGRRILYRARGGHVLAEVMNA"
+      "ADH-----";
+  seqs[counter++] =
+      "--------------------------------"
+      "AREVSRLLSVLANENRLLIVCLMMRSEMKVGELVDALHLSQSALSQHLTKLREEGLVEFRRESQTLHYKIAD"
+      "ERVTKL------------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "LTNIFKVLSDENRLRMIVLLYQEELCVCELSGILNVPQPRISQNLSRLRDLNLVDDERKEKFVFYSL-----"
+      "---------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AEILRILSHPERLLVLCQLMEGELGAGQLQNSSTLSQSAFSQHLTVLRKHNLVKVRKESQQVFYSLADERIA"
+      "ALIHN---------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "MGNPQRLRILLLLAEHERSVIELEALVGLSQSAVSQHLARLRQIKLVRFRRDGQMTFYAL------------"
+      "--------";
+  seqs[counter++] =
+      "-----------------------------PIYAQ-"
+      "LARVGKALASPIRLRLLDLLDGAELTVEELSEQAGVPLKNTSAQLQQLRAANLVATRKEGTRVHYRLAD---"
+      "---------------";
+  seqs[counter++] =
+      "---------------------------"
+      "MATDALDQVSHLFKLMGHPKRLQLLYLLIQQSMTVSQISERLKWEQSAVSHQLQVLRKYQIVERVKNGRQVV"
+      "YRLVD------------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LADSTRVQVLWALVDRELSVNDLAEHVGKPAPSVSQHLAKLRMARLVRTRKEGTQVIYRLENDHVRQLVTDA"
+      "VN------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AEFFKTLGHPVRIRVLELLSEREHAVSEMLNEVGVEAAHLSQQLAVLRRAGLVTARREGSAVHYTLAD----"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LADENRLRILRALVGTEKPVSKLVEELGISQPLVSHHLKELRRALLVSVERRGPFVYCRLAD----------"
+      "--------";
+  seqs[counter++] =
+      "--------------------------------"
+      "AEHVAEMLKLMAHPHRLMILCLLVESEHNVGELVEALDINQTALSNHLSKLRSAGLIDYTRYHRVLQYRL--"
+      "------------------";
+  seqs[counter++] =
+      "---------------------------"
+      "IVPVVFQGAADLFAALSCPTRLRIVCALSQADHTVRDLARASQCSQANVSGHLRLLRRANIVRCERSGNYVL"
+      "YHL--------------------";
+  seqs[counter++] =
+      "------------------------------"
+      "EVFEEVANYFSLLCEPTRLKILYAVCNGERSVGDIVAQVESTQANVSRQLAMLYRAKILARRKEGTLVFYRV"
+      "DD------------------";
+  seqs[counter++] =
+      "---------------------------------"
+      "RQLADVGGALSNPHRLKMISLLAQGDKPIDELAKLTNQSLAAASANVKVLRNCHLIATEKRGRSVYCSLKDP"
+      "RVAELW-----------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "ELLRALSAPIRLAIVSELAEGERCVHELVDKLGAPQPLVSQHLRVLRSAGVVRGSRRGREIAYTLVDEHVAH"
+      "IVTDAVSH-----";
+  seqs[counter++] =
+      "-------------------------------------------"
+      "AHPLRLKILCVLGEGEACVQDIVEAVGTSQSNISQHLAILRDKGVLQTRKDANRVYYRVGDQRTLQL-----"
+      "-------";
+  seqs[counter++] =
+      "-----------------------------------------"
+      "VAAEPTRRRLLQLLAPGERTVTQLASQFTVTRSAISQHLGMLAEAGLVTARKQGRERYYRL-----------"
+      "---------";
+  seqs[counter++] =
+      "-----------------------------------------"
+      "VAAEPTRRRLLQLLAPGERTVTQLASQFTVTRSAISQHLGMLAEAGLVTARKQGRERYYRL-----------"
+      "---------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "EMLKILSDTNRLRILNLLYIQELCVCELEYLLTISQSNLSKHLRLMGEIGFLDSRRQNKFIYYKI-------"
+      "-------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AESFRLLADPTRIKVLWALLQGESSVACLAELAGAAPTXXSXHXXKLRLAGLVTGRREGTFVYYSAVNNHVR"
+      "GLLAQALFH-----";
+  seqs[counter++] =
+      "--------------------------------AEATATLFA-"
+      "LANQNRLLLLCQLCNGEMSVSALEEALGIHQPTLSQQLGVLRSEGLIASRREGKRIYYSVANPKVLVLINTL"
+      "VD------";
+  seqs[counter++] =
+      "------------------------------"
+      "EILDAAGELLRALAAPVRIAIVLQLRESQRCVHELVDALHVPQPLVSQHLKILKAAGVVTGERSGREVLYRL"
+      "ADHHLAHIVLDAVAH-----";
+  seqs[counter++] =
+      "---------------------------------"
+      "QDLLKVFYALSDSVRLGIVSLLECEELCVCQITQAFGLSQPNASFHLRVLREANLVLWEKRGKWTYYKINHH"
+      "-----------------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALGEPSRLKIIKLLSQQSMCVCELSEVLDMSQPRVSQHLRTLKEVDLVYEERQGFWTYYKL---------"
+      "-----------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALSDQTRLRMVTLLSRREYCNCEFVSIFGISQPAISRHIARLKEARLIHERRPGQWIYYSL---------"
+      "-----------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FKALADSNRLRILDYLKKGKSCACDLSDNLGIPQTALSYHMRILCQAKLVKSEQVGKWKHYQLND-------"
+      "-----------";
+  seqs[counter++] =
+      "-----------------------ELEAKAEDAAQ----"
+      "FLKMIASPPRLLLLCHMAERECSVGELAERTGMRMPTVSQQLSLLRAQGLVNTRRDGTTIYYRL--------"
+      "------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "KIFSALSDKNRLRIYLLLTQAELCVCELVNILDMEQSRISHSLRILKEAKLINNHRVGK-------------"
+      "-------------";
+  seqs[counter++] =
+      "-----------------------------"
+      "PESLRSIASLLKALSDPLRLQVLEQLSTGERCVCDLTSSLALSQSRLSFHLKVMKEAGLLSDRQSGRWVYYR"
+      "IRPESLNAL------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AKLFRGFADPSRLAILEVLRSAPATVGEIAASTGQGLSNVSNHLRCLRDCGLVVRQRDGQRVRYSLSDQRVA"
+      "AL------------";
+  seqs[counter++] =
+      "--------------------------AMAGNVEQA-"
+      "EQLLKVLANKNRLMILCSLQDSEMSVSQLNEAVPLAQSALSQHLAALRKANIVATRRESQTIYYRVIDENAV"
+      "VL------------";
+  seqs[counter++] =
+      "-------------------------------------------"
+      "ADTLRVQVLSLLHKNSFSVGELVEILGVRQSALSHHLKVLAQAELVATRREGNSIFY---------------"
+      "-------";
+  seqs[counter++] =
+      "----------------------------"
+      "AAQVFERAAELFGLLSSPLRLRIVGELCRGELNVGQLQERIGATQSNMSQHLSVLYRAGVVARRRDGAQVHY"
+      "RI--------------------";
+  seqs[counter++] =
+      "----------------------------------"
+      "ALLRWLKALSDDTRLRLLHLLSRYELSVGEVVQVLGMSQPRVSRHLKILADAGMVQVRRDGLWAFYSATSH-"
+      "----------------";
+  seqs[counter++] =
+      "-----------------------"
+      "DMQDIAAQLQELHARVCKAIADPKRLLIINELRDRELSVGELCEATGLSQSNASQHLTILRERGIVTTRRVK"
+      "NNVFYSLRSQKIV----QAVDLLRE--";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FRALSDRTRLRILNLLRGGELCVCDLVDVLDVPQPTASRHLAYLRNAGLVLARKEGLWHYYRL---------"
+      "-----------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AAYFQALAEPTRLQILNFLRQQERNVGELAQLCGYSSANISRHLALLTQHGLVSRQARGNSAYYRIAD----"
+      "--------------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DMFKAMADPTRRRILQLLSEKNLSAGEIAEEFTMSKPAISKHLDILKTSELITCEKQGQYVIYAINTSAVEQ"
+      "MYCRFLD------";
+  seqs[counter++] =
+      "--------------------------------"
+      "AHEASDLLKALAHQTRLLILCILANEERTVGEIENILGIQQAMVSQQLARLRLEGLVHTRRQGRLVYYSIGN"
+      "VSVLAFLESLFD------";
+  seqs[counter++] =
+      "--------------------------------------------"
+      "DPLRLNVLRALANDSFGVLELAQIFGIGQSGMSHHLKVLAQADLVATRREGNAIFYRRALPHLNAVKDGALD"
+      "H-----";
+  seqs[counter++] =
+      "------------------------------"
+      "EMTPDIVSFLKTISEENRLKILCFLRDWEKCVCEIVEFLKIPQNLVSHHLRKLKDARILSARKDGMNVRYSI"
+      "NEDEI---------------";
+  seqs[counter++] =
+      "----------------------------"
+      "AEPVFDRLAQVLDLAGNANRLKIIYLLEESNLCVCDLSDILGMSIPAVSQHLRKLKDAQLIQARKVGQTVFY"
+      "SL--------------------";
+  seqs[counter++] =
+      "--------------------------------"
+      "ASAAARLMKLMANEQRLILMCRLGEGECSVGDLAAHVGLAQSAASQHLAKLRAEGVVATRRDGQTIYYRLED"
+      "------------------";
+  seqs[counter++] =
+      "------------------------------"
+      "ENATEVAGILKQLSNPYRLMILCCLSENELTVGDLNQRIDLSQSALSQHLAKLRESNIVTTRRESQTIFYRI"
+      "--------------------";
+  seqs[counter++] =
+      "-----------------------------------------"
+      "VLSNPDRLKILCVLIDGELNVQQIEKTAQVYQPTLSQQLTILRKSKMVSTRREGKQIFYQFSDMRILQIMQT"
+      "LYD------";
+  seqs[counter++] =
+      "---------------------------------------"
+      "FHSLSDATRLAIVLRLARGEARVADLVGELGLAQSTVSAHVACLRDCQLVAGRPEGRQIFYRLARRELIDLL"
+      "ASALE------";
+  seqs[counter++] =
+      "-----------------------------------"
+      "MAKFYRALGDPTRLDLLEFCAEDERTGNECVERAGLSQGRVSAHLACLVSCGLVSVRRQGRFAYYRVTDPRV"
+      "AEL------------";
+  seqs[counter++] =
+      "---------------------------"
+      "IETEISPELTNFIKVLSNPIRAGIIKMLKKRWMCVCLIAKALNQDQTLISHHLRTLKNMNLLHERREGK---"
+      "-----------------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AQVFKALGNPVRMALVQELLAGERCVCDLAQALGGNMPAVSKHLATLREAGIVSCRREGTTIHYSL------"
+      "--------------";
+  seqs[counter++] =
+      "------------------------------------"
+      "AKLMEMLSQPVRLRILCILLDGEQSVLKLADMAGLSQPAMSHHLRKLRDADLVNTRRDAQTIYYSLKGQEVS"
+      "AV------------";
+  seqs[counter++] =
+      "------------------------------------------"
+      "LGSSNRLMLVCQLLDGERAVGELAEALGLAQSVVSQHLSLLRRDGLVTGRRDGQSIYYAISDDRVHAL----"
+      "--------";
+  seqs[counter++] =
+      "----------------------------------------"
+      "AVLANINRLLLMCQLSQGEKCVGELEELLDLHQPTLSQQLGVLRGAGLVNTRRDGKKIHYSVADARVLTL--"
+      "----------";
+  seqs[counter++] =
+      "---------------------------------"
+      "QTLLGFFQALADANRLRIVGVLAQGPQTVEQISALLGLGMSTTSHHLRKLAKAGLVEARADGHYSVYSLRTQ"
+      "TLEELAKNLL-------";
+  seqs[counter++] =
+      "-------------------------------------"
+      "DLFKCIGNPTRYKILKVLCERPLCVNKLNEAVGYSQPNISQHLKLMRMSGIVTCSKNGMNICYQIADDDIIK"
+      "LLELAEDILKNRR";
 
-
-    std::cout << "Subustitution matrix:";
-    SubstitutionMatrix::print(subMat.subMatrix,subMat.num2aa,subMat.alphabetSize);
-    //   BaseMatrix::print(subMat.subMatrix, subMat.alphabetSize);
-    const char *seqs[1001];
-    int counter = 0;
-
-    seqs[counter++] = "QDELTAGPCATVHVITVQMAKSGELQAIAPEVAQSLAEFFAVLADPNRLRLLSLLARSELCVGDLAQAIGVSESAVSHQLRSLRNLRLVSYRKQGRHVYYQLQDHHIVALYQNALDHLQECR";
-    seqs[counter++] = "-----------------EIAPLAELQAIAPEVAQSLAEFFAVLADPNRLRLLSLLARSELCVGDLAQAIGVSESAVSHQLRSLRNLRLVSYRKQGRHVYYQLQDHHIVALYQNALDHLQECR";
-    seqs[counter++] = "---------------------AAELQAIAPEVAQSLAEFFAVLADPNRLRLLSLLARSELCVGDLAQAIGVSESAVSHQLRSLRNLRLVSYRK-----------------------------";
-    seqs[counter++] = "------------------------LQGLELEKAQKMAEFFSLLGDANRLRILSLLAKQELCVCDLADDLGMSESAVSHQLRTLRALRLVKYQKQGRRVFYRLADHHVLDLYYAVSEHLEE--";
-    seqs[counter++] = "---------------------SQEIQVLSSEKAQRMAEFFSFLGDANRLRILSLLAEKEFCVSDLAARLDMSESAVSHQLRNLRAMRLVNYRKQGRRVFYRLHDNHVLHLYQAVAEHLDE--";
-    seqs[counter++] = "-----------------------QVRQVQPEVAQQMAEFFSALADPSRLRLMSALARQELCVCDLAAAMKVSESAVSHQLRILRSQRLVKYRRVGRNVYYSLADNHVMNLYREVADHLQE--";
-    seqs[counter++] = "--------------------------------AQQMAEFFSALADPSRLRLMSALARQELCVCDLAAAMKVSESAVSHQLRILRSQRLVKYRRVGRNVYYSLADNHVMNLYREVADHLQE--";
-    seqs[counter++] = "-------------------------EVLSTEKSQRMAEFFSFLGDANRLRILSFLATKELCVSDIATLLEMSESAVSHQLRNLRAMRLVSYRKQGRHVFYRLHDNHILELYQAVAEHLDE--";
-    seqs[counter++] = "------------------------------EKAQRMAQFFGLLADTNRLRIVDLLAQGEFCVRDIAVALEMSESAVSHQLRMLKALRLVRFRRQGRHIFYQLLDHHVLTLYKAAAEHLDE--";
-    seqs[counter++] = "-----------------------QTQVLNSQKAQRMAEFFSLLGDANRLRLLSVLAAQELCVCDLAATLEMSESAVSHQLRALRALRLVSYRKQGRQVFYSLLDRHVLELYRAVAEHLDE--";
-    seqs[counter++] = "--------------------------------AQQMAEFFAVLADPNRLRLISALASQELCVCDLAALMKMTESAVSHQLRLLKAMRLVSYRREGRNIYYSLADNHVISLYREVAVHLDE--";
-    seqs[counter++] = "---------------------------------------FAALGDPTRFRIIAALQVQELCVGDLAAAIGLSQSAVSHQLRALRDLGLVRSRREGRLVYYALDDEHVVTLVAQALDHVREER";
-    seqs[counter++] = "-------------------------------VTRQMAEFFKSLSDPTRLRIVQALLEEELCVCDISAIVDISISAISHQLRLLRSMHIVKFRKQGKMVYYSLEDEHISRMLEIALEHLNE--";
-    seqs[counter++] = "------------------------------DITNRLAETFKVLGDPTRLKILLAVSLDELCVCDIASLLGTTKSAVSHQLRLLRSLRVVKYRKDGRIVYYSLDDSHVGNLLSEGLDHI----";
-    seqs[counter++] = "-----------------------------------MAETFKILADPTRVKILHALAHKELCVCDIAVTLDMKVSAVSHQLRLLKSARLVKQRREGKNVYYQLDDHHVEQLFEKTLEHIKQ--";
-    seqs[counter++] = "--------------------------------AGRLADLFKALADPTRVRIIAALLHTELCVDDLANLLDMSQSAISHQLRLLRNLHLVQFRRSGKHAFYRLVDDHVRDLFQRSREHL----";
-    seqs[counter++] = "------------------------------ELLYELAELFKIFGDSSRIRILSLLQKERLCVSEISTLLNLSQSAISHQLRILRQARLVRYKKIGKEVFYELDDDHIEKIFEQGLEHIQE--";
-    seqs[counter++] = "--------------------------------ATRLAAAFQALSDPTRVRLISALLEQELCVHDLAAVLGMSQSATSHQLRVLRALGLVRTRKEGRIVYYALDDEHIRELFQRGLEHI----";
-    seqs[counter++] = "---------------------------------EEMASFFRMMGDPTRIRILSLLFDEELCVHTLAERLEMTHSAVSHQLALLKHARLVRSRREGRHVYYRLADEHVQKVYELAREHLEE--";
-    seqs[counter++] = "-DEFKKGSDLNCHVMNIQDCKEVELKSVTEETIFDLSEFFKVFSDSTRIKILSSLLVSEMCVCDLAAVLGTSQSAISHQLRLLKVFRLVKSRKAGKVVYYSLSDDHVKSIIELGLAHLSE--";
-    seqs[counter++] = "------------------------------ELIFNLADFFKTFGDSTRIKIICALMETELCVCDLANVINTSQSAVSHQLRVLRQSRLVKYRKDGKTVYYSLDDDHIKLLISQGLDHL----";
-    seqs[counter++] = "-----------------------------------MAEVFKALNDPTRLKIINILIVSELCVNDIANLLEISQPAISHHLKELRQLKLIKYHKKGRSVFYSLDDEHIHPLFQQCLEHVNE--";
-    seqs[counter++] = "-----------------------------------LAELFKILGDPTRLKIVELLLENEMCVNHIAETMGMGQSAISHQLRVLRQARLVTYRKDGKTAYYSLNDNHVECLVRMGMEHV----";
-    seqs[counter++] = "---------------------------------EDLALLFKMFADPTRLKVLKALFEREMCVGDLAVLLKMTHSAVSHQLASLKKTRLVRSRKDGKVVYYSLDDDHIEEIFQKALDHVRE--";
-    seqs[counter++] = "-------------------------------------------ADQTRLRILCLLRDREVCVHDIVEALDMSQSAISHQLRVLRDARLVSHRREGRHVYYRLADDHVREMLENALSH-----";
-    seqs[counter++] = "-----------------------------------LSMLFKMFADPTRLRIFTILSHQTVCVDDLAEILGMTQSAVSHQLASLRKMNLVRSSKVGKNAYYQLADSHVMQIFSQALDHVKE--";
-    seqs[counter++] = "-------PCAEVTALHLRL--SPATRAVDKGALQRAAAIFRALGDPARLHLLALLAAGEQCVSQLATETGDSLPAISQRLKLLRSERLVSQRRDGKHIYYQLADQHVVQLIEAGIDHAVESR";
-    seqs[counter++] = "-----------------------------------LSEVYKSLGDGTRLKILLALKEKESCVCDLAAALSMSQSAISHQLRVLRNVRLVKYRREGKMVYYSLDDEHILKILQEGLNHI----";
-    seqs[counter++] = "------------------------------EEVQKLSAIYKALGDPTRFKILFCLKQEEMCVCDISAILDMSQSAISHQLRVLRNLRIVKYRKEGKMVFYSLDDKHIFRILDEGINHIRE--";
-    seqs[counter++] = "------------------------------ETMDAIAELFKGFADSTRVHILALLSRQELCVTDIAETVDVSQSAISHQLRILKQMHLIKFRREGKNILYSLADDHVKTILQMGLEHVLE--";
-    seqs[counter++] = "-------------------------------------ELLKAVGDPTRMRILCALADRELCVCDLQAVLGLSQSAVSHQLRTLRNARLVTYRREGKMAYYTLADDHVRRLLDLSLEHV----";
-    seqs[counter++] = "-------------------------EAKADQIASPLANFFKTLSDPTRLRIILAIGTTSLSVNEISTIINMSQSSVSHQLRILRDNHLVISQRFGQHIHYQLTDQHVLTILENSLDHISE--";
-    seqs[counter++] = "-----------------------------------LAATFRLLGDRTRVRILEALAGDELCVCDLAAVVGHSQSAVSHQLRLLRAAKLVRVRRDGKNAFYSLDDDHVRHLFRQALDHVQE--";
-    seqs[counter++] = "-----------------------------------MAQLFKILGDPTRVRILQALSISEMCVCDIAALLEMTQSAISHQLRLLKQGRLVKYRRDGKVVYYSLNDNHVRLIFDQALSHITE--";
-    seqs[counter++] = "--------------------------ALTEKTAKELSELFKVVSDPTRIKILWAIGGGEVCVCCISELLGMSVSAVSHQLKTLRQAHLVKARREGRNIYYSLDDHHVKILLDVLLEHMEE--";
-    seqs[counter++] = "---------------------------------ENLGEFFKVLTDASRLKILYALGAGELCVFDLSVTIGASVSSVSHHLAALKRVRLVKGRRDGRIIYYSLDDDHVKSIIRYAREHLEE--";
-    seqs[counter++] = "---------------------------------QKLSNMFKLFSDETRLKIICSLLKEELCVCDLCELLGLNQSQVSHQLQLLRNSKLVKFRREGKQIFYSLDDEHVELIIQMALDHILE--";
-    seqs[counter++] = "-----------------------------------LSETFGALADSNRAKILHSLLNQELCVCDIACVVGISESAISQHLRILRTLRLVKQRKQGRMMYYSLNDNHIRQLLEICLEH-----";
-    seqs[counter++] = "-----------------------------------LAQLFAAFGDPTRLRILTALRSGDLCVCDLTAVLGMTASAVSHQLRLLRNLRLVRSRKVGRVVYYHLDDEHVLNL------------";
-    seqs[counter++] = "------------------------------EILGDLSDFFKVIGDGTRIRILWALDVSEMCVCDIANVLNMTKSAVSHQLRALRDADLVKFRKSGKEVLYSLSDNHVKEIFEQGLIHIQE--";
-    seqs[counter++] = "-----------------------------------LADLFKMFADSTRLKILCILCESEMCVNDIANLISMSQSAVSHQLRILKQSKLIRGRREGKIVFYSLADSHINTIINNGLEHIQE--";
-    seqs[counter++] = "--------------------QSQEREVLAAPLAWRVADIFKALGDPTRVKIIALLDAGEMCVGEMCLTLGMSQPAISSQLRLLRTLGIVSVRREGKHAYYRLADEHVRHLFHQGLAH-----";
-    seqs[counter++] = "------------------------------EYIQELSAFFKVFGEENRTRILYALSIREMCVNDLVTLLGMSQSSVSHQLQILRAHGQVKFRKEGRNVFYSLDDKHVVDVFQEALQHI----";
-    seqs[counter++] = "------------------------------KVIYELSEFFKILSDQTRLKILVLLFEKEQNVSELQRQIGVTQSNISHQLRILRQANLVRYRKIGRNVYYRLYDEHVEIIIKYAMEHLKE--";
-    seqs[counter++] = "------------------------------EVMFDLSEFFKVFSDSTRIKILSSLLVSEMCVCDLAAVLNTSQSAISHQLRLLKAFRLVKSRKVGKVVYYSLSDDHVKSIIELGLTHLSE--";
-    seqs[counter++] = "-----------------------------------LAELFKIFGDATRIRILCALSEGEICVSDLAETLSMTQPAISHQLRILKNTRLVKARRDGKQIYYSLADAHVSSIIGTALEHVEE--";
-    seqs[counter++] = "------------------------------ETLYDLADLFKVLGDSTRIKILCTLFEAEMCVCDIAAVLGMTQSAISHQLRVLKQARLVKYKRSGKVVYYSLDDEHVKHIFDQGLIHISENR";
-    seqs[counter++] = "-----------------------------------LSDFYKVFGDPTRLKILFALESRELCVCDLAQILQMTKSAVSHQLKILRQTELVNFKKLGRSVFYRLSDAHIQGILDQGADHINE--";
-    seqs[counter++] = "------------------------------ECVMDLADFFSIFSDSTRIRILWVLYGRELCVRDISDTLGISMSACSHQLKTLRNSGAVEARRDGKMIYYKLADEHVEILLRTGLEHIQE--";
-    seqs[counter++] = "-----------------------------------LADMYKALGDPSRLRIVMALSQGEMCVCDLAAYLEISESAVSHQLRRLRSLALVKNRRDGKILYYSLDDDHVSSLVALGLEHVRE--";
-    seqs[counter++] = "-------------------------------------DLFKTLGDPSRLRIIEVLSQEELSVDDLANQVGLTQSAASHQLRRLKLDRVVKYRKEGKFIYYSLADQHLLYLFNIARDHVQE--";
-    seqs[counter++] = "-----------------------------PDQIESLSNFYKIMGDPTRLMLLMALEAGELCASDLANVTNMSRSAVSHQLKTLKQACLVRSRRDGKTIFYELDDEHIYSVLKVAFEHIQE--";
-    seqs[counter++] = "-----------------------------------LSDFFKVLGDSTRARIISALDINEMCVCDLAVLLNMTKSAISHQLRSLKEANLVKFRKEGKVVFYSLTDDHVKDIFEKGLEHIRE--";
-    seqs[counter++] = "-----------------------------------LSEFFKVFSDSTRVKILSALLISEMCVCDLAALLQVTQSAISHQLRLLKAFRLVKSRKEGKVVYYSLNDDHVKSILELGLLHLSEAK";
-    seqs[counter++] = "-----------------------------PDIIDDLSELFKILGDQTRSKILFVLEQGEFCVSDISEAVGMTKYAVSHQLRTLKQAKLVKCRREGKEVIYSLDDDHVSTLFSCALAHVTE--";
-    seqs[counter++] = "------------------------------------AELFKVFADSTRVKIINVLLENKLCVGDIAALVGGTQSAISHQLRILKSAKLVKYTKIGKTVYYELSDDHVKKLFSVGKEHINE--";
-    seqs[counter++] = "------------------------------ETMSDLAAIFKLMGEPVRITILHALSIRDLCVCDLAELLGMSHSAVSHQLRLLRTARMVRFEKQGRKAIYSLNDRHVETIMQTALAHMQ---";
-    seqs[counter++] = "---------------------------------QELANNFKVLGDPTRLRILQALMHGERCVRELADGIQMEQSAVSHQLRTLRDAGLVNFRRDGKVVYYSLADAHVFTLLSVGIEHVAE--";
-    seqs[counter++] = "-----------------------------------LSELFKILGDYTRIKIIYSLSKKELCVCDISEVVQMSQSAISHQLRILKAARLVKFRREGKSVYYSLDDEHIDRLFNAGLEHVE---";
-    seqs[counter++] = "------------------------------EIINELSEFFKVFSDTTRLRILEVLLNEETSVGVIANKINVSNSAVSHQLSYLRSTNLVKTRKEGQVIYYSIADNHIKVIIEYGLEHIKELK";
-    seqs[counter++] = "-----------------------------------MSNFFKAISDPTRLRILQAVRQKTICVGDLAIALQMTKSAISHQLRYLRDCQLVKGEKKGKMTYYELADDHVAAVLSLTLKHLKE--";
-    seqs[counter++] = "------------------------------DVVASLSELFKALGDPTRVKILSCLQISDMNVGDIADKLGMTTSAVSHQLRVLRAIKLVKGTKEGKEVRYSLDDDHVTLIMQCGLTHVNE--";
-    seqs[counter++] = "-----------------------------------LAELFKVLGDYTRIKIIYALLKKELCVCDIAELLDMSQSSISHQLRTLKAARLVKFRKEGKVVYYSLDDEHIEHILNASLEHVE---";
-    seqs[counter++] = "----------------------------------SIADFFAVFGDRTRIKILLALDQSPMCVCDLAVLLDMTKSVISHQLSSLKKINLVSSHKEGKHSYYALADDHIKKIIEMAVEHLEE--";
-    seqs[counter++] = "------------------------VKSIDADTAQHLADLFKTLGDPTRIKILSLLTKTEMRVYDIADSLTMGQSAISHQLRVLRSARLVKFRRDGKEVLYSIDDDHVMKLLGQGLEHVQ---";
-    seqs[counter++] = "---------------------------------KDLADTFKLLSDFTRVKILYVLSLSELCVQDISELTGVSQSAVSHQLRILRNSRLVSWKKTGKQVFYSLNSDAVRALIEKGMEHV----";
-    seqs[counter++] = "-----------------------------------LAELFKVFGDTTRVKILFALFTAEMCVCDLTALLGLTQSAVSHQLRVLKQARLVKYRKDGKMVYYSLDDDHVKQIFDQGLAHI----";
-    seqs[counter++] = "--------------------KSNE-QMLAPDDVDVTAEFFKALADPTRINIVNALQIHELCVTDLAEILGMTKSAVSHQLCYLRLNNLVMVKREGQRVYYALCDEHVEKVFEMAISHIKE--";
-    seqs[counter++] = "------------------------------------ADIFRALGDPSRLRMLSLLIHDELCVTEIAEALGDNLSAVSQRLKLLKSERIVGARREGKHIFYRLSDHHV---------------";
-    seqs[counter++] = "------------------------------DIVAKLSDFIKVLGDGTRIKIIWILEENEMCVNDLAVALNMSQSAVSHQLKTLKTANVVKSKREGKNIFYSLSDDHVKDIFLKTLEHIQE--";
-    seqs[counter++] = "------------------------------ETMSDLSDFFKNFGDSTRIKIVSALISGELCVADIAEVLEMSVSAISHQLRILRQAKIVRARRNGKQMYYSIDDEHVAILYSLGLEHIRE--";
-    seqs[counter++] = "------------------------------ETFNSLSDNFKVLSDPTRLKILYALMLKEICVCDLAAVLEMTDSAVSHQLRLLRNRNLVKFRKKGKMAYYSISDHKIV--------------";
-    seqs[counter++] = "------------------------------------AELFKMFGDPTRLKLLAALLGQEVCVCDLSDLLGISQSAVSHQLRLLRASHLVKNRREGKSVFYSLDDEHVATILAQGMEHV----";
-    seqs[counter++] = "-----------------------------------LSETFKIFGNPTRLKILSLLSVEDLCVCDICEILNMSQSAVSHQLRTLRSKNLVKYTKEGKQARYSLADKHVVQILKIGIEHVLE--";
-    seqs[counter++] = "-------------------------------------DIFKILGDPSRMRIVAALRIKELCVGDISALMEISLSGVSHQLRLLKKSRIIKSRREGKLIYYSLDDDHIESLIDIALDHVRD--";
-    seqs[counter++] = "---------------------------LSPQIVEEASRILKAISDPTRMKILYLLFQEECSVGHMVEVLGVSQSAISHQLTHLRHLRLVKYRREGNTYFYTYDDEHVVGILHQVIQHVE---";
-    seqs[counter++] = "-----------------------------------LAELYKVFGDSTRIRILYALLESEMCVGDMAQLLGLTPTACSHQLRVLKNSKLVRFRREGKIMFYSLADDHVRSILALGMEHILE--";
-    seqs[counter++] = "------------------------LRPVAEEAAK-LAPIFKALSDETRVKIIYALAQAELCVCDIAELTGCTLPAVSHHLRILRNIGLAKSRKEGKFIYYNIDDHHVSQIINAAFAHLRE--";
-    seqs[counter++] = "----------------------------------ALSELFKILADPSRLRILHALQSPERCVCDLAALLDMSQSALSHQLAILRRARLVRPVKIGKIVYYQLDDHHVDALIALAMEHVSE--";
-    seqs[counter++] = "----------------------------APEGTRRVAEVFGVLSDPTRARIVCALSIEELCVCDVAAVAGLSVSAASHQLKRLRDRGVVDYRKEGRLAFYRLVDDHVRSLMEEGVE------";
-    seqs[counter++] = "-----------------------------------LAELFKVFGDPTRIRILWTLNEAEMCVCDIAVLLNMTQSAISHQLRVLKQANLVKNRKEGKAVYYSLVDDHVREIFDQGLIHINE--";
-    seqs[counter++] = "----------------------------------AVAELFKALGDGSRMSILNALLCSELCVCDLTMILKMTQSAVSHQLRVLRGAKIVKSRKEGKNVYYSLDDPHIAMLIETGFEHVRE--";
-    seqs[counter++] = "-----------------------------------LEELFKVMGSQTRLRIIALMEANELCVEHLADTVNISVSAISHQLKGLRQLRLVKTRKQAQSVYYSLDDEHIALLFNTARTHLSE--";
-    seqs[counter++] = "------------------------------QVIEELAQFFKAVADASRLKLLLYLMKQEANVNELAEATGLTLSGVSQQLKLLKLMKLVKSSKQGKYVYYSLDDHHVKHIINDSLIHLSE--";
-    seqs[counter++] = "-----------------------------------LADLFNIFGDTTRIKILHVLSKSEMCVCDISSLINMNRSSVSHQLKTLRQAKLVKYRKEGTIVYYSLSNDHVKQVFNQGLIHLIE--";
-    seqs[counter++] = "------------------------------EVVQTLSTYFKALADDNRLKIIHALSREELCVRDVADIIGTTMQVASHHLRVLRDIGLVKNRKEGKHVFYSLKDRKTAEFVQNVIEDLED--";
-    seqs[counter++] = "---------------------------------ERLAGVFRTFGDGTRLRILFALLRKEMCVNDLAQNLGMTVSAVSHQLRILRQGELVRTRREGKTVYYAIADHHVSLIIRSGAEHVLE--";
-    seqs[counter++] = "-------------------------------------KLFKIYSDFTRLRIIDLLIEKEHCVQDIADSLDASQSAISHQLKLLRDLHVVKTRKQGKQVFYSLQDNHIKEIFLIGYSHATEC-";
-    seqs[counter++] = "---------------------------------QKLSKLFKVLSDETRIKILYTISKHEVCVNDIANVLNLSQSAISHQLKTLKDANLIKSRREKQTIYYTLVDDHVHLIYNQALSHIKE--";
-    seqs[counter++] = "------------------------------EAIQEVSKIFKMISDPTRLSILFLLQKEELSVGAIAQSLSMEQSAISHQLKTLRTSRLVKSKRAGKNMIYSLDDLHVFSILEQVLTHIEE--";
-    seqs[counter++] = "---------------------------------------FSMFADGTRLKIMSALFVSEMCVGDLAILLNMSTSAISHQLASLKKTKLVRMRKEGKNVFYSMDDEHIEKIFQVTYLHVKE--";
-    seqs[counter++] = "------------------------------------AALLGVISDPTRLKIMDALRLGELCVCDLAAVLSMSVSAISHQLRLLRTARLVRGRRAGKVIFYTIHDGHVEKLIDMALDHCRQC-";
-    seqs[counter++] = "------------HTVTLEILVQGELRESIPEERQNVADIFSLLGDPARLRILIALSVRRLRVCDLVKVVGASESSVSHALRILRAHRVVDVIRRGREAHYALADSHVRALLELAIDHV----";
-    seqs[counter++] = "-------------------------------------DFFDALGNPTRLKILALMEAGELCTCDLSAITKLSVSAISHQLRILKDRKIVTYRKDGKNVFYRLDDEHIREILRTALNHLSEVR";
-    seqs[counter++] = "------------------------------------AEFFKVLGDPTRIKIVSLFENGELCVNDIVDVVDVSRTAVSHQLRILKDKRIISFRKEGQMKFYHLDDAHVEVIVLLTITHLQ---";
-    seqs[counter++] = "---------------------------------EQLAELHKAMGDYTRIRILWYLMQKEYCVSDLAQKMEITESAISHQLRALRIARLVQSHKAGKNVIYSLQDEHIRWILEKTYDHISE--";
-    seqs[counter++] = "---------------------------ISKELIGSAAAFFKVLGDETRMKILCTIADSEVCVNDIAEAVDMTKSAVSHQLKLLKDDDLVKSRREGKNIFYSLDDQHVMDILDIAFVHI----";
-    seqs[counter++] = "-----------------------------------LCDIFKVLSDPTRMRIILTLVDSEMCVCDIAGAVECSQSNVSHQLRLMRQSGIVKFRKDGKSVYYSLDDDHVKTIIVQAVNHI----";
-    seqs[counter++] = "------------------------------QAAVQFADWFKAFSDPTRVKIISALLKRELCVHDLTVLLEMGQSAVSHQLRYLRNLRIVKRRKVGKTVYYSLDDTHI---------------";
-    seqs[counter++] = "------------------------------EILFDLADLFKVFGDSTRIRIMNVLFSGPTSVGEIAEVLDMSQSAISHQLKSLKDNNLVSSKRSGRSMYYELADDHVKTIFMTGLEHIKE--";
-    seqs[counter++] = "-------------------------QQIEKNIIDSTSEFFKILADNTRLHIINLLLDREMFVNDIANALNMTNSSISHQLKKMKDNDVVKSRKDGKEVYYSLNDDHVKSIFLTTIDHI----";
-    seqs[counter++] = "----------------------------AEEILYDVAELFKVFGDSTRIRIICALFESEMCVYDLAACLDMTQSAISHQLRILKQANLVKFRRDGKLMYYSLDDEHVKQIFDAGYKHIE---";
-    seqs[counter++] = "----------------------------------SITQIFKAMADPTRVQILYLLSDKEYSVGEIARSLGFNQTTVSHQLRFLKNLRLVKSRREGTSIYYTQDDKHVLELLKQTIRHVE---";
-    seqs[counter++] = "-------------------------------------QIFKALSDPNRVKIAYYLQHQELCVCDIADLLDVSVATASHHLRQLKALHIAKSRKEGKNVYYSLSDHHIQTLVAMTLEHQKEMR";
-    seqs[counter++] = "------------------------------ETLYDVAELFKAFADTTRIKIIAILKEETLCVGAISEILNISQSAISHQLKALKNAKIVKSKREGKWIYYSLDDEHIKRIFDMGFEHI----";
-    seqs[counter++] = "---------------TVEQETSTEHKNLPPEKVMPLADFFKVFGDSTRLKIIGILRHTSLSVCCIADCLGMEQSAISHQLKVLRNNHIVKVEKKGKQSFYSLDDLHVELLYQMGLEHIME--";
-    seqs[counter++] = "---------------------------VTPEEATQLADLFRLLGDPTRAQLLALLEAGELCVCDLTETVEVSDTAVSHALRLLRTAGIVASRRAGRMIYYRLADVHVRMLLDLSREHL----";
-    seqs[counter++] = "-----------------------------PAAAGKVAETLQALASPNRLRILTRLRQSPCSVTELSAAVGMEQPAVSHQLRLLRNLGLVAGDRSGRNIVYRLYDSHVASLLDEAVYHIE---";
-    seqs[counter++] = "---------------------------IQAETLSAAAEIFKALGDVTRLRILDVLERREMKVQEIAAALGMTQSAISHQLGTLRTLRIVKARREGRSTFYSIDDGHVKQLFDLCVEHV----";
-    seqs[counter++] = "---------------------------IAKEVS-GLSDLFKVIADETRTKIVFLLSETELCTCDLAEILRLSLPTISHHLKQLKSYRLVKSRREGKSVFYSLEDFHVVELIKLAKEHFQE--";
-    seqs[counter++] = "-----------------------------------LAEVFRLMADPGRIRILALLEAGEVCVHDLASVSGLSESSVSQALRLMRAQRVVAGRRAGRHVFYRLDDSHVRMLLDLAITHV----";
-    seqs[counter++] = "------------------------------EVLYDLAELFKVFGDSTRIRILYVLFETEMCVYDLSKILNVTQSAISHQLRVLKQNKLVKFRREGKNIFYSLADEH----------------";
-    seqs[counter++] = "------------------------------KVLNHLSGIFKVLADPTRLRIIYTLSMGELCVTDISETLEMTQSSISHQLAILKSRDLIKVRKVGRKSYYSLDDDHVLSLFEGGYEH-----";
-    seqs[counter++] = "-------------------------------------QLFKLLGDNTRLNIITLLTRKELCVEDLMKCTGMEQSAISHQLKKLRAHHIVKAEKVGKHVWYSLEDHHVLQLYNLADEH-----";
-    seqs[counter++] = "--------------------------------------FFKVLADDTRIRILYALKEQEMCAGDIAVFLDMTKSAVSHQLAVMRKMHQVRARREGKNVFYSLDDQHIVDIMEEALIHM----";
-    seqs[counter++] = "-----------------------------------MSEFFHMFDDPTRLKIIGALIISEMCVCDIAAVTGMSQSVISHHLKILRQERVIQFRRQGKMAYYSLCDDHIGGIFYQGRIHVQEER";
-    seqs[counter++] = "---------------------------------------FKALSDPTRIRILNLLCADEHSVNDIAEILDLGQSTVSHQLRFLKNLRLVKFRREGTTLFYSKDDDHIMNLLKQAIEH-----";
-    seqs[counter++] = "------------------------MQVLSPEQVGDVAEVFRLLGEPNRLRIVLACLETERTVGEIGEALGLSQSLTSHHLRLLRTARILRAIRHGRHVAYAIDDDHVRDVLRNMVAHLTE--";
-    seqs[counter++] = "------------------------------------ADVFGLLGDPRRLKLLVALLEGELCVCDLAAVTGMSESATSHALRLLRAHRVVSVRRDGRMAYYRLDDAHV---------------";
-    seqs[counter++] = "------------------------------ETVYNMATLFSTFSDSTRLKILLCLSRAKLCSCDISAAVNISKSATSHQMRILKMTKLVKAERKGKQIFYSLSDEHVSILLQAALEHVKE--";
-    seqs[counter++] = "---------------------------------------FQALGDSTRLQILYALMHHTLCVRDLAILVGVSESAVSHQLRLLRDRRLVRQRRSGNIIYYSLDDEHLAVLFREA--------";
-    seqs[counter++] = "------------------------------DVFEEMSGFYKLFSDRTRLKILWALRNGPLCVCDLCAVVGMSQPAVSQQLQKLRNGRIVKSRREGKVVYYSLDDEHIEAALDMAMEHVEE--";
-    seqs[counter++] = "-----------------------------PEALNQAAEMFRAMGDPERLRLLTMLQGGERCVGEL---VGENDSTVSARLQSLHRARLLHRRREARHIFYRLADEHVAELLNNALEHASE--";
-    seqs[counter++] = "------------------------------------------LATPSRLYILARLQEGPCSVGDLAEAVGMEASACSHQLRLLRNLGLVTGERQGRSIVYALYDHHVAELLDQALFHVE---";
-    seqs[counter++] = "------------------------------------AQTFKALSDPTRIRILHLLSQGEHAVNGIAEKLNLLQSTVSHQLRFLKNLRLVKSRREGTSIYYSPEDEHVLDVLQQMIHHTQD--";
-    seqs[counter++] = "-----------------------------------LAVIFGLLSDPGRVRILIALLEGEMCVCDLAATTGLSESGVSHALRLLRGPRVVQVRRSGRMAYYSLADSHVRMLLDLGLTHV----";
-    seqs[counter++] = "--------------------------------AAKLAPLFKALSDETRVKIIYALAQQELCVCDIAELTGCTLPAVSHHLRLLRTMGLARCRKEGKFIYYTIDDHHVWQIINAAFEHMKE--";
-    seqs[counter++] = "----------------------------AEHLVSAAAALFKVIGHPTRVRILLALAAEELCVCDLAQVLDATVSATSHQLRNMRAMGLVYFRTEGKLAYYRASDPVMVSLLQQGVEH-----";
-    seqs[counter++] = "-----------------------------------LASLFKLFGDGTRVQILHALEQSEMCVCDLAVLLGVTKSAISHQLKALRLANLVKFRKEAQIVYYSLADDHVKEIIDKGFEHL----";
-    seqs[counter++] = "---------------------------------KQVSQLYKVLSDPTRLRILLLLKEGEHNVTAISEQLGMEQSAVSHQLKLLRDSRVVKARREGKTIFYTLDDHHVIDILNQTFEHIE---";
-    seqs[counter++] = "-----------------------------------MADLFKIFGDSTRIRILWALHESEMCVRGISKSLDLSMSAVSHQLKALKDADLVQSRRDGKNIYYSLCDEHVEILLNTALTHLKE--";
-    seqs[counter++] = "----------------------------AEPVTEGLSTFFKALADDTRLKVIHALSQDELCVCDVANILGSTVQAASHHLRVLRNIGLAKYRKEGKRVFYSIRDRKTAGFIQKVIEDLKK--";
-    seqs[counter++] = "------------------------------EMIEHLSEFFSMFSNPTRLRILLLLSKKEMCVGKIAEILRMDQSAVSAQLKVLRHLNLVKAKRHGRYMRYKLNNKHV---------------";
-    seqs[counter++] = "------------------------------------ADIFKALADETRLKIFALTQENELCVCDVANIIGTSNATASHHLRHLRNLRIAKSRKEGKLVFYSLDDPHVITLVTMAMAHGQE--";
-    seqs[counter++] = "-----------------------------------LAELFKVFGDSTRIRILFVLFEAEVCVCDLAEALHMTQPAISHQLKILKQAKLVRSRREGKSVFYSLADGHVRTIIAQGREHIEE--";
-    seqs[counter++] = "-----------------------------------LADVFSVLGDPGRLRLLYALRDGEVSVGALSTLTGQSDSAVSHALQLLRAHRIVRVRREGRRAYYRLDDPHVQMLLEVARSH-----";
-    seqs[counter++] = "---------------------------------QQIAQIMRLFGDPARLRLLVLLEVDEMCVGDLAQLAQMNESATSHALRLLRAHHVVAVRREGRMAYYRIIDTHVKASLQLTLDHV----";
-    seqs[counter++] = "-----------------------------------MAETFRALADSTRVKIVGCLLEQELCTADLAAILNYSESAVSQHLRVLRQLRLVKQRREGKLVFYSLDDDHVRVLVLVCLNHI----";
-    seqs[counter++] = "---------------------------------------FKALGDPTRARIIYALAVSKLSVGELATGLALTQSNVSHQLTVLKQLKLVVGTRNGRNVHYQLADKHIISIFQQVAAHAEE--";
-    seqs[counter++] = "-----------------------------------LADVFGLLGEPNRVRLLIALLNGPMCVRDLAATIEMSESAVSHALRLLRAHRVVDVHRKGRVASYELADLHVLTLLKLGLEHV----";
-    seqs[counter++] = "---------------------------------QKVSNLFKVIADPTRIDILYTLKDSRLSVSEIKDKLNMSQSAISHQLRVLKDVNLVKDERVGKNIFYSLSDNHVYDIFNQAIDHVRE--";
-    seqs[counter++] = "----------------------------------SIAQIFKTLSDPTRLKILYVLSKKDLCVSDISELLSMSQSSISHQLALLRHQQLIKVNRVGRMAIYSLDDDHVLSIFNQGKTH-----";
-    seqs[counter++] = "---------------------------------------FKVLGNQSRIRILLEIADEEKCVHEISEETDQSFSNASHHLKTLRDNRLVDYRKEGRHKYYRIKDDHVLKILQECIDH-----";
-    seqs[counter++] = "-----------------------------------LSELFKILGDKTRINIIWTLDNREMCVCDIANVLNMTKSSISHQLAILKNAGIVKYYKSGKEVYYTLDDEHINKLYEIGLLHIEK--";
-    seqs[counter++] = "---------------------------------EELANFYKIFSDPTKIKILWALDISEMCGCDLAAITGVTKSAISHQLSSLKELNLVKARKQGKIVYYSLSD------------------";
-    seqs[counter++] = "----------------------------------SLANLYKIFGDATRIKIVYILFEHECCVCDIAATLGTTQSNVSHQLQILKSNDLVSYRREGKQIIYSLKDSHVKDIFEKGYEHITE--";
-    seqs[counter++] = "--------------------------------AEALAESMRAFATGSRLRLLWALLDGELTVEELAERTELSQSAVSHQLRLLRQGRLVSVRRSGRHAHYRLHDPHVVDL------------";
-    seqs[counter++] = "-----------------------------------LADLFKVFSDATRIKILFTLLETARCVADIAEATGASQSAVSHQLRILKQAHLVTFKRCGRSIEYSLADDHVYTMLLQGMNHICE--";
-    seqs[counter++] = "-----------------------------------LADFFTAFSDTTRLKILFELLESEKTVTEICDNTDFSQSAASHQLSKLRILKLVKVRKQGKFAYYSLDDEHIEHIIETALEHFEE--";
-    seqs[counter++] = "-----------------------------PGVDERVAALMGALASPTRLRLFALLESGELSAGELSKAVGMRPSATSHQLRVLRDLGLVRRRREGRRCYYSLADAHLGVLLREAL-------";
-    seqs[counter++] = "-----------------------------------LSELFKLLSDPTRMKLVLALSCGEMCVCDLGAALGMTKSAISHQLKTMKQCSVVKSRREGKNVFYSLHDQHM---------------";
-    seqs[counter++] = "------------------------------------ADFFKVFGDPTRLKILFLLEQGEKGVNAISEELGMQQSTISQQLKLLRACRLVRFRKDGRNVLYRLNDEHIHEILALGTEHYQE--";
-    seqs[counter++] = "-----------------------------------LAGFFSVFSDPTRLKIISALSEKELCVHELSSLLDMKQPSISQHLKMLWQARVVKKRKVGLHVFYRLDDEHIEKIYTWGYEHVKE--";
-    seqs[counter++] = "------------------------------EAAASVATTLQALATPSRLLILTELRHGPLPVTKLAEAVGMEQSAVSHQLRLLRNLGLVTGTRSGRSIVYSLYDNHVAQLLDEAVYH-----";
-    seqs[counter++] = "---------------------------------------FKVIADQTRMRILLALSETSLSVNEIADILTMSQSSISHQLRVLKDNRLVKGTRLGKQIHYQLTDDHIVQIFKQIIEHIEE--";
-    seqs[counter++] = "-EHLSADPLQT-HLIT-----SGLFEPMAPQEFQTSAELFGLLSDESRLRIFWILCHYEECVINLSSLVGMSSPAVSHHLRQLKTRRLIVSHRSGKEVYYKPAD------------------";
-    seqs[counter++] = "------------------------------------AKIFKALADDTRIKIAYILAEEELCVCDIAAIIDASTATTSHHLRLLRKMGLTKYRKEGKQVYYSLDDDHVKDLIKIAFEHQQE--";
-    seqs[counter++] = "--------------------------------ASRLADFFALFSDCSRLRVISALAISRMCVTDLADVCRMNQTTVSHQLRSLKSMGIVESERQGKIVFYRLADNKI---------------";
-    seqs[counter++] = "---------------------------------------FKALGDPTRLGIVLELMETEKCVSEISSSLSISDSSTSHHLRSLRQLKLVKRRREGQKLFYSLDDHHVYLILTIGLEH-----";
-    seqs[counter++] = "-----------------------------------------------RMRMISLLASGELCVGNLAIALHMSDSAVSHQRKTVRALRLVGYRKQNRHVF-----------------------";
-    seqs[counter++] = "---------------------------------------FKALGDEARLRTLEMLVNREACVSEIAEASKEQISTVSHRLKLLRAEGLVNRRREGRHIYYSLADEHVMELIHNAFEH-----";
-    seqs[counter++] = "-----------------------------------MALLYKTFGDATRLRIMYLLLQKEMAVCDIAACLNMTHSAISHQLSVLKNLNLVKYRKFGKTVIYSLADYHVSILIATAYEHITE--";
-    seqs[counter++] = "-------------------------------------KLFKVLSDATRLRIYALTVEEELCVCDVSASVDCSIATASHHLRTLLKQGLVKYRKEGKVVYYSLDDHHISSLVHLAMEHVNE--";
-    seqs[counter++] = "--------------------------------ATELGEMFRLLGDPNRLRIVASCLSQPMSVGDIADTLDLSPSLTSHHLRLLRSARLLKGTRHGKQVFYDLPDCHVRQMLTNMIEHVTE--";
-    seqs[counter++] = "------------------------------QAAAQVASTLQALATPSRLMILTQLRNGPLPVTDLAEAIGMEQSAVSHQLRVLRNLGLVVGDRAGRSIVYSLYDTHVAQLLDEAIYH-----";
-    seqs[counter++] = "---------------------------VSEEVVIKISNFYKALSDPSRLKIMSLLNEKGLCVSCIVEKVGMTQTAVSNQLKSLRDVNLVKSERKGKNIIYKLNDDHVRDILNLTMTHMEE--";
-    seqs[counter++] = "-----------------------------------LSRMFGAFGDANRLKIMLAVADQDLCVCELGELLGMSAPAVSHHLRRLKDLSLVKTRRQGKLVYYSLDDQHIRDLLVIGQAHLQ---";
-    seqs[counter++] = "------------------------------EETQRSVQIFKAFGDYTRYKILYLLYERELSVSEITSKIGVSQSAISHQLKLLRQTGLVSGRRDGQRILYSLADKHIIMIFKQVKEHISE--";
-    seqs[counter++] = "---------------------------------------FKTMSDPTRMRIILAIAQGPITVNDLAAMLDLGQSTVSHQLRLLKQARLVAGERSGKQIYYHLVDDHVLEIYALTKAHIEE--";
-    seqs[counter++] = "---------------------------VTPAESSRIADAFALLSDPGRVRVLALLEAGETCVCDLAEMVDMSPSALSHGLRLLRTAGVVTNRRDGRMVRYRLADSHVRLLLDVTREHL----";
-    seqs[counter++] = "---------------------------------QRAAALFRALGDVERLKLLESLAQREVCVTELAETSRARMPTVSQRLRVLRAEGLVVQRREGKHIFYALADQHVVELVHNALQHASE--";
-    seqs[counter++] = "------------------------------------AKIFALLGDAGRLQLVLRCMEKPQTVGELAEASGMSQSLTSHHLRQLRDQRILASERNGRHIFYQIDDEHISCVVRDVFAHV----";
-    seqs[counter++] = "-----------------------------------LAETFRLLGDQSRLKILLQCMRGSVAVGDIAGSLDLSQSLVSHHLRLLRGARLVRGERQAKHIFYGIADQHVSQVLQDMAVHISE--";
-    seqs[counter++] = "-----------------------------------LAEMFRLMGDPSRLKIIAACLGAPMCVSDIAAKYGMSQPLVSHHLRLLRAARVLRSERRGKQIFYEAADHHVKRVIGNMVEHVCE--";
-    seqs[counter++] = "-------------------AKMNEPSILDPETLTSVSKIFKILQNEARLSIIYLLKDQELSVGEITNLINMEQSAVSHKLNALKKAHLVKTRRDGKTIFYSLDDDHVFNLLEQVITHSKE--";
-    seqs[counter++] = "--------------------------------SEKLAEFYKTLGDKTRLRILSLLKVDERCVCELVEILGISQPTVSQHMRRLKSVHLVKERRQGRWVYYSL--------------------";
-    seqs[counter++] = "------------------------------KTADDLAQLFSILGDGTRMRILFLLRNEETTVQSLADSLDMTHSAVSHHLRLIRPYQLVKSRKKGRNVFYSLYDDCVWHLLEEGLIHLRK--";
-    seqs[counter++] = "--------------------------------AERLAEIMQALASPARLRILSMLSARPSTVTELSEQLQIGQTTVSNHLRLLRHLSLVTGSRAGRHIHYSLFDDHVTELLDEAIGHLE---";
-    seqs[counter++] = "-----------------------------------LSEFFKFFGDTTRIRVIHLLLSGEMSVSAIAEKLNLEQSVVSHQLRILRTANLVKPTRDGRKIYYSLDDEHIGEIFNTGLAHI----";
-    seqs[counter++] = "------------------------------ELLENVSDFFKALGNGTRLQIIWCLSRGELKSSELAAILQMSPSAISHQLTLLKNLKIVSVRREGKNQIYALADKHISQVLDSVVEHYEE--";
-    seqs[counter++] = "---------------------TGELKHVLPEFAIETASLFGLLSDSTRLRILYLLYHREVCVRNIAEAIEMSPPAVSHHLRSLKQLGVITSRRIGKEVHYTIAD------------------";
-    seqs[counter++] = "------------------------------EEVQGMAQMFKALSDPTRMKMAWLLDEGELCVCDMSILTKQSIATASHHLRLMKSLGIATSRKEGKNVFYSLADHHIRTLIRMTLEHMRE--";
-    seqs[counter++] = "---------------------------------------FSALANPIRARIVNRLTDGEASVGELSEIVGVKQPLVSHHLKVLRSAHLVSARKDGQKAMYSLIDDHVASIFLDAFNHMKE--";
-    seqs[counter++] = "--------------------------------------FHALRSEP-RLTIMYLLLEKDMCVCELERALGMTQSAISHNLRTLRQLDLVRVRKDGRFAVYSVADEHVRALLELSRSHVMGCQ";
-    seqs[counter++] = "-----------------------------------LTEFFKMLGNPARIRILLLLMEQDANVSDLAEQLGMTQSAVSHQLNLLKLNKLVRGCRVGKMVFYALVDEHVQMVIEKGTEHIGRC-";
-    seqs[counter++] = "--------------------------------------YFAALSEPNRLKILYILKNGEYCPCELSEILGCTKSALSHQLRILKDKNLIKNRKDGKFIYYSIKD------------------";
-    seqs[counter++] = "-----------------------------------LSDFFGLLSESTRLKIILELIKGEKNVSQISKNLDMSQSAVLHQLRILRQGRIVKFKKAGKNVFYSIDDEHVEGIINKAIEHL----";
-    seqs[counter++] = "----------------------------------SVAQLFKALADENRAKIFALCQDDELCVCDVANIIGSSVATASHHLRTLHKQGIVKYRKEGKLAFYSLDDDHIKQLFTLALAH-----";
-    seqs[counter++] = "------------------------------EVLSGLADFFSIFSDATRMKIISALTITEMCVTDISEILGINQTTVSHQLKIMRQAGVVGFRREGKILFY----------------------";
-    seqs[counter++] = "------------------------------EALYSEARIFKALADPNRLKIVKLLKEGELCACELTIALSSSQSTVSHHLSVLKSAGLVKERKEGKWSYFRLSEGAVIEILNQALKH-----";
-    seqs[counter++] = "---------------------------------------FHLLRNKTRFKILLLLMEKERNVSELEEIIGGTQSAISHQLAELRNMKLVKDRQEKRMRYYSIYDSHVTSIIEAAVSHINEC-";
-    seqs[counter++] = "---------------------------ISNEVLTEIVHIHKILANPSRVKILLLLSEGQQNVSQISDAIGLEQSAVSHQLKMLKAHQLVTQARNGKAINYQIGDSHILQLLKLSIAHAQE--";
-    seqs[counter++] = "-------------------------------------DIFKILSEPTRLKILMALSLDSLCVCELASLLDVTQSAVSHQLRILRNAGMVDYERDGKMARYYLRDNMVV--------------";
-    seqs[counter++] = "-----------------------EMELINKKEITELAELFKIFSSETRLKILYLLIDTEMCVHDIAKLINMNQSAVSHQLAVLREAHLVRYERKGRVLFYSL--------------------";
-    seqs[counter++] = "-----------------------------------------VLANSTRVQILYLLEQSELNVSELTDILKIEQSNVSHQLQRLRDYQLISQKRKGKSIYYSLDDPHIITTLNQLMNHVQ---";
-    seqs[counter++] = "-----------------------------------LEKIFKLLGNKQRLIILELLRERSYSVSEIINSLGMEQSAVSHQLKLLREAQLVETEKRGREVLYGLSDSHILILLDNALKHV----";
-    seqs[counter++] = "---------------------------------------FKLLSNPSRLQMLKVLEQRELNVGELGDLLGLEQSVVSHQLALLRKHQLVSSERVGKANYYRLDDPHILDVVNEMLEH-----";
-    seqs[counter++] = "------------------------------EILQKMSGLLKIAGDPTRLKMLYVLVRGPKCVCDLQEEIQASQSLVSHQLKILRDNGLVKCEKIGNRALYTLSDDHVVALLSIVHEHVME--";
-    seqs[counter++] = "------------------------------ENAETAAEALKLLAEPTRLSILALLKDNEMAVGAIAEELGRPTPAISQHLAKLRAAKLVTFRKEGTTTYYSQKDEHVDMLVTNAL-------";
-    seqs[counter++] = "-------------------------------VTEGMADLFKVLADDTRLKIVYALCRDELCVCDVATILGITNANASHHLRLLSHMGLAASRREGKMVFYRLQSPHVRHLLQEVLSRGEEDR";
-    seqs[counter++] = "-----------------------------PEYITRMSAVFQALQSDTRLKILFLLRQKEMCVCELEQALEVTQSAVSHGLRTLRQLDLVRVRREGKFTVYYIADEHV---------------";
-    seqs[counter++] = "-----------------------------------LADCHKALGDKTRLRILALLREEDLCVGELVEILKITQPAVSQHVRKLRNARLVKERRQGQWVYYSL--------------------";
-    seqs[counter++] = "--------------------------------AEKIAELFKLISDGTRLRVLVLLCISEKCVSEIADAFGMSLPAVSHHLRVLKQAEIISSHRDGKEVYYSL--------------------";
-    seqs[counter++] = "-----------------------------------LEKIFKILGNKQRLTILELLRSRSYSVSEIVDILNMEQSAVSHQLRVLREAQLVQAEKRGREVLYYLSDSHILILLDNALKHV----";
-    seqs[counter++] = "------------------------------ELLDDLTDLFSVFSDKTRLRIVCALAMSRTCVTDLSGVLGINQTTVSHQLRLLRNLGVVRSERDGKIIYYSIKN------------------";
-    seqs[counter++] = "---------------------------------EQVTDIFKALSDGNRLRIMHLLIQGESSVGHIAHALDLSQSNVSHQLRILKQAHLVKGNRDGQSMIYTIDDTHVTTLLKQAIHH-----";
-    seqs[counter++] = "-----------------------------PKIFEMSTDLFSILSDVSRVRILWLLCHTEDCVANIADAVDMSSPAVSHHLKLLKSANILKYTKKGKEVYYTLAD------------------";
-    seqs[counter++] = "------------------------------------AAMFKLLGDPTRARLLALLEAGELCVCDLAAATGTQEATVSQSLRMLRASGVVTGRRQGRLVFYRLADAHV---------------";
-    seqs[counter++] = "---------------------------------ERLAGRFKGLADANRIKIAYLLTREELCVHDIARLVGISIANASHHLRLMRSLGVTKTRKKGTTVFYSLADRHVHTIVLLGMEHMEE--";
-    seqs[counter++] = "------------------------------QVIVNLSSLYKVFADKTRLEILYALHENEMCVCDLAVLLNMTKSAISHQLKTLRLANLVKNRRVGKVVYYSLADEKVYEIFNQSFKQLTE--";
-    seqs[counter++] = "---------------------------------QKVSQLYKVLSDPTRLKILLYLKQGELNVTALSEKLNMEQSAVSHQLKLLRENHVVKTDRVGKTIFYILDDHHVLDILNQTIQHI----";
-    seqs[counter++] = "----------------------------------ALSDFFRIFGDQTRLRILYALAKTELCVCDLAKLLGASQSAVSHQLQVLRSHRLV---------------------------------";
-    seqs[counter++] = "------------------------------DVAEKLAGAFKLLSVEARIRIVQVLKRRALCVTELTSQLGISQSATSQHLRVLKDARIVKFQKRGFHVYYHL--------------------";
-    seqs[counter++] = "--------------------------------------------DPTRLKILLSLKEGELCSCDISEISKISISATSHQLRLLRDRKLVKYRKEGKFVYYELYDEKI---------------";
-    seqs[counter++] = "---------------------------ISDHTATHLADTFSLLGDPSRIRVLGTLLDGPKRVLDIAQACGHTQSATSHSLRLLKAHHVVAGERHGREIHYALADDHVRALLTLALAHI----";
-    seqs[counter++] = "---------------------------------QKILEILKILSDETRLKIVSLLAENELCVCELMEALRMSQSRISNHLRILRNTRIIEAKREGKWIFYSL--------------------";
-    seqs[counter++] = "-----------------------------------LADFFDIFGDTSRIKILLALHDKSLPVSSIAELTGLSASAVSHHLSLLRGRRVVKVERKGKYRVYELDDDHVSSVLKMAISHIQEVK";
-    seqs[counter++] = "---------------------------------EGIAVIFKALADDTRLKIVYALSQAELCVCDVAALINSTKSTASYHLRLLNHMGLAKFRKDGKLVYYRLADQHI---------------";
-    seqs[counter++] = "--------------------------AIDAEAVQGVSALFKALGDETRLKVLALYKGEELCVCDVANIVGSTVATASHHLRLLRNIGIANYRKEGKLAFYSLRDAHI---------------";
-    seqs[counter++] = "------------------------------------------LGDPTRLKIIYTLSETSMCVSDIAKTLDLSQSLVSHQLALLREAELVKVKRVSRNAIYSLDDAHVLTIFKQAHEH-----";
-    seqs[counter++] = "-----------------------------PQLAAA-ANTFAMLASPARLHLVTLMSGGRFDVGTLAEKVGLSLPTTSQHLSKLRLAGIVSARRAGRHSYYTVEDPHVLSLVEQIFEHI----";
-    seqs[counter++] = "---------------------------------------FKVLGDPTRTKIVLALDNREVCVCTLADTLGMTKSAVSHQLAILKANNIVKSRRDGKQVYYSFDDEHITDIIEIAQAHIKD--";
-    seqs[counter++] = "------------------------------------ARLFKGLGDETRFRIYALYLEAELCVCDVAGILGTSVATASHHLRLMKNLGLTRSRKEGKMVYYSLDDDHVRLLVKLAIDHAAE--";
-    seqs[counter++] = "---------------------------------------FQALGDPERLRLMIRLSEQEICVSELAELAQEQLTTVSARLKSLYAARLVKRRRQAKHVFYSIADDHVLQMIRGAVAHAAE--";
-    seqs[counter++] = "-------------------------------------DIFKIIGDPTRLMILHAIEFHELCVCDLGHLVGVTKSAISHQMKLLKKYGLVKGRKVGKMVYYSVIDDNVKNLIHAGYNHV----";
-    seqs[counter++] = "-------------------------------------ETFRLLGDPTRLKILLACLSEPKCVNDVASEVGITGSLTSHHLRLLRGARLVRAERQGRQIFYVAADSHVNAMLAEMVAHIRQ--";
-    seqs[counter++] = "-----------------------------------LAEVFKVFGDSTRIKILYDLFEGEKNVTEICQDLEMNQSAISHQLKILRTARLVSGKRMGKSILYSLADEHVKTIIAMGIEHIEE--";
-    seqs[counter++] = "---------------------------------------FSALADRSRLKILYALSETELCVCDVASLLGMKIATASHHLRKLRDLQILKYRNDGKLAYYSLKDQRVAEILHHTLNQLVE--";
-    seqs[counter++] = "-----------------------------------LADLFKVFSDSTRMKIMYKLFDGEVSVGQIATSLDMSQSAISHQLKYLKESNLVKSKRNGKSMLYYLADDHVKIIIKTGLEHIEE--";
-    seqs[counter++] = "-----------------------------------LVEFFKTLGDFTRLRIV-LELKTKRCVGELAEELEMSHSAVSHQLNILKANGIVKSQRQGKYIYYIVQDEYV----QNAIE------";
-    seqs[counter++] = "----------------------------------AVAEVFKLISDGSRLRILWLLCHREVSVGDIAEMMDMSNPAVSHHLKLLKQSGLVDSRREGKEVFYRLAD------------------";
-    seqs[counter++] = "--------------------------------------FFKQLGYSTRVRILCYLIQEPRKVSDIAVHLNMTLSSVSHQLRVLREAGLVSGQRQGKTITYQKKDDHVATIIQNTLDHL----";
-    seqs[counter++] = "---------------------------VSPDVLELIAERFRVLADPARLQILNVLQGGEQTVTELMRTTGFRQAKVSKHLQLLYNLGFVDRRKEGLHVYYRL--------------------";
-    seqs[counter++] = "---------------------------------------FKMLSDKTRLSIMLLIKEQEMNVSEISRALNMEQSAISHQLSALRSERLVKSRREKRSVFYSPNDQHVYDILTQVIDHLETC-";
-    seqs[counter++] = "------------------MARAGDV----PSDYEPVSALFKALANPVRAAIVHLLSDRERTVGQLVEALGLPQPLVSQHLRVLRGALMVATRRQGQEIWYSVCDQHVAHILGDAMKHTQE--";
-    seqs[counter++] = "---------------------------------KDIAEFFKLFSNDGRLKIISSLATDNLTVNEIVERTKLSQSLVSQQLKLLKNARILTNEKIGKTVTYSIYDRHILHLLKDVAEHLDE--";
-    seqs[counter++] = "----------------------------------SVAQMLKAIADENRAKIYALCQDEELCVCDIANIIGITVANASHHLRTLHKQGIVRYRKEGKLAFYSLDDEHIRQIMMIVLEHKKE--";
-    seqs[counter++] = "-----------------------------PDVGE-MVQIFKALADETRLRIYSLTLESEMCVCDVAAVIQSSSATASHHLRYLREHSLAKSERRGKMVYYALADKHVADLYEHAIEHTME--";
-    seqs[counter++] = "---------------------------VSQEVVQQVAEYFSLLSEPMRLRLLHLLRDEEKCVQELVDATQTSQANVSKHLKVMWQAGILSRRSEGTSAYYRVEDEMIFELCNRVCDRL----";
-    seqs[counter++] = "---------------------------------EKVSQLFKMLSDPTRLKILLYLKDGEQNVTAITQAVEMEQSAVSHQLRLLRENHVVKSHREGKAILYSLDDSHVLDILNQTLKHVEQ--";
-    seqs[counter++] = "-------------------------------IAEHAAEVLKAIAHPVRLQIVELLQAEEMCVGDIVNALGAKQAITSQQLNMMKAKGVLSCRRDGARVYYRIENRNVIKLLDCIYDHCEK--";
-    seqs[counter++] = "---------------------------------ERIAETLKALSDPTRLRIVSLLRHGELCVCDLTEALQTPQSKVSRHLAFLKNAGWVRARRSGKWVYYQILD------------------";
-    seqs[counter++] = "-----------------------------------LSELFWVLSDATRIRILYALSEKEMCVCELARLLNNKQSSISHKLRILRNSKLVGFKRNGK--------------------------";
-    seqs[counter++] = "--------------------------------------------NPTRLRILLLLSKKDMCVGKIAEILRMDQSAVSAQLKVLRHLNLVKAKRHGRYMRYKLNNKHV---------------";
-    seqs[counter++] = "------------------------------EHSQIAAETFRMLADATRVRILWALFHDELSVNALAEHVGAVPTAVSQHLAKLRLAGLVSSRREGTFVYYSASDAHVKALVAQAL-------";
-    seqs[counter++] = "----------------------GEIMVILPDRLQAQSELFKPLSDPTRLKILYLLRNGELCVCEIIFALKKPQSTISHHLNILKKAGFIKGRKEGVWIHYRLADAEIVGVIDNLTSILNE--";
-    seqs[counter++] = "---------------------------------------FKALADETRVKIIALLQEPNLCVCDLAQITELTISGASHHLRLLKNMGLARSHKEGKHVRYCIHDEHVKIILEEALNH-----";
-    seqs[counter++] = "------------------------------EQLQSLADTFKLMGDKTRLTILALLRERELCVCDLVDVTGMSQPSISQHLRKMKDAGLVSETRKGQWIYYSL--------------------";
-    seqs[counter++] = "-------------------------------------------------------------------ALGTSESAVSHQLRRLRDQNLVLPRKEGRVVYYRLADAHVTDLLRNVLEHVGE--";
-    seqs[counter++] = "-------------------------------------DLLGALANANRLKILSLIIDGELCVSAINAHVDLSEAALSHRLAKLRKLRLIESRRQGTTIYY----------------------";
-    seqs[counter++] = "------------------------------EQAEELAGMFHLLGDVNRLRLICACLEEAVCVQDLADRFSLTPSLVSHHLRLLKAARLMRAERRGKQVFYTVNDEHV---------------";
-    seqs[counter++] = "------------------------------------AKIFALLGDAGRLQLVLRCMEKPQTVSELAEATNMSQSLCSHHLRHLRDQRILASERRGRHILYRIDDDHISRVVRDTFAHVHE--";
-    seqs[counter++] = "-------------------------------------EVFRMLADSTRIQLLWALIDRELSVNELAGEVGKLPASVSQHLAKLRMSRLVHTRREGTQIYYRLENEHIARLVTDALD------";
-    seqs[counter++] = "---------------------------------KKIAEFYKALGDEVRLKILQMLSEQEMCVCEIIERLDMSQPAVSHHLKILRQVGLVKDSREGKWIYYSLHD------------------";
-    seqs[counter++] = "-----------------------ELPALDDQHIASLAHLFHLLGDEGRIRLVLACMAGPVPVSELSAVTGMSQSLTSHHLRHLREARILRSERQGKQILYRLDDHHI---------------";
-    seqs[counter++] = "-------------------------------------DIFKLLSHPMRLQIIYMLEQQTMNVGEIVERLGLEQSAVSHQLTLLRKGHLISTCQIGKIVCYSLNDKHILDIVNEALEHTQ---";
-    seqs[counter++] = "------------------------------------------LSDPTRLRLLALLVREELSVAELQEILGMGQSRVSSQLALLRQVDLVTDRRDGKKAFYSIRSNRTLALLKSAIDSVSE--";
-    seqs[counter++] = "------------------------IQPLSRKNAQSAEKLFKCLASASRLKILFVLLESEKSVGDITVDCDMSQPLVSQHLRHLRDNNLVYTKRHGKQVYYSIADEHIKHVVADCIQHVQ---";
-    seqs[counter++] = "---------------------------IASELAPAVA-LFRSLGDPARLAILDRLARGEARVVDLTDELGLAQSTVSKHLACLRDCRLVDFRVEGRQSFYALARPELPALFRSA--------";
-    seqs[counter++] = "------------------------------EEAAQLTSVLSLMADPTRARVLALDMVKELCVGDLALALESNEDAVGYALRLLRTAGLVTNRKQGRVVFYRL--------------------";
-    seqs[counter++] = "------------------------------------ADLLKALSNPGRLRILCALVPGEMSVGDLETALGASQSYVSGQLLRLRNEGLVSCTRDGRSIRYQLAD------------------";
-    seqs[counter++] = "------------------------------------------LSTPSRLLILARLREGPLPATELAAEVGMEQSACSHQLRLLRNLGLVVGERRGRSVVYALHDDHVAGLLDQAVYHVE---";
-    seqs[counter++] = "------------------------------------AEYFKAISDPARVRIIYALANGELCVCELMLIMGMQQTVVSHHLKILKYANIVSDRKSGKWVNYSLADRRVL--------------";
-    seqs[counter++] = "------------------------------------ANIFKLLGDYNRIRIINALKIKELCVCELSILLDMSQSSISHQLRILRHHNIVKNRKENKRVFYSLNNDKIFKLIEESI-------";
-    seqs[counter++] = "-------------------------------------ELFTQLSSSTRIRLLCILAIEEMCVCELADMLKMSQPSISHHLRLLRQSGVVKYKKSGKRVIYYITD------------------";
-    seqs[counter++] = "----------------------------------TLAELFKALGDPTRLNVLQLLTERQLCVGAIARRLGVTQPAVSQHLKVLKHLGLVKASRDGYHIHYSI-NQDMLASYKTHIDEWQ---";
-    seqs[counter++] = "-----------------------------------MADILKVLGDPNRLHILSLISRQELCVCEITSILNISQSNASQHLARLRSVDLVKERRNAQWIYYSL--------------------";
-    seqs[counter++] = "---------------------------------------FQALSEPIRLQILDLLQEQELCVCEIREKIKISQSKLSFHLRILREAKLARSRQQGRWVYYSLNPEQLL-LLEQYLNQLRE--";
-    seqs[counter++] = "-------------------------KALQREHLQSAADLAKSLSDENRLRILDCISRGKQSVGGIAKELSLSQPLVSHHLRELRRTLLVKIERNGAFVYYELSD------------------";
-    seqs[counter++] = "-----------------------------------------ILGEPSRLKIVLALSEGDMCVYHIVKAVNSNQSAVSHQLRILRENKVIKSFRKGQNIVYSLDDEHIMQIINIVKTHVEE--";
-    seqs[counter++] = "----------------------------------SLAKYGKAISDPKRIELMDLLVQAEKNVDVLSKETGMSIASTSHHLQILKEARLVSDRRKGRNIFYQIED------------------";
-    seqs[counter++] = "------------------------------EHAEDLAQVMQALSSPGRLLILARLDDSPCSVSTLVEDCGMAQATISNHLRILRHLDLVTGQREGRQVIYSLYDAHVQEFFRQALGHI----";
-    seqs[counter++] = "-----------------------DLSSLSRSQAEVASELFKSLSNPNRLQIVAALALGEHPVGDLETMLGIKQPTLSQQLAELRDAGFVESRREAKQVFYRLGDKRLLAL------------";
-    seqs[counter++] = "-----------------------------------LADFYKLFSDSSRIKILFVLLSGAHCVKHIAEKAEMSQSAVSHQLAVLRRSNIIRQTRSGQNITYSLADDHVKLLLELAIAHIRE--";
-    seqs[counter++] = "------------------------------------ANLFKALADETRLSIYALTIEEEMCVCDIAAVIGSSMATASHHLRYLRERSLAKSERKGKQIYYSLSDNHVRQLVKIAHEHTKE--";
-    seqs[counter++] = "------------------------------QAATQTASLLKTLGNPDRLLLLCQLTQGEACVSDLEASLGIQQPTLSQQLTVLRNEELVATRREGKRIYYSIAD------------------";
-    seqs[counter++] = "------------------------LQMNMTQAATQTASLLKTLGNPDRLLLLCQLTQGEACVSDLEASLGIVQPTLSQQLTVLRNEGLVATRREGKRIYYSIADEKLFTL------------";
-    seqs[counter++] = "-----------------------EMQDIAAQLQELHARVCKAIADPKRLLIINELRDGELSVGDLCEALGFSQSNASQHLSVLRERGIVNARRSGNNVFYSLRSRKIV----QAVDLLRE--";
-    seqs[counter++] = "------------------------------------AKFFHGLANPTRLKIVETLLAGEMSVSQIVDAVGVSQSQVSNQLACLKWCGYVTSRKEGKYILYRISDERVRAILQLA--------";
-    seqs[counter++] = "------------------------------------AEGFRLLADPTRIKILWALLQGESSVACLAEMVGAAPTAVSQHLAKLRLAGLVKGRREGTYVHYSAADGHVRALLAEALFH-----";
-    seqs[counter++] = "---------------------------------------FKALSDFNRVRIMEFLENGEASVGHISHSLNMTQSNVSHQLKLLKSTHLVKSKRQGQSMIYSIDDIHVSTLLKQAIHH-----";
-    seqs[counter++] = "----------------------------APEVGVTLARALLALTDPSRVRLCRLIARQAMTTADLADRLTMTRPQVSRHLRALRELGLVRMERHGRHVLYEL--------------------";
-    seqs[counter++] = "---------------------------------QMLDEFFKSLSEPVRLRVMYLLERGELCVCDIVSSLEVSQSVVSRHLAYLRNAGLVSSRRQGVWIYYQL--------------------";
-    seqs[counter++] = "------------------------------DLAASVSEKLKVYAQPQRLMILSCLWRGERTVADIGQATGIVQPALSQQLAELRRADLVQTRKEAKQVWYRLAD------------------";
-    seqs[counter++] = "---------------------------------KKLASFFDVLSDGTRLKILSALAITPMCVSDLSAVLEINQTTVSHQLARMRLAAMVDFRREGK--------------------------";
-    seqs[counter++] = "-----------------------------------LAELYKLLGNVTRLKILLALAQGELCVCDVAHVLGLTVAATSHQLKLLRDQGWLAMRNDGKMVYYRL--------------------";
-    seqs[counter++] = "-------------------------------------KILSLLKNPVRLQILYILSQQSLSVSEIVELLHLDQSLVSHHLSDLRKYQLVSTKRDGKSIFYELDDPHILDIVNETLEH-----";
-    seqs[counter++] = "-----------------------------------LSETFRLLGDPSRLRILLHCEEGPKSVTDISETLELSQSLVSHHLRLLRGARLVTRVRHSKQMFYEISDQHVGDVLLDMLSHVRE--";
-    seqs[counter++] = "-----------------------------------LAELFAALSDPTRLRLLNLMRDREVCVCDFVEILGQSQPKISRHLAYLRRAGIVCARREGKWMHYRIE-------------------";
-    seqs[counter++] = "---------------------------------------FQQLGDPTRLKILWILCHCRECVSDIAAAVGMSDAAVSHHLQLLKRSGLIVGSRVGKEIHYTLSDERRAGLLHRMMDALFE--";
-    seqs[counter++] = "-----------------------------------MADIFSVVADPTRRELLGTLLSAELSVGQLVERLGVSQPTVSKHLRVLRDIGLVTSREEGQHRYYRL--------------------";
-    seqs[counter++] = "------------------------------EYFQTVALVFRQLSDANRVRLFWLLCHCEECVVNLAAMMGMSPPALSHHLRQLRESGLIVSRRDGKEVYY----------------------";
-    seqs[counter++] = "------------------------------------AEVFNQLSDGTRLRILWLLCHSEECVNDIAAAVRMTAPAVSHHLKTLKQNGIIKSRRLGKEVLYTLED------------------";
-    seqs[counter++] = "-------------------------------------QIYDALSDFTRFQILGALLLGEKSVTELQELLSVSQSATSHQLRLLRDRGLVTAKRDGRRVIYSLADDHVITLISVGLAH-----";
-    seqs[counter++] = "--------------------------------------FLNLIADKRRIDIIYLIMKKRLCVQDIAEIINETVANTSYHLQQLKKGNIVKVEKEGKEVFYSLSDKHVYEILENVLEHI----";
-    seqs[counter++] = "-----------------------------PQLLETAAGTLRMLAEPTRLNLLFQLTDGPKTVTELTAAVDVPRTVVSQHLAKLRLSGLVDTRKDGRHVIYSLHDGHLIRLIRETINH-----";
-    seqs[counter++] = "--------------------------------AQAATALLKVLANENRLMILCTLMGGEMSVGELNTAVPLSQSALSQHLASLREAGLVSTRKEAQTVYYRLQ-------------------";
-    seqs[counter++] = "------------------------------QAADAAVELLKALANPVRLKLLCFLVEQERSVGEIASRLGVRETLVSQHLSLLRRDKLVAYRRDGQTLWYRLAD------------------";
-    seqs[counter++] = "-----------------------------PKTSELQAKLFRGFADPSRLAILETLRDGPLTVGEIVQATGLSQSNVSNHLGCLRDCGLVTATQQGRFVSYALSD------------------";
-    seqs[counter++] = "------------------MAESQEMH---QEEAQNAASFLRSLGNPHRLQILCRLALGEQSVGQLHQFFDLSPSAFSQHLAVLRQQQLVSIRKESQTVYYSIKD------------------";
-    seqs[counter++] = "------------------------------------------LSDAGRLRLLLWLAQREMCVSELVALEQDKVSSVSARLQMLHAVNLVTRRREAKHMFYALADVHVHRLLRNILDHAAE--";
-    seqs[counter++] = "---------------------------------------FAVIAEPSRRRILDLLLQSESNVTDLAQALGLSQPLVSKHLRTLRQSGLVKVRKSQQHIY-----------------------";
-    seqs[counter++] = "------------------------------------ARFFRVLGDPVRMGILELLLEGEKNVSEIVSRLGMSQSRVSNHLACLRWCGLVSVRRKGSFIYYSLADEQLRELLEIANDRVEK--";
-    seqs[counter++] = "----------------------------------TLSDILHLMGEPNRLRLLVTCLEGAKSVSELAQQLQLSVPLTSHHLSLLRSARLLVANREGKHIYYSIYDAHVRCILDDMLKHFTE--";
-    seqs[counter++] = "---------------------------------------FELLSDGNRLRLLLCLHHADICVGDLAAALDMTGTAVSHALRLLRNQGWVSATRDGRSMRYRLTD------------------";
-    seqs[counter++] = "-------------------------------------DFFKALAHPTRIVLVEDLAEGEKCVCDLAQKIDADISTVSRHLRELRNAGIVANQKRGNQVFYSL--------------------";
-    seqs[counter++] = "-----------------------------PEVDREIIEFLKALSNPIRLKILKLTRDNWLCVCLLSEVLGEDQTLISHHLRTLKTLDLVKERREGRMRFY----------------------";
-    seqs[counter++] = "------------------------------ENADQAADFLSALANNKRLLILCKLLHNEMSVGALAKAIDLSQSALSQHLAKLRALDLVSTRRDAQTIYYMVSSPHI---------------";
-    seqs[counter++] = "---------------------------------KNLSSYFKGLADENRLRILNLLFHGELCGCDIQYVLGASQSNVSRHLSYLKNAGLVNDRRKANRVYFSL--------------------";
-    seqs[counter++] = "------------------------------------AELFKVLSSATRLRLLRTLAEEVSTVSRLAERSGLAQPLVSQHLRTLRSAGLVSVERVGREAHYSVADTHVTHIVEDAVHH-----";
-    seqs[counter++] = "-----------------------------------LAETFGILSDSTRLSIVLACMETEVSAGDIATKLKVSPSLVSHHLRLLRAVRIVRSERRGKQVFYTMTDACVRDILTTMINHLPE--";
-    seqs[counter++] = "------------------------------------AKFFRGLADPSRLALLLALRPGEKTVSTLSEETGLSQSNVSNHLACLKDCGLVVNRQEWRHVYYRIADSKVLTL------------";
-    seqs[counter++] = "---------------------------------------FKCLSDPTRLQILHLLMEGEHCVGDIALKIGTTQANISKHLSLLKNAGLVVSNKQGMKVIYSLQ-------------------";
-    seqs[counter++] = "----------------VPLPTSTLMQDIAAQLQELHARVCKAIADPKRLLIINELRDGELSVGDLCEALGFSQSNASQHLSVLRERGIVNARRSGNNVFYSLRSRKIV----QAVDLLRE--";
-    seqs[counter++] = "---------------------------------KSLNEQFSVIANPNRLEMLEFLAQCEYSVDDLAKVMGLSVANTSHHLQQLRLAGLVASRKEAQRVFYRLKGDGVVEL------------";
-    seqs[counter++] = "------------------------------------AEMLKALADPHRLGILLRLSKRELSVGELAEIEQEKVTTMSARLKVLLTAHLVKRRRKGQSVLYSLADTHVLNLVDNAIEH-----";
-    seqs[counter++] = "-----------------------------PDVVQ----LFKVLADETRLEILRLLALTDLRVGEIVAHLGLPQNAVSYHLKQLRRLRLLRDHRSARDIYYSVDLDHLQALYAAA--------";
-    seqs[counter++] = "-------------------------------------ETLKTLANQKRLEIVQLLGQGELTVSEMIEMLGISQSNLSQHLAVLRRYQIVATRKEGLYVYYRLTDGHI---------------";
-    seqs[counter++] = "---------------------------------------FKILGDENRLRILNLLRKGELCVCEIELVLETTQSNVSRHLGKLRNEKIISFEKKAQWIYYRI--------------------";
-    seqs[counter++] = "------------------------------------ADLFKALSSPARLRILSALIAGPSDVGSLADATELSQPLVSQHLRTLRLAGIVQVERIGRNAVYSLHDEHIAHIVGDAVSHVSE--";
-    seqs[counter++] = "------------------------------------ARLFKVLGSESRLALLRILQAKPATVGVLVEKSGLTQPLVSQHLRVLRQTGLVTRDRQGKEVTYQIADHHVAHLIDDAIIH-----";
-    seqs[counter++] = "-----------------------------------LANLFKVFSDSTRIRILFSLFDYEKNVNTISKELNLSQSAISHQLRYLKDSNLVKSQRDGQAMIYALSDRHVKFIIKLGLEHLYE--";
-    seqs[counter++] = "-----------------------KVEAVKEELAASISQLFKVLADERRFKILYALTKQELCVCDVALIIGATVATTSHHLRTLSKQSILTHEKIGKMVYYQLSNPMIQQLVLDAMNQEKE--";
-    seqs[counter++] = "---------------------------------KAVVRIFDVLGNRTRLRILLALASEELCVCDIAHALNLSISAASHQLRALHDRDWLRMRNDGKMVYY----------------------";
-    seqs[counter++] = "---------------------------------ENVGEFAKALGHEKRLLIIELLSSHERCVEDLATAMGIGVKSVSAHLKVMRTQGILTTRKEGLRVYYRLRNDNILKLFQ----------";
-    seqs[counter++] = "---------------------------------KELSNFFNAFGNPTRLKILLALKEEELCTCDLSNITGLSVSAISHQLRVLKGRKNVNYRGDGK--------------------------";
-    seqs[counter++] = "---------------------------------------FHALGEPLRLKVIEILHREELCVCDLCERLHLRPSKLSFHLRALRQANLVLSRQQGRWVYYRL--------------------";
-    seqs[counter++] = "-------------------------------------EVLRLLADRTRLAILAMLDGTEMPVNAIAEALGRPAPAVSQHLARLRAGRLVTSRRDGTTVFYGQPDEHVAALVANVLQHTEPHR";
-    seqs[counter++] = "-------------------------------------EVFKAVADPCRLRIVKLLKEGELCVCEIMTALDKPQSTTSHHLSILREAGLVRERKDGKWSYYRLAD------------------";
-    seqs[counter++] = "---------------------------------------FRALSDPIRLNVINLLQEKEMCVGDICLALKIAQPKLSFHLRVLRESGLLQTRQEGRWIYYRL--------------------";
-    seqs[counter++] = "---------------------------------------FKALADANRRKILFLLKESDLTAGEIASEFDISKPSISHHLNILKNAGLVEARREGQQIYYSL--------------------";
-    seqs[counter++] = "------------------------------------------LGEVNRLSLLALLHAGDLCVSDLAVAVGMSDSAVSHALRLLRAHGMVTAHREGRLVRYRL--------------------";
-    seqs[counter++] = "---------------------------------------FKILSDETRLRIIILLAQEELCVCQISGVLNVSQPKVSKSLSRLRDLNLVIDERKEKFVFYKLKTENFVSTIRNIMDNLNESR";
-    seqs[counter++] = "----------------------------------TLESLFSALADRTRLEIVLFIMRGKASVQEIARGINKSQSLVSHHLACLRNCGIVKTERKGKYVYYSLLDNEVVSIIKLAVEH-----";
-    seqs[counter++] = "---------------------------------------FQALADPSRRAIFESLTRGEAAVKDLTTRFDISQPAVSQHLAALKDAGLVSGRREGRHVYYRVE-------------------";
-    seqs[counter++] = "------------------------------------AALFHALSDAGRLRTLAILAEQSSSVSHLAEVTGERIGTVSARLKVLLQANLVTRRREGQSAIYSIADQHVLELIHNALEHVNE--";
-    seqs[counter++] = "-------------------------------------DFFGIVADETRLRIIGLLNQKELCVCEMCEILGLSQPKVSRHLSKLRDAGIVIDSRQGQWVFYYL--------------------";
-    seqs[counter++] = "---------------------------------------FKALGDNNRLRILSMLNVRELCVCEINAVLKVSMSTISSHLKILRNAGLVTSRKDGRWIIYRLE-------------------";
-    seqs[counter++] = "------------------------------------AELFKALATPSRLKILLTLSHGPASVSNIVIATELSQPLVSQHLKVLRGIHLVSVQRDGREAIYSLMDDHVAHIILDAMAHVNE--";
-    seqs[counter++] = "------------------------MMSVSEETSDEAARQLKAVADPVRLRILYALSKEPLCVCELSVLLNMSMPAVSHHLRILLSAGLLKVRKEGKFACYHLRDSH----------------";
-    seqs[counter++] = "-----------------------------PQAAHEASDLLKALAHHTRLLILCILAKQERTVGEIENILGIQQAMVSQQLARLRLEGLVNTRRQGRLVYYSIGNVSVLAFLESLFD------";
-    seqs[counter++] = "------------------------------------------LAEPTRLHLLWQLSNGPKTVTELTDASGAARTVVSQHLAKLRLSGLVDTRKDGRHVIYSLHDGHLVRLIRETINH-----";
-    seqs[counter++] = "----------------------------------TISQIFKILSDETRVKIVALLTENELCVCDLANIVEATVAATSHHLRFLKKQGIANYRKDGKLVYYSL--------------------";
-    seqs[counter++] = "------------------------------------------LGDPTRLRVTALLSGEELCVCDLAWVVGLAQNLVSHHLRLLKGAGLVTGRRHGRLVMYAL--------------------";
-    seqs[counter++] = "------------------------------------AAIFKALGEVNRTRIVKALSLEELCVCDIATIIDATIATTSHHLRSLHGQGIIKSRKEGKMVYYSLDDDHIRQIVSMAFLHQEE--";
-    seqs[counter++] = "------------------------------EDAEIAAGFLSAMANPKRLLILDSLVKEEMAVGALAHKVGLSQSALSQHLSKLRAQNLVSTRRDAQTIYY----------------------";
-    seqs[counter++] = "------------------------------------------LSDPHRQSILKMLAHQEMGACEIIHSIGLSQPAVSHHLKILRQARLITSQKQGKMVFYSL--------------------";
-    seqs[counter++] = "------------------------------------AEYFKALSHPTRIKIIELLSKKEMCVCQMMAALNLDQSHVSRHLMVLRANEMVKTRREGTIIFYSLTDENII--------------";
-    seqs[counter++] = "-------------------------------------EMFRAFSDRTRLRILNLLLRGEMCVGDLVSILEMSQPRVSQHLSCLRNSGLVVGRREGQWNHYSL--------------------";
-    seqs[counter++] = "---------------------------------------FKLLSNPTRLNILMLLEHEQLSVNEIVTQLEITQPQVSHQLAILKEQQLVSAKKIGKKSLYQLSDPHILSV------------";
-    seqs[counter++] = "-------------------------------------DIFEALSDPHRRKILDMLKHGELCSSDIASQLDITPASVTHHLNKLRSANLIIKTRKGRNIYY----------------------";
-    seqs[counter++] = "------------------------LERLEPQISEA-ARLMEMLSHPARLRILCTMLGGEKSVQELAINASLSQPAMSHHLRKLRDSELVNTRRDKQTIYYSLKGEHVAAVLE-VLEHL----";
-    seqs[counter++] = "---------------------------------QARAERLRALGEPTRLRIYALHAGAELCVCDLAWIIGSSQGLVSHHLRQLRAAGLVTSRRDGKLVMYRL--------------------";
-    seqs[counter++] = "------------------------------------ARIFKVLGDRNRTAIYALCENDTLCVCDIATIIDASVATTSHHLRTLYKEGVVTYEKKGKLAMYALDDNHIRQLMMTTLEHAEE--";
-    seqs[counter++] = "---------------------------------------FELLSDANRLRLLLCLHHAPICVTDLSVALGMSGTAVSHALRLLRSQGWVSATRDGRSMRYQLAD------------------";
-    seqs[counter++] = "------------------------------------------MADPLRLQVLNLLSKQELCVCDLCDRLQVKQPKLSFHLRQLREAGLIQARPQGRWTYYSL--------------------";
-    seqs[counter++] = "-----------------------------PDFVETSAALLQAMANPARINILIILAEREVSVGPLSELVGLSQSALSQHLAKLRQAGLVSTRREAHTVYY----------------------";
-    seqs[counter++] = "------------------------------------ADLFKVLSNPVRIQILDALRLGEQSVGYIAEWLEIEASAVSQQLAVLRSRNLVTSRKQGNYVFYSVRD------------------";
-    seqs[counter++] = "---------------------------------------FQALSDPLRLQILQLLRHQELCVCELRDHLDIAQSKLSFHLKTLKEANLVRSRQEGRWIYYSL--------------------";
-    seqs[counter++] = "---------------------------------QTTADIFKQLSDPTRIRIFWILCHCEECVINIASMMEMSSPAVAHHLRLLRSSGLIESRRDGKETYYRAVD------------------";
-    seqs[counter++] = "-------------------------------------------ADEKRLKLVNLLLKQDYCVGALAKELEISKSAVSQHLKVLRESELVIGEKRGYWVHYSVQEDKLIEL------------";
-    seqs[counter++] = "---------------------------------ERLTEIFKLLSDETRLRVVMLLAREETCVCEIVGVLGIPQPKVSKALSKLRDLGLVNDERKEKYVYY----------------------";
-    seqs[counter++] = "------------------------------------AELFKALGHPLRLRILELLRTGEKTVGELQRLLMVEASSVSQQLAVMRAHHLVESRKQGTNVFYSVKD------------------";
-    seqs[counter++] = "------------------------------------AEFFRTLGHPARIRALELLSEREWSVSELVPEIGLEASHLSQQLGVLRRAGLVTTRKQGTTVFYAVASPEIVTL------------";
-    seqs[counter++] = "------------------------MQTPATTIPHLIAAGFYALCDPLIISVLELLRQQELCVCDLCKALGVNQSKLSFHLKTLKETALVHSRQEGRWIY-----------------------";
-    seqs[counter++] = "---------------------------------EELSQSFRVLGDPTRLRILRLVAEAPLNVTELVSLVGVAQSSVSHHLGKLKGLGLLREERHAGYSYYSL--------------------";
-    seqs[counter++] = "--------------------------------------------DEARLRLLVRLSEGERCVTDLAAGSDERMSTVSQRLKVLKGEGLVTGRREGKHVYYTLADRHV---------------";
-    seqs[counter++] = "---------------------------MAVELVQSL----KALADDKRMQIIHLLLEGDLCVGALAQSLGISEPAVSQHLKVLREAGLVWGEKRG---------------------------";
-    seqs[counter++] = "-----------------------------------------------------MLFLKEYSVNEIAENLHLRQSTVSHQLRFLKNLRLVKYRREGTTLYYSHDDAHVMNMLKETINH-----";
-    seqs[counter++] = "----------------------GAMAAAQPPIYRLKADFFRLLGHPARVRILELLRDGERAVGELQAALGLDSSGTSQHLTAMRRQGLLESRRAGTSVLYRVKDPRIFQLLEVA--------";
-    seqs[counter++] = "------------------------------------AELLALLADRTRLALLHALTGGEADVSTLTQVCGAARPAVSQHLARLRLAGLVNTRKEGRRVIYSLRDGHLRRVVDEAL-------";
-    seqs[counter++] = "-------------------------------------ETFRLIGDPSRLKILYILSHTEENVRNISAAFDMSPPAVSHHLRLLKSMKIIKSERRGKEVYYTL--------------------";
-    seqs[counter++] = "-------------------------------------KIYKVLSNMNRIKILYFLENHEADVSRIVDHVQLSQPIVSHQLAILYHYQLVTRHKRGKHVYYCLDDPHILEMVDAMLGHV----";
-    seqs[counter++] = "---------------------------------KGVSQILKAIADENRAKIYALCQDEELCVCDIANILGVTIANASHHLRTLYKQGVVNFRKEGKLALYSLGDEHIRQIMMIALAHKKE--";
-    seqs[counter++] = "------------------------------------ARVFKVLSVESRVRLIELLKQRSLCVNALARSLAITPAAVSQHLRVLRDAEVVIADKQGYHVHYRI--------------------";
-    seqs[counter++] = "------------------------------KVAGQAAKLLAAIANARRLVILDIISQQETSVGSLAEQVGLSQSALSQHLAKLRSAKLVNTRRDAQTIYY----------------------";
-    seqs[counter++] = "-----------------------------------------VLANANRLLLMCQLSQGEKCVGELEELLDLHQPTLSQQLGVLRSEGLVSTRRDGKKIYYSVADARVLAL------------";
-    seqs[counter++] = "------------------------------EKSEQAARCLRAMAHPARLMILQLLSGSEMSVSELEKALDISQSNLSQHLNLMKDKQLLSSRRSGNQVYYSLKDPRLLGL------------";
-    seqs[counter++] = "------------------------------------ANVFSLLSDPTRLRIILTLKEGEQPVGMIAEKLGRKPTIISQHLAKMRWGKLVRTRQEGTRIFYSLSDEHVSALVDQAI-------";
-    seqs[counter++] = "-------------------------------------DIFKALGDENRLRIINLLSKGKLCVCDIEAILMMTQSNVSRHLNKLKNVGIISSEKKSQWVYY----------------------";
-    seqs[counter++] = "-----------------------ELYQVEREELLSKAELLKVLGHPERLAIVLLTMDGERCVKELVEALGISQPKVSQHVGLMKELGILTFRKEGTKVLYRVNDRKVV--------------";
-    seqs[counter++] = "-------------------------------------DIFRALGDPTRLRIVHLLRAMELAVGEIAQVVGQSQPRVSRHVRILAEAGLVERRKEGNWVFLRL--------------------";
-    seqs[counter++] = "---------------------------------------FHILQSDTRLRILFLLSQKQMCVCELEAGLDVTQSAISHSLSIMKNAGIVGVKREGRFAIYFIHDEEIRKMMQICRKYAEESR";
-    seqs[counter++] = "---------------------------------------FGILSDKTRLRILLLLQNRELCVCEIFGALRMSQPRVSRQLAILKQSRIIKDRRSGKWIYYRIEE------------------";
-    seqs[counter++] = "--------CPMIYALSRNIVISIFLMNISSAALQEIADFFEVLAVPTRLGILLAIGEREVCVCHLEAVLKLRQAAISQHLQVFKKNGWVISRRQGRFVYYKLSNPSVLPL------------";
-    seqs[counter++] = "-----------------------------------MADIFDVVADPTRRDLLRVLPTGEISVSELVQTLGISQPTVSKHLRVLRDSGLVSVREEGQHRYYRLE-------------------";
-    seqs[counter++] = "--------------------------------ALSATELFRLLGDETRLRAVVLLRRGELCVCELTETLGVSQPKMSRHLATLRDSGLVETRRSGQWIHYQL--------------------";
-    seqs[counter++] = "----------------------------APDAPEQAAKFLKSLGHPDRLKVLCSLVGGEQSVASIEAQVGASQSAVSQHLSRLRSEGLLQARRDGRQVYYSIAD------------------";
-    seqs[counter++] = "-----------------------------------------VLGNPDRLLLLCQLSQGEYAVGELETLLGITQPTLSQQLAVLREEQLVSTRREGKQVFYRIDSEAALALMQ----------";
-    seqs[counter++] = "---------------------------------------------------------------DLAQVLQMTPSAISHQLRVLKQMKLVTNRREGKTVFYSLADSHIKTIMNQGMEHIRK--";
-    seqs[counter++] = "-------------------------------------EVLRVLADPTRLQLAGLLLDEEKSVSDLASQLDRPATGVSQHLAKMRMARLVSTRRRGTSVLYRVENDHVRQLVVDTIGHVE---";
-    seqs[counter++] = "------------------------------EVADRLAGIFKQVGDPTRLKIFWLLCQQEECVTNIAYLLDMSSPAISHHLKSLKLADLIESERKGKEMFY----------------------";
-    seqs[counter++] = "-------------------------------------DIFKQLSDPTRVRIFWLLSHREECVINIAALLDMSSPAVSHHLRSLTQSGLIESRRCGKEVYYKAGD------------------";
-    seqs[counter++] = "-----------------------------------------VFAHPHRLMILSRLLRGECTVGEIDAATGIGQPALSQQLAQLRRAETVRTRREARQIHYSLADAHV---------------";
-    seqs[counter++] = "-------------------------QLIGPELSRFKAEFFKALAHPLRIRIVDELRNGEVGVTHLCARLEVEQSSLSQQLAVLRARYIVNARKDGLSVLYSIRDPEIFSL------------";
-    seqs[counter++] = "---------------------------------------FHALSDPIRLNILDILNNQEMCVGNICDLLSIKQSKVSFHLKILKESGFVETRQQGRCIYYRL--------------------";
-    seqs[counter++] = "------------------------------EVFESTARYFSVLGEPTRLKILHVICHKEKCVNDIIRATGLLQANVSRHLGLMYQAGLLSKRRDGTQIFYRV--------------------";
-    seqs[counter++] = "-----------------------------------LADVFRLLGEPNRLRILCAIGSDCKSVSELMSETGIGQSNTSFHLRFLRNAALVNAEPRGRNMYYRVRDKELLKL------------";
-    seqs[counter++] = "--------------------------AAAKEELEEIASLLKLLGDKTRLTIFALLKVRELCVCELTELLHVSQPAISQHLRKLKLANLVRERKVGQWVHYSLRQRHIVLLEKSA--------";
-    seqs[counter++] = "-------------------------------------ELFRILASQIKLEILSLLLENDLCVCQICAIVGTSQPNISQHLNTLRHLGVVDIRKDGTFIYYSL--------------------";
-    seqs[counter++] = "-----------------------EFERICPFMLETFETVAKAVADPSRVRILKLLEGGELCVCQITTVLDLAPATISKHLAALKTAGLVQQRRDGKWVYYRLAERDFNAYARSFLD------";
-    seqs[counter++] = "--------------------------------------FLRAISDPNRLKILCVLQGGSKCVCEIVPLVGISDKLASHHLKQLKNVGLLIEKREGKFIRYNL-DKKVIKEYKNV--------";
-    seqs[counter++] = "-----------------------------------LSDILHLMGEVNRLKLLIECLKGPKSVSDLAEQLQLSVPLTSHHLSLLRSARLLMANREGKHIYYSIYDAHVRCILEDMLKHFTE--";
-    seqs[counter++] = "---------------------------------------FDLLSDPHRLELLSLHRAPGICVSDLAAALGRSENAVSQALRVLRQQGWVSSTRVGRAVSYRLDD------------------";
-    seqs[counter++] = "--------------------------------AEEVSELLRILAHPERLMVLCQLTKGEVGVGQLQQSSALSQSAFSQHLTVLRKHGLIEARKESQQVFYSLADTRVAQLIQ----------";
-    seqs[counter++] = "--------------IEVEMATDEIMKKNAVEVA----ELLRVMAHPERLMVLCQLTHHEMGVGQLQQGSTLSQSAFSQHLTVLRKHGIIQARKESQQVFYRLADSRITAL------------";
-    seqs[counter++] = "-----------------------------------------VLANPDRLKILCVLVDGEMNVQEIEESTDIHQPTLSQQLTVLRKADMVSTRREGKQIFYRLSDPKVLSLMQKLYEALNYC-";
-    seqs[counter++] = "------------------------------------AEFFKTLGHPVRIRVLELLGQREHAVSEMLPEVGVEAANLSQQLAVLRRAGLVANRKEGSAVYYSL--------------------";
-    seqs[counter++] = "------------------------------------ADLLLVMANAHRLRMLKTLAEREVAVNNLADIIGISQSALSQHLAKLRSRDLVKTRRDAQTIYY----------------------";
-    seqs[counter++] = "------------------------------EVFESVARYFSVLGEPTRLRILHALCQEEKCVNEIIKVTALAQANVSRHLGLMYQAGMLSRRREGTQIFYKVAD------------------";
-    seqs[counter++] = "------------------------------ETFEKISDLFKQLGDPTRMRIFWILCHHEECVIHISARMDMSSPAVAHHLRLLKTSGLVTSRRQGKETYYRASD------------------";
-    seqs[counter++] = "------------------------------------------LSNEKRIRILYLLENHSFNVSELSEQLELPQPSVSHQLALLRQYQLVQAHRDGKQIFYTLDDPHIIEVLNDMLAHVQQ--";
-    seqs[counter++] = "--------------------------------------FAKAISDPIRLRILYALREGELCVCELADALELRQSTLSTHLQIIRQAGLVQTRREGRWVYYALE-------------------";
-    seqs[counter++] = "-------------------------------------EAFKAIADPTRRKILTLLRTGDLTAGEIASHFDMQKPSVSHHLKILKQADLVQDRREGQYIYYSL--------------------";
-    seqs[counter++] = "---------------------------------------FKALGQHLRLRIIALLAEQELCVCELEEILGITQPAISQHLRVLKEADLVWEEKVSQWVFYHLKKEKLAAVLQSWLAYLQ---";
-    seqs[counter++] = "-----------------------------PKITGKWEDFFKVLSDETRLRILMLLNQRELCVCEICQILDLPQPKVSRHLAKMRDLDIVRGKKEDQWVFYYL--------------------";
-    seqs[counter++] = "------------------------------ELFEEVANYFSLLCEPTRLKILYAVCNGERSVGDIVNEVESTQANVSRQINMLYRAKILARRKEGTQVYYRVDDEKTVDL------------";
-    seqs[counter++] = "-------------------------------------EVFSMLADATRIRIILALRDQELSVNHLADIVDKSAPAVSQHLAKLRLARIVSTRQEGTKVFYRLTNEHARQLVADAI-------";
-    seqs[counter++] = "-------------------------------------ELLRALASPTRIAIVQSLGSESRCVHELVGELELSQPLVSQHLRVLKDAGVVRGERNGREIMYSLVDHHIVHIVDDALVHATE--";
-    seqs[counter++] = "------------------------------ELLENAAATLRMLAEPTRLHLLWQLSQGPKSVTELTEAAAVPRTVVSQHLAKLRLSGMVDGRKNGRQVIYSLHDGHLVRLIRETINH-----";
-    seqs[counter++] = "-------------------------------------EILKALSDENRLRILNLLRWGKLCVGEIQSILGITQSNASRHLNKLKGVGIIKFEKDAQWVHYKL--------------------";
-    seqs[counter++] = "------------------------------------------LSDPARLQMLWALSTEDLSLSDLAQLVGVSSTVASQLLSRLRTAGVLQTRKSGRHVIYSMHD------------------";
-    seqs[counter++] = "--------------------------------AEKTARMFKVLSVGSRVRMVELLKERSLCVNALARTLGITAAAVSQHLRVLRDAGLVCPEKHGYYVHYRI--------------------";
-    seqs[counter++] = "---------------------------------ERLAEIFKALGHPTRVKIVEYLADGEKCVKDIWQEIGVPQPTVSQHINILKNAGIISFRKDG---------------------------";
-    seqs[counter++] = "------------------------MENLTPEAMEQVAAYFRALSEPTRLAILNLLREGERNVGELAQLCSCSPANVSRHLSLLSQHGLVRREGRGTAVYYRIADDSVYAL------------";
-    seqs[counter++] = "------------------------------EKASDISKAFRHLGDPKRLQIFWLLCHRKECVINIAAIMGMSSPAISHHLKILKTAGLISSKREGKEMFYKAND------------------";
-    seqs[counter++] = "---------------------------------ENLSPLFHALADPNRLRIIELLRQEDLTVGSIAERLDISQPQTSKQLRVLYDAGLVS--------------------------------";
-    seqs[counter++] = "-------------------------------------ELLRALSAPIRLAIVSQLAEGERCVHELVNQLGAAQPLVSQHLRVLRGAGVVRGSRRGREIAYTLVDEHVAHIVADAVSHASE--";
-    seqs[counter++] = "-------------------------------------ELLKIMAHPERMMVLCQLIEGEVAVAQLQQASLLSQSALSQHLALLRRQRLISARKRSQQVFYSLADQRVQQLI-ASLQHIASC-";
-    seqs[counter++] = "-----------------------------PEVFDRIAERLRILAHPHRLRMVEMLLAGKYSVGELAESCSIPSHMASEHLRLMQHCGLLGSEKEGRYTYYRI--------------------";
-    seqs[counter++] = "------------------------------------------LSDQNRLRVLSLLDGNELTVKEMLEILQLSQSTLSSQLSQLKDSGLVQSRRDGQYVFYKLPRQYETQMVSNPID------";
-    seqs[counter++] = "------------------------------------AELLRQLANTNRLLILCHIAAEERSVGQLEADLGIKQPALSQQLAELRQYGLVKTRRQSRSIYYSIAD------------------";
-    seqs[counter++] = "------------------------------------------LSDETRMRILNLLEKGEMCVCEMEEILDISQSNASRHLTKLTNAEIINYNKVSKYVYYKI--------------------";
-    seqs[counter++] = "--------------------------------------------------LLYQLKDGERCVGELV-VDGNKLSTVSARLQTLLNANLVKRRRDARHLYYRLADQHVVQLIDNALAHVDE--";
-    seqs[counter++] = "--------------------------------AEEVAELLRVMAHPERLMVLCQLTQSEMGVGQLQQGSTLSQSAFSQHLTVLRKHGIIQARKESQQVFYRLADSRI---------------";
-    seqs[counter++] = "---------------------------------REMAELLGVLSHPCRVQIVEELRDSERNVNALQELLGISHSGVSQHLALLRTRKLLKERRSGRHVYYRL--------------------";
-    seqs[counter++] = "---------------------------------------FALLADPLRLRIVEALSREQLCTCHLVDITGARQTTISNHLRLLREAGVVASEPEGRYTWYRL--------------------";
-    seqs[counter++] = "-------------------------------------EILKALADETRIRILNLLYRETLCVCDLEEILKLSQSNASRHITKLKQAKLIAGEKQAQWIYYQV--------------------";
-    seqs[counter++] = "---------------------------------RNLVKFFAALADPTRLRLLNMMAGGEVCVCHFQGVLQTNQPKISRHLAYLKKAGLVEARRDGKWMHYRL--------------------";
-    seqs[counter++] = "---------------------------------------FKALGDEKRLRILSLLRQGERCACVLLEHLNLSQPTLSHHMKILCEARLVTGRKEGKWVYYSL--------------------";
-    seqs[counter++] = "-------------------------------------KLFKALAHPTRIQILNLLQEGELCVCEIYEALELSQSNISQHLKVLRDQNLVESQKVGVEVHYKIKN------------------";
-    seqs[counter++] = "------------------------------------AEILSLLADRTRLALLRRLSLGEADVTTLTRACGVARPAVSQHLARLRLAGLVTTRKEGRRVVYALRHGHLRRLIDEALN------";
-    seqs[counter++] = "-------------------------------------EIFKALSDKNRLLILDMISCGELCACDIMDVLNLTQPTISHHMKVLQKCELVDARKEGKWVFY----------------------";
-    seqs[counter++] = "-------------------------------------EVFRMLADATRVQVLWSLADREMSVNELAEQVGKPAPSVSQHLAKLRMARLVRTRRDGTTIFYRLENEHVRQLVIDAVE------";
-    seqs[counter++] = "---------------------------------------FKLLGNETRLNILLLLEKQPQTVSELVSALHLKQSNVSHQLAQLKHHQLIASTRRGKNLLYSLRDPHVITMIETTYEH-----";
-    seqs[counter++] = "---------------------------------------FKALADENRIRILNLLKNGKLCVCDIEAVLGIKQSNTSRHLNKLKMAGIIVSEKKSQWVYYRLND------------------";
-    seqs[counter++] = "-------------------------------VYQLISEIFKTLAHPLRIQILMMLSEKERCVCELLNEIGVEQSNLSQHLRILKKQGIIDSRKDGQKMFYRI--------------------";
-    seqs[counter++] = "-----------------------ELPEMSSEQLARLASLFRLLGDEGRLKLVMACIDAPQPVCCLSEISGMSQPLTSHHLRGLREARILKSSRRGKQVLYELDDHHI---------------";
-    seqs[counter++] = "------------------------------DMAQEQVTILKALADPNRLAIIQHLTEGEACVCELLQLFSVTQPTLSHHMRILSDADLVKGRREGKWIHY----------------------";
-    seqs[counter++] = "-------------------------------------DIFKALADENRIKIIKMLACCDMCVCDICGNLNLSQPAVSHHLKILSDSGLLNTTRKGKWIYYSL--------------------";
-    seqs[counter++] = "-------------------------------------DLFKALSDPTRRKILELLKEKDMSAGEIAEYFDISKPSISHHLNILKNAKLVLWEKDGQNIIY----------------------";
-    seqs[counter++] = "-------------------------------------KIFKILGSETRLNILLLLEKKDMTVTDLFNELEVSQPAISKQLAILKEYKIISYDKKGVENIYKLNDLHILNVINSTMGH-----";
-    seqs[counter++] = "---------------------------MAEQVFAQVASYFGLLADPTRLRILSCLCGEERPVHDVVERIGLTQANISRHLNILYRAGVVDRRREGSSVLYKVVD------------------";
-    seqs[counter++] = "------------------------------------AECLKALASPVRLKILFTLKDKPMCVTDLEQELGISQSSLSQHLRTLRYKGIVAKTRKGNKVYY----------------------";
-    seqs[counter++] = "------------------------------------ATLFKALAEPIRLRILALLKDGELCVCDLTETLALPQSTVSRHLAVLRTAGWIRGRKGGSWTYYSL--------------------";
-    seqs[counter++] = "------------------------------------ADLFKALADPMRLRILALLRTREACVCELAGLLPITQPAVSQHLRKLRQAGLIHERRHKYWTYY----------------------";
-    seqs[counter++] = "------------------------------------ADFFKALAHPLRIRILEVLSEGERNVNELQTALGSEGSAVSQQLAVLRAKNLVNSFKEGTTVVYSLRD------------------";
-    seqs[counter++] = "-----------------------------PDRAGRIAEVLKAVAHPLRLRIVASLCREELNVSALAERLGASQAIVSQQLRILRSLGLVA--------------------------------";
-    seqs[counter++] = "-----------------------------------------------------VLKRRALCVTELTSQLGISQSATSQHLRVLKDARIVKFQKRGLHVYYHL--------------------";
-    seqs[counter++] = "-----------------------------------LTNFLKIISDKNRLIILYLLSRNILCVCDIQKLIPLTQGALSIQLKNLMSAGLLESFKQGKWVFYKL--------------------";
-    seqs[counter++] = "-----------------------DMQMMMKDNANKASSLLKAISHESRLLILCLLLRREMTVGELAEYSSLSQSAFSQHLSVLRNNGLVKCRKEAQNVYYSIND------------------";
-    seqs[counter++] = "--------------------------------------FFEAFSNKNRFEILMQLRNKELCAGELQQKLKIEQTNLSHDLKCLLNCRFISVRKDGR--------------------------";
-    seqs[counter++] = "-----------------------------------------ILANEDRLLLLCQLSQGEKAVGELEDALGIHQPTLSQQLGVLRSDGLVNTRREGKRIFYSIADDKVLAL------------";
-    seqs[counter++] = "-------------------------------------------ADANRLRILACLKKGEVCVCDFTDFLNISQPAVSQHLRKLKEAGIITERKVGTWKHYRIQE------------------";
-    seqs[counter++] = "-----------------------------------LSNIFKALNDPIRVKILFALLEYEICVGEMVNLLQIPQSHVSHQLRILRKYGIVEFTKDKKMSFYYIKNEYIKTL------------";
-    seqs[counter++] = "---------------------------------------FDMLSAPNRLHLVWLLATGEFDVSTLAELSGSNVPAASQHLAKLRAAGIVTARRDGRRQLYRVEDPHIVTVIEQMFSHI----";
-    seqs[counter++] = "--------------------KAKEAQLLSMEILEQAAECLRTLAHPHRLRIVQILLDHEESVGELARACELPSHMVSEHLRLLKDRGFLESRRDGRKVFY----------------------";
-    seqs[counter++] = "-------------------------------------EIFKALGDENRIRILNLLIRQELCVCEIETVLDMTQSNASRHLNKLKTSGIITSEKKSQWVYYRV--------------------";
-    seqs[counter++] = "------------------------------EVEQYIDRFLDTVCDTRRRAIVELLAISEMRSGDIARAIGLSAATTSEHLRQLAQTGLLTSRRQGNTVYYSLCNHKLVQAFRDLLEAL----";
-    seqs[counter++] = "------------------------------EMMEATARVLKLLGDPTRLTILAILQKRECCVCELMEVFSSSQPAISQHLRKLKDAGLLQEERRGQWVYYSL--------------------";
-    seqs[counter++] = "------------------------------------AELLAVLGNERRLVILGHLTEGEISVGELAVLVGLSKSALSQHLSKLRKHQLVSTRRHRQTVYY----------------------";
-    seqs[counter++] = "-------------------------------------ELIRVLGDPLRLKIVTLLARETLCTSHLVEETGARQTNLSNHLRVLREAGVVETEPCGRFTYYKLRPDVIAAL------------";
-    seqs[counter++] = "------------------------VSAFTEQFARKASDLLKAMSHETRLVILCLLSEKERSVGDIESILSMPQAAVSQQLARLRFDRLVKTRREGRTVYYSLASEEVTSL------------";
-    seqs[counter++] = "------------------------------------ADLFKIMGDRSRLSMVAMMNRRECCVCDFTECFGMSQPAVSQHLKKLRAMGLIKERKEG---------------------------";
-    seqs[counter++] = "--------------------------------SQEAAKVMQLLSHPDRLLILCLLSEKEYSVGEIEKQLDIHQPMLSQHLNRLRQQSLVATRREGKYIYYQLCD------------------";
-    seqs[counter++] = "--------------------------------ASAAAELLKLVANPNRLRILYLLTEGERSVSEIEQRLGIRQPTLSQQLGELRNAGTVTTRRAHKVVFYSL--------------------";
-    seqs[counter++] = "--------------------------------------FFKALADDSRLKIVGILANQECSVEELAVLLQLKEPTVSHHLAKLKELNLVTMRPEGNSRLYQL--------------------";
-    seqs[counter++] = "------------------------------------ASILKALGHPIRLKILYLLSEKEHCVCELLSQINTSQPNLSQHLSILRNLKLIKDERNGNMVIYKLQDNKIV--------------";
-    seqs[counter++] = "-------------------------------------------------------------VGELTEEVGVSQSLVSQHLRLLRAGRLLKQTRSGRNVFYALPDCHVRTMLTNMMDHVLE--";
-    seqs[counter++] = "------------------------------------------LASSNRLELLEALAQGERSVDALAQATGMSVANTSHHLQILRDSGLAESRKEGLQVIYRLSDDQIPVL------------";
-    seqs[counter++] = "---------------------------------QKLIKFFHALSDETRLKIIKLLEKSELCVCEIVAALDMVQPKVSFHLGVLKEAGLVKIKRKGKWILYSLDD------------------";
-    seqs[counter++] = "--------------------------------AEVASELMKILSNENRLMILCQLVDGEKSVGELVELLDLNQPTVSQQLSRMKNQGLVSYRKNAQTVYYSL--------------------";
-    seqs[counter++] = "-----------------------------------------LLGDKTRLTILSYLKDQELCVCELVDLLDISQPAISQHLKKLRVAEIIRERKQGTWVYYSL--------------------";
-    seqs[counter++] = "------------------------------------------LADSTRLKILNLLSRQEMAVCELIEALDLSQPAVSHHLKLLKQACLITDSREGKWVLY----------------------";
-    seqs[counter++] = "----------------------------------------------------------------MATEVGMEQSACSHQLRLLRNLGLVVGTRKGRSVVYSLYDNHVAELLDQAIYHIPVC-";
-    seqs[counter++] = "--------------------------------------FLKVLGNPLRLQILKILSHVDMCVCAISEILGQQQTLVSHHLSKLKSARIVEERQNGKYRIYSIKDKRVKSL------------";
-    seqs[counter++] = "--------------------------------AERLADRLRPLAQPQRLMILSLLLAGEHTVGEIETRTGIGQPALSQQLAELRRSGLVTTRRAARQVHYRIAD------------------";
-    seqs[counter++] = "-------------------------------------DFLKLLADETRLKIIMMLSQRDMCVCEIMDELAMSQPAVSHHLRILKKSGIVRDDKDGRWVFYSL--------------------";
-    seqs[counter++] = "--------------------KTRELELSIPGVSDTLAKFFRAIADPNRLLLLEFLVSCEHTGNECVAHVRLAQSRVSSHLQCLVNCGFVRVRREGHFAYYRVVDERVIDL------------";
-    seqs[counter++] = "------------------------------------------LADKNRLKIIQYLSTGQRNVSEVADRLNVEENLASHHLRVLASLGFLKNDKKGREVYYRINETRFVALLKDLL-------";
-    seqs[counter++] = "---------------------SHELAAAAPGI-EAMAAVLALAGNEVRLKMLFLLLDQQLCVCDLADVLQMNVSAISQHLRKLKDGGVIQARKVGQTVFYSL--------------------";
-    seqs[counter++] = "------------------------------------------LADPTRMRMLWLISGEEYDVASLAAAVDIARPAVSQHLAKLKLAGLVTQRRDGRRILYRARGGHVLAEVMNAADH-----";
-    seqs[counter++] = "--------------------------------AREVSRLLSVLANENRLLIVCLMMRSEMKVGELVDALHLSQSALSQHLTKLREEGLVEFRRESQTLHYKIADERVTKL------------";
-    seqs[counter++] = "-----------------------------------LTNIFKVLSDENRLRMIVLLYQEELCVCELSGILNVPQPRISQNLSRLRDLNLVDDERKEKFVFYSL--------------------";
-    seqs[counter++] = "------------------------------------AEILRILSHPERLLVLCQLMEGELGAGQLQNSSTLSQSAFSQHLTVLRKHNLVKVRKESQQVFYSLADERIAALIHN---------";
-    seqs[counter++] = "------------------------------------------MGNPQRLRILLLLAEHERSVIELEALVGLSQSAVSQHLARLRQIKLVRFRRDGQMTFYAL--------------------";
-    seqs[counter++] = "-----------------------------PIYAQ-LARVGKALASPIRLRLLDLLDGAELTVEELSEQAGVPLKNTSAQLQQLRAANLVATRKEGTRVHYRLAD------------------";
-    seqs[counter++] = "---------------------------MATDALDQVSHLFKLMGHPKRLQLLYLLIQQSMTVSQISERLKWEQSAVSHQLQVLRKYQIVERVKNGRQVVYRLVD------------------";
-    seqs[counter++] = "------------------------------------------LADSTRVQVLWALVDRELSVNDLAEHVGKPAPSVSQHLAKLRMARLVRTRKEGTQVIYRLENDHVRQLVTDAVN------";
-    seqs[counter++] = "------------------------------------AEFFKTLGHPVRIRVLELLSEREHAVSEMLNEVGVEAAHLSQQLAVLRRAGLVTARREGSAVHYTLAD------------------";
-    seqs[counter++] = "------------------------------------------LADENRLRILRALVGTEKPVSKLVEELGISQPLVSHHLKELRRALLVSVERRGPFVYCRLAD------------------";
-    seqs[counter++] = "--------------------------------AEHVAEMLKLMAHPHRLMILCLLVESEHNVGELVEALDINQTALSNHLSKLRSAGLIDYTRYHRVLQYRL--------------------";
-    seqs[counter++] = "---------------------------IVPVVFQGAADLFAALSCPTRLRIVCALSQADHTVRDLARASQCSQANVSGHLRLLRRANIVRCERSGNYVLYHL--------------------";
-    seqs[counter++] = "------------------------------EVFEEVANYFSLLCEPTRLKILYAVCNGERSVGDIVAQVESTQANVSRQLAMLYRAKILARRKEGTLVFYRVDD------------------";
-    seqs[counter++] = "---------------------------------RQLADVGGALSNPHRLKMISLLAQGDKPIDELAKLTNQSLAAASANVKVLRNCHLIATEKRGRSVYCSLKDPRVAELW-----------";
-    seqs[counter++] = "-------------------------------------ELLRALSAPIRLAIVSELAEGERCVHELVDKLGAPQPLVSQHLRVLRSAGVVRGSRRGREIAYTLVDEHVAHIVTDAVSH-----";
-    seqs[counter++] = "-------------------------------------------AHPLRLKILCVLGEGEACVQDIVEAVGTSQSNISQHLAILRDKGVLQTRKDANRVYYRVGDQRTLQL------------";
-    seqs[counter++] = "-----------------------------------------VAAEPTRRRLLQLLAPGERTVTQLASQFTVTRSAISQHLGMLAEAGLVTARKQGRERYYRL--------------------";
-    seqs[counter++] = "-----------------------------------------VAAEPTRRRLLQLLAPGERTVTQLASQFTVTRSAISQHLGMLAEAGLVTARKQGRERYYRL--------------------";
-    seqs[counter++] = "-------------------------------------EMLKILSDTNRLRILNLLYIQELCVCELEYLLTISQSNLSKHLRLMGEIGFLDSRRQNKFIYYKI--------------------";
-    seqs[counter++] = "------------------------------------AESFRLLADPTRIKVLWALLQGESSVACLAELAGAAPTXXSXHXXKLRLAGLVTGRREGTFVYYSAVNNHVRGLLAQALFH-----";
-    seqs[counter++] = "--------------------------------AEATATLFA-LANQNRLLLLCQLCNGEMSVSALEEALGIHQPTLSQQLGVLRSEGLIASRREGKRIYYSVANPKVLVLINTLVD------";
-    seqs[counter++] = "------------------------------EILDAAGELLRALAAPVRIAIVLQLRESQRCVHELVDALHVPQPLVSQHLKILKAAGVVTGERSGREVLYRLADHHLAHIVLDAVAH-----";
-    seqs[counter++] = "---------------------------------QDLLKVFYALSDSVRLGIVSLLECEELCVCQITQAFGLSQPNASFHLRVLREANLVLWEKRGKWTYYKINHH-----------------";
-    seqs[counter++] = "---------------------------------------FKALGEPSRLKIIKLLSQQSMCVCELSEVLDMSQPRVSQHLRTLKEVDLVYEERQGFWTYYKL--------------------";
-    seqs[counter++] = "---------------------------------------FKALSDQTRLRMVTLLSRREYCNCEFVSIFGISQPAISRHIARLKEARLIHERRPGQWIYYSL--------------------";
-    seqs[counter++] = "---------------------------------------FKALADSNRLRILDYLKKGKSCACDLSDNLGIPQTALSYHMRILCQAKLVKSEQVGKWKHYQLND------------------";
-    seqs[counter++] = "-----------------------ELEAKAEDAAQ----FLKMIASPPRLLLLCHMAERECSVGELAERTGMRMPTVSQQLSLLRAQGLVNTRRDGTTIYYRL--------------------";
-    seqs[counter++] = "-------------------------------------KIFSALSDKNRLRIYLLLTQAELCVCELVNILDMEQSRISHSLRILKEAKLINNHRVGK--------------------------";
-    seqs[counter++] = "-----------------------------PESLRSIASLLKALSDPLRLQVLEQLSTGERCVCDLTSSLALSQSRLSFHLKVMKEAGLLSDRQSGRWVYYRIRPESLNAL------------";
-    seqs[counter++] = "------------------------------------AKLFRGFADPSRLAILEVLRSAPATVGEIAASTGQGLSNVSNHLRCLRDCGLVVRQRDGQRVRYSLSDQRVAAL------------";
-    seqs[counter++] = "--------------------------AMAGNVEQA-EQLLKVLANKNRLMILCSLQDSEMSVSQLNEAVPLAQSALSQHLAALRKANIVATRRESQTIYYRVIDENAVVL------------";
-    seqs[counter++] = "-------------------------------------------ADTLRVQVLSLLHKNSFSVGELVEILGVRQSALSHHLKVLAQAELVATRREGNSIFY----------------------";
-    seqs[counter++] = "----------------------------AAQVFERAAELFGLLSSPLRLRIVGELCRGELNVGQLQERIGATQSNMSQHLSVLYRAGVVARRRDGAQVHYRI--------------------";
-    seqs[counter++] = "----------------------------------ALLRWLKALSDDTRLRLLHLLSRYELSVGEVVQVLGMSQPRVSRHLKILADAGMVQVRRDGLWAFYSATSH-----------------";
-    seqs[counter++] = "-----------------------DMQDIAAQLQELHARVCKAIADPKRLLIINELRDRELSVGELCEATGLSQSNASQHLTILRERGIVTTRRVKNNVFYSLRSQKIV----QAVDLLRE--";
-    seqs[counter++] = "---------------------------------------FRALSDRTRLRILNLLRGGELCVCDLVDVLDVPQPTASRHLAYLRNAGLVLARKEGLWHYYRL--------------------";
-    seqs[counter++] = "------------------------------------AAYFQALAEPTRLQILNFLRQQERNVGELAQLCGYSSANISRHLALLTQHGLVSRQARGNSAYYRIAD------------------";
-    seqs[counter++] = "-------------------------------------DMFKAMADPTRRRILQLLSEKNLSAGEIAEEFTMSKPAISKHLDILKTSELITCEKQGQYVIYAINTSAVEQMYCRFLD------";
-    seqs[counter++] = "--------------------------------AHEASDLLKALAHQTRLLILCILANEERTVGEIENILGIQQAMVSQQLARLRLEGLVHTRRQGRLVYYSIGNVSVLAFLESLFD------";
-    seqs[counter++] = "--------------------------------------------DPLRLNVLRALANDSFGVLELAQIFGIGQSGMSHHLKVLAQADLVATRREGNAIFYRRALPHLNAVKDGALDH-----";
-    seqs[counter++] = "------------------------------EMTPDIVSFLKTISEENRLKILCFLRDWEKCVCEIVEFLKIPQNLVSHHLRKLKDARILSARKDGMNVRYSINEDEI---------------";
-    seqs[counter++] = "----------------------------AEPVFDRLAQVLDLAGNANRLKIIYLLEESNLCVCDLSDILGMSIPAVSQHLRKLKDAQLIQARKVGQTVFYSL--------------------";
-    seqs[counter++] = "--------------------------------ASAAARLMKLMANEQRLILMCRLGEGECSVGDLAAHVGLAQSAASQHLAKLRAEGVVATRRDGQTIYYRLED------------------";
-    seqs[counter++] = "------------------------------ENATEVAGILKQLSNPYRLMILCCLSENELTVGDLNQRIDLSQSALSQHLAKLRESNIVTTRRESQTIFYRI--------------------";
-    seqs[counter++] = "-----------------------------------------VLSNPDRLKILCVLIDGELNVQQIEKTAQVYQPTLSQQLTILRKSKMVSTRREGKQIFYQFSDMRILQIMQTLYD------";
-    seqs[counter++] = "---------------------------------------FHSLSDATRLAIVLRLARGEARVADLVGELGLAQSTVSAHVACLRDCQLVAGRPEGRQIFYRLARRELIDLLASALE------";
-    seqs[counter++] = "-----------------------------------MAKFYRALGDPTRLDLLEFCAEDERTGNECVERAGLSQGRVSAHLACLVSCGLVSVRRQGRFAYYRVTDPRVAEL------------";
-    seqs[counter++] = "---------------------------IETEISPELTNFIKVLSNPIRAGIIKMLKKRWMCVCLIAKALNQDQTLISHHLRTLKNMNLLHERREGK--------------------------";
-    seqs[counter++] = "------------------------------------AQVFKALGNPVRMALVQELLAGERCVCDLAQALGGNMPAVSKHLATLREAGIVSCRREGTTIHYSL--------------------";
-    seqs[counter++] = "------------------------------------AKLMEMLSQPVRLRILCILLDGEQSVLKLADMAGLSQPAMSHHLRKLRDADLVNTRRDAQTIYYSLKGQEVSAV------------";
-    seqs[counter++] = "------------------------------------------LGSSNRLMLVCQLLDGERAVGELAEALGLAQSVVSQHLSLLRRDGLVTGRRDGQSIYYAISDDRVHAL------------";
-    seqs[counter++] = "----------------------------------------AVLANINRLLLMCQLSQGEKCVGELEELLDLHQPTLSQQLGVLRGAGLVNTRRDGKKIHYSVADARVLTL------------";
-    seqs[counter++] = "---------------------------------QTLLGFFQALADANRLRIVGVLAQGPQTVEQISALLGLGMSTTSHHLRKLAKAGLVEARADGHYSVYSLRTQTLEELAKNLL-------";
-    seqs[counter++] = "-------------------------------------DLFKCIGNPTRYKILKVLCERPLCVNKLNEAVGYSQPNISQHLKLMRMSGIVTCSKNGMNICYQIADDDIIKLLELAEDILKNRR";
-
-    char ** seqsCpy = new char*[counter];
-    for (int k = 0; k < counter; ++k) {
-        seqsCpy[k] = MultipleAlignment::initX(122);
-        for (int pos = 0; pos < 122; ++pos) {
-//            seqs[k][pos] = (seqs[k][pos] == '-') ? MultipleAlignment::GAP : subMat.aa2num[(int) seqs[k][pos]];
-            seqsCpy[k][pos] = (seqs[k][pos] == '-') ? MultipleAlignment::GAP : static_cast<int>(subMat.aa2num[(int) seqs[k][pos]]);
-        }
+  char** seqsCpy = new char*[counter];
+  for (int k = 0; k < counter; ++k) {
+    seqsCpy[k] = MultipleAlignment::initX(122);
+    for (int pos = 0; pos < 122; ++pos) {
+      //            seqs[k][pos] = (seqs[k][pos] == '-') ?
+      //            MultipleAlignment::GAP : subMat.aa2num[(int) seqs[k][pos]];
+      seqsCpy[k][pos] =
+          (seqs[k][pos] == '-')
+              ? MultipleAlignment::GAP
+              : static_cast<int>(subMat.aa2num[(int)seqs[k][pos]]);
     }
+  }
 
-    MultipleAlignment::MSAResult res(122, 122, counter, seqsCpy);
-    MultipleAlignment::print(res, &subMat);
+  MultipleAlignment::MSAResult res(122, 122, counter, seqsCpy);
+  MultipleAlignment::print(res, &subMat);
 
-    MsaFilter msaFilter(10000, counter, &subMat, par.gapOpen.aminoacids, par.gapExtend.aminoacids);
-    std::vector<Matcher::result_t> empty;
-    size_t filteredSetSize = msaFilter.filter(res, empty, 0, 0,-20.0, 90, 100);
+  MsaFilter msaFilter(10000, counter, &subMat, par.gapOpen.aminoacids,
+                      par.gapExtend.aminoacids);
+  std::vector<Matcher::result_t> empty;
+  size_t filteredSetSize = msaFilter.filter(res, empty, 0, 0, -20.0, 90, 100);
 
-/*    std::cout << "Filtered:" << filterResult.setSize << std::endl;
-//    for(size_t k = 0; k < res.setSize; k++){
-//        std::cout << "k=" << k << "\t" << (int)filterResult.keep[k] << std::endl;
-//    }
+  /*    std::cout << "Filtered:" << filterResult.setSize << std::endl;
+  //    for(size_t k = 0; k < res.setSize; k++){
+  //        std::cout << "k=" << k << "\t" << (int)filterResult.keep[k] <<
+  std::endl;
+  //    }
 
-    std::cout <<"Filterted MSA" << std::endl;
-    for(size_t k = 0; k < filterResult.setSize; k++){
-        printf("k=%.3zu ", k);
-        for(size_t pos = 0; pos < res.centerLength; pos++){
-            char aa = filterResult.filteredMsaSequence[k][pos];
-            printf("%c", (aa < MultipleAlignment::NAA) ? subMat.num2aa[(int)aa] : '-' );
-        }
-        printf("\n");
-    }
-*/
-    //seqSet.push_back(s5);
-    PSSMCalculator pssm(&subMat, par.maxSeqLen, filteredSetSize, 1.0, 1.5);
-    PSSMCalculator::Profile profile = pssm.computePSSMFromMSA(filteredSetSize, res.centerLength,  (const char **) res.msaSequence, false);
-    //std::string libraryString((const char *)Library1_lib, Library1_lib_len);
-    ProfileStates ps(32, subMat.pBack);
+      std::cout <<"Filterted MSA" << std::endl;
+      for(size_t k = 0; k < filterResult.setSize; k++){
+          printf("k=%.3zu ", k);
+          for(size_t pos = 0; pos < res.centerLength; pos++){
+              char aa = filterResult.filteredMsaSequence[k][pos];
+              printf("%c", (aa < MultipleAlignment::NAA) ?
+  subMat.num2aa[(int)aa] : '-' );
+          }
+          printf("\n");
+      }
+  */
+  // seqSet.push_back(s5);
+  PSSMCalculator pssm(&subMat, par.maxSeqLen, filteredSetSize, 1.0, 1.5);
+  PSSMCalculator::Profile profile = pssm.computePSSMFromMSA(
+      filteredSetSize, res.centerLength, (const char**)res.msaSequence, false);
+  // std::string libraryString((const char *)Library1_lib, Library1_lib_len);
+  ProfileStates ps(32, subMat.pBack);
 
-    char mmOrder[] = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y','\0'};
-    for (size_t i=0 ; i<20;i++)
-        std::cout<< mmOrder[ProfileStates::hh2mmseqsAAorder(i)] <<std::endl;
+  char mmOrder[] = {'A', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'K', 'L', 'M',
+                    'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'Y', '\0'};
+  for (size_t i = 0; i < 20; i++)
+    std::cout << mmOrder[ProfileStates::hh2mmseqsAAorder(i)] << std::endl;
 
-//    std::ifstream libFile;
-//    libFile.open ("/home/clovis/Software/mmseqs-dev/data/LibraryPure.lib");
+  //    std::ifstream libFile;
+  //    libFile.open ("/home/clovis/Software/mmseqs-dev/data/LibraryPure.lib");
 
-//    std::string libData((std::istreambuf_iterator<char>(libFile)),
-//                        std::istreambuf_iterator<char>());
+  //    std::string libData((std::istreambuf_iterator<char>(libFile)),
+  //                        std::istreambuf_iterator<char>());
 
-//    ps.read(libData);
+  //    ps.read(libData);
 
-//    std::string sequence({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,'\0'});
+  //    std::string
+  //    sequence({0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,'\0'});
 
-    size_t L = res.centerLength;
-    std::string disc;
-    ps.discretize(profile.prob, L, disc);
-    for (size_t i = 0 ; i< L ; i++)
-        std::cout<<i<<","<<(int)disc[i]<<std::endl;
-    //pssm.printProfile(res.centerLength);
-    pssm.printPSSM(res.centerLength);
-    for (int k = 0; k < counter; ++k) {
-        free(seqsCpy[k]);
-    }
-    delete [] seqsCpy;
-    return 0;
+  size_t L = res.centerLength;
+  std::string disc;
+  ps.discretize(profile.prob, L, disc);
+  for (size_t i = 0; i < L; i++)
+    std::cout << i << "," << (int)disc[i] << std::endl;
+  // pssm.printProfile(res.centerLength);
+  pssm.printPSSM(res.centerLength);
+  for (int k = 0; k < counter; ++k) {
+    free(seqsCpy[k]);
+  }
+  delete[] seqsCpy;
+  return 0;
 }
 
-//PQITLWQRPLVTIKIGGQLKEALLDTGADDTVLEEMSLPGRWKPKMIGGIGGFIKVRQYDQILIEICGHKAIGTVLVGPTPVNIIGRNLLTQIGCTLNF
+// PQITLWQRPLVTIKIGGQLKEALLDTGADDTVLEEMSLPGRWKPKMIGGIGGFIKVRQYDQILIEICGHKAIGTVLVGPTPVNIIGRNLLTQIGCTLNF
 //                     ALLDTGADDTVISEEDWPTDWPVMEAANPQIHGIGGGIPVRKSRDMIELGVINRDGSLERPLLLFPLVAMTPVNILGRDCLQGLGLRLTNL

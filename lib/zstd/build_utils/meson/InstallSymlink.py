@@ -12,60 +12,69 @@ import os
 
 
 def mkdir_p(path, dir_mode=0o777):
-  try:
-    os.makedirs(path, mode=dir_mode)
-  except OSError as exc:  # Python >2.5
-    if exc.errno == errno.EEXIST and os.path.isdir(path):
-      pass
-    else:
-      raise
+    try:
+        os.makedirs(path, mode=dir_mode)
+    except OSError as exc:  # Python >2.5
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
 
 
 def install_symlink(src, dst, install_dir, dst_is_dir=False, dir_mode=0o777):
-  if not os.path.exists(install_dir):
-      mkdir_p(install_dir, dir_mode)
-  if not os.path.isdir(install_dir):
-      raise NotADirectoryError(install_dir)
+    if not os.path.exists(install_dir):
+        mkdir_p(install_dir, dir_mode)
+    if not os.path.isdir(install_dir):
+        raise NotADirectoryError(install_dir)
 
-  new_dst = os.path.join(install_dir, dst)
-  if os.path.islink(new_dst) and os.readlink(new_dst) == src:
-    print('File exists: {!r} -> {!r}'.format(new_dst, src))
-    return
-  print('Installing symlink {!r} -> {!r}'.format(new_dst, src))
-  os.symlink(src, new_dst, dst_is_dir)
+    new_dst = os.path.join(install_dir, dst)
+    if os.path.islink(new_dst) and os.readlink(new_dst) == src:
+        print("File exists: {!r} -> {!r}".format(new_dst, src))
+        return
+    print("Installing symlink {!r} -> {!r}".format(new_dst, src))
+    os.symlink(src, new_dst, dst_is_dir)
 
 
 def main():
-  import argparse
-  parser = argparse.ArgumentParser(description='Install a symlink',
-      usage='InstallSymlink.py [-h] [-d] [-m MODE] src dst install_dir\n\n'
-            'example:\n'
-            '\tInstallSymlink.py dash sh /bin\n'
-            '\tDESTDIR=./staging InstallSymlink.py dash sh /bin')
-  parser.add_argument('src', help='target to link')
-  parser.add_argument('dst', help='link name')
-  parser.add_argument('install_dir', help='installation directory')
-  parser.add_argument('-d', '--isdir',
-      action='store_true',
-      help='dst is a directory')
-  parser.add_argument('-m', '--mode',
-      help='directory mode on creating if not exist',
-      default='0o777')
-  args = parser.parse_args()
+    import argparse
 
-  src = args.src
-  dst = args.dst
-  install_dir = args.install_dir
-  dst_is_dir = args.isdir
-  dir_mode = int(args.mode, 8)
+    parser = argparse.ArgumentParser(
+        description="Install a symlink",
+        usage="InstallSymlink.py [-h] [-d] [-m MODE] src dst install_dir\n\n"
+        "example:\n"
+        "\tInstallSymlink.py dash sh /bin\n"
+        "\tDESTDIR=./staging InstallSymlink.py dash sh /bin",
+    )
+    parser.add_argument("src", help="target to link")
+    parser.add_argument("dst", help="link name")
+    parser.add_argument("install_dir", help="installation directory")
+    parser.add_argument(
+        "-d", "--isdir", action="store_true", help="dst is a directory"
+    )
+    parser.add_argument(
+        "-m",
+        "--mode",
+        help="directory mode on creating if not exist",
+        default="0o777",
+    )
+    args = parser.parse_args()
 
-  DESTDIR = os.environ.get('DESTDIR')
-  if DESTDIR:
-      install_dir = DESTDIR + install_dir if os.path.isabs(install_dir) \
-               else os.path.join(DESTDIR, install_dir)
+    src = args.src
+    dst = args.dst
+    install_dir = args.install_dir
+    dst_is_dir = args.isdir
+    dir_mode = int(args.mode, 8)
 
-  install_symlink(src, dst, install_dir, dst_is_dir, dir_mode)
+    DESTDIR = os.environ.get("DESTDIR")
+    if DESTDIR:
+        install_dir = (
+            DESTDIR + install_dir
+            if os.path.isabs(install_dir)
+            else os.path.join(DESTDIR, install_dir)
+        )
+
+    install_symlink(src, dst, install_dir, dst_is_dir, dir_mode)
 
 
-if __name__ == '__main__':
-  main()
+if __name__ == "__main__":
+    main()

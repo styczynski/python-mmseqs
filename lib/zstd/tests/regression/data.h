@@ -15,28 +15,27 @@
 #include <stdint.h>
 
 typedef enum {
-    data_type_file = 1,  /**< This data is a file. *.zst */
-    data_type_dir = 2,   /**< This data is a directory. *.tar.zst */
+  data_type_file = 1, /**< This data is a file. *.zst */
+  data_type_dir = 2,  /**< This data is a directory. *.tar.zst */
 } data_type_t;
 
 typedef struct {
-    char const* url;   /**< Where to get this resource. */
-    uint64_t xxhash64; /**< Hash of the url contents. */
-    char const* path;  /**< The path of the unpacked resource (derived). */
+  char const* url;   /**< Where to get this resource. */
+  uint64_t xxhash64; /**< Hash of the url contents. */
+  char const* path;  /**< The path of the unpacked resource (derived). */
 } data_resource_t;
 
 typedef struct {
-    data_resource_t data;
-    data_resource_t dict;
-    data_type_t type;  /**< The type of the data. */
-    char const* name;  /**< The logical name of the data (no extension). */
+  data_resource_t data;
+  data_resource_t dict;
+  data_type_t type; /**< The type of the data. */
+  char const* name; /**< The logical name of the data (no extension). */
 } data_t;
 
 /**
  * The NULL-terminated list of data objects.
  */
 extern data_t const* const* data;
-
 
 int data_has_dict(data_t const* data);
 
@@ -58,9 +57,9 @@ int data_init(char const* dir);
 void data_finish(void);
 
 typedef struct {
-    uint8_t* data;
-    size_t size;
-    size_t capacity;
+  uint8_t* data;
+  size_t size;
+  size_t capacity;
 } data_buffer_t;
 
 /**
@@ -103,9 +102,9 @@ int data_buffer_compare(data_buffer_t buffer1, data_buffer_t buffer2);
 void data_buffer_free(data_buffer_t buffer);
 
 typedef struct {
-    char* buffer;
-    char const** filenames;
-    unsigned size;
+  char* buffer;
+  char const** filenames;
+  unsigned size;
 } data_filenames_t;
 
 /**
@@ -123,8 +122,8 @@ data_filenames_t data_filenames_get(data_t const* data);
 void data_filenames_free(data_filenames_t filenames);
 
 typedef struct {
-    data_buffer_t const* buffers;
-    size_t size;
+  data_buffer_t const* buffers;
+  size_t size;
 } data_buffers_t;
 
 /**

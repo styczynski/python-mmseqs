@@ -23,8 +23,8 @@ using namespace std;
 using namespace pzstd;
 
 namespace {
-string
-writeData(size_t size, double matchProba, double litProba, unsigned seed) {
+string writeData(size_t size, double matchProba, double litProba,
+                 unsigned seed) {
   std::unique_ptr<uint8_t[]> buf(new uint8_t[size]);
   RDG_genBuffer(buf.get(), size, matchProba, litProba, seed);
   string file = tmpnam(nullptr);
@@ -59,7 +59,7 @@ Options generateOptions(Generator& gen, const string& inputFile) {
 
   return options;
 }
-}
+}  // namespace
 
 int main() {
   std::mt19937 gen(std::random_device{}());

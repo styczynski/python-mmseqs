@@ -7,13 +7,13 @@
  * in the COPYING file in the root directory of this source tree).
  */
 
-#include "fuzz.h"
-#include "fuzz_helpers.h"
-#include "util.h"
 #include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "fuzz.h"
+#include "fuzz_helpers.h"
+#include "util.h"
 
 int main(int argc, char const **argv) {
   size_t const kMaxFileSize = (size_t)1 << 27;
@@ -29,8 +29,7 @@ int main(int argc, char const **argv) {
 #ifdef UTIL_HAS_CREATEFILELIST
   files = UTIL_createFileList(files, numFiles, &fileNamesBuf, &numFiles,
                               kFollowLinks);
-  if (!files)
-    numFiles = 0;
+  if (!files) numFiles = 0;
 #endif
   if (numFiles == 0)
     fprintf(stderr, "WARNING: No files passed to %s\n", argv[0]);

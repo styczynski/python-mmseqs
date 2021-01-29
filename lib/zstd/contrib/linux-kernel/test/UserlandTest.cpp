@@ -2,9 +2,9 @@ extern "C" {
 #include <linux/zstd.h>
 }
 #include <gtest/gtest.h>
+#include <iostream>
 #include <memory>
 #include <string>
-#include <iostream>
 
 using namespace std;
 
@@ -12,11 +12,14 @@ namespace {
 struct WorkspaceDeleter {
   void *memory;
 
-  template <typename T> void operator()(T const *) { free(memory); }
+  template <typename T>
+  void operator()(T const *) {
+    free(memory);
+  }
 };
 
-std::unique_ptr<ZSTD_CCtx, WorkspaceDeleter>
-createCCtx(ZSTD_compressionParameters cParams) {
+std::unique_ptr<ZSTD_CCtx, WorkspaceDeleter> createCCtx(
+    ZSTD_compressionParameters cParams) {
   size_t const workspaceSize = ZSTD_CCtxWorkspaceBound(cParams);
   void *workspace = malloc(workspaceSize);
   std::unique_ptr<ZSTD_CCtx, WorkspaceDeleter> cctx{
@@ -27,15 +30,13 @@ createCCtx(ZSTD_compressionParameters cParams) {
   return cctx;
 }
 
-std::unique_ptr<ZSTD_CCtx, WorkspaceDeleter>
-createCCtx(int level, unsigned long long estimatedSrcSize = 0,
-           size_t dictSize = 0) {
+std::unique_ptr<ZSTD_CCtx, WorkspaceDeleter> createCCtx(
+    int level, unsigned long long estimatedSrcSize = 0, size_t dictSize = 0) {
   auto const cParams = ZSTD_getCParams(level, estimatedSrcSize, dictSize);
   return createCCtx(cParams);
 }
 
-std::unique_ptr<ZSTD_DCtx, WorkspaceDeleter>
-createDCtx() {
+std::unique_ptr<ZSTD_DCtx, WorkspaceDeleter> createDCtx() {
   size_t const workspaceSize = ZSTD_DCtxWorkspaceBound();
   void *workspace = malloc(workspaceSize);
   std::unique_ptr<ZSTD_DCtx, WorkspaceDeleter> dctx{
@@ -46,8 +47,8 @@ createDCtx() {
   return dctx;
 }
 
-std::unique_ptr<ZSTD_CDict, WorkspaceDeleter>
-createCDict(std::string const& dict, ZSTD_parameters params) {
+std::unique_ptr<ZSTD_CDict, WorkspaceDeleter> createCDict(
+    std::string const &dict, ZSTD_parameters params) {
   size_t const workspaceSize = ZSTD_CDictWorkspaceBound(params.cParams);
   void *workspace = malloc(workspaceSize);
   std::unique_ptr<ZSTD_CDict, WorkspaceDeleter> cdict{
@@ -60,14 +61,14 @@ createCDict(std::string const& dict, ZSTD_parameters params) {
   return cdict;
 }
 
-std::unique_ptr<ZSTD_CDict, WorkspaceDeleter>
-createCDict(std::string const& dict, int level) {
+std::unique_ptr<ZSTD_CDict, WorkspaceDeleter> createCDict(
+    std::string const &dict, int level) {
   auto const params = ZSTD_getParams(level, 0, dict.size());
   return createCDict(dict, params);
 }
 
-std::unique_ptr<ZSTD_DDict, WorkspaceDeleter>
-createDDict(std::string const& dict) {
+std::unique_ptr<ZSTD_DDict, WorkspaceDeleter> createDDict(
+    std::string const &dict) {
   size_t const workspaceSize = ZSTD_DDictWorkspaceBound();
   void *workspace = malloc(workspaceSize);
   std::unique_ptr<ZSTD_DDict, WorkspaceDeleter> ddict{
@@ -79,8 +80,8 @@ createDDict(std::string const& dict) {
   return ddict;
 }
 
-std::unique_ptr<ZSTD_CStream, WorkspaceDeleter>
-createCStream(ZSTD_parameters params, unsigned long long pledgedSrcSize = 0) {
+std::unique_ptr<ZSTD_CStream, WorkspaceDeleter> createCStream(
+    ZSTD_parameters params, unsigned long long pledgedSrcSize = 0) {
   size_t const workspaceSize = ZSTD_CStreamWorkspaceBound(params.cParams);
   void *workspace = malloc(workspaceSize);
   std::unique_ptr<ZSTD_CStream, WorkspaceDeleter> zcs{
@@ -91,9 +92,9 @@ createCStream(ZSTD_parameters params, unsigned long long pledgedSrcSize = 0) {
   return zcs;
 }
 
-std::unique_ptr<ZSTD_CStream, WorkspaceDeleter>
-createCStream(ZSTD_compressionParameters cParams, ZSTD_CDict const &cdict,
-              unsigned long long pledgedSrcSize = 0) {
+std::unique_ptr<ZSTD_CStream, WorkspaceDeleter> createCStream(
+    ZSTD_compressionParameters cParams, ZSTD_CDict const &cdict,
+    unsigned long long pledgedSrcSize = 0) {
   size_t const workspaceSize = ZSTD_CStreamWorkspaceBound(cParams);
   void *workspace = malloc(workspaceSize);
   std::unique_ptr<ZSTD_CStream, WorkspaceDeleter> zcs{
@@ -105,15 +106,15 @@ createCStream(ZSTD_compressionParameters cParams, ZSTD_CDict const &cdict,
   return zcs;
 }
 
-std::unique_ptr<ZSTD_CStream, WorkspaceDeleter>
-createCStream(int level, unsigned long long pledgedSrcSize = 0) {
+std::unique_ptr<ZSTD_CStream, WorkspaceDeleter> createCStream(
+    int level, unsigned long long pledgedSrcSize = 0) {
   auto const params = ZSTD_getParams(level, pledgedSrcSize, 0);
   return createCStream(params, pledgedSrcSize);
 }
 
-std::unique_ptr<ZSTD_DStream, WorkspaceDeleter>
-createDStream(size_t maxWindowSize = (1ULL << ZSTD_WINDOWLOG_MAX),
-              ZSTD_DDict const *ddict = nullptr) {
+std::unique_ptr<ZSTD_DStream, WorkspaceDeleter> createDStream(
+    size_t maxWindowSize = (1ULL << ZSTD_WINDOWLOG_MAX),
+    ZSTD_DDict const *ddict = nullptr) {
   size_t const workspaceSize = ZSTD_DStreamWorkspaceBound(maxWindowSize);
   void *workspace = malloc(workspaceSize);
   std::unique_ptr<ZSTD_DStream, WorkspaceDeleter> zds{
@@ -132,12 +133,11 @@ std::string compress(ZSTD_CCtx &cctx, std::string const &data,
   std::string compressed;
   compressed.resize(ZSTD_compressBound(data.size()));
   size_t const rc =
-      dict.empty()
-          ? ZSTD_compressCCtx(&cctx, &compressed[0], compressed.size(),
-                              data.data(), data.size(), params)
-          : ZSTD_compress_usingDict(&cctx, &compressed[0], compressed.size(),
-                                    data.data(), data.size(), dict.data(),
-                                    dict.size(), params);
+      dict.empty() ? ZSTD_compressCCtx(&cctx, &compressed[0], compressed.size(),
+                                       data.data(), data.size(), params)
+                   : ZSTD_compress_usingDict(
+                         &cctx, &compressed[0], compressed.size(), data.data(),
+                         data.size(), dict.data(), dict.size(), params);
   if (ZSTD_isError(rc)) {
     throw std::runtime_error{"compression error"};
   }
@@ -145,12 +145,14 @@ std::string compress(ZSTD_CCtx &cctx, std::string const &data,
   return compressed;
 }
 
-std::string compress(ZSTD_CCtx& cctx, std::string const& data, int level, std::string const& dict = "") {
+std::string compress(ZSTD_CCtx &cctx, std::string const &data, int level,
+                     std::string const &dict = "") {
   auto const params = ZSTD_getParams(level, 0, dict.size());
   return compress(cctx, data, params, dict);
 }
 
-std::string decompress(ZSTD_DCtx& dctx, std::string const& compressed, size_t decompressedSize, std::string const& dict = "") {
+std::string decompress(ZSTD_DCtx &dctx, std::string const &compressed,
+                       size_t decompressedSize, std::string const &dict = "") {
   std::string decompressed;
   decompressed.resize(decompressedSize);
   size_t const rc =
@@ -167,7 +169,8 @@ std::string decompress(ZSTD_DCtx& dctx, std::string const& compressed, size_t de
   return decompressed;
 }
 
-std::string compress(ZSTD_CCtx& cctx, std::string const& data, ZSTD_CDict& cdict) {
+std::string compress(ZSTD_CCtx &cctx, std::string const &data,
+                     ZSTD_CDict &cdict) {
   std::string compressed;
   compressed.resize(ZSTD_compressBound(data.size()));
   size_t const rc =
@@ -180,7 +183,8 @@ std::string compress(ZSTD_CCtx& cctx, std::string const& data, ZSTD_CDict& cdict
   return compressed;
 }
 
-std::string decompress(ZSTD_DCtx& dctx, std::string const& compressed, size_t decompressedSize, ZSTD_DDict& ddict) {
+std::string decompress(ZSTD_DCtx &dctx, std::string const &compressed,
+                       size_t decompressedSize, ZSTD_DDict &ddict) {
   std::string decompressed;
   decompressed.resize(decompressedSize);
   size_t const rc =
@@ -193,7 +197,7 @@ std::string decompress(ZSTD_DCtx& dctx, std::string const& compressed, size_t de
   return decompressed;
 }
 
-std::string compress(ZSTD_CStream& zcs, std::string const& data) {
+std::string compress(ZSTD_CStream &zcs, std::string const &data) {
   std::string compressed;
   compressed.resize(ZSTD_compressBound(data.size()));
   ZSTD_inBuffer in = {data.data(), data.size(), 0};
@@ -252,7 +256,7 @@ std::string const kZstdDict{
     "\x00\x00\x00\x08\x00\x00\x00"
     "0123456789",
     161};
-}
+}  // namespace
 
 TEST(Block, CCtx) {
   auto cctx = createCCtx(1);
@@ -316,8 +320,7 @@ TEST(Block, PreprocessedPlainDict) {
   auto dctx = createDCtx();
   auto const ddict = createDDict(kPlainDict);
   EXPECT_ANY_THROW(decompress(*dctx, compressed, kData.size()));
-  auto const decompressed =
-      decompress(*dctx, compressed, kData.size(), *ddict);
+  auto const decompressed = decompress(*dctx, compressed, kData.size(), *ddict);
   EXPECT_EQ(kData, decompressed);
 }
 
@@ -328,8 +331,7 @@ TEST(Block, PreprocessedZstdDict) {
   auto dctx = createDCtx();
   auto const ddict = createDDict(kZstdDict);
   EXPECT_ANY_THROW(decompress(*dctx, compressed, kData.size()));
-  auto const decompressed =
-      decompress(*dctx, compressed, kData.size(), *ddict);
+  auto const decompressed = decompress(*dctx, compressed, kData.size(), *ddict);
   EXPECT_EQ(kData, decompressed);
 }
 
@@ -345,8 +347,7 @@ TEST(Block, ReinitializeCCtx) {
   auto d = cctx.get_deleter();
   auto raw = cctx.release();
   auto params = ZSTD_getParams(1, 0, 0);
-  cctx.reset(
-      ZSTD_initCCtx(d.memory, ZSTD_CCtxWorkspaceBound(params.cParams)));
+  cctx.reset(ZSTD_initCCtx(d.memory, ZSTD_CCtxWorkspaceBound(params.cParams)));
   // Repeat
   {
     auto const compressed = compress(*cctx, kData, 1);
@@ -489,10 +490,10 @@ TEST(Stream, DStreamLevelIncrease) {
   }
 }
 
-#define TEST_SYMBOL(symbol)                                                    \
-  do {                                                                         \
-    extern void *__##symbol;                                                   \
-    EXPECT_NE((void *)0, __##symbol);                                          \
+#define TEST_SYMBOL(symbol)           \
+  do {                                \
+    extern void *__##symbol;          \
+    EXPECT_NE((void *)0, __##symbol); \
   } while (0)
 
 TEST(API, Symbols) {

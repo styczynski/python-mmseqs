@@ -18,7 +18,6 @@
 #include <thread>
 #include <vector>
 
-
 namespace pzstd {
 
 namespace {
@@ -74,36 +73,69 @@ void usage() {
   std::fprintf(stderr, "Usage:\n");
   std::fprintf(stderr, "  pzstd [args] [FILE(s)]\n");
   std::fprintf(stderr, "Parallel ZSTD options:\n");
-  std::fprintf(stderr, "  -p, --processes   #    : number of threads to use for (de)compression (default:<numcpus>)\n");
+  std::fprintf(stderr,
+               "  -p, --processes   #    : number of threads to use for "
+               "(de)compression (default:<numcpus>)\n");
 
   std::fprintf(stderr, "ZSTD options:\n");
-  std::fprintf(stderr, "  -#                     : # compression level (1-%d, default:%d)\n", kMaxNonUltraCompressionLevel, kDefaultCompressionLevel);
+  std::fprintf(
+      stderr,
+      "  -#                     : # compression level (1-%d, default:%d)\n",
+      kMaxNonUltraCompressionLevel, kDefaultCompressionLevel);
   std::fprintf(stderr, "  -d, --decompress       : decompression\n");
-  std::fprintf(stderr, "  -o                file : result stored into `file` (only if 1 input file)\n");
-  std::fprintf(stderr, "  -f, --force            : overwrite output without prompting, (de)compress links\n");
-  std::fprintf(stderr, "      --rm               : remove source file(s) after successful (de)compression\n");
-  std::fprintf(stderr, "  -k, --keep             : preserve source file(s) (default)\n");
+  std::fprintf(stderr,
+               "  -o                file : result stored into `file` (only if "
+               "1 input file)\n");
+  std::fprintf(stderr,
+               "  -f, --force            : overwrite output without prompting, "
+               "(de)compress links\n");
+  std::fprintf(stderr,
+               "      --rm               : remove source file(s) after "
+               "successful (de)compression\n");
+  std::fprintf(
+      stderr, "  -k, --keep             : preserve source file(s) (default)\n");
   std::fprintf(stderr, "  -h, --help             : display help and exit\n");
-  std::fprintf(stderr, "  -V, --version          : display version number and exit\n");
-  std::fprintf(stderr, "  -v, --verbose          : verbose mode; specify multiple times to increase log level (default:2)\n");
-  std::fprintf(stderr, "  -q, --quiet            : suppress warnings; specify twice to suppress errors too\n");
-  std::fprintf(stderr, "  -c, --stdout           : force write to standard output, even if it is the console\n");
+  std::fprintf(stderr,
+               "  -V, --version          : display version number and exit\n");
+  std::fprintf(stderr,
+               "  -v, --verbose          : verbose mode; specify multiple "
+               "times to increase log level (default:2)\n");
+  std::fprintf(stderr,
+               "  -q, --quiet            : suppress warnings; specify twice to "
+               "suppress errors too\n");
+  std::fprintf(stderr,
+               "  -c, --stdout           : force write to standard output, "
+               "even if it is the console\n");
 #ifdef UTIL_HAS_CREATEFILELIST
-  std::fprintf(stderr, "  -r                     : operate recursively on directories\n");
+  std::fprintf(
+      stderr,
+      "  -r                     : operate recursively on directories\n");
 #endif
-  std::fprintf(stderr, "      --ultra            : enable levels beyond %i, up to %i (requires more memory)\n", kMaxNonUltraCompressionLevel, ZSTD_maxCLevel());
-  std::fprintf(stderr, "  -C, --check            : integrity check (default)\n");
+  std::fprintf(stderr,
+               "      --ultra            : enable levels beyond %i, up to %i "
+               "(requires more memory)\n",
+               kMaxNonUltraCompressionLevel, ZSTD_maxCLevel());
+  std::fprintf(stderr,
+               "  -C, --check            : integrity check (default)\n");
   std::fprintf(stderr, "      --no-check         : no integrity check\n");
-  std::fprintf(stderr, "  -t, --test             : test compressed file integrity\n");
-  std::fprintf(stderr, "  --                     : all arguments after \"--\" are treated as files\n");
+  std::fprintf(stderr,
+               "  -t, --test             : test compressed file integrity\n");
+  std::fprintf(stderr,
+               "  --                     : all arguments after \"--\" are "
+               "treated as files\n");
 }
-} // anonymous namespace
+}  // anonymous namespace
 
 Options::Options()
-    : numThreads(defaultNumThreads()), maxWindowLog(23),
-      compressionLevel(kDefaultCompressionLevel), decompress(false),
-      overwrite(false), keepSource(true), writeMode(WriteMode::Auto),
-      checksum(true), verbosity(2) {}
+    : numThreads(defaultNumThreads()),
+      maxWindowLog(23),
+      compressionLevel(kDefaultCompressionLevel),
+      decompress(false),
+      overwrite(false),
+      keepSource(true),
+      writeMode(WriteMode::Auto),
+      checksum(true),
+      verbosity(2) {}
 
 Options::Status Options::parse(int argc, const char **argv) {
   bool test = false;
@@ -197,96 +229,97 @@ Options::Status Options::parse(int argc, const char **argv) {
       }
 
       switch (*options) {
-      case 'h':
-      case 'H':
-        usage();
-        return Status::Message;
-      case 'V':
-        std::fprintf(stderr, "PZSTD version: %s.\n", ZSTD_VERSION_STRING);
-        return Status::Message;
-      case 'p': {
-        finished = true;
-        const char *optionArgument = getArgument(options, argv, i, argc);
-        if (optionArgument == nullptr) {
-          return Status::Failure;
+        case 'h':
+        case 'H':
+          usage();
+          return Status::Message;
+        case 'V':
+          std::fprintf(stderr, "PZSTD version: %s.\n", ZSTD_VERSION_STRING);
+          return Status::Message;
+        case 'p': {
+          finished = true;
+          const char *optionArgument = getArgument(options, argv, i, argc);
+          if (optionArgument == nullptr) {
+            return Status::Failure;
+          }
+          if (*optionArgument < '0' || *optionArgument > '9') {
+            std::fprintf(stderr,
+                         "Option -p expects a number, but %s provided\n",
+                         optionArgument);
+            return Status::Failure;
+          }
+          numThreads = parseUnsigned(&optionArgument);
+          if (*optionArgument != 0) {
+            std::fprintf(stderr,
+                         "Option -p expects a number, but %u%s provided\n",
+                         numThreads, optionArgument);
+            return Status::Failure;
+          }
+          break;
         }
-        if (*optionArgument < '0' || *optionArgument > '9') {
-          std::fprintf(stderr, "Option -p expects a number, but %s provided\n",
-                       optionArgument);
-          return Status::Failure;
+        case 'o': {
+          finished = true;
+          const char *optionArgument = getArgument(options, argv, i, argc);
+          if (optionArgument == nullptr) {
+            return Status::Failure;
+          }
+          outputFile = optionArgument;
+          break;
         }
-        numThreads = parseUnsigned(&optionArgument);
-        if (*optionArgument != 0) {
-          std::fprintf(stderr,
-                       "Option -p expects a number, but %u%s provided\n",
-                       numThreads, optionArgument);
-          return Status::Failure;
-        }
-        break;
-      }
-      case 'o': {
-        finished = true;
-        const char *optionArgument = getArgument(options, argv, i, argc);
-        if (optionArgument == nullptr) {
-          return Status::Failure;
-        }
-        outputFile = optionArgument;
-        break;
-      }
-      case 'C':
-        checksum = true;
-        break;
-      case 'k':
-        keepSource = true;
-        break;
-      case 'd':
-        decompress = true;
-        break;
-      case 'f':
-        overwrite = true;
-        forceStdout = true;
-        followLinks = true;
-        break;
-      case 't':
-        test = true;
-        decompress = true;
-        break;
+        case 'C':
+          checksum = true;
+          break;
+        case 'k':
+          keepSource = true;
+          break;
+        case 'd':
+          decompress = true;
+          break;
+        case 'f':
+          overwrite = true;
+          forceStdout = true;
+          followLinks = true;
+          break;
+        case 't':
+          test = true;
+          decompress = true;
+          break;
 #ifdef UTIL_HAS_CREATEFILELIST
-      case 'r':
-        recursive = true;
-        break;
+        case 'r':
+          recursive = true;
+          break;
 #endif
-      case 'c':
-        outputFile = kStdOut;
-        forceStdout = true;
-        break;
-      case 'v':
-        ++verbosity;
-        break;
-      case 'q':
-        --verbosity;
-        // Ignore them for now
-        break;
-      // Unsupported options from Zstd
-      case 'D':
-      case 's':
-        notSupported("Zstd dictionaries.");
-        return Status::Failure;
-      case 'b':
-      case 'e':
-      case 'i':
-      case 'B':
-        notSupported("Zstd benchmarking options.");
-        return Status::Failure;
-      default:
-        std::fprintf(stderr, "Invalid argument: %s\n", arg);
-        return Status::Failure;
+        case 'c':
+          outputFile = kStdOut;
+          forceStdout = true;
+          break;
+        case 'v':
+          ++verbosity;
+          break;
+        case 'q':
+          --verbosity;
+          // Ignore them for now
+          break;
+        // Unsupported options from Zstd
+        case 'D':
+        case 's':
+          notSupported("Zstd dictionaries.");
+          return Status::Failure;
+        case 'b':
+        case 'e':
+        case 'i':
+        case 'B':
+          notSupported("Zstd benchmarking options.");
+          return Status::Failure;
+        default:
+          std::fprintf(stderr, "Invalid argument: %s\n", arg);
+          return Status::Failure;
       }
       if (!finished) {
         ++options;
       }
-    } // while (*options != 0);
-  }   // for (int i = 1; i < argc; ++i);
+    }  // while (*options != 0);
+  }    // for (int i = 1; i < argc; ++i);
 
   // Set options for test mode
   if (test) {
@@ -322,17 +355,15 @@ Options::Status Options::parse(int argc, const char **argv) {
   g_utilDisplayLevel = verbosity;
   // Remove local input files that are symbolic links
   if (!followLinks) {
-      std::remove_if(localInputFiles.begin(), localInputFiles.end(),
-                     [&](const char *path) {
-                        bool isLink = UTIL_isLink(path);
-                        if (isLink && verbosity >= 2) {
-                            std::fprintf(
-                                    stderr,
-                                    "Warning : %s is symbolic link, ignoring\n",
-                                    path);
-                        }
-                        return isLink;
-                    });
+    std::remove_if(
+        localInputFiles.begin(), localInputFiles.end(), [&](const char *path) {
+          bool isLink = UTIL_isLink(path);
+          if (isLink && verbosity >= 2) {
+            std::fprintf(stderr, "Warning : %s is symbolic link, ignoring\n",
+                         path);
+          }
+          return isLink;
+        });
   }
 
   // Translate input files/directories into files to (de)compress
@@ -374,8 +405,9 @@ Options::Status Options::parse(int argc, const char **argv) {
     return Status::Failure;
   }
   if (outputFile == "-" && IS_CONSOLE(stdout) && !(forceStdout && decompress)) {
-    std::fprintf(stderr, "Will not write to console stdout unless -c or -f is "
-                         "specified and decompressing\n");
+    std::fprintf(stderr,
+                 "Will not write to console stdout unless -c or -f is "
+                 "specified and decompressing\n");
     return Status::Failure;
   }
 
@@ -391,8 +423,9 @@ Options::Status Options::parse(int argc, const char **argv) {
 
   // Check that numThreads is set
   if (numThreads == 0) {
-    std::fprintf(stderr, "Invalid arguments: # of threads not specified "
-                         "and unable to determine hardware concurrency.\n");
+    std::fprintf(stderr,
+                 "Invalid arguments: # of threads not specified "
+                 "and unable to determine hardware concurrency.\n");
     return Status::Failure;
   }
 
@@ -425,4 +458,4 @@ std::string Options::getOutputFile(const std::string &inputFile) const {
     return inputFile + kZstdExtension;
   }
 }
-}
+}  // namespace pzstd

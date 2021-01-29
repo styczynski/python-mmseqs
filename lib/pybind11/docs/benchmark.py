@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import random
-import os
-import time
 import datetime as dt
+import os
+import random
+import time
 
 nfns = 4  # Functions per class
 nargs = 4  # Arguments per function
@@ -26,7 +26,11 @@ def generate_dummy_code_pybind11(nclasses=10):
             decl += "    cl%03i *fn_%03i(" % (ret, fn)
             decl += ", ".join("cl%03i *" % p for p in params)
             decl += ");\n"
-            bindings += '        .def("fn_%03i", &cl%03i::fn_%03i)\n' % (fn, cl, fn)
+            bindings += '        .def("fn_%03i", &cl%03i::fn_%03i)\n' % (
+                fn,
+                cl,
+                fn,
+            )
         decl += "};\n\n"
         bindings += "        ;\n"
 

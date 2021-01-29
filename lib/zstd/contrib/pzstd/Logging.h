@@ -29,16 +29,15 @@ class Logger {
 
  public:
   explicit Logger(int level, FILE* out = stderr)
-      : out_(out), level_(level), lastUpdate_(Clock::now()),
+      : out_(out),
+        level_(level),
+        lastUpdate_(Clock::now()),
         refreshRate_(150) {}
 
-
-  bool logsAt(int level) {
-    return level <= level_;
-  }
+  bool logsAt(int level) { return level <= level_; }
 
   template <typename... Args>
-  void operator()(int level, const char *fmt, Args... args) {
+  void operator()(int level, const char* fmt, Args... args) {
     if (level > level_) {
       return;
     }
@@ -47,7 +46,7 @@ class Logger {
   }
 
   template <typename... Args>
-  void update(int level, const char *fmt, Args... args) {
+  void update(int level, const char* fmt, Args... args) {
     if (level > level_) {
       return;
     }
@@ -69,4 +68,4 @@ class Logger {
   }
 };
 
-}
+}  // namespace pzstd

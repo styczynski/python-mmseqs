@@ -20,7 +20,7 @@ FMT_BEGIN_NAMESPACE
 
 // Enable safe chrono durations, unless explicitly disabled.
 #ifndef FMT_SAFE_DURATION_CAST
-#  define FMT_SAFE_DURATION_CAST 1
+#define FMT_SAFE_DURATION_CAST 1
 #endif
 #if FMT_SAFE_DURATION_CAST
 
@@ -394,7 +394,8 @@ struct formatter<std::chrono::time_point<std::chrono::system_clock>, Char>
   }
 };
 
-template <typename Char> struct formatter<std::tm, Char> {
+template <typename Char>
+struct formatter<std::tm, Char> {
   template <typename ParseContext>
   auto parse(ParseContext& ctx) -> decltype(ctx.begin()) {
     auto it = ctx.begin();
@@ -435,30 +436,84 @@ template <typename Char> struct formatter<std::tm, Char> {
 };
 
 namespace detail {
-template <typename Period> FMT_CONSTEXPR const char* get_units() {
+template <typename Period>
+FMT_CONSTEXPR const char* get_units() {
   return nullptr;
 }
-template <> FMT_CONSTEXPR const char* get_units<std::atto>() { return "as"; }
-template <> FMT_CONSTEXPR const char* get_units<std::femto>() { return "fs"; }
-template <> FMT_CONSTEXPR const char* get_units<std::pico>() { return "ps"; }
-template <> FMT_CONSTEXPR const char* get_units<std::nano>() { return "ns"; }
-template <> FMT_CONSTEXPR const char* get_units<std::micro>() { return "µs"; }
-template <> FMT_CONSTEXPR const char* get_units<std::milli>() { return "ms"; }
-template <> FMT_CONSTEXPR const char* get_units<std::centi>() { return "cs"; }
-template <> FMT_CONSTEXPR const char* get_units<std::deci>() { return "ds"; }
-template <> FMT_CONSTEXPR const char* get_units<std::ratio<1>>() { return "s"; }
-template <> FMT_CONSTEXPR const char* get_units<std::deca>() { return "das"; }
-template <> FMT_CONSTEXPR const char* get_units<std::hecto>() { return "hs"; }
-template <> FMT_CONSTEXPR const char* get_units<std::kilo>() { return "ks"; }
-template <> FMT_CONSTEXPR const char* get_units<std::mega>() { return "Ms"; }
-template <> FMT_CONSTEXPR const char* get_units<std::giga>() { return "Gs"; }
-template <> FMT_CONSTEXPR const char* get_units<std::tera>() { return "Ts"; }
-template <> FMT_CONSTEXPR const char* get_units<std::peta>() { return "Ps"; }
-template <> FMT_CONSTEXPR const char* get_units<std::exa>() { return "Es"; }
-template <> FMT_CONSTEXPR const char* get_units<std::ratio<60>>() {
+template <>
+FMT_CONSTEXPR const char* get_units<std::atto>() {
+  return "as";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::femto>() {
+  return "fs";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::pico>() {
+  return "ps";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::nano>() {
+  return "ns";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::micro>() {
+  return "µs";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::milli>() {
+  return "ms";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::centi>() {
+  return "cs";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::deci>() {
+  return "ds";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::ratio<1>>() {
+  return "s";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::deca>() {
+  return "das";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::hecto>() {
+  return "hs";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::kilo>() {
+  return "ks";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::mega>() {
+  return "Ms";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::giga>() {
+  return "Gs";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::tera>() {
+  return "Ts";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::peta>() {
+  return "Ps";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::exa>() {
+  return "Es";
+}
+template <>
+FMT_CONSTEXPR const char* get_units<std::ratio<60>>() {
   return "m";
 }
-template <> FMT_CONSTEXPR const char* get_units<std::ratio<3600>>() {
+template <>
+FMT_CONSTEXPR const char* get_units<std::ratio<3600>>() {
   return "h";
 }
 
@@ -486,139 +541,139 @@ FMT_CONSTEXPR const Char* parse_chrono_format(const Char* begin,
     if (ptr == end) FMT_THROW(format_error("invalid format"));
     c = *ptr++;
     switch (c) {
-    case '%':
-      handler.on_text(ptr - 1, ptr);
-      break;
-    case 'n': {
-      const Char newline[] = {'\n'};
-      handler.on_text(newline, newline + 1);
-      break;
-    }
-    case 't': {
-      const Char tab[] = {'\t'};
-      handler.on_text(tab, tab + 1);
-      break;
-    }
-    // Day of the week:
-    case 'a':
-      handler.on_abbr_weekday();
-      break;
-    case 'A':
-      handler.on_full_weekday();
-      break;
-    case 'w':
-      handler.on_dec0_weekday(numeric_system::standard);
-      break;
-    case 'u':
-      handler.on_dec1_weekday(numeric_system::standard);
-      break;
-    // Month:
-    case 'b':
-      handler.on_abbr_month();
-      break;
-    case 'B':
-      handler.on_full_month();
-      break;
-    // Hour, minute, second:
-    case 'H':
-      handler.on_24_hour(numeric_system::standard);
-      break;
-    case 'I':
-      handler.on_12_hour(numeric_system::standard);
-      break;
-    case 'M':
-      handler.on_minute(numeric_system::standard);
-      break;
-    case 'S':
-      handler.on_second(numeric_system::standard);
-      break;
-    // Other:
-    case 'c':
-      handler.on_datetime(numeric_system::standard);
-      break;
-    case 'x':
-      handler.on_loc_date(numeric_system::standard);
-      break;
-    case 'X':
-      handler.on_loc_time(numeric_system::standard);
-      break;
-    case 'D':
-      handler.on_us_date();
-      break;
-    case 'F':
-      handler.on_iso_date();
-      break;
-    case 'r':
-      handler.on_12_hour_time();
-      break;
-    case 'R':
-      handler.on_24_hour_time();
-      break;
-    case 'T':
-      handler.on_iso_time();
-      break;
-    case 'p':
-      handler.on_am_pm();
-      break;
-    case 'Q':
-      handler.on_duration_value();
-      break;
-    case 'q':
-      handler.on_duration_unit();
-      break;
-    case 'z':
-      handler.on_utc_offset();
-      break;
-    case 'Z':
-      handler.on_tz_name();
-      break;
-    // Alternative representation:
-    case 'E': {
-      if (ptr == end) FMT_THROW(format_error("invalid format"));
-      c = *ptr++;
-      switch (c) {
-      case 'c':
-        handler.on_datetime(numeric_system::alternative);
+      case '%':
+        handler.on_text(ptr - 1, ptr);
         break;
-      case 'x':
-        handler.on_loc_date(numeric_system::alternative);
+      case 'n': {
+        const Char newline[] = {'\n'};
+        handler.on_text(newline, newline + 1);
         break;
-      case 'X':
-        handler.on_loc_time(numeric_system::alternative);
-        break;
-      default:
-        FMT_THROW(format_error("invalid format"));
       }
-      break;
-    }
-    case 'O':
-      if (ptr == end) FMT_THROW(format_error("invalid format"));
-      c = *ptr++;
-      switch (c) {
+      case 't': {
+        const Char tab[] = {'\t'};
+        handler.on_text(tab, tab + 1);
+        break;
+      }
+      // Day of the week:
+      case 'a':
+        handler.on_abbr_weekday();
+        break;
+      case 'A':
+        handler.on_full_weekday();
+        break;
       case 'w':
-        handler.on_dec0_weekday(numeric_system::alternative);
+        handler.on_dec0_weekday(numeric_system::standard);
         break;
       case 'u':
-        handler.on_dec1_weekday(numeric_system::alternative);
+        handler.on_dec1_weekday(numeric_system::standard);
         break;
+      // Month:
+      case 'b':
+        handler.on_abbr_month();
+        break;
+      case 'B':
+        handler.on_full_month();
+        break;
+      // Hour, minute, second:
       case 'H':
-        handler.on_24_hour(numeric_system::alternative);
+        handler.on_24_hour(numeric_system::standard);
         break;
       case 'I':
-        handler.on_12_hour(numeric_system::alternative);
+        handler.on_12_hour(numeric_system::standard);
         break;
       case 'M':
-        handler.on_minute(numeric_system::alternative);
+        handler.on_minute(numeric_system::standard);
         break;
       case 'S':
-        handler.on_second(numeric_system::alternative);
+        handler.on_second(numeric_system::standard);
+        break;
+      // Other:
+      case 'c':
+        handler.on_datetime(numeric_system::standard);
+        break;
+      case 'x':
+        handler.on_loc_date(numeric_system::standard);
+        break;
+      case 'X':
+        handler.on_loc_time(numeric_system::standard);
+        break;
+      case 'D':
+        handler.on_us_date();
+        break;
+      case 'F':
+        handler.on_iso_date();
+        break;
+      case 'r':
+        handler.on_12_hour_time();
+        break;
+      case 'R':
+        handler.on_24_hour_time();
+        break;
+      case 'T':
+        handler.on_iso_time();
+        break;
+      case 'p':
+        handler.on_am_pm();
+        break;
+      case 'Q':
+        handler.on_duration_value();
+        break;
+      case 'q':
+        handler.on_duration_unit();
+        break;
+      case 'z':
+        handler.on_utc_offset();
+        break;
+      case 'Z':
+        handler.on_tz_name();
+        break;
+      // Alternative representation:
+      case 'E': {
+        if (ptr == end) FMT_THROW(format_error("invalid format"));
+        c = *ptr++;
+        switch (c) {
+          case 'c':
+            handler.on_datetime(numeric_system::alternative);
+            break;
+          case 'x':
+            handler.on_loc_date(numeric_system::alternative);
+            break;
+          case 'X':
+            handler.on_loc_time(numeric_system::alternative);
+            break;
+          default:
+            FMT_THROW(format_error("invalid format"));
+        }
+        break;
+      }
+      case 'O':
+        if (ptr == end) FMT_THROW(format_error("invalid format"));
+        c = *ptr++;
+        switch (c) {
+          case 'w':
+            handler.on_dec0_weekday(numeric_system::alternative);
+            break;
+          case 'u':
+            handler.on_dec1_weekday(numeric_system::alternative);
+            break;
+          case 'H':
+            handler.on_24_hour(numeric_system::alternative);
+            break;
+          case 'I':
+            handler.on_12_hour(numeric_system::alternative);
+            break;
+          case 'M':
+            handler.on_minute(numeric_system::alternative);
+            break;
+          case 'S':
+            handler.on_second(numeric_system::alternative);
+            break;
+          default:
+            FMT_THROW(format_error("invalid format"));
+        }
         break;
       default:
         FMT_THROW(format_error("invalid format"));
-      }
-      break;
-    default:
-      FMT_THROW(format_error("invalid format"));
     }
     begin = ptr;
   }
@@ -629,7 +684,8 @@ FMT_CONSTEXPR const Char* parse_chrono_format(const Char* begin,
 struct chrono_format_checker {
   FMT_NORETURN void report_no_date() { FMT_THROW(format_error("no date")); }
 
-  template <typename Char> void on_text(const Char*, const Char*) {}
+  template <typename Char>
+  void on_text(const Char*, const Char*) {}
   FMT_NORETURN void on_abbr_weekday() { report_no_date(); }
   FMT_NORETURN void on_full_weekday() { report_no_date(); }
   FMT_NORETURN void on_dec0_weekday(numeric_system) { report_no_date(); }
@@ -705,7 +761,8 @@ struct make_unsigned_or_unchanged {
   using type = T;
 };
 
-template <typename T> struct make_unsigned_or_unchanged<T, true> {
+template <typename T>
+struct make_unsigned_or_unchanged<T, true> {
   using type = typename std::make_unsigned<T>::type;
 };
 
@@ -1023,7 +1080,8 @@ struct formatter<std::chrono::duration<Rep, Period>, Char> {
     basic_format_parse_context<Char>& context;
     basic_string_view<Char> format_str;
 
-    template <typename Id> FMT_CONSTEXPR arg_ref_type make_arg_ref(Id arg_id) {
+    template <typename Id>
+    FMT_CONSTEXPR arg_ref_type make_arg_ref(Id arg_id) {
       context.check_arg_id(arg_id);
       return arg_ref_type(arg_id);
     }
@@ -1044,11 +1102,13 @@ struct formatter<std::chrono::duration<Rep, Period>, Char> {
     void on_precision(int _precision) { f.precision = _precision; }
     void end_precision() {}
 
-    template <typename Id> void on_dynamic_width(Id arg_id) {
+    template <typename Id>
+    void on_dynamic_width(Id arg_id) {
       f.width_ref = make_arg_ref(arg_id);
     }
 
-    template <typename Id> void on_dynamic_precision(Id arg_id) {
+    template <typename Id>
+    void on_dynamic_precision(Id arg_id) {
       f.precision_ref = make_arg_ref(arg_id);
     }
   };

@@ -24,7 +24,9 @@ VERSION_REGEX = re.compile(
 
 global_sdist = os.environ.get("PYBIND11_GLOBAL_SDIST", False)
 
-setup_py = "tools/setup_global.py.in" if global_sdist else "tools/setup_main.py.in"
+setup_py = (
+    "tools/setup_global.py.in" if global_sdist else "tools/setup_main.py.in"
+)
 extra_cmd = 'cmdclass["sdist"] = SDist\n'
 
 to_src = (
@@ -67,7 +69,9 @@ class SDist(setuptools.command.sdist.sdist):
         setuptools.command.sdist.sdist.make_release_tree(self, base_dir, files)
 
         for to, src in to_src:
-            txt = get_and_replace(src, binary=True, version=version, extra_cmd="")
+            txt = get_and_replace(
+                src, binary=True, version=version, extra_cmd=""
+            )
 
             dest = os.path.join(base_dir, to)
 

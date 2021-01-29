@@ -14,8 +14,8 @@
 #ifndef ZSTD_HELPERS_H
 #define ZSTD_HELPERS_H
 
-#include "zstd.h"
 #include <stdint.h>
+#include "zstd.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +26,6 @@ void FUZZ_setRandomParameters(ZSTD_CCtx *cctx, size_t srcSize, uint32_t *state);
 ZSTD_compressionParameters FUZZ_randomCParams(size_t srcSize, uint32_t *state);
 ZSTD_frameParameters FUZZ_randomFParams(uint32_t *state);
 ZSTD_parameters FUZZ_randomParams(size_t srcSize, uint32_t *state);
-
 
 #ifdef __cplusplus
 }

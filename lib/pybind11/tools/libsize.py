@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-from __future__ import print_function, division
+from __future__ import division, print_function
+
 import os
 import sys
 
@@ -30,7 +31,11 @@ if os.path.exists(save):
         if change == 0:
             print(" (no change)")
         else:
-            print(" (change of {:+} bytes = {:+.2%})".format(change, change / oldsize))
+            print(
+                " (change of {:+} bytes = {:+.2%})".format(
+                    change, change / oldsize
+                )
+            )
 else:
     print()
 

@@ -13,31 +13,31 @@
 
 #define XXH_STATIC_LINKING_ONLY
 
+#include <stddef.h> /* size_t */
 #include "xxhash.h"
-#include <stddef.h>   /* size_t */
 
 typedef enum {
-    SEQ_gen_ml = 0,
-    SEQ_gen_ll,
-    SEQ_gen_of,
-    SEQ_gen_max /* Must be the last value */
+  SEQ_gen_ml = 0,
+  SEQ_gen_ll,
+  SEQ_gen_of,
+  SEQ_gen_max /* Must be the last value */
 } SEQ_gen_type;
 
 /* Internal state, do not use */
 typedef struct {
-    XXH64_state_t xxh; /* xxh state for all the data produced so far (seed=0) */
-    unsigned seed;
-    int state; /* enum to control state machine (clean=0) */
-    unsigned saved;
-    size_t bytesLeft;
+  XXH64_state_t xxh; /* xxh state for all the data produced so far (seed=0) */
+  unsigned seed;
+  int state; /* enum to control state machine (clean=0) */
+  unsigned saved;
+  size_t bytesLeft;
 } SEQ_stream;
 
 SEQ_stream SEQ_initStream(unsigned seed);
 
 typedef struct {
-    void* dst;
-    size_t size;
-    size_t pos;
+  void* dst;
+  size_t size;
+  size_t pos;
 } SEQ_outBuffer;
 
 /* Returns non-zero until the current type/value has been generated.

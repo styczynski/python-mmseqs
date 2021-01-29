@@ -14,24 +14,24 @@ using namespace std;
 
 namespace {
 const std::array<std::string, 11> kTestInputs = {
-  "",
-  "0",
-  "01234",
-  "0123456789abcde",
-  "0123456789abcdef",
-  "0123456789abcdef0",
-  "0123456789abcdef0123",
-  "0123456789abcdef0123456789abcde",
-  "0123456789abcdef0123456789abcdef",
-  "0123456789abcdef0123456789abcdef0",
-  "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+    "",
+    "0",
+    "01234",
+    "0123456789abcde",
+    "0123456789abcdef",
+    "0123456789abcdef0",
+    "0123456789abcdef0123",
+    "0123456789abcdef0123456789abcde",
+    "0123456789abcdef0123456789abcdef",
+    "0123456789abcdef0123456789abcdef0",
+    "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
 };
 
-bool testXXH32(const void *input, const size_t length, uint32_t seed) {
+bool testXXH32(const void* input, const size_t length, uint32_t seed) {
   return XXH32(input, length, seed) == xxh32(input, length, seed);
 }
 
-bool testXXH64(const void *input, const size_t length, uint32_t seed) {
+bool testXXH64(const void* input, const size_t length, uint32_t seed) {
   return XXH64(input, length, seed) == xxh64(input, length, seed);
 }
 
@@ -39,7 +39,7 @@ class XXH32State {
   struct xxh32_state kernelState;
   XXH32_state_t state;
 
-public:
+ public:
   explicit XXH32State(const uint32_t seed) { reset(seed); }
   XXH32State(XXH32State const& other) noexcept {
     xxh32_copy_state(&kernelState, &other.kernelState);
@@ -56,7 +56,7 @@ public:
     EXPECT_EQ(0, XXH32_reset(&state, seed));
   }
 
-  void update(const void *input, const size_t length) {
+  void update(const void* input, const size_t length) {
     EXPECT_EQ(0, xxh32_update(&kernelState, input, length));
     EXPECT_EQ(0, (int)XXH32_update(&state, input, length));
   }
@@ -70,7 +70,7 @@ class XXH64State {
   struct xxh64_state kernelState;
   XXH64_state_t state;
 
-public:
+ public:
   explicit XXH64State(const uint64_t seed) { reset(seed); }
   XXH64State(XXH64State const& other) noexcept {
     xxh64_copy_state(&kernelState, &other.kernelState);
@@ -87,7 +87,7 @@ public:
     EXPECT_EQ(0, XXH64_reset(&state, seed));
   }
 
-  void update(const void *input, const size_t length) {
+  void update(const void* input, const size_t length) {
     EXPECT_EQ(0, xxh64_update(&kernelState, input, length));
     EXPECT_EQ(0, (int)XXH64_update(&state, input, length));
   }
@@ -96,7 +96,7 @@ public:
     return xxh64_digest(&kernelState) == XXH64_digest(&state);
   }
 };
-}
+}  // namespace
 
 TEST(Simple, Null) {
   EXPECT_TRUE(testXXH32(NULL, 0, 0));

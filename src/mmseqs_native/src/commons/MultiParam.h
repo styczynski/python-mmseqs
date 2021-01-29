@@ -6,91 +6,83 @@
  * written by Annika Seidel <annika.seidel@mpibpc.mpg.de>
  */
 
-#include <string>
-#include <cstring>
 #include <limits.h>
 #include <stdlib.h>
+#include <cstring>
+#include <string>
 
 template <class T>
 class MultiParam {
+ public:
+  T aminoacids;
+  T nucleotides;
+  MultiParam(){};
+  MultiParam(T aminoacids, T nucleotides);
+  MultiParam(const char* parametercstring);
+  ~MultiParam(){};
 
-public:
-    T aminoacids;
-    T nucleotides;
-    MultiParam(){};
-    MultiParam(T aminoacids, T nucleotides);
-    MultiParam(const char* parametercstring);
-    ~MultiParam(){};
+  static std::string format(const MultiParam<T>& multiparam);
 
-    static std::string format(const MultiParam<T> &multiparam);
-
-    MultiParam<T>& operator=(T value) {
-        nucleotides = value;
-        aminoacids = value;
-        return *this;
-    }
+  MultiParam<T>& operator=(T value) {
+    nucleotides = value;
+    aminoacids = value;
+    return *this;
+  }
 };
 
 template <>
 class MultiParam<char*> {
+ public:
+  char* aminoacids = NULL;
+  char* nucleotides = NULL;
 
-public:
-    char* aminoacids = NULL;
-    char* nucleotides = NULL;
+  MultiParam() {
+    aminoacids = (char*)malloc(sizeof(char));
+    nucleotides = (char*)malloc(sizeof(char));
+    aminoacids[0] = '\0';
+    nucleotides[0] = '\0';
+  }
 
-    MultiParam() {
-        aminoacids = (char*) malloc(sizeof(char));
-        nucleotides = (char*) malloc(sizeof(char));
-        aminoacids[0] = '\0';
-        nucleotides[0] = '\0';
+  MultiParam(const char* aminoacids, const char* nucleotides);
+  MultiParam(const char* parametercstring);
+  MultiParam(const MultiParam<char*>& par) {
+    nucleotides = strdup(par.nucleotides);
+    aminoacids = strdup(par.aminoacids);
+  };
+
+  explicit MultiParam<char*>(const std::string& parameterstring)
+      : MultiParam<char*>(parameterstring.c_str()) {}
+  ~MultiParam();
+
+  static std::string format(const MultiParam<char*>& multiparam);
+  // MultiParam<char>& operator=(char* value);
+
+  // ScoreMatrixFile(const ScoreMatrixFile& copy) :
+  // ScoreMatrixFile(copy.aminoacids, copy.nucleotides) {}
+
+  MultiParam<char*>& operator=(const MultiParam<char*>& other) {
+    if (nucleotides != NULL) {
+      free(nucleotides);
     }
-
-    MultiParam(const char* aminoacids, const char* nucleotides);
-    MultiParam(const char* parametercstring);
-    MultiParam(const MultiParam<char*> & par) {
-        nucleotides = strdup(par.nucleotides);
-        aminoacids = strdup(par.aminoacids);
-    };
-
-    explicit MultiParam<char*>(const std::string& parameterstring) : MultiParam<char*>(parameterstring.c_str()) {}
-    ~MultiParam();
-
-    static std::string format(const MultiParam<char*> &multiparam);
-    //MultiParam<char>& operator=(char* value);
-
-
-
-    //ScoreMatrixFile(const ScoreMatrixFile& copy) : ScoreMatrixFile(copy.aminoacids, copy.nucleotides) {}
-
-    MultiParam<char*>& operator=(const MultiParam<char*>& other) {
-        if (nucleotides != NULL) {
-            free(nucleotides);
-        }
-        if (aminoacids != NULL) {
-            free(aminoacids);
-        }
-        nucleotides = strdup(other.nucleotides);
-        aminoacids = strdup(other.aminoacids);
-        return *this;
+    if (aminoacids != NULL) {
+      free(aminoacids);
     }
+    nucleotides = strdup(other.nucleotides);
+    aminoacids = strdup(other.aminoacids);
+    return *this;
+  }
 
+  bool operator==(const char* other) const;
+  bool operator==(const std::string& other) const;
+  bool operator==(const MultiParam<char*>& other) const;
 
-    bool operator==(const char* other) const;
-    bool operator==(const std::string& other) const;
-    bool operator==(const MultiParam<char*>& other) const;
-
-    bool operator!=(const char* other) const {
-        return !(operator==(other));
-    }
-    bool operator!=(const std::string& other) const {
-        return !(operator==(other));
-    }
-    bool operator!=(const MultiParam<char*>& other) const {
-        return !(operator==(other));
-    }
-
-
+  bool operator!=(const char* other) const { return !(operator==(other)); }
+  bool operator!=(const std::string& other) const {
+    return !(operator==(other));
+  }
+  bool operator!=(const MultiParam<char*>& other) const {
+    return !(operator==(other));
+  }
 };
-
 
 #endif

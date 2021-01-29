@@ -6,9 +6,9 @@
  * LICENSE file in the root directory of this source tree) and the GPLv2 (found
  * in the COPYING file in the root directory of this source tree).
  */
-#include "platform.h"   /* Large Files support, SET_BINARY_MODE */
 #include "Pzstd.h"
 #include "SkippableFrame.h"
+#include "platform.h" /* Large Files support, SET_BINARY_MODE */
 #include "utils/FileSystem.h"
 #include "utils/Range.h"
 #include "utils/ScopeGuard.h"
@@ -22,7 +22,6 @@
 #include <memory>
 #include <string>
 
-
 namespace pzstd {
 
 namespace {
@@ -31,11 +30,11 @@ const std::string nullOutput = "nul";
 #else
 const std::string nullOutput = "/dev/null";
 #endif
-}
+}  // namespace
 
 using std::size_t;
 
-static std::uintmax_t fileSizeOrZero(const std::string &file) {
+static std::uintmax_t fileSizeOrZero(const std::string& file) {
   if (file == "-") {
     return 0;
   }
@@ -47,12 +46,10 @@ static std::uintmax_t fileSizeOrZero(const std::string &file) {
   return size;
 }
 
-static std::uint64_t handleOneInput(const Options &options,
-                             const std::string &inputFile,
-                             FILE* inputFd,
-                             const std::string &outputFile,
-                             FILE* outputFd,
-                             SharedState& state) {
+static std::uint64_t handleOneInput(const Options& options,
+                                    const std::string& inputFile, FILE* inputFd,
+                                    const std::string& outputFile,
+                                    FILE* outputFd, SharedState& state) {
   auto inputSize = fileSizeOrZero(inputFile);
   // WorkQueue outlives ThreadPool so in the case of error we are certain
   // we don't accidently try to call push() on it after it is destroyed
@@ -68,14 +65,9 @@ static std::uint64_t handleOneInput(const Options &options,
       // Add a job that reads the input and starts all the compression jobs
       readExecutor.add(
           [&state, &outs, &executor, inputFd, inputSize, &options, &bytesRead] {
-            bytesRead = asyncCompressChunks(
-                state,
-                outs,
-                executor,
-                inputFd,
-                inputSize,
-                options.numThreads,
-                options.determineParameters());
+            bytesRead = asyncCompressChunks(state, outs, executor, inputFd,
+                                            inputSize, options.numThreads,
+                                            options.determineParameters());
           });
       // Start writing
       bytesWritten = writeFile(state, outs, outputFd, options.decompress);
@@ -94,20 +86,20 @@ static std::uint64_t handleOneInput(const Options &options,
     if (!options.decompress) {
       double ratio = static_cast<double>(bytesWritten) /
                      static_cast<double>(bytesRead + !bytesRead);
-      state.log(INFO, "%-20s :%6.2f%%   (%6" PRIu64 " => %6" PRIu64
-                   " bytes, %s)\n",
-                   inputFileName.c_str(), ratio * 100, bytesRead, bytesWritten,
-                   outputFileName.c_str());
+      state.log(INFO,
+                "%-20s :%6.2f%%   (%6" PRIu64 " => %6" PRIu64 " bytes, %s)\n",
+                inputFileName.c_str(), ratio * 100, bytesRead, bytesWritten,
+                outputFileName.c_str());
     } else {
-      state.log(INFO, "%-20s: %" PRIu64 " bytes \n",
-                   inputFileName.c_str(),bytesWritten);
+      state.log(INFO, "%-20s: %" PRIu64 " bytes \n", inputFileName.c_str(),
+                bytesWritten);
     }
   }
   return bytesWritten;
 }
 
-static FILE *openInputFile(const std::string &inputFile,
-                           ErrorHolder &errorHolder) {
+static FILE* openInputFile(const std::string& inputFile,
+                           ErrorHolder& errorHolder) {
   if (inputFile == "-") {
     SET_BINARY_MODE(stdin);
     return stdin;
@@ -127,9 +119,8 @@ static FILE *openInputFile(const std::string &inputFile,
   return inputFd;
 }
 
-static FILE *openOutputFile(const Options &options,
-                            const std::string &outputFile,
-                            SharedState& state) {
+static FILE* openOutputFile(const Options& options,
+                            const std::string& outputFile, SharedState& state) {
   if (outputFile == "-") {
     SET_BINARY_MODE(stdout);
     return stdout;
@@ -143,10 +134,9 @@ static FILE *openOutputFile(const Options &options,
         state.errorHolder.setError("Output file exists");
         return nullptr;
       }
-      state.log(
-          INFO,
-          "pzstd: %s already exists; do you wish to overwrite (y/n) ? ",
-          outputFile.c_str());
+      state.log(INFO,
+                "pzstd: %s already exists; do you wish to overwrite (y/n) ? ",
+                outputFile.c_str());
       int c = getchar();
       if (c != 'y' && c != 'Y') {
         state.errorHolder.setError("Not overwritten");
@@ -155,14 +145,14 @@ static FILE *openOutputFile(const Options &options,
     }
   }
   auto outputFd = std::fopen(outputFile.c_str(), "wb");
-  if (!state.errorHolder.check(
-          outputFd != nullptr, "Failed to open output file")) {
+  if (!state.errorHolder.check(outputFd != nullptr,
+                               "Failed to open output file")) {
     return nullptr;
   }
   return outputFd;
 }
 
-int pzstdMain(const Options &options) {
+int pzstdMain(const Options& options) {
   int returnCode = 0;
   SharedState state(options);
   for (const auto& input : options.inputFiles) {
@@ -183,7 +173,7 @@ int pzstdMain(const Options &options) {
     // Open the output file
     auto outputFile = options.getOutputFile(input);
     if (!state.errorHolder.check(outputFile != "",
-                           "Input file does not have extension .zst")) {
+                                 "Input file does not have extension .zst")) {
       continue;
     }
     auto outputFd = openOutputFile(options, outputFile, state);
@@ -200,12 +190,12 @@ int pzstdMain(const Options &options) {
     if (!options.keepSource) {
       // Be sure that we are done and have written everything before we delete
       if (!state.errorHolder.check(std::fclose(inputFd) == 0,
-                             "Failed to close input file")) {
+                                   "Failed to close input file")) {
         continue;
       }
       closeInputGuard.dismiss();
       if (!state.errorHolder.check(std::fclose(outputFd) == 0,
-                             "Failed to close output file")) {
+                                   "Failed to close output file")) {
         continue;
       }
       closeOutputGuard.dismiss();
@@ -261,11 +251,9 @@ Buffer split(Buffer& buffer, ZSTD_outBuffer& outBuffer) {
  * @param out          Queue that we `push()` compressed output buffers to
  * @param maxInputSize An upper bound on the size of the input
  */
-static void compress(
-    SharedState& state,
-    std::shared_ptr<BufferWorkQueue> in,
-    std::shared_ptr<BufferWorkQueue> out,
-    size_t maxInputSize) {
+static void compress(SharedState& state, std::shared_ptr<BufferWorkQueue> in,
+                     std::shared_ptr<BufferWorkQueue> out,
+                     size_t maxInputSize) {
   auto& errorHolder = state.errorHolder;
   auto guard = makeScopeGuard([&] { out->finish(); });
   // Initialize the CCtx
@@ -290,8 +278,8 @@ static void compress(
       auto zstdInBuffer = makeZstdInBuffer(inBuffer);
       // Compress the whole buffer and send it to the output queue
       while (!inBuffer.empty() && !errorHolder.hasError()) {
-        if (!errorHolder.check(
-                !outBuffer.empty(), "ZSTD_compressBound() was too small")) {
+        if (!errorHolder.check(!outBuffer.empty(),
+                               "ZSTD_compressBound() was too small")) {
           return;
         }
         // Compress
@@ -310,13 +298,13 @@ static void compress(
   // Write the epilog
   size_t bytesLeft;
   do {
-    if (!errorHolder.check(
-            !outBuffer.empty(), "ZSTD_compressBound() was too small")) {
+    if (!errorHolder.check(!outBuffer.empty(),
+                           "ZSTD_compressBound() was too small")) {
       return;
     }
     bytesLeft = ZSTD_endStream(ctx.get(), &zstdOutBuffer);
-    if (!errorHolder.check(
-            !ZSTD_isError(bytesLeft), ZSTD_getErrorName(bytesLeft))) {
+    if (!errorHolder.check(!ZSTD_isError(bytesLeft),
+                           ZSTD_getErrorName(bytesLeft))) {
       return;
     }
     out->push(split(outBuffer, zstdOutBuffer));
@@ -330,10 +318,8 @@ static void compress(
  * @param numThreads The number of threads available to run compression jobs on
  * @param params     The zstd parameters to be used for compression
  */
-static size_t calculateStep(
-    std::uintmax_t size,
-    size_t numThreads,
-    const ZSTD_parameters &params) {
+static size_t calculateStep(std::uintmax_t size, size_t numThreads,
+                            const ZSTD_parameters& params) {
   (void)size;
   (void)numThreads;
   return size_t{1} << (params.cParams.windowLog + 2);
@@ -350,16 +336,16 @@ FileStatus fileStatus(FILE* fd) {
   }
   return FileStatus::Continue;
 }
-} // anonymous namespace
+}  // anonymous namespace
 
 /**
  * Reads `size` data in chunks of `chunkSize` and puts it into `queue`.
  * Will read less if an error or EOF occurs.
  * Returns the status of the file after all of the reads have occurred.
  */
-static FileStatus
-readData(BufferWorkQueue& queue, size_t chunkSize, size_t size, FILE* fd,
-         std::uint64_t *totalBytesRead) {
+static FileStatus readData(BufferWorkQueue& queue, size_t chunkSize,
+                           size_t size, FILE* fd,
+                           std::uint64_t* totalBytesRead) {
   Buffer buffer(size);
   while (!buffer.empty()) {
     auto bytesRead =
@@ -375,12 +361,8 @@ readData(BufferWorkQueue& queue, size_t chunkSize, size_t size, FILE* fd,
 }
 
 std::uint64_t asyncCompressChunks(
-    SharedState& state,
-    WorkQueue<std::shared_ptr<BufferWorkQueue>>& chunks,
-    ThreadPool& executor,
-    FILE* fd,
-    std::uintmax_t size,
-    size_t numThreads,
+    SharedState& state, WorkQueue<std::shared_ptr<BufferWorkQueue>>& chunks,
+    ThreadPool& executor, FILE* fd, std::uintmax_t size, size_t numThreads,
     ZSTD_parameters params) {
   auto chunksGuard = makeScopeGuard([&] { chunks.finish(); });
   std::uint64_t bytesRead = 0;
@@ -398,8 +380,7 @@ std::uint64_t asyncCompressChunks(
     auto out = std::make_shared<BufferWorkQueue>();
     // Start compression in the thread pool
     executor.add([&state, in, out, step] {
-      return compress(
-          state, std::move(in), std::move(out), step);
+      return compress(state, std::move(in), std::move(out), step);
     });
     // Pass the output queue to the writer thread.
     chunks.push(std::move(out));
@@ -420,10 +401,8 @@ std::uint64_t asyncCompressChunks(
  *                      exactly one compressed frame.
  * @param out          Queue that we `push()` decompressed output buffers to
  */
-static void decompress(
-    SharedState& state,
-    std::shared_ptr<BufferWorkQueue> in,
-    std::shared_ptr<BufferWorkQueue> out) {
+static void decompress(SharedState& state, std::shared_ptr<BufferWorkQueue> in,
+                       std::shared_ptr<BufferWorkQueue> out) {
   auto& errorHolder = state.errorHolder;
   auto guard = makeScopeGuard([&] { out->finish(); });
   // Initialize the DCtx
@@ -452,8 +431,8 @@ static void decompress(
       // Decompress
       returnCode =
           ZSTD_decompressStream(ctx.get(), &zstdOutBuffer, &zstdInBuffer);
-      if (!errorHolder.check(
-              !ZSTD_isError(returnCode), ZSTD_getErrorName(returnCode))) {
+      if (!errorHolder.check(!ZSTD_isError(returnCode),
+                             ZSTD_getErrorName(returnCode))) {
         return;
       }
       // Pass the buffer with the decompressed data to the output queue
@@ -480,8 +459,8 @@ static void decompress(
     // Decompress
     returnCode =
         ZSTD_decompressStream(ctx.get(), &zstdOutBuffer, &zstdInBuffer);
-    if (!errorHolder.check(
-            !ZSTD_isError(returnCode), ZSTD_getErrorName(returnCode))) {
+    if (!errorHolder.check(!ZSTD_isError(returnCode),
+                           ZSTD_getErrorName(returnCode))) {
       return;
     }
     // Pass the buffer with the decompressed data to the output queue
@@ -490,10 +469,8 @@ static void decompress(
 }
 
 std::uint64_t asyncDecompressFrames(
-    SharedState& state,
-    WorkQueue<std::shared_ptr<BufferWorkQueue>>& frames,
-    ThreadPool& executor,
-    FILE* fd) {
+    SharedState& state, WorkQueue<std::shared_ptr<BufferWorkQueue>>& frames,
+    ThreadPool& executor, FILE* fd) {
   auto framesGuard = makeScopeGuard([&] { frames.finish(); });
   std::uint64_t totalBytesRead = 0;
 
@@ -540,7 +517,8 @@ std::uint64_t asyncDecompressFrames(
     if (frameSize == 0) {
       // We hit a non SkippableFrame ==> not compressed by pzstd or corrupted
       // Pass the rest of the source to this decompression task
-      state.log(VERBOSE, "%s\n",
+      state.log(
+          VERBOSE, "%s\n",
           "Input not in pzstd format, falling back to serial decompression");
       while (status == FileStatus::Continue && !state.errorHolder.hasError()) {
         status = readData(*in, chunkSize, chunkSize, fd, &totalBytesRead);
@@ -566,15 +544,11 @@ static bool writeData(ByteRange data, FILE* fd) {
   return true;
 }
 
-std::uint64_t writeFile(
-    SharedState& state,
-    WorkQueue<std::shared_ptr<BufferWorkQueue>>& outs,
-    FILE* outputFd,
-    bool decompress) {
+std::uint64_t writeFile(SharedState& state,
+                        WorkQueue<std::shared_ptr<BufferWorkQueue>>& outs,
+                        FILE* outputFd, bool decompress) {
   auto& errorHolder = state.errorHolder;
-  auto lineClearGuard = makeScopeGuard([&state] {
-    state.log.clear(INFO);
-  });
+  auto lineClearGuard = makeScopeGuard([&state] { state.log.clear(INFO); });
   std::uint64_t bytesWritten = 0;
   std::shared_ptr<BufferWorkQueue> out;
   // Grab the output queue for each decompression job (in order).
@@ -603,9 +577,9 @@ std::uint64_t writeFile(
       }
       bytesWritten += buffer.size();
       state.log.update(INFO, "Written: %u MB   ",
-                static_cast<std::uint32_t>(bytesWritten >> 20));
+                       static_cast<std::uint32_t>(bytesWritten >> 20));
     }
   }
   return bytesWritten;
 }
-}
+}  // namespace pzstd

@@ -18,16 +18,20 @@ namespace detail {
 
 // Checks if a value fits in int - used to avoid warnings about comparing
 // signed and unsigned integers.
-template <bool IsSigned> struct int_checker {
-  template <typename T> static bool fits_in_int(T value) {
+template <bool IsSigned>
+struct int_checker {
+  template <typename T>
+  static bool fits_in_int(T value) {
     unsigned max = max_value<int>();
     return value <= max;
   }
   static bool fits_in_int(bool) { return true; }
 };
 
-template <> struct int_checker<true> {
-  template <typename T> static bool fits_in_int(T value) {
+template <>
+struct int_checker<true> {
+  template <typename T>
+  static bool fits_in_int(T value) {
     return value >= (std::numeric_limits<int>::min)() &&
            value <= max_value<int>();
   }
@@ -64,11 +68,16 @@ class is_zero_int {
   }
 };
 
-template <typename T> struct make_unsigned_or_bool : std::make_unsigned<T> {};
+template <typename T>
+struct make_unsigned_or_bool : std::make_unsigned<T> {};
 
-template <> struct make_unsigned_or_bool<bool> { using type = bool; };
+template <>
+struct make_unsigned_or_bool<bool> {
+  using type = bool;
+};
 
-template <typename T, typename Context> class arg_converter {
+template <typename T, typename Context>
+class arg_converter {
  private:
   using char_type = typename Context::char_type;
 
@@ -124,7 +133,8 @@ void convert_arg(basic_format_arg<Context>& arg, Char type) {
 }
 
 // Converts an integer argument to char for printf.
-template <typename Context> class char_converter {
+template <typename Context>
+class char_converter {
  private:
   basic_format_arg<Context>& arg_;
 
@@ -143,14 +153,19 @@ template <typename Context> class char_converter {
 
 // An argument visitor that return a pointer to a C string if argument is a
 // string or null otherwise.
-template <typename Char> struct get_cstring {
-  template <typename T> const Char* operator()(T) { return nullptr; }
+template <typename Char>
+struct get_cstring {
+  template <typename T>
+  const Char* operator()(T) {
+    return nullptr;
+  }
   const Char* operator()(const Char* s) { return s; }
 };
 
 // Checks if an argument is a valid printf width specifier and sets
 // left alignment if it is negative.
-template <typename Char> class printf_width_handler {
+template <typename Char>
+class printf_width_handler {
  private:
   using format_specs = basic_format_specs<Char>;
 
@@ -198,7 +213,8 @@ template <typename Char>
 class basic_printf_parse_context : public basic_format_parse_context<Char> {
   using basic_format_parse_context<Char>::basic_format_parse_context;
 };
-template <typename OutputIt, typename Char> class basic_printf_context;
+template <typename OutputIt, typename Char>
+class basic_printf_context;
 
 /**
   \rst
@@ -315,7 +331,8 @@ class printf_arg_formatter : public detail::arg_formatter_base<OutputIt, Char> {
   }
 };
 
-template <typename T> struct printf_formatter {
+template <typename T>
+struct printf_formatter {
   printf_formatter() = delete;
 
   template <typename ParseContext>
@@ -333,14 +350,16 @@ template <typename T> struct printf_formatter {
 /**
  This template formats data and writes the output through an output iterator.
  */
-template <typename OutputIt, typename Char> class basic_printf_context {
+template <typename OutputIt, typename Char>
+class basic_printf_context {
  public:
   /** The character type for the output. */
   using char_type = Char;
   using iterator = OutputIt;
   using format_arg = basic_format_arg<basic_printf_context>;
   using parse_context_type = basic_printf_parse_context<Char>;
-  template <typename T> using formatter_type = printf_formatter<T>;
+  template <typename T>
+  using formatter_type = printf_formatter<T>;
 
  private:
   using format_specs = basic_format_specs<char_type>;
@@ -394,25 +413,25 @@ void basic_printf_context<OutputIt, Char>::parse_flags(format_specs& specs,
                                                        const Char* end) {
   for (; it != end; ++it) {
     switch (*it) {
-    case '-':
-      specs.align = align::left;
-      break;
-    case '+':
-      specs.sign = sign::plus;
-      break;
-    case '0':
-      specs.fill[0] = '0';
-      break;
-    case ' ':
-      if (specs.sign != sign::plus) {
-        specs.sign = sign::space;
-      }
-      break;
-    case '#':
-      specs.alt = true;
-      break;
-    default:
-      return;
+      case '-':
+        specs.align = align::left;
+        break;
+      case '+':
+        specs.sign = sign::plus;
+        break;
+      case '0':
+        specs.fill[0] = '0';
+        break;
+      case ' ':
+        if (specs.sign != sign::plus) {
+          specs.sign = sign::space;
+        }
+        break;
+      case '#':
+        specs.alt = true;
+        break;
+      default:
+        return;
     }
   }
 }
@@ -535,40 +554,40 @@ OutputIt basic_printf_context<OutputIt, Char>::format() {
     char_type t = it != end ? *it : 0;
     using detail::convert_arg;
     switch (c) {
-    case 'h':
-      if (t == 'h') {
-        ++it;
-        t = it != end ? *it : 0;
-        convert_arg<signed char>(arg, t);
-      } else {
-        convert_arg<short>(arg, t);
-      }
-      break;
-    case 'l':
-      if (t == 'l') {
-        ++it;
-        t = it != end ? *it : 0;
-        convert_arg<long long>(arg, t);
-      } else {
-        convert_arg<long>(arg, t);
-      }
-      break;
-    case 'j':
-      convert_arg<intmax_t>(arg, t);
-      break;
-    case 'z':
-      convert_arg<size_t>(arg, t);
-      break;
-    case 't':
-      convert_arg<std::ptrdiff_t>(arg, t);
-      break;
-    case 'L':
-      // printf produces garbage when 'L' is omitted for long double, no
-      // need to do the same.
-      break;
-    default:
-      --it;
-      convert_arg<void>(arg, c);
+      case 'h':
+        if (t == 'h') {
+          ++it;
+          t = it != end ? *it : 0;
+          convert_arg<signed char>(arg, t);
+        } else {
+          convert_arg<short>(arg, t);
+        }
+        break;
+      case 'l':
+        if (t == 'l') {
+          ++it;
+          t = it != end ? *it : 0;
+          convert_arg<long long>(arg, t);
+        } else {
+          convert_arg<long>(arg, t);
+        }
+        break;
+      case 'j':
+        convert_arg<intmax_t>(arg, t);
+        break;
+      case 'z':
+        convert_arg<size_t>(arg, t);
+        break;
+      case 't':
+        convert_arg<std::ptrdiff_t>(arg, t);
+        break;
+      case 'L':
+        // printf produces garbage when 'L' is omitted for long double, no
+        // need to do the same.
+        break;
+      default:
+        --it;
+        convert_arg<void>(arg, c);
     }
 
     // Parse type.
@@ -577,14 +596,14 @@ OutputIt basic_printf_context<OutputIt, Char>::format() {
     if (arg.is_integral()) {
       // Normalize type.
       switch (specs.type) {
-      case 'i':
-      case 'u':
-        specs.type = 'd';
-        break;
-      case 'c':
-        visit_format_arg(detail::char_converter<basic_printf_context>(arg),
-                         arg);
-        break;
+        case 'i':
+        case 'u':
+          specs.type = 'd';
+          break;
+        case 'c':
+          visit_format_arg(detail::char_converter<basic_printf_context>(arg),
+                           arg);
+          break;
       }
     }
 

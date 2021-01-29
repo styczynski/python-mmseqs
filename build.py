@@ -1,9 +1,9 @@
+import ctypes
 import os
 import platform
 import re
 import subprocess
 import sys
-import ctypes
 from distutils.version import LooseVersion
 from shutil import copyfile, copymode
 
@@ -59,7 +59,9 @@ class CMakeBuild(build_ext):
                     cfg.upper(), extdir
                 )
             ]
-            if (sys.maxsize > 2 ** 32) or (8 * ctypes.sizeof(ctypes.c_voidp) == 64):
+            if (sys.maxsize > 2 ** 32) or (
+                8 * ctypes.sizeof(ctypes.c_voidp) == 64
+            ):
                 arch = "x64"
             else:
                 arch = "Win32"
@@ -94,16 +96,23 @@ class CMakeBuild(build_ext):
         if not os.path.exists(self.build_temp):
             os.makedirs(self.build_temp)
 
-        print(f'The cmake config will use the following args: {" ".join(cmake_args)}')
-        print(f'The cmake build will use the following args: {" ".join(build_args)}')
+        print(
+            f'The cmake config will use the following args: {" ".join(cmake_args)}'
+        )
+        print(
+            f'The cmake build will use the following args: {" ".join(build_args)}'
+        )
 
         subprocess.check_call(
-            ["cmake", ext.sourcedir] + cmake_args, cwd=self.build_temp, env=env,
+            ["cmake", ext.sourcedir] + cmake_args,
+            cwd=self.build_temp,
+            env=env,
             stdout=sys.stdout,
             stderr=sys.stdout,
         )
         subprocess.check_call(
-            ["cmake", "--build", "."] + build_args, cwd=self.build_temp,
+            ["cmake", "--build", "."] + build_args,
+            cwd=self.build_temp,
             stdout=sys.stdout,
             stderr=sys.stdout,
         )
@@ -164,9 +173,7 @@ def build(setup_kwargs):
 
     setup_kwargs.update(
         {
-            "ext_modules": [
-                CMakeExtension("mmseqs/mmseqs_native")
-            ],
+            "ext_modules": [CMakeExtension("mmseqs/mmseqs_native")],
             "cmdclass": {"build_ext": CMakeBuild},
             "zip_safe": False,
             "include_package_data": True,

@@ -41,23 +41,22 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import contextlib
 import os
+import platform
 import shutil
 import sys
 import tempfile
 import threading
-import platform
 import warnings
 
 try:
-    from setuptools.command.build_ext import build_ext as _build_ext
     from setuptools import Extension as _Extension
+    from setuptools.command.build_ext import build_ext as _build_ext
 except ImportError:
     from distutils.command.build_ext import build_ext as _build_ext
     from distutils.extension import Extension as _Extension
 
-import distutils.errors
 import distutils.ccompiler
-
+import distutils.errors
 
 WIN = sys.platform.startswith("win32")
 PY2 = sys.version_info[0] < 3
@@ -162,7 +161,9 @@ class Pybind11Extension(_Extension):
     def cxx_std(self, level):
 
         if self._cxx_level:
-            warnings.warn("You cannot safely change the cxx_level after setting it!")
+            warnings.warn(
+                "You cannot safely change the cxx_level after setting it!"
+            )
 
         # MSVC 2015 Update 3 and later only have 14 (and later 17) modes, so
         # force a valid flag here.
@@ -182,9 +183,13 @@ class Pybind11Extension(_Extension):
             # you are careful in your feature usage, but 10.14 is the safest
             # setting for general use. However, never set higher than the
             # current macOS version!
-            current_macos = tuple(int(x) for x in platform.mac_ver()[0].split(".")[:2])
+            current_macos = tuple(
+                int(x) for x in platform.mac_ver()[0].split(".")[:2]
+            )
             desired_macos = (10, 9) if level < 17 else (10, 14)
-            macos_string = ".".join(str(x) for x in min(current_macos, desired_macos))
+            macos_string = ".".join(
+                str(x) for x in min(current_macos, desired_macos)
+            )
             macosx_min = "-mmacosx-version-min=" + macos_string
             self.extra_compile_args.append(macosx_min)
             self.extra_link_args.append(macosx_min)
@@ -288,7 +293,9 @@ class build_ext(_build_ext):  # noqa: N801
         for ext in self.extensions:
             if hasattr(ext, "_cxx_level") and ext._cxx_level == 0:
                 # Python 2 syntax - old-style distutils class
-                ext.__class__.cxx_std.__set__(ext, auto_cpp_level(self.compiler))
+                ext.__class__.cxx_std.__set__(
+                    ext, auto_cpp_level(self.compiler)
+                )
 
         # Python 2 doesn't allow super here, since distutils uses old-style
         # classes!
@@ -355,7 +362,9 @@ class ParallelCompile(object):
 
     __slots__ = ("envvar", "default", "max", "_old", "needs_recompile")
 
-    def __init__(self, envvar=None, default=0, max=0, needs_recompile=no_recompile):
+    def __init__(
+        self, envvar=None, default=0, max=0, needs_recompile=no_recompile
+    ):
         self.envvar = envvar
         self.default = default
         self.max = max
@@ -380,8 +389,19 @@ class ParallelCompile(object):
         ):
 
             # These lines are directly from distutils.ccompiler.CCompiler
-            macros, objects, extra_postargs, pp_opts, build = compiler._setup_compile(
-                output_dir, macros, include_dirs, sources, depends, extra_postargs
+            (
+                macros,
+                objects,
+                extra_postargs,
+                pp_opts,
+                build,
+            ) = compiler._setup_compile(
+                output_dir,
+                macros,
+                include_dirs,
+                sources,
+                depends,
+                extra_postargs,
             )
             cc_args = compiler._get_cc_args(pp_opts, debug, extra_preargs)
 
@@ -399,7 +419,9 @@ class ParallelCompile(object):
                     return
 
                 if not os.path.exists(obj) or self.needs_recompile(obj, src):
-                    compiler._compile(obj, src, ext, cc_args, extra_postargs, pp_opts)
+                    compiler._compile(
+                        obj, src, ext, cc_args, extra_postargs, pp_opts
+                    )
 
             try:
                 import multiprocessing
@@ -410,12 +432,18 @@ class ParallelCompile(object):
             if threads == 0:
                 try:
                     threads = multiprocessing.cpu_count()
-                    threads = self.max if self.max and self.max < threads else threads
+                    threads = (
+                        self.max
+                        if self.max and self.max < threads
+                        else threads
+                    )
                 except NotImplementedError:
                     threads = 1
 
             if threads > 1:
-                for _ in ThreadPool(threads).imap_unordered(_single_compile, objects):
+                for _ in ThreadPool(threads).imap_unordered(
+                    _single_compile, objects
+                ):
                     pass
             else:
                 for ob in objects:

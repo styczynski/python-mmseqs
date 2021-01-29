@@ -1,11 +1,11 @@
 #include "Util.h"
 
-#include <iostream>
 #include <chrono>
+#include <iostream>
 
 const char* binary_name = "test_counting";
 
-//u_int64_t revcomp64_v2 (const u_int64_t& x, size_t sizeKmer)
+// u_int64_t revcomp64_v2 (const u_int64_t& x, size_t sizeKmer)
 //{
 //    u_int64_t res = x;
 //
@@ -19,14 +19,14 @@ const char* binary_name = "test_counting";
 //    return (res >> (2*( 32 - sizeKmer))) ;
 //}
 
-int main(int, char **){
-    auto start = std::chrono::system_clock::now();
-    size_t revComp = 0;
-    for(u_int64_t i = 0; i < 10001010101011; i++){
-        revComp += Util::revComplement(i, 21);
-    }
-    auto end = std::chrono::system_clock::now();
-    auto elapsed = end - start;
-    std::cout << revComp << "\t" << elapsed.count() << '\n';
-    return 0;
+int main(int, char**) {
+  auto start = std::chrono::system_clock::now();
+  size_t revComp = 0;
+  for (u_int64_t i = 0; i < 10001010101011; i++) {
+    revComp += Util::revComplement(i, 21);
+  }
+  auto end = std::chrono::system_clock::now();
+  auto elapsed = end - start;
+  std::cout << revComp << "\t" << elapsed.count() << '\n';
+  return 0;
 }

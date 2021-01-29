@@ -5,7 +5,6 @@ import re
 
 import ghapi.core
 
-
 ENTRY = re.compile(
     r"""
     Suggested \s changelog \s entry:

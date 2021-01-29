@@ -1,13 +1,12 @@
 # IMPORTANT: Should stay in sync with setup_helpers.py (mostly checked by CI /
 # pre-commit).
 
-from typing import Any, Callable, Iterator, Optional, Type, TypeVar, Union
-from types import TracebackType
-
+import contextlib
+import distutils.ccompiler
 from distutils.command.build_ext import build_ext as _build_ext  # type: ignore
 from distutils.extension import Extension as _Extension
-import distutils.ccompiler
-import contextlib
+from types import TracebackType
+from typing import Any, Callable, Iterator, Optional, Type, TypeVar, Union
 
 WIN: bool
 PY2: bool
@@ -18,7 +17,11 @@ class Pybind11Extension(_Extension):
     def _add_cflags(self, *flags: str) -> None: ...
     def _add_lflags(self, *flags: str) -> None: ...
     def __init__(
-        self, *args: Any, cxx_std: int = 0, language: str = "c++", **kwargs: Any
+        self,
+        *args: Any,
+        cxx_std: int = 0,
+        language: str = "c++",
+        **kwargs: Any
     ) -> None: ...
     @property
     def cxx_std(self) -> int: ...
@@ -28,7 +31,9 @@ class Pybind11Extension(_Extension):
 @contextlib.contextmanager
 def tmp_chdir() -> Iterator[str]: ...
 def has_flag(compiler: distutils.ccompiler.CCompiler, flag: str) -> bool: ...
-def auto_cpp_level(compiler: distutils.ccompiler.CCompiler) -> Union[int, str]: ...
+def auto_cpp_level(
+    compiler: distutils.ccompiler.CCompiler,
+) -> Union[int, str]: ...
 
 class build_ext(_build_ext):  # type: ignore
     def build_extensions(self) -> None: ...

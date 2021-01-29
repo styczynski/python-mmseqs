@@ -352,7 +352,8 @@ FMT_CONSTEXPR text_style operator|(emphasis lhs, emphasis rhs) FMT_NOEXCEPT {
 
 namespace detail {
 
-template <typename Char> struct ansi_color_escape {
+template <typename Char>
+struct ansi_color_escape {
   FMT_CONSTEXPR ansi_color_escape(detail::color_type text_color,
                                   const char* esc) FMT_NOEXCEPT {
     // If we have a terminal color, we need to output another escape code
@@ -454,11 +455,13 @@ inline void fputs<wchar_t>(const wchar_t* chars, FILE* stream) FMT_NOEXCEPT {
   std::fputws(chars, stream);
 }
 
-template <typename Char> inline void reset_color(FILE* stream) FMT_NOEXCEPT {
+template <typename Char>
+inline void reset_color(FILE* stream) FMT_NOEXCEPT {
   fputs(detail::data::reset_color, stream);
 }
 
-template <> inline void reset_color<wchar_t>(FILE* stream) FMT_NOEXCEPT {
+template <>
+inline void reset_color<wchar_t>(FILE* stream) FMT_NOEXCEPT {
   fputs(detail::data::wreset_color, stream);
 }
 

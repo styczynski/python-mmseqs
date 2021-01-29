@@ -4,21 +4,20 @@
 #include "SubstitutionMatrix.h"
 
 class NucleotideMatrix : public SubstitutionMatrix {
-public:
-    NucleotideMatrix(const char *scoringMatrixFileName, float bitFactor, float scoreBias);
+ public:
+  NucleotideMatrix(const char *scoringMatrixFileName, float bitFactor,
+                   float scoreBias);
 
-    virtual ~NucleotideMatrix();
+  virtual ~NucleotideMatrix();
 
-    using BaseMatrix::getBitFactor;
+  using BaseMatrix::getBitFactor;
 
-    void setupLetterMapping();
+  void setupLetterMapping();
 
-    int reverseResidue(int res) {
-        return reverseLookup[res];
-    }
+  int reverseResidue(int res) { return reverseLookup[res]; }
 
-private:
-    int *reverseLookup;
+ private:
+  int *reverseLookup;
 };
 
 #endif

@@ -191,7 +191,9 @@ def test_build_global_dist(monkeypatch, tmpdir):
     files |= set("pybind11_global{}".format(n) for n in local_sdist_files)
     assert simpler == files
 
-    with open(os.path.join(MAIN_DIR, "tools", "setup_global.py.in"), "rb") as f:
+    with open(
+        os.path.join(MAIN_DIR, "tools", "setup_global.py.in"), "rb"
+    ) as f:
         contents = (
             string.Template(f.read().decode())
             .substitute(version=version, extra_cmd="")
@@ -228,7 +230,9 @@ def tests_build_wheel(monkeypatch, tmpdir):
 
     trimmed = set(n for n in names if "dist-info" not in n)
     trimmed |= set(
-        "dist-info/{}".format(n.split("/", 1)[-1]) for n in names if "dist-info" in n
+        "dist-info/{}".format(n.split("/", 1)[-1])
+        for n in names
+        if "dist-info" in n
     )
     assert files == trimmed
 

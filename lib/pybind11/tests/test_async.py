@@ -17,9 +17,13 @@ async def get_await_result(x):
 
 
 def test_await(event_loop):
-    assert 5 == event_loop.run_until_complete(get_await_result(m.SupportsAsync()))
+    assert 5 == event_loop.run_until_complete(
+        get_await_result(m.SupportsAsync())
+    )
 
 
 def test_await_missing(event_loop):
     with pytest.raises(TypeError):
-        event_loop.run_until_complete(get_await_result(m.DoesNotSupportAsync()))
+        event_loop.run_until_complete(
+            get_await_result(m.DoesNotSupportAsync())
+        )

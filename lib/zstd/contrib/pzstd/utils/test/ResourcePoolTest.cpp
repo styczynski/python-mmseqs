@@ -19,8 +19,14 @@ TEST(ResourcePool, FullTest) {
   unsigned numDeleted = 0;
   {
     ResourcePool<int> pool(
-      [&numCreated] { ++numCreated; return new int{5}; },
-      [&numDeleted](int *x) { ++numDeleted; delete x; });
+        [&numCreated] {
+          ++numCreated;
+          return new int{5};
+        },
+        [&numDeleted](int *x) {
+          ++numDeleted;
+          delete x;
+        });
 
     {
       auto i = pool.get();
@@ -50,8 +56,14 @@ TEST(ResourcePool, ThreadSafe) {
   std::atomic<unsigned> numDeleted{0};
   {
     ResourcePool<int> pool(
-      [&numCreated] { ++numCreated; return new int{0}; },
-      [&numDeleted](int *x) { ++numDeleted; delete x; });
+        [&numCreated] {
+          ++numCreated;
+          return new int{0};
+        },
+        [&numDeleted](int *x) {
+          ++numDeleted;
+          delete x;
+        });
     auto push = [&pool] {
       for (int i = 0; i < 100; ++i) {
         auto x = pool.get();

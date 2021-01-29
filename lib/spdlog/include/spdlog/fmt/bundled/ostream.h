@@ -14,12 +14,15 @@
 
 FMT_BEGIN_NAMESPACE
 
-template <typename Char> class basic_printf_parse_context;
-template <typename OutputIt, typename Char> class basic_printf_context;
+template <typename Char>
+class basic_printf_parse_context;
+template <typename OutputIt, typename Char>
+class basic_printf_context;
 
 namespace detail {
 
-template <class Char> class formatbuf : public std::basic_streambuf<Char> {
+template <class Char>
+class formatbuf : public std::basic_streambuf<Char> {
  private:
   using int_type = typename std::basic_streambuf<Char>::int_type;
   using traits_type = typename std::basic_streambuf<Char>::traits_type;
@@ -50,10 +53,12 @@ template <class Char> class formatbuf : public std::basic_streambuf<Char> {
 };
 
 struct converter {
-  template <typename T, FMT_ENABLE_IF(is_integral<T>::value)> converter(T);
+  template <typename T, FMT_ENABLE_IF(is_integral<T>::value)>
+  converter(T);
 };
 
-template <typename Char> struct test_stream : std::basic_ostream<Char> {
+template <typename Char>
+struct test_stream : std::basic_ostream<Char> {
  private:
   void_t<> operator<<(converter);
 };
@@ -72,7 +77,8 @@ void_t<> operator<<(std::basic_ostream<char, Traits>&, unsigned char);
 
 // Checks if T has a user-defined operator<< (e.g. not a member of
 // std::ostream).
-template <typename T, typename Char> class is_streamable {
+template <typename T, typename Char>
+class is_streamable {
  private:
   template <typename U>
   static bool_constant<!std::is_same<decltype(std::declval<test_stream<Char>&>()
@@ -80,7 +86,8 @@ template <typename T, typename Char> class is_streamable {
                                      void_t<>>::value>
   test(int);
 
-  template <typename> static std::false_type test(...);
+  template <typename>
+  static std::false_type test(...);
 
   using result = decltype(test<T>(0));
 

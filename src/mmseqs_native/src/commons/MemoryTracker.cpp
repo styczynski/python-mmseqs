@@ -4,4 +4,3 @@
 
 #include "MemoryTracker.h"
 size_t MemoryTracker::totalMemorySizeInst = 0;
-

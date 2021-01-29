@@ -9,10 +9,10 @@
  */
 
 #ifndef LEVEL
-# error LEVEL(x) must be defined
+#error LEVEL(x) must be defined
 #endif
 #ifndef FAST_LEVEL
-# error FAST_LEVEL(x) must be defined
+#error FAST_LEVEL(x) must be defined
 #endif
 
 /**

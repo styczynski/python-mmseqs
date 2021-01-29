@@ -12,10 +12,10 @@
 #include "Pzstd.h"
 #include "utils/ScopeGuard.h"
 
-#include <cstdio>
-#include <string>
 #include <cstdint>
+#include <cstdio>
 #include <memory>
+#include <string>
 
 namespace pzstd {
 
@@ -83,4 +83,4 @@ inline bool roundTrip(Options& options) {
   }
   return check(source, decompressedFile);
 }
-}
+}  // namespace pzstd

@@ -31,15 +31,15 @@ template <typename T>
 class ResourcePool {
  public:
   class Deleter;
-  using Factory = std::function<T*()>;
-  using Free = std::function<void(T*)>;
+  using Factory = std::function<T *()>;
+  using Free = std::function<void(T *)>;
   using UniquePtr = std::unique_ptr<T, Deleter>;
 
  private:
   std::mutex mutex_;
   Factory factory_;
   Free free_;
-  std::vector<T*> resources_;
+  std::vector<T *> resources_;
   unsigned inUse_;
 
  public:
@@ -78,10 +78,11 @@ class ResourcePool {
 
   class Deleter {
     ResourcePool *pool_;
-  public:
+
+   public:
     explicit Deleter(ResourcePool &pool) : pool_(&pool) {}
 
-    void operator() (T *resource) {
+    void operator()(T *resource) {
       std::lock_guard<std::mutex> lock(pool_->mutex_);
       // Make sure we don't put null resources into the pool
       if (resource) {
@@ -93,4 +94,4 @@ class ResourcePool {
   };
 };
 
-}
+}  // namespace pzstd

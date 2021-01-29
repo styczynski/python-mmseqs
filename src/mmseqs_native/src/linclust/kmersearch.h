@@ -5,29 +5,31 @@
 #ifndef MMSEQS_KMERSEARCH_H
 #define MMSEQS_KMERSEARCH_H
 
-#include "kmermatcher.h"
 #include "KmerIndex.h"
+#include "kmermatcher.h"
 
-class KmerSearch{
+class KmerSearch {
+ public:
+  template <int TYPE>
+  static std::pair<KmerPosition<short> *, size_t> searchInIndex(
+      KmerPosition<short> *kmers, size_t kmersSize, KmerIndex &kmerIndex,
+      int resultDirection);
 
-public:
-    template  <int TYPE>
-    static std::pair<KmerPosition<short> *,size_t > searchInIndex( KmerPosition<short> *kmers, size_t kmersSize, KmerIndex &kmerIndex, int resultDirection);
+  template <int TYPE>
+  static void writeResult(DBWriter &dbw, KmerPosition<short> *kmers,
+                          size_t kmerCount);
 
-    template  <int TYPE>
-    static void writeResult(DBWriter & dbw, KmerPosition<short> *kmers, size_t kmerCount);
-
-
-    struct ExtractKmerAndSortResult{
-        ExtractKmerAndSortResult(size_t kmerCount, KmerPosition<short> * kmers, size_t adjustedKmer)
-                : kmerCount(kmerCount), kmers(kmers), adjustedKmer(adjustedKmer)  {}
-        size_t kmerCount;
-        KmerPosition<short> * kmers;
-        size_t adjustedKmer;
-    };
-    static ExtractKmerAndSortResult extractKmerAndSort(size_t splitKmerCount, size_t split, size_t splits,
-                                                       DBReader<unsigned int> &seqDbr, Parameters &par, BaseMatrix *subMat);
+  struct ExtractKmerAndSortResult {
+    ExtractKmerAndSortResult(size_t kmerCount, KmerPosition<short> *kmers,
+                             size_t adjustedKmer)
+        : kmerCount(kmerCount), kmers(kmers), adjustedKmer(adjustedKmer) {}
+    size_t kmerCount;
+    KmerPosition<short> *kmers;
+    size_t adjustedKmer;
+  };
+  static ExtractKmerAndSortResult extractKmerAndSort(
+      size_t splitKmerCount, size_t split, size_t splits,
+      DBReader<unsigned int> &seqDbr, Parameters &par, BaseMatrix *subMat);
 };
 
-
-#endif //MMSEQS_KMERSEARCH_H
+#endif  // MMSEQS_KMERSEARCH_H

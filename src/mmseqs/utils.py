@@ -1,13 +1,20 @@
 import os
-from typing import List, Optional
-from glob import glob
 import shutil
+from glob import glob
+from typing import List, Optional
+
 
 def to_args(args_str: str) -> List[str]:
-   return [param.strip() for param in args_str.split(' ') if len(param.strip()) > 0]
+    return [
+        param.strip()
+        for param in args_str.split(" ")
+        if len(param.strip()) > 0
+    ]
 
 
-def remove_paths(paths: List[str], base_path: Optional[str] = None, is_glob=False):
+def remove_paths(
+    paths: List[str], base_path: Optional[str] = None, is_glob=False
+):
     for glob_pattern in paths:
         if base_path is not None:
             glob_pattern = os.path.join(base_path, glob_pattern)

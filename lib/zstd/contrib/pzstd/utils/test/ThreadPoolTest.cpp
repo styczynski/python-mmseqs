@@ -22,7 +22,7 @@ TEST(ThreadPool, Ordering) {
   {
     ThreadPool executor(1);
     for (int i = 0; i < 10; ++i) {
-      executor.add([ &results, i ] { results.push_back(i); });
+      executor.add([&results, i] { results.push_back(i); });
     }
   }
 
@@ -38,7 +38,7 @@ TEST(ThreadPool, AllJobsFinished) {
     std::cerr << "Creating executor" << std::endl;
     ThreadPool executor(5);
     for (int i = 0; i < 10; ++i) {
-      executor.add([ &numFinished, &start ] {
+      executor.add([&numFinished, &start] {
         while (!start.load()) {
           std::this_thread::yield();
         }
@@ -62,9 +62,7 @@ TEST(ThreadPool, AddJobWhileJoining) {
       }
       // Sleep for a second to be sure that we are joining
       std::this_thread::sleep_for(std::chrono::seconds(1));
-      executor.add([] {
-        EXPECT_TRUE(false);
-      });
+      executor.add([] { EXPECT_TRUE(false); });
     });
     done.store(true);
   }

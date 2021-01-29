@@ -23,9 +23,7 @@ class ErrorHolder {
  public:
   ErrorHolder() : error_(false) {}
 
-  bool hasError() noexcept {
-    return error_.load();
-  }
+  bool hasError() noexcept { return error_.load(); }
 
   void setError(std::string message) noexcept {
     // Given multiple possibly concurrent calls, exactly one will ever succeed.
@@ -47,8 +45,6 @@ class ErrorHolder {
     return std::move(message_);
   }
 
-  ~ErrorHolder() {
-    assert(!hasError());
-  }
+  ~ErrorHolder() { assert(!hasError()); }
 };
-}
+}  // namespace pzstd

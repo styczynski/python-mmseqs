@@ -13,9 +13,9 @@ extern "C" {
 #include "test/RoundTrip.h"
 #include "utils/ScopeGuard.h"
 
+#include <gtest/gtest.h>
 #include <cstddef>
 #include <cstdio>
-#include <gtest/gtest.h>
 #include <memory>
 #include <random>
 

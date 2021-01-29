@@ -34,9 +34,9 @@ struct Options {
   int verbosity;
 
   enum class Status {
-    Success, // Successfully parsed options
-    Failure, // Failure to parse options
-    Message  // Options specified to print a message (e.g. "-h")
+    Success,  // Successfully parsed options
+    Failure,  // Failure to parse options
+    Message   // Options specified to print a message (e.g. "-h")
   };
 
   Options();
@@ -44,11 +44,17 @@ struct Options {
           bool decompress, std::vector<std::string> inputFiles,
           std::string outputFile, bool overwrite, bool keepSource,
           WriteMode writeMode, bool checksum, int verbosity)
-      : numThreads(numThreads), maxWindowLog(maxWindowLog),
-        compressionLevel(compressionLevel), decompress(decompress),
-        inputFiles(std::move(inputFiles)), outputFile(std::move(outputFile)),
-        overwrite(overwrite), keepSource(keepSource), writeMode(writeMode),
-        checksum(checksum), verbosity(verbosity) {}
+      : numThreads(numThreads),
+        maxWindowLog(maxWindowLog),
+        compressionLevel(compressionLevel),
+        decompress(decompress),
+        inputFiles(std::move(inputFiles)),
+        outputFile(std::move(outputFile)),
+        overwrite(overwrite),
+        keepSource(keepSource),
+        writeMode(writeMode),
+        checksum(checksum),
+        verbosity(verbosity) {}
 
   Status parse(int argc, const char **argv);
 
@@ -65,4 +71,4 @@ struct Options {
 
   std::string getOutputFile(const std::string &inputFile) const;
 };
-}
+}  // namespace pzstd

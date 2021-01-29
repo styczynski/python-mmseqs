@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
-
+from pybind11_tests import ConstructorStats, UserType
 from pybind11_tests import stl as m
-from pybind11_tests import UserType
-from pybind11_tests import ConstructorStats
 
 
 def test_vector(doc):
@@ -85,7 +83,9 @@ def test_recursive_casting():
     assert m.cast_lv_array() == ["lvalue", "lvalue"]
     assert m.cast_rv_map() == {"a": "rvalue"}
     assert m.cast_lv_map() == {"a": "lvalue", "b": "lvalue"}
-    assert m.cast_rv_nested() == [[[{"b": "rvalue", "c": "rvalue"}], [{"a": "rvalue"}]]]
+    assert m.cast_rv_nested() == [
+        [[{"b": "rvalue", "c": "rvalue"}], [{"a": "rvalue"}]]
+    ]
     assert m.cast_lv_nested() == {
         "a": [[["lvalue", "lvalue"]], [["lvalue", "lvalue"]]],
         "b": [[["lvalue", "lvalue"], ["lvalue", "lvalue"]]],
@@ -175,7 +175,8 @@ def test_variant(doc):
     assert m.cast_variant() == (5, "Hello")
 
     assert (
-        doc(m.load_variant) == "load_variant(arg0: Union[int, str, float, None]) -> str"
+        doc(m.load_variant)
+        == "load_variant(arg0: Union[int, str, float, None]) -> str"
     )
 
 

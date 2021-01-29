@@ -12,30 +12,33 @@ import sys
 
 
 def find_version(filepath):
-  version_file_data = None
-  with open(filepath) as fd:
-    version_file_data = fd.read()
+    version_file_data = None
+    with open(filepath) as fd:
+        version_file_data = fd.read()
 
-  patterns = r"""#\s*define\s+ZSTD_VERSION_MAJOR\s+([0-9]+)
+    patterns = r"""#\s*define\s+ZSTD_VERSION_MAJOR\s+([0-9]+)
 #\s*define\s+ZSTD_VERSION_MINOR\s+([0-9]+)
 #\s*define\s+ZSTD_VERSION_RELEASE\s+([0-9]+)
 """
-  regex = re.compile(patterns, re.MULTILINE)
-  version_match = regex.search(version_file_data)
-  if version_match:
-    return version_match.groups()
-  raise Exception("Unable to find version string.")
+    regex = re.compile(patterns, re.MULTILINE)
+    version_match = regex.search(version_file_data)
+    if version_match:
+        return version_match.groups()
+    raise Exception("Unable to find version string.")
 
 
 def main():
-  import argparse
-  parser = argparse.ArgumentParser(description='Print zstd version from lib/zstd.h')
-  parser.add_argument('file', help='path to lib/zstd.h')
-  args = parser.parse_args()
-  filepath = args.file
-  version_tup = find_version(filepath)
-  print('.'.join(version_tup))
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="Print zstd version from lib/zstd.h"
+    )
+    parser.add_argument("file", help="path to lib/zstd.h")
+    args = parser.parse_args()
+    filepath = args.file
+    version_tup = find_version(filepath)
+    print(".".join(version_tup))
 
 
-if __name__ == '__main__':
-  main()
+if __name__ == "__main__":
+    main()

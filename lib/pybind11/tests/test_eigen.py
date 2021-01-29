@@ -44,11 +44,17 @@ def test_dense():
 
 
 def test_partially_fixed():
-    ref2 = np.array([[0.0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]])
+    ref2 = np.array(
+        [[0.0, 1, 2, 3], [4, 5, 6, 7], [8, 9, 10, 11], [12, 13, 14, 15]]
+    )
     np.testing.assert_array_equal(m.partial_copy_four_rm_r(ref2), ref2)
     np.testing.assert_array_equal(m.partial_copy_four_rm_c(ref2), ref2)
-    np.testing.assert_array_equal(m.partial_copy_four_rm_r(ref2[:, 1]), ref2[:, [1]])
-    np.testing.assert_array_equal(m.partial_copy_four_rm_c(ref2[0, :]), ref2[[0], :])
+    np.testing.assert_array_equal(
+        m.partial_copy_four_rm_r(ref2[:, 1]), ref2[:, [1]]
+    )
+    np.testing.assert_array_equal(
+        m.partial_copy_four_rm_c(ref2[0, :]), ref2[[0], :]
+    )
     np.testing.assert_array_equal(
         m.partial_copy_four_rm_r(ref2[:, (0, 2)]), ref2[:, (0, 2)]
     )
@@ -58,8 +64,12 @@ def test_partially_fixed():
 
     np.testing.assert_array_equal(m.partial_copy_four_cm_r(ref2), ref2)
     np.testing.assert_array_equal(m.partial_copy_four_cm_c(ref2), ref2)
-    np.testing.assert_array_equal(m.partial_copy_four_cm_r(ref2[:, 1]), ref2[:, [1]])
-    np.testing.assert_array_equal(m.partial_copy_four_cm_c(ref2[0, :]), ref2[[0], :])
+    np.testing.assert_array_equal(
+        m.partial_copy_four_cm_r(ref2[:, 1]), ref2[:, [1]]
+    )
+    np.testing.assert_array_equal(
+        m.partial_copy_four_cm_c(ref2[0, :]), ref2[[0], :]
+    )
     np.testing.assert_array_equal(
         m.partial_copy_four_cm_r(ref2[:, (0, 2)]), ref2[:, (0, 2)]
     )
@@ -103,8 +113,9 @@ def test_mutator_descriptors():
     )
     with pytest.raises(TypeError) as excinfo:
         m.fixed_mutator_a(np.array([[1, 2], [3, 4]], dtype="float32"))
-    assert "(arg0: numpy.ndarray[numpy.float32[5, 6], flags.writeable]) -> None" in str(
-        excinfo.value
+    assert (
+        "(arg0: numpy.ndarray[numpy.float32[5, 6], flags.writeable]) -> None"
+        in str(excinfo.value)
     )
     zr.flags.writeable = False
     with pytest.raises(TypeError):
@@ -142,7 +153,9 @@ def test_pass_readonly_array():
     np.testing.assert_array_equal(z, m.fixed_copy_r(z))
     np.testing.assert_array_equal(m.fixed_r_const(), m.fixed_r())
     assert not m.fixed_r_const().flags.writeable
-    np.testing.assert_array_equal(m.fixed_copy_r(m.fixed_r_const()), m.fixed_r_const())
+    np.testing.assert_array_equal(
+        m.fixed_copy_r(m.fixed_r_const()), m.fixed_r_const()
+    )
 
 
 def test_nonunit_stride_from_python():
@@ -151,10 +164,14 @@ def test_nonunit_stride_from_python():
     second_col = counting_mat[:, 1]
     np.testing.assert_array_equal(m.double_row(second_row), 2.0 * second_row)
     np.testing.assert_array_equal(m.double_col(second_row), 2.0 * second_row)
-    np.testing.assert_array_equal(m.double_complex(second_row), 2.0 * second_row)
+    np.testing.assert_array_equal(
+        m.double_complex(second_row), 2.0 * second_row
+    )
     np.testing.assert_array_equal(m.double_row(second_col), 2.0 * second_col)
     np.testing.assert_array_equal(m.double_col(second_col), 2.0 * second_col)
-    np.testing.assert_array_equal(m.double_complex(second_col), 2.0 * second_col)
+    np.testing.assert_array_equal(
+        m.double_complex(second_col), 2.0 * second_col
+    )
 
     counting_3d = np.arange(27.0, dtype=np.float32).reshape((3, 3, 3))
     slices = [counting_3d[0, :, :], counting_3d[:, 0, :], counting_3d[:, :, 0]]
@@ -165,7 +182,9 @@ def test_nonunit_stride_from_python():
     # Mutator:
     m.double_threer(second_row)
     m.double_threec(second_col)
-    np.testing.assert_array_equal(counting_mat, [[0.0, 2, 2], [6, 16, 10], [6, 14, 8]])
+    np.testing.assert_array_equal(
+        counting_mat, [[0.0, 2, 2], [6, 16, 10], [6, 14, 8]]
+    )
 
 
 def test_negative_stride_from_python(msg):
@@ -179,10 +198,14 @@ def test_negative_stride_from_python(msg):
     second_col = counting_mat[:, 1]
     np.testing.assert_array_equal(m.double_row(second_row), 2.0 * second_row)
     np.testing.assert_array_equal(m.double_col(second_row), 2.0 * second_row)
-    np.testing.assert_array_equal(m.double_complex(second_row), 2.0 * second_row)
+    np.testing.assert_array_equal(
+        m.double_complex(second_row), 2.0 * second_row
+    )
     np.testing.assert_array_equal(m.double_row(second_col), 2.0 * second_col)
     np.testing.assert_array_equal(m.double_col(second_col), 2.0 * second_col)
-    np.testing.assert_array_equal(m.double_complex(second_col), 2.0 * second_col)
+    np.testing.assert_array_equal(
+        m.double_complex(second_col), 2.0 * second_col
+    )
 
     counting_3d = np.arange(27.0, dtype=np.float32).reshape((3, 3, 3))
     counting_3d = counting_3d[::-1, ::-1, ::-1]
@@ -578,7 +601,9 @@ def test_both_ref_mutators():
 def test_nocopy_wrapper():
     # get_elem requires a column-contiguous matrix reference, but should be
     # callable with other types of matrix (via copying):
-    int_matrix_colmajor = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]], order="F")
+    int_matrix_colmajor = np.array(
+        [[1, 2, 3], [4, 5, 6], [7, 8, 9]], order="F"
+    )
     dbl_matrix_colmajor = np.array(
         int_matrix_colmajor, dtype="double", order="F", copy=True
     )
@@ -647,7 +672,9 @@ def test_eigen_ref_life_support():
 def test_special_matrix_objects():
     assert np.all(m.incr_diag(7) == np.diag([1.0, 2, 3, 4, 5, 6, 7]))
 
-    asymm = np.array([[1.0, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]])
+    asymm = np.array(
+        [[1.0, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]
+    )
     symm_lower = np.array(asymm)
     symm_upper = np.array(asymm)
     for i in range(4):
@@ -735,14 +762,20 @@ def test_sparse_signature(doc):
 
 def test_issue738():
     """Ignore strides on a length-1 dimension (even if they would be incompatible length > 1)"""
-    assert np.all(m.iss738_f1(np.array([[1.0, 2, 3]])) == np.array([[1.0, 102, 203]]))
     assert np.all(
-        m.iss738_f1(np.array([[1.0], [2], [3]])) == np.array([[1.0], [12], [23]])
+        m.iss738_f1(np.array([[1.0, 2, 3]])) == np.array([[1.0, 102, 203]])
+    )
+    assert np.all(
+        m.iss738_f1(np.array([[1.0], [2], [3]]))
+        == np.array([[1.0], [12], [23]])
     )
 
-    assert np.all(m.iss738_f2(np.array([[1.0, 2, 3]])) == np.array([[1.0, 102, 203]]))
     assert np.all(
-        m.iss738_f2(np.array([[1.0], [2], [3]])) == np.array([[1.0], [12], [23]])
+        m.iss738_f2(np.array([[1.0, 2, 3]])) == np.array([[1.0, 102, 203]])
+    )
+    assert np.all(
+        m.iss738_f2(np.array([[1.0], [2], [3]]))
+        == np.array([[1.0], [12], [23]])
     )
 
 

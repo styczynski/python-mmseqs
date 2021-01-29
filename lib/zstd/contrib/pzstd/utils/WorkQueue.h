@@ -12,7 +12,6 @@
 
 #include <atomic>
 #include <cassert>
-#include <cstddef>
 #include <condition_variable>
 #include <cstddef>
 #include <functional>
@@ -159,13 +158,9 @@ class BufferWorkQueue {
     return result;
   }
 
-  void setMaxSize(std::size_t maxSize) {
-    queue_.setMaxSize(maxSize);
-  }
+  void setMaxSize(std::size_t maxSize) { queue_.setMaxSize(maxSize); }
 
-  void finish() {
-    queue_.finish();
-  }
+  void finish() { queue_.finish(); }
 
   /**
    * Blocks until `finish()` has been called.
@@ -178,4 +173,4 @@ class BufferWorkQueue {
     return size_.load();
   }
 };
-}
+}  // namespace pzstd

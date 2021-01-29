@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
-import pytest
-
 import env  # noqa: F401
+import pytest
 
 m = pytest.importorskip("pybind11_tests.virtual_functions")
 from pybind11_tests import ConstructorStats  # noqa: E402
@@ -187,7 +186,8 @@ def test_alias_delay_initialization2(capture):
 # to fail in ncv1.print_nc()
 @pytest.mark.xfail("env.PYPY")
 @pytest.mark.skipif(
-    not hasattr(m, "NCVirt"), reason="NCVirt does not work on Intel/PGI/NVCC compilers"
+    not hasattr(m, "NCVirt"),
+    reason="NCVirt does not work on Intel/PGI/NVCC compilers",
 )
 def test_move_support():
     class NCVirtExt(m.NCVirt):

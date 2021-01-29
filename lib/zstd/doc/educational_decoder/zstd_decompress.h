@@ -9,9 +9,9 @@
 
 /******* EXPOSED TYPES ********************************************************/
 /*
-* Contains the parsed contents of a dictionary
-* This includes Huffman and FSE tables used for decoding and data on offsets
-*/
+ * Contains the parsed contents of a dictionary
+ * This includes Huffman and FSE tables used for decoding and data on offsets
+ */
 typedef struct dictionary_s dictionary_t;
 /******* END EXPOSED TYPES ****************************************************/
 
@@ -19,13 +19,13 @@ typedef struct dictionary_s dictionary_t;
 /// Zstandard decompression functions.
 /// `dst` must point to a space at least as large as the reconstructed output.
 size_t ZSTD_decompress(void *const dst, const size_t dst_len,
-                    const void *const src, const size_t src_len);
+                       const void *const src, const size_t src_len);
 
 /// If `dict != NULL` and `dict_len >= 8`, does the same thing as
 /// `ZSTD_decompress` but uses the provided dict
 size_t ZSTD_decompress_with_dict(void *const dst, const size_t dst_len,
-                              const void *const src, const size_t src_len,
-                              dictionary_t* parsed_dict);
+                                 const void *const src, const size_t src_len,
+                                 dictionary_t *parsed_dict);
 
 /// Get the decompressed size of an input stream so memory can be allocated in
 /// advance
@@ -39,7 +39,7 @@ size_t ZSTD_get_decompressed_size(const void *const src, const size_t src_len);
  * Return a valid dictionary_t pointer for use with dictionary initialization
  * or decompression
  */
-dictionary_t* create_dictionary();
+dictionary_t *create_dictionary();
 
 /*
  * Parse a provided dictionary blob for use in decompression
@@ -49,7 +49,7 @@ dictionary_t* create_dictionary();
  *        can be used for decompression
  */
 void parse_dictionary(dictionary_t *const dict, const void *src,
-                             size_t src_len);
+                      size_t src_len);
 
 /*
  * Free internal Huffman tables, FSE tables, and dictionary content

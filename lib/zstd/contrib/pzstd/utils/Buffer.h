@@ -28,9 +28,7 @@ class Buffer {
   std::shared_ptr<unsigned char> buffer_;
   MutableByteRange range_;
 
-  static void delete_buffer(unsigned char* buffer) {
-    delete[] buffer;
-  }
+  static void delete_buffer(unsigned char* buffer) { delete[] buffer; }
 
  public:
   /// Construct an empty buffer that owns no data.
@@ -62,38 +60,22 @@ class Buffer {
   }
 
   /// Modifies the buffer to point to the range [begin + n, end).
-  void advance(std::size_t n) {
-    range_.advance(n);
-  }
+  void advance(std::size_t n) { range_.advance(n); }
 
   /// Modifies the buffer to point to the range [begin, end - n).
-  void subtract(std::size_t n) {
-    range_.subtract(n);
-  }
+  void subtract(std::size_t n) { range_.subtract(n); }
 
   /// Returns a read only `Range` pointing to the `Buffer`s data.
-  ByteRange range() const {
-    return range_;
-  }
+  ByteRange range() const { return range_; }
   /// Returns a mutable `Range` pointing to the `Buffer`s data.
-  MutableByteRange range() {
-    return range_;
-  }
+  MutableByteRange range() { return range_; }
 
-  const unsigned char* data() const {
-    return range_.data();
-  }
+  const unsigned char* data() const { return range_.data(); }
 
-  unsigned char* data() {
-    return range_.data();
-  }
+  unsigned char* data() { return range_.data(); }
 
-  std::size_t size() const {
-    return range_.size();
-  }
+  std::size_t size() const { return range_.size(); }
 
-  bool empty() const {
-    return range_.empty();
-  }
+  bool empty() const { return range_.empty(); }
 };
-}
+}  // namespace pzstd

@@ -2,23 +2,23 @@
 #define PHP_A3M_READER_H
 
 #include <cstddef>
-#include <vector>
 #include <string>
+#include <vector>
 
 class A3mReader {
-public:
-    A3mReader(std::string a3m);
+ public:
+  A3mReader(std::string a3m);
 
-    std::string getFasta();
+  std::string getFasta();
 
-private:
-    void addSequence(const std::string& sequence);
+ private:
+  void addSequence(const std::string& sequence);
 
-    bool columnHasInsertion(size_t col);
+  bool columnHasInsertion(size_t col);
 
-    std::vector<std::string> headers;
-    std::vector<std::vector<char>> entries;
-    size_t length;
+  std::vector<std::string> headers;
+  std::vector<std::vector<char>> entries;
+  size_t length;
 };
 
 #endif

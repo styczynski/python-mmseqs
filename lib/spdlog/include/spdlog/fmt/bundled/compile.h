@@ -43,7 +43,8 @@ const T& first(const T& value, const Tail&...) {
 
 // Part of a compiled format string. It can be either literal text or a
 // replacement field.
-template <typename Char> struct format_part {
+template <typename Char>
+struct format_part {
   enum class kind { arg_index, arg_name, text, replacement };
 
   struct replacement {
@@ -81,7 +82,8 @@ template <typename Char> struct format_part {
   }
 };
 
-template <typename Char> struct part_counter {
+template <typename Char>
+struct part_counter {
   unsigned num_parts = 0;
 
   FMT_CONSTEXPR void on_text(const Char* begin, const Char* end) {
@@ -218,51 +220,51 @@ auto vformat_to(OutputIt out, CompiledFormat& cf,
 
     using format_part_t = format_part<char_type>;
     switch (part.part_kind) {
-    case format_part_t::kind::text: {
-      const auto text = value.str;
-      auto output = ctx.out();
-      auto&& it = reserve(output, text.size());
-      it = std::copy_n(text.begin(), text.size(), it);
-      ctx.advance_to(output);
-      break;
-    }
+      case format_part_t::kind::text: {
+        const auto text = value.str;
+        auto output = ctx.out();
+        auto&& it = reserve(output, text.size());
+        it = std::copy_n(text.begin(), text.size(), it);
+        ctx.advance_to(output);
+        break;
+      }
 
-    case format_part_t::kind::arg_index:
-      advance_to(parse_ctx, part.arg_id_end);
-      detail::format_arg<OutputIt>(parse_ctx, ctx, value.arg_index);
-      break;
+      case format_part_t::kind::arg_index:
+        advance_to(parse_ctx, part.arg_id_end);
+        detail::format_arg<OutputIt>(parse_ctx, ctx, value.arg_index);
+        break;
 
-    case format_part_t::kind::arg_name:
-      advance_to(parse_ctx, part.arg_id_end);
-      detail::format_arg<OutputIt>(parse_ctx, ctx, value.str);
-      break;
+      case format_part_t::kind::arg_name:
+        advance_to(parse_ctx, part.arg_id_end);
+        detail::format_arg<OutputIt>(parse_ctx, ctx, value.str);
+        break;
 
-    case format_part_t::kind::replacement: {
-      const auto& arg_id_value = value.repl.arg_id.val;
-      const auto arg = value.repl.arg_id.kind == arg_id_kind::index
-                           ? ctx.arg(arg_id_value.index)
-                           : ctx.arg(arg_id_value.name);
+      case format_part_t::kind::replacement: {
+        const auto& arg_id_value = value.repl.arg_id.val;
+        const auto arg = value.repl.arg_id.kind == arg_id_kind::index
+                             ? ctx.arg(arg_id_value.index)
+                             : ctx.arg(arg_id_value.name);
 
-      auto specs = value.repl.specs;
+        auto specs = value.repl.specs;
 
-      handle_dynamic_spec<width_checker>(specs.width, specs.width_ref, ctx);
-      handle_dynamic_spec<precision_checker>(specs.precision,
-                                             specs.precision_ref, ctx);
+        handle_dynamic_spec<width_checker>(specs.width, specs.width_ref, ctx);
+        handle_dynamic_spec<precision_checker>(specs.precision,
+                                               specs.precision_ref, ctx);
 
-      error_handler h;
-      numeric_specs_checker<error_handler> checker(h, arg.type());
-      if (specs.align == align::numeric) checker.require_numeric_argument();
-      if (specs.sign != sign::none) checker.check_sign();
-      if (specs.alt) checker.require_numeric_argument();
-      if (specs.precision >= 0) checker.check_precision();
+        error_handler h;
+        numeric_specs_checker<error_handler> checker(h, arg.type());
+        if (specs.align == align::numeric) checker.require_numeric_argument();
+        if (specs.sign != sign::none) checker.check_sign();
+        if (specs.alt) checker.require_numeric_argument();
+        if (specs.precision >= 0) checker.check_precision();
 
-      advance_to(parse_ctx, part.arg_id_end);
-      ctx.advance_to(
-          visit_format_arg(arg_formatter<OutputIt, typename Context::char_type>(
-                               ctx, nullptr, &specs),
-                           arg));
-      break;
-    }
+        advance_to(parse_ctx, part.arg_id_end);
+        ctx.advance_to(visit_format_arg(
+            arg_formatter<OutputIt, typename Context::char_type>(ctx, nullptr,
+                                                                 &specs),
+            arg));
+        break;
+      }
     }
   }
   return ctx.out();
@@ -288,7 +290,8 @@ struct compiled_format_base : basic_compiled_format {
   const parts_container& parts() const { return compiled_parts; }
 };
 
-template <typename Char, unsigned N> struct format_part_array {
+template <typename Char, unsigned N>
+struct format_part_array {
   format_part<Char> data[N] = {};
   FMT_CONSTEXPR format_part_array() = default;
 };
@@ -314,7 +317,8 @@ FMT_CONSTEXPR format_part_array<Char, N> compile_to_parts(
   return parts;
 }
 
-template <typename T> constexpr const T& constexpr_max(const T& a, const T& b) {
+template <typename T>
+constexpr const T& constexpr_max(const T& a, const T& b) {
   return (a < b) ? b : a;
 }
 
@@ -364,7 +368,8 @@ class compiled_format : private compiled_format_base<S> {
 };
 
 #ifdef __cpp_if_constexpr
-template <typename... Args> struct type_list {};
+template <typename... Args>
+struct type_list {};
 
 // Returns a reference to the argument at index N from [first, rest...].
 template <int N, typename T, typename... Args>
@@ -377,18 +382,22 @@ constexpr const auto& get([[maybe_unused]] const T& first,
     return get<N - 1>(rest...);
 }
 
-template <int N, typename> struct get_type_impl;
+template <int N, typename>
+struct get_type_impl;
 
-template <int N, typename... Args> struct get_type_impl<N, type_list<Args...>> {
+template <int N, typename... Args>
+struct get_type_impl<N, type_list<Args...>> {
   using type = remove_cvref_t<decltype(get<N>(std::declval<Args>()...))>;
 };
 
 template <int N, typename T>
 using get_type = typename get_type_impl<N, T>::type;
 
-template <typename T> struct is_compiled_format : std::false_type {};
+template <typename T>
+struct is_compiled_format : std::false_type {};
 
-template <typename Char> struct text {
+template <typename Char>
+struct text {
   basic_string_view<Char> data;
   using char_type = Char;
 
@@ -407,7 +416,8 @@ constexpr text<Char> make_text(basic_string_view<Char> s, size_t pos,
   return {{&s[pos], size}};
 }
 
-template <typename Char> struct code_unit {
+template <typename Char>
+struct code_unit {
   Char value;
   using char_type = Char;
 
@@ -421,7 +431,8 @@ template <typename Char>
 struct is_compiled_format<code_unit<Char>> : std::true_type {};
 
 // A replacement field that refers to argument N.
-template <typename Char, typename T, int N> struct field {
+template <typename Char, typename T, int N>
+struct field {
   using char_type = Char;
 
   template <typename OutputIt, typename... Args>
@@ -436,7 +447,8 @@ template <typename Char, typename T, int N>
 struct is_compiled_format<field<Char, T, N>> : std::true_type {};
 
 // A replacement field that refers to argument N and has format specifiers.
-template <typename Char, typename T, int N> struct spec_field {
+template <typename Char, typename T, int N>
+struct spec_field {
   using char_type = Char;
   mutable formatter<T, Char> fmt;
 
@@ -454,7 +466,8 @@ template <typename Char, typename T, int N> struct spec_field {
 template <typename Char, typename T, int N>
 struct is_compiled_format<spec_field<Char, T, N>> : std::true_type {};
 
-template <typename L, typename R> struct concat {
+template <typename L, typename R>
+struct concat {
   L lhs;
   R rhs;
   using char_type = typename L::char_type;
@@ -502,7 +515,8 @@ constexpr auto parse_tail(T head, S format_str) {
   }
 }
 
-template <typename T, typename Char> struct parse_specs_result {
+template <typename T, typename Char>
+struct parse_specs_result {
   formatter<T, Char> fmt;
   size_t end;
   int next_arg_id;
@@ -601,7 +615,7 @@ FMT_DEPRECATED auto compile(const Args&... args)
 }
 
 #if FMT_USE_CONSTEXPR
-#  ifdef __cpp_if_constexpr
+#ifdef __cpp_if_constexpr
 
 template <typename CompiledFormat, typename... Args,
           typename Char = typename CompiledFormat::char_type,
@@ -619,8 +633,8 @@ OutputIt format_to(OutputIt out, const CompiledFormat& cf,
                    const Args&... args) {
   return cf.format(out, args...);
 }
-#  endif  // __cpp_if_constexpr
-#endif    // FMT_USE_CONSTEXPR
+#endif  // __cpp_if_constexpr
+#endif  // FMT_USE_CONSTEXPR
 
 template <typename CompiledFormat, typename... Args,
           typename Char = typename CompiledFormat::char_type,

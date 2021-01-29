@@ -43,7 +43,7 @@
 #define FUZZ_H
 
 #ifndef FUZZ_RNG_SEED_SIZE
-#  define FUZZ_RNG_SEED_SIZE 4
+#define FUZZ_RNG_SEED_SIZE 4
 #endif
 
 #include <stddef.h>

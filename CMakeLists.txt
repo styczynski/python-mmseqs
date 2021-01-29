@@ -213,7 +213,7 @@ set_target_properties(libzstd_static PROPERTIES COMPILE_FLAGS "${MMSEQS_C_FLAGS}
 include_directories(src/mmseqs_native/src)
 
 # cppfs
-add_subdirectory(lib/cppfs/source/cppfs)
+add_subdirectory(lib/cppfs)
 
 # spdlog
 add_subdirectory(lib/spdlog)
@@ -271,7 +271,7 @@ target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/util)
 target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src)
 target_include_directories(mmseqs_native PUBLIC lib/toml11)
 target_include_directories(mmseqs_native PUBLIC lib/spdlog/include)
-target_include_directories(mmseqs_native PUBLIC lib/cppfs/source/cppfs/include)
+target_include_directories(mmseqs_native PUBLIC lib/cppfs/include)
 get_target_property(COMPILE_TMP mmseqs-framework COMPILE_FLAGS)
 get_target_property(LINK_TMP mmseqs-framework LINK_FLAGS)
 get_target_property(DEF_TMP mmseqs-framework COMPILE_DEFINITIONS)

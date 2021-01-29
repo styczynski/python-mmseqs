@@ -163,7 +163,10 @@ def test_scoped_enum():
 def test_implicit_conversion():
     assert str(m.ClassWithUnscopedEnum.EMode.EFirstMode) == "EMode.EFirstMode"
     assert str(m.ClassWithUnscopedEnum.EFirstMode) == "EMode.EFirstMode"
-    assert repr(m.ClassWithUnscopedEnum.EMode.EFirstMode) == "<EMode.EFirstMode: 1>"
+    assert (
+        repr(m.ClassWithUnscopedEnum.EMode.EFirstMode)
+        == "<EMode.EFirstMode: 1>"
+    )
     assert repr(m.ClassWithUnscopedEnum.EFirstMode) == "<EMode.EFirstMode: 1>"
 
     f = m.ClassWithUnscopedEnum.test_function

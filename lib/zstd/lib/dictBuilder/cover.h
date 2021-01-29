@@ -2,7 +2,7 @@
 #include <stdlib.h> /* malloc, free, qsort */
 #include <string.h> /* memset */
 #include <time.h>   /* clock */
-#include "mem.h" /* read */
+#include "mem.h"    /* read */
 #include "pool.h"
 #include "threading.h"
 #include "zstd_internal.h" /* includes zstd.h */
@@ -42,15 +42,16 @@ typedef struct {
  *  Checks total compressed size of a dictionary
  */
 size_t COVER_checkTotalCompressedSize(const ZDICT_cover_params_t parameters,
-                                      const size_t *samplesSizes, const BYTE *samples,
-                                      size_t *offsets,
+                                      const size_t *samplesSizes,
+                                      const BYTE *samples, size_t *offsets,
                                       size_t nbTrainSamples, size_t nbSamples,
-                                      BYTE *const dict, size_t dictBufferCapacity);
+                                      BYTE *const dict,
+                                      size_t dictBufferCapacity);
 
 /**
  * Returns the sum of the sample sizes.
  */
-size_t COVER_sum(const size_t *samplesSizes, unsigned nbSamples) ;
+size_t COVER_sum(const size_t *samplesSizes, unsigned nbSamples);
 
 /**
  * Initialize the `COVER_best_t`.

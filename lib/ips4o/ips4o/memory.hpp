@@ -23,14 +23,15 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ *ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ *LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ *CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #pragma once
@@ -43,10 +44,10 @@
 #include <utility>
 #include <vector>
 
-#include "ips4o_fwd.hpp"
 #include "bucket_pointers.hpp"
 #include "buffers.hpp"
 #include "classifier.hpp"
+#include "ips4o_fwd.hpp"
 
 namespace ips4o {
 namespace detail {
@@ -56,9 +57,9 @@ namespace detail {
  */
 template <class T>
 static T* alignPointer(T* ptr, std::size_t alignment) {
-    uintptr_t v = reinterpret_cast<std::uintptr_t>(ptr);
-    v = (v - 1 + alignment) & ~(alignment - 1);
-    return reinterpret_cast<T*>(v);
+  uintptr_t v = reinterpret_cast<std::uintptr_t>(ptr);
+  v = (v - 1 + alignment) & ~(alignment - 1);
+  return reinterpret_cast<T*>(v);
 }
 
 /**
@@ -67,40 +68,38 @@ static T* alignPointer(T* ptr, std::size_t alignment) {
 template <class T>
 class AlignedPtr {
  public:
-    AlignedPtr() {}
+  AlignedPtr() {}
 
-    template <class... Args>
-    explicit AlignedPtr(std::size_t alignment, Args&&... args)
-            : alloc_(new char[sizeof(T) + alignment])
-            , value_(new (alignPointer(alloc_, alignment)) T(std::forward<Args>(args)...))
-    {}
+  template <class... Args>
+  explicit AlignedPtr(std::size_t alignment, Args&&... args)
+      : alloc_(new char[sizeof(T) + alignment]),
+        value_(new (alignPointer(alloc_, alignment))
+                   T(std::forward<Args>(args)...)) {}
 
-    AlignedPtr(const AlignedPtr&) = delete;
-    AlignedPtr& operator=(const AlignedPtr&) = delete;
+  AlignedPtr(const AlignedPtr&) = delete;
+  AlignedPtr& operator=(const AlignedPtr&) = delete;
 
-    AlignedPtr(AlignedPtr&& rhs) : alloc_(rhs.alloc_), value_(rhs.value_) {
-        rhs.alloc_ = nullptr;
+  AlignedPtr(AlignedPtr&& rhs) : alloc_(rhs.alloc_), value_(rhs.value_) {
+    rhs.alloc_ = nullptr;
+  }
+  AlignedPtr& operator=(AlignedPtr&& rhs) {
+    std::swap(alloc_, rhs.alloc_);
+    std::swap(value_, rhs.value_);
+    return *this;
+  }
+
+  ~AlignedPtr() {
+    if (alloc_) {
+      value_->~T();
+      delete[] alloc_;
     }
-    AlignedPtr& operator=(AlignedPtr&& rhs) {
-        std::swap(alloc_, rhs.alloc_);
-        std::swap(value_, rhs.value_);
-        return *this;
-    }
+  }
 
-    ~AlignedPtr() {
-        if (alloc_) {
-            value_->~T();
-            delete[] alloc_;
-        }
-    }
-
-    T& get() {
-        return *value_;
-    }
+  T& get() { return *value_; }
 
  private:
-    char* alloc_ = nullptr;
-    T* value_;
+  char* alloc_ = nullptr;
+  T* value_;
 };
 
 /**
@@ -109,39 +108,36 @@ class AlignedPtr {
 template <>
 class AlignedPtr<void> {
  public:
-    AlignedPtr() {}
+  AlignedPtr() {}
 
-    template <class... Args>
-    explicit AlignedPtr(std::size_t alignment, std::size_t size)
-            : alloc_(new char[size + alignment])
-            , value_(alignPointer(alloc_, alignment))
-    {}
+  template <class... Args>
+  explicit AlignedPtr(std::size_t alignment, std::size_t size)
+      : alloc_(new char[size + alignment]),
+        value_(alignPointer(alloc_, alignment)) {}
 
-    AlignedPtr(const AlignedPtr&) = delete;
-    AlignedPtr& operator=(const AlignedPtr&) = delete;
+  AlignedPtr(const AlignedPtr&) = delete;
+  AlignedPtr& operator=(const AlignedPtr&) = delete;
 
-    AlignedPtr(AlignedPtr&& rhs) : alloc_(rhs.alloc_), value_(rhs.value_) {
-        rhs.alloc_ = nullptr;
+  AlignedPtr(AlignedPtr&& rhs) : alloc_(rhs.alloc_), value_(rhs.value_) {
+    rhs.alloc_ = nullptr;
+  }
+  AlignedPtr& operator=(AlignedPtr&& rhs) {
+    std::swap(alloc_, rhs.alloc_);
+    std::swap(value_, rhs.value_);
+    return *this;
+  }
+
+  ~AlignedPtr() {
+    if (alloc_) {
+      delete[] alloc_;
     }
-    AlignedPtr& operator=(AlignedPtr&& rhs) {
-        std::swap(alloc_, rhs.alloc_);
-        std::swap(value_, rhs.value_);
-        return *this;
-    }
+  }
 
-    ~AlignedPtr() {
-        if (alloc_) {
-            delete[] alloc_;
-        }
-    }
-
-    char* get() {
-        return value_;
-    }
+  char* get() { return value_; }
 
  private:
-    char* alloc_ = nullptr;
-    char* value_;
+  char* alloc_ = nullptr;
+  char* value_;
 };
 
 /**
@@ -149,16 +145,16 @@ class AlignedPtr<void> {
  */
 template <class Cfg>
 class Sorter<Cfg>::BufferStorage : public AlignedPtr<void> {
-    static constexpr const auto kPerThread =
-            Cfg::kBlockSizeInBytes * Cfg::kMaxBuckets * (1 + Cfg::kAllowEqualBuckets);
+  static constexpr const auto kPerThread =
+      Cfg::kBlockSizeInBytes * Cfg::kMaxBuckets * (1 + Cfg::kAllowEqualBuckets);
 
  public:
-    BufferStorage() {}
+  BufferStorage() {}
 
-    explicit BufferStorage(int num_threads)
-        : AlignedPtr<void>(Cfg::kDataAlignment, num_threads * kPerThread) {}
+  explicit BufferStorage(int num_threads)
+      : AlignedPtr<void>(Cfg::kDataAlignment, num_threads * kPerThread) {}
 
-    char* forThread(int id) { return this->get() + id * kPerThread; }
+  char* forThread(int id) { return this->get() + id * kPerThread; }
 };
 
 /**
@@ -166,66 +162,76 @@ class Sorter<Cfg>::BufferStorage : public AlignedPtr<void> {
  */
 template <class Cfg>
 struct Sorter<Cfg>::LocalData {
-    using diff_t = typename Cfg::difference_type;
-    // Buffers
-    diff_t bucket_size[Cfg::kMaxBuckets];
-    Buffers buffers;
-    Block swap[2];
-    Block overflow;
+  using diff_t = typename Cfg::difference_type;
+  // Buffers
+  diff_t bucket_size[Cfg::kMaxBuckets];
+  Buffers buffers;
+  Block swap[2];
+  Block overflow;
 
-    // Bucket information
-    BucketPointers bucket_pointers[Cfg::kMaxBuckets];
+  // Bucket information
+  BucketPointers bucket_pointers[Cfg::kMaxBuckets];
 
-    // Classifier
-    Classifier classifier;
+  // Classifier
+  Classifier classifier;
 
-    // Information used during empty block movement
-    diff_t first_block;
-    diff_t first_empty_block;
+  // Information used during empty block movement
+  diff_t first_block;
+  diff_t first_empty_block;
 
-    // Random bit generator for sampling
-    // LCG using constants by Knuth (for 64 bit) or Numerical Recipes (for 32 bit)
-    std::linear_congruential_engine<std::uintptr_t,
-                                    Cfg::kIs64Bit ? 6364136223846793005u : 1664525u,
-                                    Cfg::kIs64Bit ? 1442695040888963407u : 1013904223u,
-                                    0u> random_generator;
+  // Random bit generator for sampling
+  // LCG using constants by Knuth (for 64 bit) or Numerical Recipes (for 32 bit)
+  std::linear_congruential_engine<
+      std::uintptr_t, Cfg::kIs64Bit ? 6364136223846793005u : 1664525u,
+      Cfg::kIs64Bit ? 1442695040888963407u : 1013904223u, 0u>
+      random_generator;
 
-    LocalData(typename Cfg::less comp, char* buffer_storage)
-            : buffers(buffer_storage)
-            , classifier(std::move(comp))
-    {
-        std::random_device rdev;
-        std::ptrdiff_t seed = rdev();
-        if (Cfg::kIs64Bit)
-            seed = (seed << (Cfg::kIs64Bit * 32)) | rdev();
-        random_generator.seed(seed);
-        reset();
-    }
+  LocalData(typename Cfg::less comp, char* buffer_storage)
+      : buffers(buffer_storage), classifier(std::move(comp)) {
+    std::random_device rdev;
+    std::ptrdiff_t seed = rdev();
+    if (Cfg::kIs64Bit) seed = (seed << (Cfg::kIs64Bit * 32)) | rdev();
+    random_generator.seed(seed);
+    reset();
+  }
 
-    /**
-     * Resets local data after partitioning is done.
-     */
-    void reset() {
-        classifier.reset();
-        std::fill_n(bucket_size, Cfg::kMaxBuckets, 0);
-    }
+  /**
+   * Resets local data after partitioning is done.
+   */
+  void reset() {
+    classifier.reset();
+    std::fill_n(bucket_size, Cfg::kMaxBuckets, 0);
+  }
 };
 
 /**
  * A subtask in the parallel algorithm.
- * Uses indices instead of iterators to avoid unnecessary template instantiations.
+ * Uses indices instead of iterators to avoid unnecessary template
+ * instantiations.
  */
 struct ParallelTask {
-    std::ptrdiff_t begin;
-    std::ptrdiff_t end;
-    int level;
+  std::ptrdiff_t begin;
+  std::ptrdiff_t end;
+  int level;
 
-    bool operator==(const ParallelTask& rhs) const { return begin == rhs.begin && end == rhs.end; }
-    bool operator!=(const ParallelTask& rhs) const { return begin != rhs.begin || end != rhs.end; }
-    bool operator<(const ParallelTask& rhs) const { return end - begin < rhs.end - rhs.begin; }
-    bool operator<=(const ParallelTask& rhs) const { return end - begin <= rhs.end - rhs.begin; }
-    bool operator>(const ParallelTask& rhs) const { return end - begin > rhs.end - rhs.begin; }
-    bool operator>=(const ParallelTask& rhs) const { return end - begin >= rhs.end - rhs.begin; }
+  bool operator==(const ParallelTask& rhs) const {
+    return begin == rhs.begin && end == rhs.end;
+  }
+  bool operator!=(const ParallelTask& rhs) const {
+    return begin != rhs.begin || end != rhs.end;
+  }
+  bool operator<(const ParallelTask& rhs) const {
+    return end - begin < rhs.end - rhs.begin;
+  }
+  bool operator<=(const ParallelTask& rhs) const {
+    return end - begin <= rhs.end - rhs.begin;
+  }
+  bool operator>(const ParallelTask& rhs) const {
+    return end - begin > rhs.end - rhs.begin;
+  }
+  bool operator>=(const ParallelTask& rhs) const {
+    return end - begin >= rhs.end - rhs.begin;
+  }
 };
 
 /**
@@ -233,44 +239,44 @@ struct ParallelTask {
  */
 template <class Cfg>
 struct Sorter<Cfg>::SharedData {
-    // Bucket information
-    typename Cfg::difference_type bucket_start[Cfg::kMaxBuckets + 1];
-    BucketPointers bucket_pointers[Cfg::kMaxBuckets];
-    Block* overflow;
-    int num_buckets;
-    bool use_equal_buckets;
+  // Bucket information
+  typename Cfg::difference_type bucket_start[Cfg::kMaxBuckets + 1];
+  BucketPointers bucket_pointers[Cfg::kMaxBuckets];
+  Block* overflow;
+  int num_buckets;
+  bool use_equal_buckets;
 
-    // Classifier for parallel partitioning
-    Classifier classifier;
+  // Classifier for parallel partitioning
+  Classifier classifier;
 
-    // Synchronisation support
-    typename Cfg::Sync sync;
+  // Synchronisation support
+  typename Cfg::Sync sync;
 
-    // Local thread data
-    std::vector<LocalData*> local;
+  // Local thread data
+  std::vector<LocalData*> local;
 
-    // Parallel subtask information
-    typename Cfg::iterator begin_;
-    std::vector<ParallelTask> big_tasks;
-    std::vector<ParallelTask> small_tasks;
-    std::atomic_size_t small_task_index;
+  // Parallel subtask information
+  typename Cfg::iterator begin_;
+  std::vector<ParallelTask> big_tasks;
+  std::vector<ParallelTask> small_tasks;
+  std::atomic_size_t small_task_index;
 
-    SharedData(typename Cfg::less comp, typename Cfg::Sync sync, std::size_t num_threads)
-        : classifier(std::move(comp))
-        , sync(std::forward<typename Cfg::Sync>(sync))
-        , local(num_threads)
-    {
-        reset();
-    }
+  SharedData(typename Cfg::less comp, typename Cfg::Sync sync,
+             std::size_t num_threads)
+      : classifier(std::move(comp)),
+        sync(std::forward<typename Cfg::Sync>(sync)),
+        local(num_threads) {
+    reset();
+  }
 
-    /**
-     * Resets shared data after partitioning is done.
-     */
-    void reset() {
-        classifier.reset();
-        std::fill_n(bucket_start, Cfg::kMaxBuckets + 1, 0);
-        overflow = nullptr;
-    }
+  /**
+   * Resets shared data after partitioning is done.
+   */
+  void reset() {
+    classifier.reset();
+    std::fill_n(bucket_start, Cfg::kMaxBuckets + 1, 0);
+    overflow = nullptr;
+  }
 };
 
 }  // namespace detail

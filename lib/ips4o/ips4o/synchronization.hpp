@@ -23,14 +23,15 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ *ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ *LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ *CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #pragma once
@@ -47,30 +48,30 @@ namespace detail {
  */
 class Barrier {
  public:
-    explicit Barrier(int num_threads)
-        : init_count_(num_threads), hit_count_(num_threads), flag_(false) {}
+  explicit Barrier(int num_threads)
+      : init_count_(num_threads), hit_count_(num_threads), flag_(false) {}
 
-    inline void barrier();
+  inline void barrier();
 
-    template <class F>
-    inline void single(F&& func);
+  template <class F>
+  inline void single(F&& func);
 
-    /**
-     * Reset the number of threads.
-     * No thread must currently be waiting at this barrier.
-     */
-    void setNumThreads(int num_threads) {
-        hit_count_ = init_count_ = num_threads;
-    }
+  /**
+   * Reset the number of threads.
+   * No thread must currently be waiting at this barrier.
+   */
+  void setNumThreads(int num_threads) {
+    hit_count_ = init_count_ = num_threads;
+  }
 
  private:
-    std::mutex mutex_;
-    std::condition_variable cv_;
-    int init_count_;
-    int hit_count_;
-    bool flag_;
+  std::mutex mutex_;
+  std::condition_variable cv_;
+  int init_count_;
+  int hit_count_;
+  bool flag_;
 
-    inline void notify_all(std::unique_lock<std::mutex>& lk);
+  inline void notify_all(std::unique_lock<std::mutex>& lk);
 };
 
 /**
@@ -78,24 +79,24 @@ class Barrier {
  */
 class Sync : public Barrier {
  public:
-    explicit Sync(int num_threads) : Barrier(num_threads) {}
+  explicit Sync(int num_threads) : Barrier(num_threads) {}
 
-    template <class F>
-    inline void critical(F&& func);
+  template <class F>
+  inline void critical(F&& func);
 
  private:
-    std::mutex mutex_critical_;
+  std::mutex mutex_critical_;
 };
 
 /**
  * Barrier: Execution resumes only after all threads reached this point.
  */
 void Barrier::barrier() {
-    std::unique_lock<std::mutex> lk(mutex_);
-    if (--hit_count_ == 0) {
-        notify_all(lk);
-    } else
-        cv_.wait(lk, [this, f = flag_] { return f != flag_; });
+  std::unique_lock<std::mutex> lk(mutex_);
+  if (--hit_count_ == 0) {
+    notify_all(lk);
+  } else
+    cv_.wait(lk, [this, f = flag_] { return f != flag_; });
 }
 
 /**
@@ -103,27 +104,27 @@ void Barrier::barrier() {
  */
 template <class F>
 void Barrier::single(F&& func) {
-    std::unique_lock<std::mutex> lk(mutex_);
-    if (hit_count_-- == init_count_) {
-        lk.unlock();
-        func();
-        lk.lock();
-        --hit_count_;
-    }
-    if (hit_count_ < 0)
-        notify_all(lk);
-    else
-        cv_.wait(lk, [this, f = flag_] { return f != flag_; });
+  std::unique_lock<std::mutex> lk(mutex_);
+  if (hit_count_-- == init_count_) {
+    lk.unlock();
+    func();
+    lk.lock();
+    --hit_count_;
+  }
+  if (hit_count_ < 0)
+    notify_all(lk);
+  else
+    cv_.wait(lk, [this, f = flag_] { return f != flag_; });
 }
 
 /**
  * Wakes up waiting threads.
  */
 void Barrier::notify_all(std::unique_lock<std::mutex>& lk) {
-    hit_count_ = init_count_;
-    flag_ = !flag_;
-    lk.unlock();
-    cv_.notify_all();
+  hit_count_ = init_count_;
+  flag_ = !flag_;
+  lk.unlock();
+  cv_.notify_all();
 }
 
 /**
@@ -131,8 +132,8 @@ void Barrier::notify_all(std::unique_lock<std::mutex>& lk) {
  */
 template <class F>
 void Sync::critical(F&& func) {
-    std::unique_lock<std::mutex> lk(mutex_critical_);
-    func();
+  std::unique_lock<std::mutex> lk(mutex_critical_);
+  func();
 }
 
 }  // namespace detail

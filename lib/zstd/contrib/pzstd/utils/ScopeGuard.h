@@ -31,9 +31,7 @@ class ScopeGuard {
   explicit ScopeGuard(Function&& function)
       : function(std::move(function)), dismissed(false) {}
 
-  void dismiss() {
-    dismissed = true;
-  }
+  void dismiss() { dismissed = true; }
 
   ~ScopeGuard() noexcept {
     if (!dismissed) {
@@ -47,4 +45,4 @@ template <typename Function>
 ScopeGuard<Function> makeScopeGuard(Function&& function) {
   return ScopeGuard<Function>(std::forward<Function>(function));
 }
-}
+}  // namespace pzstd

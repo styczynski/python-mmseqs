@@ -32,7 +32,7 @@ struct Popper {
     }
   }
 };
-}
+}  // namespace
 
 TEST(WorkQueue, SingleThreaded) {
   WorkQueue<int> queue;
@@ -69,7 +69,7 @@ TEST(WorkQueue, SPSC) {
     queue.push(int{i});
   }
 
-  std::thread thread([ &queue, max ] {
+  std::thread thread([&queue, max] {
     int result;
     for (int i = 0;; ++i) {
       if (!queue.pop(result)) {
@@ -125,12 +125,11 @@ TEST(WorkQueue, MPMC) {
   for (int i = 0; i < 2; ++i) {
     auto min = i * 50;
     auto max = (i + 1) * 50;
-    pusherThreads.emplace_back(
-        [ &queue, min, max ] {
-          for (int i = min; i < max; ++i) {
-            queue.push(int{i});
-          }
-        });
+    pusherThreads.emplace_back([&queue, min, max] {
+      for (int i = min; i < max; ++i) {
+        queue.push(int{i});
+      }
+    });
   }
 
   for (auto& thread : pusherThreads) {
@@ -164,9 +163,7 @@ TEST(WorkQueue, BoundedSizePushAfterFinish) {
   WorkQueue<int> queue(1);
   int result;
   queue.push(5);
-  std::thread pusher([&queue] {
-    queue.push(6);
-  });
+  std::thread pusher([&queue] { queue.push(6); });
   // Dirtily try and make sure that pusher has run.
   std::this_thread::sleep_for(std::chrono::seconds(1));
   queue.finish();
@@ -183,9 +180,7 @@ TEST(WorkQueue, SetMaxSize) {
   queue.push(5);
   queue.push(6);
   queue.setMaxSize(1);
-  std::thread pusher([&queue] {
-    queue.push(7);
-  });
+  std::thread pusher([&queue] { queue.push(7); });
   // Dirtily try and make sure that pusher has run.
   std::this_thread::sleep_for(std::chrono::seconds(1));
   queue.finish();
@@ -213,12 +208,11 @@ TEST(WorkQueue, BoundedSizeMPMC) {
   for (int i = 0; i < 2; ++i) {
     auto min = i * 100;
     auto max = (i + 1) * 100;
-    pusherThreads.emplace_back(
-        [ &queue, min, max ] {
-          for (int i = min; i < max; ++i) {
-            queue.push(int{i});
-          }
-        });
+    pusherThreads.emplace_back([&queue, min, max] {
+      for (int i = min; i < max; ++i) {
+        queue.push(int{i});
+      }
+    });
   }
 
   std::cerr << "Joining pusherThreads" << std::endl;

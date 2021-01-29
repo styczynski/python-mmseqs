@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
+from threading import Thread
+
 import pytest
 from pybind11_tests import callbacks as m
-from threading import Thread
 
 
 def test_callbacks():
@@ -18,7 +19,13 @@ def test_callbacks():
 
     assert m.test_callback1(func1) == "func1"
     assert m.test_callback2(func2) == ("func2", "Hello", "x", True, 5)
-    assert m.test_callback1(partial(func2, 1, 2, 3, 4)) == ("func2", 1, 2, 3, 4)
+    assert m.test_callback1(partial(func2, 1, 2, 3, 4)) == (
+        "func2",
+        1,
+        2,
+        3,
+        4,
+    )
     assert m.test_callback1(partial(func3, "partial")) == "func3(partial)"
     assert m.test_callback3(lambda i: i + 1) == "func(43) = 44"
 
@@ -86,7 +93,8 @@ def test_cpp_function_roundtrip():
     """Test if passing a function pointer from C++ -> Python -> C++ yields the original pointer"""
 
     assert (
-        m.test_dummy_function(m.dummy_function) == "matches dummy_function: eval(1) = 2"
+        m.test_dummy_function(m.dummy_function)
+        == "matches dummy_function: eval(1) = 2"
     )
     assert (
         m.test_dummy_function(m.roundtrip(m.dummy_function))
@@ -106,12 +114,18 @@ def test_cpp_function_roundtrip():
         m.test_dummy_function(lambda x, y: x + y)
     assert any(
         s in str(excinfo.value)
-        for s in ("missing 1 required positional argument", "takes exactly 2 arguments")
+        for s in (
+            "missing 1 required positional argument",
+            "takes exactly 2 arguments",
+        )
     )
 
 
 def test_function_signatures(doc):
-    assert doc(m.test_callback3) == "test_callback3(arg0: Callable[[int], int]) -> str"
+    assert (
+        doc(m.test_callback3)
+        == "test_callback3(arg0: Callable[[int], int]) -> str"
+    )
     assert doc(m.test_callback4) == "test_callback4() -> Callable[[int], int]"
 
 

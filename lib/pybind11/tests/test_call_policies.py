@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
-import pytest
-
 import env  # noqa: F401
-
-from pybind11_tests import call_policies as m
+import pytest
 from pybind11_tests import ConstructorStats
+from pybind11_tests import call_policies as m
 
 
-@pytest.mark.xfail("env.PYPY", reason="sometimes comes out 1 off on PyPy", strict=False)
+@pytest.mark.xfail(
+    "env.PYPY", reason="sometimes comes out 1 off on PyPy", strict=False
+)
 def test_keep_alive_argument(capture):
     n_inst = ConstructorStats.detail_reg_inst()
     with capture:

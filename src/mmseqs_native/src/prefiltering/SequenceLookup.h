@@ -5,52 +5,51 @@
 #ifndef MMSEQS_SEQUENCEINDEX_H
 #define MMSEQS_SEQUENCEINDEX_H
 
-
 #include <cstddef>
 #include "Sequence.h"
 
 class SequenceLookup {
-public:
-    SequenceLookup(size_t dbSize, size_t entrySize);
-    SequenceLookup(size_t dbSize);
-    ~SequenceLookup();
+ public:
+  SequenceLookup(size_t dbSize, size_t entrySize);
+  SequenceLookup(size_t dbSize);
+  ~SequenceLookup();
 
-    // add sequence at offset
-    void addSequence(unsigned char *seq, int L, size_t index, size_t offset);
+  // add sequence at offset
+  void addSequence(unsigned char *seq, int L, size_t index, size_t offset);
 
-    // add sequence to index
-    void addSequence(Sequence * seq);
+  // add sequence to index
+  void addSequence(Sequence *seq);
 
-    // get sequence data
-    std::pair<const unsigned char *, const unsigned int> getSequence(size_t id);
+  // get sequence data
+  std::pair<const unsigned char *, const unsigned int> getSequence(size_t id);
 
-    const char *getData();
+  const char *getData();
 
-    int64_t getDataSize();
+  int64_t getDataSize();
 
-    size_t getSequenceCount();
+  size_t getSequenceCount();
 
-    size_t *getOffsets();
+  size_t *getOffsets();
 
-    void initLookupByExternalData(char *seqData, size_t dataSize, size_t *seqOffsets);
-    void initLookupByExternalDataCopy(char *seqData, size_t *seqOffsets);
+  void initLookupByExternalData(char *seqData, size_t dataSize,
+                                size_t *seqOffsets);
+  void initLookupByExternalDataCopy(char *seqData, size_t *seqOffsets);
 
-private:
-    size_t sequenceCount;
+ private:
+  size_t sequenceCount;
 
-    // data contains sequence data
-    char *data;
-    size_t dataSize;
+  // data contains sequence data
+  char *data;
+  size_t dataSize;
 
-    size_t *offsets;
+  size_t *offsets;
 
-    // write position
-    size_t currentIndex;
-    size_t currentOffset;
+  // write position
+  size_t currentIndex;
+  size_t currentOffset;
 
-    // if data are read from mmap
-    bool externalData;
+  // if data are read from mmap
+  bool externalData;
 };
 
-
-#endif //MMSEQS_SEQUENCEINDEX_H
+#endif  // MMSEQS_SEQUENCEINDEX_H

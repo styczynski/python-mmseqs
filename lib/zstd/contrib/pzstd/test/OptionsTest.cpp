@@ -8,8 +8,8 @@
  */
 #include "Options.h"
 
-#include <array>
 #include <gtest/gtest.h>
+#include <array>
 
 using namespace pzstd;
 
@@ -64,7 +64,7 @@ std::ostream &operator<<(std::ostream &out, const Options &opt) {
   out << "\n}";
   return out;
 }
-}
+}  // namespace pzstd
 
 namespace {
 #ifdef _WIN32
@@ -74,7 +74,7 @@ const char nullOutput[] = "/dev/null";
 #endif
 
 constexpr auto autoMode = Options::WriteMode::Auto;
-} // anonymous namespace
+}  // anonymous namespace
 
 #define EXPECT_SUCCESS(...) EXPECT_EQ(Options::Status::Success, __VA_ARGS__)
 #define EXPECT_FAILURE(...) EXPECT_EQ(Options::Status::Failure, __VA_ARGS__)
@@ -113,8 +113,8 @@ TEST(Options, ValidInputs) {
   }
   {
     Options options;
-    auto args = makeArray("--processes", "100", "hello.zst", "--decompress",
-                          "--force");
+    auto args =
+        makeArray("--processes", "100", "hello.zst", "--decompress", "--force");
     EXPECT_SUCCESS(options.parse(args.size(), args.data()));
     Options expected = {100,  23,       3,    true, {"hello.zst"}, "", true,
                         true, autoMode, true, 2};
@@ -284,7 +284,7 @@ TEST(Options, BadCompressionLevel) {
   }
   {
     Options options;
-    auto args = makeArray("x", "--1"); // negative 1?
+    auto args = makeArray("x", "--1");  // negative 1?
     EXPECT_FAILURE(options.parse(args.size(), args.data()));
   }
 }

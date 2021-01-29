@@ -15,10 +15,8 @@
 using namespace pzstd;
 
 namespace {
-void deleter(const unsigned char* buf) {
-  delete[] buf;
-}
-}
+void deleter(const unsigned char* buf) { delete[] buf; }
+}  // namespace
 
 TEST(Buffer, Constructors) {
   Buffer empty;

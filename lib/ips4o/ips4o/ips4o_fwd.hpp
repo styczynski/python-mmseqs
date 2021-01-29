@@ -23,14 +23,15 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ *ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ *LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ *CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ *SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ *INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ *CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ *POSSIBILITY OF SUCH DAMAGE.
  *****************************************************************************/
 
 #pragma once
@@ -47,85 +48,90 @@ inline void baseCaseSort(It begin, It end, Comp&& comp);
 inline constexpr unsigned long log2(unsigned long n);
 
 template <class It, class RandomGen>
-inline void selectSample(It begin, It end,
-                         typename std::iterator_traits<It>::difference_type num_samples,
-                         RandomGen&& gen);
+inline void selectSample(
+    It begin, It end,
+    typename std::iterator_traits<It>::difference_type num_samples,
+    RandomGen&& gen);
 
 template <class Cfg>
 class Sorter {
  public:
-    using iterator = typename Cfg::iterator;
-    using diff_t = typename Cfg::difference_type;
-    using value_type = typename Cfg::value_type;
+  using iterator = typename Cfg::iterator;
+  using diff_t = typename Cfg::difference_type;
+  using value_type = typename Cfg::value_type;
 
-    class BufferStorage;
-    class Block;
-    class Buffers;
-    class BucketPointers;
-    class Classifier;
-    struct LocalData;
-    struct SharedData;
-    explicit Sorter(LocalData& local) : local_(local) {}
+  class BufferStorage;
+  class Block;
+  class Buffers;
+  class BucketPointers;
+  class Classifier;
+  struct LocalData;
+  struct SharedData;
+  explicit Sorter(LocalData& local) : local_(local) {}
 
-    void sequential(iterator begin, iterator end);
+  void sequential(iterator begin, iterator end);
 
 #if defined(_REENTRANT) || defined(_OPENMP)
-    template <class TaskSorter>
-    void parallelPrimary(iterator begin, iterator end, SharedData& shared,
-                         int num_threads, TaskSorter&& task_sorter);
+  template <class TaskSorter>
+  void parallelPrimary(iterator begin, iterator end, SharedData& shared,
+                       int num_threads, TaskSorter&& task_sorter);
 
-    void parallelSecondary(SharedData& shared, int id, int num_threads);
+  void parallelSecondary(SharedData& shared, int id, int num_threads);
 #endif
 
  private:
-    LocalData& local_;
-    SharedData* shared_;
-    Classifier* classifier_;
+  LocalData& local_;
+  SharedData* shared_;
+  Classifier* classifier_;
 
-    diff_t* bucket_start_;
-    BucketPointers* bucket_pointers_;
-    Block* overflow_;
+  diff_t* bucket_start_;
+  BucketPointers* bucket_pointers_;
+  Block* overflow_;
 
-    iterator begin_;
-    iterator end_;
-    int num_buckets_;
-    int my_id_;
-    int num_threads_;
+  iterator begin_;
+  iterator end_;
+  int num_buckets_;
+  int my_id_;
+  int num_threads_;
 
-    static inline int computeLogBuckets(diff_t n);
+  static inline int computeLogBuckets(diff_t n);
 
-    std::pair<int, bool> buildClassifier(iterator begin, iterator end, Classifier& classifier);
+  std::pair<int, bool> buildClassifier(iterator begin, iterator end,
+                                       Classifier& classifier);
 
-    template <bool kEqualBuckets> __attribute__((flatten))
-    diff_t classifyLocally(iterator my_begin, iterator my_end);
+  template <bool kEqualBuckets>
+  __attribute__((flatten)) diff_t classifyLocally(iterator my_begin,
+                                                  iterator my_end);
 
-    inline void parallelClassification(bool use_equal_buckets);
+  inline void parallelClassification(bool use_equal_buckets);
 
-    inline void sequentialClassification(bool use_equal_buckets);
+  inline void sequentialClassification(bool use_equal_buckets);
 
-    void moveEmptyBlocks(diff_t my_begin, diff_t my_end, diff_t my_first_empty_block);
+  void moveEmptyBlocks(diff_t my_begin, diff_t my_end,
+                       diff_t my_first_empty_block);
 
-    inline int computeOverflowBucket();
+  inline int computeOverflowBucket();
 
-    template <bool kEqualBuckets, bool kIsParallel>
-    inline int classifyAndReadBlock(int read_bucket);
+  template <bool kEqualBuckets, bool kIsParallel>
+  inline int classifyAndReadBlock(int read_bucket);
 
-    template <bool kEqualBuckets, bool kIsParallel>
-    inline int swapBlock(diff_t max_off, int dest_bucket, bool current_swap);
+  template <bool kEqualBuckets, bool kIsParallel>
+  inline int swapBlock(diff_t max_off, int dest_bucket, bool current_swap);
 
-    template <bool kEqualBuckets, bool kIsParallel>
-    void permuteBlocks();
+  template <bool kEqualBuckets, bool kIsParallel>
+  void permuteBlocks();
 
-    inline std::pair<int, diff_t> saveMargins(int last_bucket);
+  inline std::pair<int, diff_t> saveMargins(int last_bucket);
 
-    void writeMargins(int first_bucket, int last_bucket, int overflow_bucket,
-                      int swap_bucket, diff_t in_swap_buffer);
+  void writeMargins(int first_bucket, int last_bucket, int overflow_bucket,
+                    int swap_bucket, diff_t in_swap_buffer);
 
-    template <bool kIsParallel>
-    std::pair<int, bool> partition(iterator begin, iterator end, diff_t* bucket_start,
-                                   SharedData* shared, int my_id, int num_threads);
+  template <bool kIsParallel>
+  std::pair<int, bool> partition(iterator begin, iterator end,
+                                 diff_t* bucket_start, SharedData* shared,
+                                 int my_id, int num_threads);
 
-    inline void processSmallTasks(iterator begin, SharedData& shared);
+  inline void processSmallTasks(iterator begin, SharedData& shared);
 };
 
 }  // namespace detail

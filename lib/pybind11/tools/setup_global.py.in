@@ -12,11 +12,11 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from distutils.command.install_headers import install_headers
 
 # Setuptools has to be before distutils
 from setuptools import setup
 
-from distutils.command.install_headers import install_headers
 
 class InstallHeadersNested(install_headers):
     def run(self):

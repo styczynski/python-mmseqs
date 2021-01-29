@@ -11,18 +11,18 @@
 #include "result.h"
 
 char const* result_get_error_string(result_t result) {
-    switch (result_get_error(result)) {
-        case result_error_ok:
-            return "okay";
-        case result_error_skip:
-            return "skip";
-        case result_error_system_error:
-            return "system error";
-        case result_error_compression_error:
-            return "compression error";
-        case result_error_decompression_error:
-            return "decompression error";
-        case result_error_round_trip_error:
-            return "round trip error";
-    }
+  switch (result_get_error(result)) {
+    case result_error_ok:
+      return "okay";
+    case result_error_skip:
+      return "skip";
+    case result_error_system_error:
+      return "system error";
+    case result_error_compression_error:
+      return "compression error";
+    case result_error_decompression_error:
+      return "decompression error";
+    case result_error_round_trip_error:
+      return "round trip error";
+  }
 }

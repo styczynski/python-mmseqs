@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
-from pybind11_tests import sequences_and_iterators as m
 from pybind11_tests import ConstructorStats
+from pybind11_tests import sequences_and_iterators as m
 
 
 def isclose(a, b, rel_tol=1e-05, abs_tol=0.0):
@@ -11,17 +11,25 @@ def isclose(a, b, rel_tol=1e-05, abs_tol=0.0):
 
 def allclose(a_list, b_list, rel_tol=1e-05, abs_tol=0.0):
     return all(
-        isclose(a, b, rel_tol=rel_tol, abs_tol=abs_tol) for a, b in zip(a_list, b_list)
+        isclose(a, b, rel_tol=rel_tol, abs_tol=abs_tol)
+        for a, b in zip(a_list, b_list)
     )
 
 
 def test_generalized_iterators():
-    assert list(m.IntPairs([(1, 2), (3, 4), (0, 5)]).nonzero()) == [(1, 2), (3, 4)]
-    assert list(m.IntPairs([(1, 2), (2, 0), (0, 3), (4, 5)]).nonzero()) == [(1, 2)]
+    assert list(m.IntPairs([(1, 2), (3, 4), (0, 5)]).nonzero()) == [
+        (1, 2),
+        (3, 4),
+    ]
+    assert list(m.IntPairs([(1, 2), (2, 0), (0, 3), (4, 5)]).nonzero()) == [
+        (1, 2)
+    ]
     assert list(m.IntPairs([(0, 3), (1, 2), (3, 4)]).nonzero()) == []
 
     assert list(m.IntPairs([(1, 2), (3, 4), (0, 5)]).nonzero_keys()) == [1, 3]
-    assert list(m.IntPairs([(1, 2), (2, 0), (0, 3), (4, 5)]).nonzero_keys()) == [1]
+    assert list(
+        m.IntPairs([(1, 2), (2, 0), (0, 3), (4, 5)]).nonzero_keys()
+    ) == [1]
     assert list(m.IntPairs([(0, 3), (1, 2), (3, 4)]).nonzero_keys()) == []
 
     # __next__ must continue to raise StopIteration
@@ -165,7 +173,9 @@ def test_python_iterator_in_cpp():
 
     with pytest.raises(RuntimeError) as excinfo:
         m.iterator_to_list(iter(bad_next_call, None))
-    assert str(excinfo.value) == "py::iterator::advance() should propagate errors"
+    assert (
+        str(excinfo.value) == "py::iterator::advance() should propagate errors"
+    )
 
     lst = [1, None, 0, None]
     assert m.count_none(lst) == 2

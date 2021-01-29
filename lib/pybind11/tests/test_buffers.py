@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
+import ctypes
 import io
 import struct
-import ctypes
-
-import pytest
 
 import env  # noqa: F401
-
-from pybind11_tests import buffers as m
+import pytest
 from pybind11_tests import ConstructorStats
+from pybind11_tests import buffers as m
 
 np = pytest.importorskip("numpy")
 
@@ -143,7 +141,8 @@ def test_ctypes_array_2d():
 
 
 @pytest.mark.skipif(
-    "env.PYPY and env.PY2", reason="PyPy2 bytes buffer not reported as readonly"
+    "env.PYPY and env.PY2",
+    reason="PyPy2 bytes buffer not reported as readonly",
 )
 def test_ctypes_from_buffer():
     test_pystr = b"0123456789"

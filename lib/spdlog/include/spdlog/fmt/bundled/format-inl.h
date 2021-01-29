@@ -18,11 +18,11 @@
 #include <exception>
 
 #ifndef FMT_STATIC_THOUSANDS_SEPARATOR
-#  include <locale>
+#include <locale>
 #endif
 
 #ifdef _WIN32
-#  include <io.h>  // _isatty
+#include <io.h>  // _isatty
 #endif
 
 #include "format.h"
@@ -45,7 +45,7 @@ FMT_FUNC void assert_fail(const char* file, int line, const char* message) {
 }
 
 #ifndef _MSC_VER
-#  define FMT_SNPRINTF snprintf
+#define FMT_SNPRINTF snprintf
 #else  // _MSC_VER
 inline int fmt_snprintf(char* buffer, size_t size, const char* format, ...) {
   va_list args;
@@ -54,7 +54,7 @@ inline int fmt_snprintf(char* buffer, size_t size, const char* format, ...) {
   va_end(args);
   return result;
 }
-#  define FMT_SNPRINTF fmt_snprintf
+#define FMT_SNPRINTF fmt_snprintf
 #endif  // _MSC_VER
 
 // A portable thread-safe version of strerror.
@@ -175,19 +175,23 @@ locale_ref::locale_ref(const Locale& loc) : locale_(&loc) {
   static_assert(std::is_same<Locale, std::locale>::value, "");
 }
 
-template <typename Locale> Locale locale_ref::get() const {
+template <typename Locale>
+Locale locale_ref::get() const {
   static_assert(std::is_same<Locale, std::locale>::value, "");
   return locale_ ? *static_cast<const std::locale*>(locale_) : std::locale();
 }
 
-template <typename Char> FMT_FUNC std::string grouping_impl(locale_ref loc) {
+template <typename Char>
+FMT_FUNC std::string grouping_impl(locale_ref loc) {
   return std::use_facet<std::numpunct<Char>>(loc.get<std::locale>()).grouping();
 }
-template <typename Char> FMT_FUNC Char thousands_sep_impl(locale_ref loc) {
+template <typename Char>
+FMT_FUNC Char thousands_sep_impl(locale_ref loc) {
   return std::use_facet<std::numpunct<Char>>(loc.get<std::locale>())
       .thousands_sep();
 }
-template <typename Char> FMT_FUNC Char decimal_point_impl(locale_ref loc) {
+template <typename Char>
+FMT_FUNC Char decimal_point_impl(locale_ref loc) {
   return std::use_facet<std::numpunct<Char>>(loc.get<std::locale>())
       .decimal_point();
 }
@@ -197,10 +201,12 @@ template <typename Char>
 FMT_FUNC std::string detail::grouping_impl(locale_ref) {
   return "\03";
 }
-template <typename Char> FMT_FUNC Char detail::thousands_sep_impl(locale_ref) {
+template <typename Char>
+FMT_FUNC Char detail::thousands_sep_impl(locale_ref) {
   return FMT_STATIC_THOUSANDS_SEPARATOR;
 }
-template <typename Char> FMT_FUNC Char detail::decimal_point_impl(locale_ref) {
+template <typename Char>
+FMT_FUNC Char detail::decimal_point_impl(locale_ref) {
   return '.';
 }
 #endif
@@ -219,7 +225,8 @@ FMT_FUNC void system_error::init(int err_code, string_view format_str,
 
 namespace detail {
 
-template <> FMT_FUNC int count_digits<4>(detail::fallback_uintptr n) {
+template <>
+FMT_FUNC int count_digits<4>(detail::fallback_uintptr n) {
   // fallback_uintptr is always stored in little endian.
   int i = static_cast<int>(sizeof(void*)) - 1;
   while (i > 0 && n.value[i] == 0) --i;
@@ -1067,21 +1074,26 @@ template <typename T>
 const char basic_data<T>::foreground_color[] = "\x1b[38;2;";
 template <typename T>
 const char basic_data<T>::background_color[] = "\x1b[48;2;";
-template <typename T> const char basic_data<T>::reset_color[] = "\x1b[0m";
-template <typename T> const wchar_t basic_data<T>::wreset_color[] = L"\x1b[0m";
-template <typename T> const char basic_data<T>::signs[] = {0, '-', '+', ' '};
+template <typename T>
+const char basic_data<T>::reset_color[] = "\x1b[0m";
+template <typename T>
+const wchar_t basic_data<T>::wreset_color[] = L"\x1b[0m";
+template <typename T>
+const char basic_data<T>::signs[] = {0, '-', '+', ' '};
 template <typename T>
 const char basic_data<T>::left_padding_shifts[] = {31, 31, 0, 1, 0};
 template <typename T>
 const char basic_data<T>::right_padding_shifts[] = {0, 31, 0, 1, 0};
 
-template <typename T> struct bits {
+template <typename T>
+struct bits {
   static FMT_CONSTEXPR_DECL const int value =
       static_cast<int>(sizeof(T) * std::numeric_limits<unsigned char>::digits);
 };
 
 class fp;
-template <int SHIFT = 0> fp normalize(fp value);
+template <int SHIFT = 0>
+fp normalize(fp value);
 
 // Lower (upper) boundary is a value half way between a floating-point value
 // and its predecessor (successor). Boundaries have the same exponent as the
@@ -1119,7 +1131,10 @@ class fp {
 
   // Constructs fp from an IEEE754 double. It is a template to prevent compile
   // errors on platforms where double is not IEEE754.
-  template <typename Double> explicit fp(Double d) { assign(d); }
+  template <typename Double>
+  explicit fp(Double d) {
+    assign(d);
+  }
 
   // Assigns d to this and return true iff predecessor is closer than successor.
   template <typename Float, FMT_ENABLE_IF(is_supported_float<Float>::value)>
@@ -1157,7 +1172,8 @@ class fp {
 };
 
 // Normalizes the value converted from double and multiplied by (1 << SHIFT).
-template <int SHIFT> fp normalize(fp value) {
+template <int SHIFT>
+fp normalize(fp value) {
   // Handle subnormals.
   const auto shifted_implicit_bit = fp::implicit_bit << SHIFT;
   while ((value.f & shifted_implicit_bit) == 0) {
@@ -1347,7 +1363,8 @@ class bigint {
     return *this;
   }
 
-  template <typename Int> bigint& operator*=(Int value) {
+  template <typename Int>
+  bigint& operator*=(Int value) {
     FMT_ASSERT(value > 0, "");
     multiply(uint32_or_64_or_128_t<Int>(value));
     return *this;
@@ -1532,39 +1549,39 @@ FMT_ALWAYS_INLINE digits::result grisu_gen_digits(fp value, uint64_t error,
     // This optimization by Milo Yip reduces the number of integer divisions by
     // one per iteration.
     switch (exp) {
-    case 10:
-      divmod_integral(1000000000);
-      break;
-    case 9:
-      divmod_integral(100000000);
-      break;
-    case 8:
-      divmod_integral(10000000);
-      break;
-    case 7:
-      divmod_integral(1000000);
-      break;
-    case 6:
-      divmod_integral(100000);
-      break;
-    case 5:
-      divmod_integral(10000);
-      break;
-    case 4:
-      divmod_integral(1000);
-      break;
-    case 3:
-      divmod_integral(100);
-      break;
-    case 2:
-      divmod_integral(10);
-      break;
-    case 1:
-      digit = integral;
-      integral = 0;
-      break;
-    default:
-      FMT_ASSERT(false, "invalid number of digits");
+      case 10:
+        divmod_integral(1000000000);
+        break;
+      case 9:
+        divmod_integral(100000000);
+        break;
+      case 8:
+        divmod_integral(10000000);
+        break;
+      case 7:
+        divmod_integral(1000000);
+        break;
+      case 6:
+        divmod_integral(100000);
+        break;
+      case 5:
+        divmod_integral(10000);
+        break;
+      case 4:
+        divmod_integral(1000);
+        break;
+      case 3:
+        divmod_integral(100);
+        break;
+      case 2:
+        divmod_integral(10);
+        break;
+      case 1:
+        digit = integral;
+        integral = 0;
+        break;
+      default:
+        FMT_ASSERT(false, "invalid number of digits");
     }
     --exp;
     auto remainder = (static_cast<uint64_t>(integral) << -one.e) + fractional;
@@ -1801,7 +1818,8 @@ bool check_divisibility_and_divide_by_pow5(uint32_t& n) FMT_NOEXCEPT {
 
 // Computes floor(n / pow(10, N)) for small n and N.
 // Precondition: n <= pow(10, N + 1).
-template <int N> uint32_t small_division_by_pow10(uint32_t n) FMT_NOEXCEPT {
+template <int N>
+uint32_t small_division_by_pow10(uint32_t n) FMT_NOEXCEPT {
   static constexpr struct {
     uint32_t magic_number;
     int shift_amount;
@@ -1822,9 +1840,11 @@ inline uint64_t divide_by_10_to_kappa_plus_1(uint64_t n) FMT_NOEXCEPT {
 }
 
 // Various subroutines using pow10 cache
-template <class T> struct cache_accessor;
+template <class T>
+struct cache_accessor;
 
-template <> struct cache_accessor<float> {
+template <>
+struct cache_accessor<float> {
   using carrier_uint = float_info<float>::carrier_uint;
   using cache_entry_type = uint64_t;
 
@@ -1877,7 +1897,8 @@ template <> struct cache_accessor<float> {
   }
 };
 
-template <> struct cache_accessor<double> {
+template <>
+struct cache_accessor<double> {
   using carrier_uint = float_info<double>::carrier_uint;
   using cache_entry_type = uint128_wrapper;
 
@@ -2642,7 +2663,8 @@ inline const char* utf8_decode(const char* buf, uint32_t* c, int* e) {
 }
 
 struct stringifier {
-  template <typename T> FMT_INLINE std::string operator()(T value) const {
+  template <typename T>
+  FMT_INLINE std::string operator()(T value) const {
     return to_string(value);
   }
   std::string operator()(basic_format_arg<format_context>::handle h) const {
@@ -2655,7 +2677,8 @@ struct stringifier {
 };
 }  // namespace detail
 
-template <> struct formatter<detail::bigint> {
+template <>
+struct formatter<detail::bigint> {
   format_parse_context::iterator parse(format_parse_context& ctx) {
     return ctx.begin();
   }

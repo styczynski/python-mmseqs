@@ -10,7 +10,7 @@
 
 #if defined(__MINGW32__) || defined(__CYGWIN__)
 // Workaround MinGW bug https://sourceforge.net/p/mingw/bugs/2024/.
-#  undef __STRICT_ANSI__
+#undef __STRICT_ANSI__
 #endif
 
 #include <cerrno>
@@ -20,55 +20,55 @@
 #include <cstdlib>  // for strtod_l
 
 #if defined __APPLE__ || defined(__FreeBSD__)
-#  include <xlocale.h>  // for LC_NUMERIC_MASK on OS X
+#include <xlocale.h>  // for LC_NUMERIC_MASK on OS X
 #endif
 
 #include "format.h"
 
 // UWP doesn't provide _pipe.
 #if FMT_HAS_INCLUDE("winapifamily.h")
-#  include <winapifamily.h>
+#include <winapifamily.h>
 #endif
 #if (FMT_HAS_INCLUDE(<fcntl.h>) || defined(__APPLE__) || \
      defined(__linux__)) &&                              \
     (!defined(WINAPI_FAMILY) || (WINAPI_FAMILY == WINAPI_FAMILY_DESKTOP_APP))
-#  include <fcntl.h>  // for O_RDONLY
-#  define FMT_USE_FCNTL 1
+#include <fcntl.h>  // for O_RDONLY
+#define FMT_USE_FCNTL 1
 #else
-#  define FMT_USE_FCNTL 0
+#define FMT_USE_FCNTL 0
 #endif
 
 #ifndef FMT_POSIX
-#  if defined(_WIN32) && !defined(__MINGW32__)
+#if defined(_WIN32) && !defined(__MINGW32__)
 // Fix warnings about deprecated symbols.
-#    define FMT_POSIX(call) _##call
-#  else
-#    define FMT_POSIX(call) call
-#  endif
+#define FMT_POSIX(call) _##call
+#else
+#define FMT_POSIX(call) call
+#endif
 #endif
 
 // Calls to system functions are wrapped in FMT_SYSTEM for testability.
 #ifdef FMT_SYSTEM
-#  define FMT_POSIX_CALL(call) FMT_SYSTEM(call)
+#define FMT_POSIX_CALL(call) FMT_SYSTEM(call)
 #else
-#  define FMT_SYSTEM(call) ::call
-#  ifdef _WIN32
+#define FMT_SYSTEM(call) ::call
+#ifdef _WIN32
 // Fix warnings about deprecated symbols.
-#    define FMT_POSIX_CALL(call) ::_##call
-#  else
-#    define FMT_POSIX_CALL(call) ::call
-#  endif
+#define FMT_POSIX_CALL(call) ::_##call
+#else
+#define FMT_POSIX_CALL(call) ::call
+#endif
 #endif
 
 // Retries the expression while it evaluates to error_result and errno
 // equals to EINTR.
 #ifndef _WIN32
-#  define FMT_RETRY_VAL(result, expression, error_result) \
-    do {                                                  \
-      (result) = (expression);                            \
-    } while ((result) == (error_result) && errno == EINTR)
+#define FMT_RETRY_VAL(result, expression, error_result) \
+  do {                                                  \
+    (result) = (expression);                            \
+  } while ((result) == (error_result) && errno == EINTR)
 #else
-#  define FMT_RETRY_VAL(result, expression, error_result) result = (expression)
+#define FMT_RETRY_VAL(result, expression, error_result) result = (expression)
 #endif
 
 #define FMT_RETRY(result, expression) FMT_RETRY_VAL(result, expression, -1)
@@ -100,7 +100,8 @@ FMT_BEGIN_NAMESPACE
     format(std::string("{}"), 42);
   \endrst
  */
-template <typename Char> class basic_cstring_view {
+template <typename Char>
+class basic_cstring_view {
  private:
   const Char* data_;
 
@@ -435,7 +436,7 @@ inline ostream output_file(cstring_view path, T... params) {
 // A "C" numeric locale.
 class locale {
  private:
-#  ifdef _WIN32
+#ifdef _WIN32
   using locale_t = _locale_t;
 
   static void freelocale(locale_t loc) { _free_locale(loc); }
@@ -443,7 +444,7 @@ class locale {
   static double strtod_l(const char* nptr, char** endptr, _locale_t loc) {
     return _strtod_l(nptr, endptr, loc);
   }
-#  endif
+#endif
 
   locale_t locale_;
 
@@ -453,11 +454,11 @@ class locale {
   void operator=(const locale&) = delete;
 
   locale() {
-#  ifndef _WIN32
+#ifndef _WIN32
     locale_ = FMT_SYSTEM(newlocale(LC_NUMERIC_MASK, "C", nullptr));
-#  else
+#else
     locale_ = _create_locale(LC_NUMERIC, "C");
-#  endif
+#endif
     if (!locale_) FMT_THROW(system_error(errno, "cannot create locale"));
   }
   ~locale() { freelocale(locale_); }

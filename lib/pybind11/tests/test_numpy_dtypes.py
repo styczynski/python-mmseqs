@@ -1,10 +1,8 @@
 # -*- coding: utf-8 -*-
 import re
 
-import pytest
-
 import env  # noqa: F401
-
+import pytest
 from pybind11_tests import numpy_dtypes as m
 
 np = pytest.importorskip("numpy")
@@ -24,7 +22,9 @@ def simple_dtype():
 
 @pytest.fixture(scope="module")
 def packed_dtype():
-    return np.dtype([("bool_", "?"), ("uint_", "u4"), ("float_", "f4"), ("ldbl_", "g")])
+    return np.dtype(
+        [("bool_", "?"), ("uint_", "u4"), ("float_", "f4"), ("ldbl_", "g")]
+    )
 
 
 def dt_fmt():
@@ -41,14 +41,17 @@ def dt_fmt():
 def simple_dtype_fmt():
     ld = np.dtype("longdouble")
     simple_ld_off = 12 + 4 * (ld.alignment > 4)
-    return dt_fmt().format(ld.itemsize, simple_ld_off, simple_ld_off + ld.itemsize)
+    return dt_fmt().format(
+        ld.itemsize, simple_ld_off, simple_ld_off + ld.itemsize
+    )
 
 
 def packed_dtype_fmt():
     from sys import byteorder
 
     return "[('bool_', '?'), ('uint_', '{e}u4'), ('float_', '{e}f4'), ('ldbl_', '{e}f{}')]".format(
-        np.dtype("longdouble").itemsize, e="<" if byteorder == "little" else ">"
+        np.dtype("longdouble").itemsize,
+        e="<" if byteorder == "little" else ">",
     )
 
 
@@ -64,7 +67,9 @@ def partial_ld_offset():
 def partial_dtype_fmt():
     ld = np.dtype("longdouble")
     partial_ld_off = partial_ld_offset()
-    return dt_fmt().format(ld.itemsize, partial_ld_off, partial_ld_off + ld.itemsize)
+    return dt_fmt().format(
+        ld.itemsize, partial_ld_off, partial_ld_off + ld.itemsize
+    )
 
 
 def partial_nested_fmt():
@@ -78,7 +83,9 @@ def partial_nested_fmt():
 
 
 def assert_equal(actual, expected_data, expected_dtype):
-    np.testing.assert_equal(actual, np.array(expected_data, dtype=expected_dtype))
+    np.testing.assert_equal(
+        actual, np.array(expected_data, dtype=expected_dtype)
+    )
 
 
 def test_format_descriptors():
@@ -119,7 +126,9 @@ def test_dtype(simple_dtype):
     assert m.print_dtypes() == [
         simple_dtype_fmt(),
         packed_dtype_fmt(),
-        "[('a', {}), ('b', {})]".format(simple_dtype_fmt(), packed_dtype_fmt()),
+        "[('a', {}), ('b', {})]".format(
+            simple_dtype_fmt(), packed_dtype_fmt()
+        ),
         partial_dtype_fmt(),
         partial_nested_fmt(),
         "[('a', 'S3'), ('b', 'S3')]",
@@ -171,7 +180,11 @@ def test_dtype(simple_dtype):
 
 
 def test_recarray(simple_dtype, packed_dtype):
-    elements = [(False, 0, 0.0, -0.0), (True, 1, 1.5, -2.5), (False, 2, 3.0, -5.0)]
+    elements = [
+        (False, 0, 0.0, -0.0),
+        (True, 1, 1.5, -2.5),
+        (False, 2, 3.0, -5.0),
+    ]
 
     for func, dtype in [
         (m.create_rec_simple, simple_dtype),
@@ -246,8 +259,12 @@ def test_recarray(simple_dtype, packed_dtype):
 def test_array_constructors():
     data = np.arange(1, 7, dtype="int32")
     for i in range(8):
-        np.testing.assert_array_equal(m.test_array_ctors(10 + i), data.reshape((3, 2)))
-        np.testing.assert_array_equal(m.test_array_ctors(20 + i), data.reshape((3, 2)))
+        np.testing.assert_array_equal(
+            m.test_array_ctors(10 + i), data.reshape((3, 2))
+        )
+        np.testing.assert_array_equal(
+            m.test_array_ctors(20 + i), data.reshape((3, 2))
+        )
     for i in range(5):
         np.testing.assert_array_equal(m.test_array_ctors(30 + i), data)
         np.testing.assert_array_equal(m.test_array_ctors(40 + i), data)
@@ -351,7 +368,9 @@ def test_scalar_conversion():
     for i, func in enumerate(funcs):
         for j, arr in enumerate(arrays):
             if i == j and i < 2:
-                assert [func(arr[k]) for k in range(n)] == [k * 10 for k in range(n)]
+                assert [func(arr[k]) for k in range(n)] == [
+                    k * 10 for k in range(n)
+                ]
             else:
                 with pytest.raises(TypeError) as excinfo:
                     func(arr[0])

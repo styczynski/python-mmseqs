@@ -19,40 +19,40 @@
 #include "data.h"
 
 typedef struct {
-    ZSTD_cParameter param;
-    unsigned value;
+  ZSTD_cParameter param;
+  unsigned value;
 } param_value_t;
 
 typedef struct {
-    size_t size;
-    param_value_t const* data;
+  size_t size;
+  param_value_t const* data;
 } param_values_t;
 
 /**
  * The config tells the compression method what options to use.
  */
 typedef struct {
-    const char* name;  /**< Identifies the config in the results table */
-    /**
-     * Optional arguments to pass to the CLI. If not set, CLI-based methods
-     * will skip this config.
-     */
-    char const* cli_args;
-    /**
-     * Parameters to pass to the advanced API. If the advanced API isn't used,
-     * the parameters will be derived from these.
-     */
-    param_values_t param_values;
-    /**
-     * Boolean parameter that says if we should use a dictionary. If the data
-     * doesn't have a dictionary, this config is skipped. Defaults to no.
-     */
-    int use_dictionary;
-    /**
-     * Boolean parameter that says if we should pass the pledged source size
-     * when the method allows it. Defaults to yes.
-     */
-    int no_pledged_src_size;
+  const char* name; /**< Identifies the config in the results table */
+  /**
+   * Optional arguments to pass to the CLI. If not set, CLI-based methods
+   * will skip this config.
+   */
+  char const* cli_args;
+  /**
+   * Parameters to pass to the advanced API. If the advanced API isn't used,
+   * the parameters will be derived from these.
+   */
+  param_values_t param_values;
+  /**
+   * Boolean parameter that says if we should use a dictionary. If the data
+   * doesn't have a dictionary, this config is skipped. Defaults to no.
+   */
+  int use_dictionary;
+  /**
+   * Boolean parameter that says if we should pass the pledged source size
+   * when the method allows it. Defaults to yes.
+   */
+  int no_pledged_src_size;
 } config_t;
 
 /**
