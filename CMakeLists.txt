@@ -290,7 +290,7 @@ if (MSVC)
     target_compile_options(mmseqs_native PRIVATE /W4 /WX)
 else()
     # lots of warnings and all warnings as errors
-    target_compile_options(mmseqs_native PRIVATE -Wall -Wextra -pedantic -Werror -Wno-unused-parameter)
+    target_compile_options(mmseqs_native PRIVATE -Wall -Wextra -pedantic)
 endif()
 
 
