@@ -49,7 +49,7 @@ jobs:
           name: build_wheels
       - name: Temporarily store all prebuild wheels
         shell: bash
-        run: mkdir _build_wheels && cp ./**/*.whl _build_wheels
+        run: mkdir _build_wheels && cp ./*.whl _build_wheels
       - name: Run poetry build
         shell: bash
         run: poetry build
