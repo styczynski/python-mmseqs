@@ -8,6 +8,11 @@
 #include <algorithm>
 #include <string>
 #include "MathUtil.h"
+#include "Indexer.h"
+#include "DBWriter.h"
+#include "BaseMatrix.h"
+#include "Parameters.h"
+#include "Debug.h"
 
 class KmerIndex {
  private:

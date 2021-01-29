@@ -40,7 +40,7 @@ set(export_macro "${target_id}_API")
 #
 
 set(include_path "${CMAKE_CURRENT_SOURCE_DIR}/include/${target}")
-set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/source")
+set(source_path  "${CMAKE_CURRENT_SOURCE_DIR}/src")
 
 if("${CMAKE_SYSTEM_NAME}" MATCHES "Windows")
     set(localfs "windows")
@@ -195,7 +195,7 @@ set_target_properties(${target}
 
 target_include_directories(${target}
     PRIVATE
-    ${PROJECT_BINARY_DIR}/source/include
+    ${PROJECT_BINARY_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_BINARY_DIR}/include
