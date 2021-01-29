@@ -63,7 +63,6 @@ class CMakeBuild(build_ext):
                 arch = "x64"
             else:
                 arch = "Win32"
-                force_x86 = True
 
             build_args += ["--", "/m"]
         else:
