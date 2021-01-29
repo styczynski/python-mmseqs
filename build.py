@@ -51,6 +51,7 @@ class CMakeBuild(build_ext):
         cfg = "Debug" if self.debug else "Release"
         build_args = ["--config", cfg]
         arch = None
+        force_x86 = False
 
         if platform.system() == "Windows":
             cmake_args += [
@@ -62,6 +63,7 @@ class CMakeBuild(build_ext):
                 arch = "x64"
             else:
                 arch = "x86"
+                force_x86 = True
 
             build_args += ["--", "/m"]
         else:
@@ -76,7 +78,11 @@ class CMakeBuild(build_ext):
         if "MMSEQ_CMAKE_ARCH" in os.environ:
             if len(os.environ["MMSEQ_CMAKE_ARCH"]) > 0:
                 arch = os.environ["MMSEQ_CMAKE_ARCH"]
-                cmake_args += ["-DFORCE_X86"]
+                if arch == "x86":
+                    force_x86 = True
+
+        if force_x86:
+            cmake_args += ["-DFORCE_X86"]
 
         if arch is not None:
             cmake_args += ["-A", arch]
