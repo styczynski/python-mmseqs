@@ -16,7 +16,11 @@ if(NOT MATH_LIB)
     set(MATH_LIB "")
 endif()
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ansi -Wall -Wshadow -fPIC -O3")
+if (MSVC)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+else ()
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ansi -Wall  -fPIC -O3")
+endif ()
 
 set(SOURCE_FILES
         tinyexpr.c
