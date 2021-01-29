@@ -1,7 +1,7 @@
-#include "ExtendedSubstitutionMatrix.h"
+#include "extendedSubstitutionMatrix.h"
 #include <_simd/simd.h>
-#include "Indexer.h"
-#include "Util.h"
+#include "indexer.h"
+#include "util.h"
 
 #include <cmath>
 #include <cstdlib>

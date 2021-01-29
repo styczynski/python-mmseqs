@@ -1,6 +1,6 @@
-#include "DBReader.h"
-#include "FileUtil.h"
-#include "Parameters.h"
+#include "dBReader.h"
+#include "fileUtil.h"
+#include "parameters.h"
 #include "output.h"
 
 int rmdb(mmseqs_output* out, Parameters& par) {

@@ -1,8 +1,8 @@
-#include "MultiParam.h"
+#include "multiParam.h"
 #include <stdio.h>
 #include <cfloat>
 
-#include "Util.h"
+#include "util.h"
 
 template <typename T>
 MultiParam<T>::MultiParam(T aminoacids, T nucleotides) {

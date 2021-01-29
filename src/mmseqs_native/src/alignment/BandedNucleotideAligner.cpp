@@ -4,15 +4,15 @@
 // Wrapper for KSW2 aligner.
 // Local banded nucleotide aligner
 //
-#include "BandedNucleotideAligner.h"
-#include "DistanceCalculator.h"
-#include "Parameters.h"
+#include "bandedNucleotideAligner.h"
+#include "distanceCalculator.h"
+#include "parameters.h"
 #include "ksw2.h"
 
-#include "Debug.h"
-#include "StripedSmithWaterman.h"
-#include "SubstitutionMatrix.h"
-#include "Util.h"
+#include "debug.h"
+#include "stripedSmithWaterman.h"
+#include "substitutionMatrix.h"
+#include "util.h"
 
 BandedNucleotideAligner::BandedNucleotideAligner(BaseMatrix *subMat,
                                                  size_t maxSequenceLength,

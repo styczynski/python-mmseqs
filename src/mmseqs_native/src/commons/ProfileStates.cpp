@@ -1,9 +1,9 @@
 
-#include "ProfileStates.h"
+#include "profileStates.h"
 #include <_simd/simd.h>
 #include <sstream>
-#include "MathUtil.h"
-#include "Util.h"
+#include "mathUtil.h"
+#include "util.h"
 //#include <LibraryPure.lib.h>
 //#include <LibraryPureMMorder.lib.h>
 //#include <Library_Training2_run17.lib.h>

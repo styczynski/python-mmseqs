@@ -1,11 +1,11 @@
 #include "result2stats.h"
 
-#include "AminoAcidLookupTables.h"
+#include "aminoAcidLookupTables.h"
 
-#include "Debug.h"
-#include "FileUtil.h"
-#include "Parameters.h"
-#include "Util.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "parameters.h"
+#include "util.h"
 #include "itoa.h"
 #include "output.h"
 

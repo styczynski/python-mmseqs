@@ -1,7 +1,7 @@
 #ifndef OUTPUT_H
 #define OUTPUT_H
 
-#include "Util.h"
+#include "util.h"
 
 #include <iostream>
 #include <map>

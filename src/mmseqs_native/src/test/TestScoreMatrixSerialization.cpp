@@ -1,8 +1,8 @@
-#include "Debug.h"
-#include "ExtendedSubstitutionMatrix.h"
-#include "Parameters.h"
-#include "ScoreMatrix.h"
-#include "SubstitutionMatrix.h"
+#include "debug.h"
+#include "extendedSubstitutionMatrix.h"
+#include "parameters.h"
+#include "scoreMatrix.h"
+#include "substitutionMatrix.h"
 
 const char* binary_name = "test_scorematrixserialization";
 

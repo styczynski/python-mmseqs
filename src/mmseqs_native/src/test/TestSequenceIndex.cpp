@@ -3,12 +3,12 @@
 #include <iostream>
 #include <list>
 
-#include "Clustering.h"
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Parameters.h"
-#include "SequenceLookup.h"
-#include "SubstitutionMatrix.h"
+#include "clustering.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "parameters.h"
+#include "sequenceLookup.h"
+#include "substitutionMatrix.h"
 
 const char *binary_name = "test_sequenceindex";
 

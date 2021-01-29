@@ -1,7 +1,7 @@
-#include "HeaderSummarizer.h"
-#include "Debug.h"
-#include "PatternCompiler.h"
-#include "Util.h"
+#include "headerSummarizer.h"
+#include "debug.h"
+#include "patternCompiler.h"
+#include "util.h"
 
 #include <algorithm>
 #include <set>

@@ -1,10 +1,10 @@
-#include "CompressedA3M.h"
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Debug.h"
-#include "Matcher.h"
-#include "Parameters.h"
-#include "Util.h"
+#include "compressedA3M.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "matcher.h"
+#include "parameters.h"
+#include "util.h"
 #include "output.h"
 
 #ifdef OPENMP

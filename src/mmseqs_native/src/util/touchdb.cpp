@@ -1,7 +1,7 @@
-#include "MemoryMapped.h"
-#include "Parameters.h"
-#include "PrefilteringIndexReader.h"
-#include "Util.h"
+#include "memoryMapped.h"
+#include "parameters.h"
+#include "prefilteringIndexReader.h"
+#include "util.h"
 #include "output.h"
 
 int touchdb(mmseqs_output* out, Parameters& par) {

@@ -1,4 +1,4 @@
-#include "Parameters.h"
+#include "parameters.h"
 #include "output.h"
 
 struct mmseqs_call_args {

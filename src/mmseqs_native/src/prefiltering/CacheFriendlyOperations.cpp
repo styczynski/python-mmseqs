@@ -1,5 +1,5 @@
-#include "CacheFriendlyOperations.h"
-#include "Util.h"
+#include "cacheFriendlyOperations.h"
+#include "util.h"
 
 #include <cmath>
 

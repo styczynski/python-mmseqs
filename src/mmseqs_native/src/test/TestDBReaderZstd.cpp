@@ -6,10 +6,10 @@
 #include <iostream>
 #include <list>
 
-#include "Clustering.h"
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Parameters.h"
+#include "clustering.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "parameters.h"
 
 const char* binary_name = "test_dbreader_zlib";
 

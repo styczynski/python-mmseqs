@@ -4,9 +4,9 @@
  * Licensed under GPLv3
  */
 
-#include "CompressedA3M.h"
+#include "compressedA3M.h"
 #include <sstream>
-#include "DBConcat.h"
+#include "dBConcat.h"
 
 void readU16(const char **ptr, uint16_t &result) {
   unsigned char array[2];

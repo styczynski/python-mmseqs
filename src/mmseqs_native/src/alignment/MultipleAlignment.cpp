@@ -1,9 +1,9 @@
-#include "MultipleAlignment.h"
+#include "multipleAlignment.h"
 
-#include "Debug.h"
-#include "Sequence.h"
-#include "SubstitutionMatrix.h"
-#include "Util.h"
+#include "debug.h"
+#include "sequence.h"
+#include "substitutionMatrix.h"
+#include "util.h"
 
 MultipleAlignment::MultipleAlignment(size_t maxSeqLen,
                                      SubstitutionMatrix *subMat) {

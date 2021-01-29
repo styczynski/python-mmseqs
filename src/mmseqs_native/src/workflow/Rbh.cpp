@@ -1,8 +1,8 @@
-#include "CommandCaller.h"
-#include "Debug.h"
-#include "FileUtil.h"
-#include "Parameters.h"
-#include "Util.h"
+#include "commandCaller.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "parameters.h"
+#include "util.h"
 #include "output.h"
 #include "rbh.sh.h"
 

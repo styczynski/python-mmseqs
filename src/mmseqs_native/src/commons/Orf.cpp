@@ -31,11 +31,11 @@
  *
  */
 
-#include "Orf.h"
+#include "orf.h"
 #include <_simd/simd.h>
-#include "Debug.h"
-#include "TranslateNucl.h"
-#include "Util.h"
+#include "debug.h"
+#include "translateNucl.h"
+#include "util.h"
 #include "itoa.h"
 
 #include <algorithm>

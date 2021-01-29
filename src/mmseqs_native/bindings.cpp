@@ -1,8 +1,8 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "Application.h"
-#include "Parameters.h"
+#include "application.h"
+#include "parameters.h"
 #include "output.h"
 
 namespace py = pybind11;

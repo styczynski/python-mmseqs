@@ -1,9 +1,9 @@
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Debug.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "debug.h"
 #include "output.h"
 
-#include "Util.h"
+#include "util.h"
 
 #ifdef OPENMP
 #include <omp.h>

@@ -1,8 +1,8 @@
-#include "DBWriter.h"
-#include "Debug.h"
-#include "FileUtil.h"
-#include "PatternCompiler.h"
-#include "Util.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "patternCompiler.h"
+#include "util.h"
 
 #include "microtar.h"
 #include "output.h"

@@ -1,9 +1,9 @@
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Debug.h"
-#include "MemoryMapped.h"
-#include "Orf.h"
-#include "Util.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "memoryMapped.h"
+#include "orf.h"
+#include "util.h"
 #include "output.h"
 
 int gff2db(mmseqs_output *out, Parameters &par) {

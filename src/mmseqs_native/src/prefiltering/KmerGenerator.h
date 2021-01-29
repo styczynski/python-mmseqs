@@ -2,9 +2,9 @@
 #define KMERGENERATOR_H
 #include <string>
 #include <vector>
-#include "Debug.h"
-#include "Indexer.h"
-#include "ScoreMatrix.h"
+#include "debug.h"
+#include "indexer.h"
+#include "scoreMatrix.h"
 
 class KmerGenerator {
  public:

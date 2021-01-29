@@ -1,4 +1,4 @@
-#include "IndexBuilder.h"
+#include "indexBuilder.h"
 #include "tantan.h"
 
 #ifdef OPENMP

@@ -5,11 +5,11 @@
  * sequences/headers databases) modified by Milot Mirdita <milot@mirdita.de>
  */
 
-#include "DBWriter.h"
-#include "Debug.h"
-#include "FileUtil.h"
-#include "KSeqWrapper.h"
-#include "Util.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "kSeqWrapper.h"
+#include "util.h"
 #include "itoa.h"
 #include "output.h"
 

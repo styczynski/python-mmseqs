@@ -7,13 +7,13 @@
 #include <cfloat>
 #include <cmath>
 #include <iostream>
-#include "BaseMatrix.h"
-#include "DBReader.h"
-#include "Indexer.h"
-#include "Parameters.h"
-#include "ReducedMatrix.h"
-#include "Sequence.h"
-#include "SubstitutionMatrix.h"
+#include "baseMatrix.h"
+#include "dBReader.h"
+#include "indexer.h"
+#include "parameters.h"
+#include "reducedMatrix.h"
+#include "sequence.h"
+#include "substitutionMatrix.h"
 
 const char* binary_name = "test_bestalphabet";
 

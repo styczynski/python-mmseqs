@@ -1,9 +1,9 @@
 #ifndef RESULT2PROFILE_H
 #define RESULT2PROFILE_H
 
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Parameters.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "parameters.h"
 #include "output.h"
 
 #include <unordered_map>

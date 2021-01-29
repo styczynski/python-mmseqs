@@ -8,7 +8,7 @@
 #include <cstddef>
 #include <vector>
 
-#include "Matcher.h"
+#include "matcher.h"
 
 class MultipleAlignment {
  public:

@@ -3,8 +3,8 @@
 
 #include <unordered_map>
 
-#include "DBReader.h"
-#include "DBWriter.h"
+#include "dBReader.h"
+#include "dBWriter.h"
 
 class Clustering {
  public:

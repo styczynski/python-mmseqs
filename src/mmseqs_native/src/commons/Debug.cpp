@@ -1,4 +1,4 @@
-#include "Debug.h"
+#include "debug.h"
 
 int Debug::debugLevel = Debug::INFO;
 

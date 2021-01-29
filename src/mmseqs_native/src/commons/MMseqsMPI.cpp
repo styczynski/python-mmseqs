@@ -1,6 +1,6 @@
-#include "MMseqsMPI.h"
-#include "Debug.h"
-#include "Parameters.h"
+#include "mMseqsMPI.h"
+#include "debug.h"
+#include "parameters.h"
 
 bool MMseqsMPI::active = false;
 int MMseqsMPI::rank = -1;

@@ -2,7 +2,7 @@
 #define BYTE_PARSER_H
 
 #include <string>
-#include "Debug.h"
+#include "debug.h"
 
 class ByteParser {
  public:

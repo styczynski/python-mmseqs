@@ -16,11 +16,11 @@
  * not be misrepresented as being the original software.
  */
 
-#include "MemoryMapped.h"
+#include "memoryMapped.h"
 
 #include <cstdio>
-#include "Debug.h"
-#include "Util.h"
+#include "debug.h"
+#include "util.h"
 
 // OS-specific
 #ifdef _MSC_VER

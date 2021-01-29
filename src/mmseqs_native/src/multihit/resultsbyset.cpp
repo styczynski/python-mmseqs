@@ -1,7 +1,7 @@
 #include "Aggregation.h"
-#include "Debug.h"
-#include "FastSort.h"
-#include "Parameters.h"
+#include "debug.h"
+#include "fastSort.h"
+#include "parameters.h"
 #include "output.h"
 
 #include <algorithm>

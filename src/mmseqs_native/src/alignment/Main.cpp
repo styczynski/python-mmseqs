@@ -1,8 +1,8 @@
-#include "Alignment.h"
-#include "Debug.h"
-#include "MMseqsMPI.h"
-#include "Parameters.h"
-#include "Util.h"
+#include "alignment.h"
+#include "debug.h"
+#include "mMseqsMPI.h"
+#include "parameters.h"
+#include "util.h"
 #include "output.h"
 
 #ifdef OPENMP

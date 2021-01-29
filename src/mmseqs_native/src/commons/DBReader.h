@@ -9,11 +9,11 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include "Debug.h"
-#include "FileUtil.h"
-#include "MemoryTracker.h"
-#include "Parameters.h"
-#include "Sequence.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "memoryTracker.h"
+#include "parameters.h"
+#include "sequence.h"
 
 #define ZSTD_STATIC_LINKING_ONLY  // ZSTD_findDecompressedSize
 #include <zstd.h>

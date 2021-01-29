@@ -1,8 +1,8 @@
-#include "ClusteringAlgorithms.h"
-#include "AlignmentSymmetry.h"
-#include "Debug.h"
-#include "Timer.h"
-#include "Util.h"
+#include "clusteringAlgorithms.h"
+#include "alignmentSymmetry.h"
+#include "debug.h"
+#include "timer.h"
+#include "util.h"
 
 #include <FastSort.h>
 #include <algorithm>

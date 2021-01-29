@@ -3,9 +3,9 @@
 #include <iostream>
 #include <list>
 
-#include "Clustering.h"
-#include "DBReader.h"
-#include "DBWriter.h"
+#include "clustering.h"
+#include "dBReader.h"
+#include "dBWriter.h"
 
 const char* binary_name = "test_dbreader";
 

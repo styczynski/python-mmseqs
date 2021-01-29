@@ -1,15 +1,15 @@
 //
 // Implemented by Martin Steinegger, Lars vdd
 //
-#include "AlignmentSymmetry.h"
+#include "alignmentSymmetry.h"
 #include <algorithm>
 #include <climits>
 #include <cmath>
 #include <new>
-#include "Debug.h"
-#include "FastSort.h"
-#include "Parameters.h"
-#include "Util.h"
+#include "debug.h"
+#include "fastSort.h"
+#include "parameters.h"
+#include "util.h"
 
 #ifdef OPENMP
 #include <omp.h>

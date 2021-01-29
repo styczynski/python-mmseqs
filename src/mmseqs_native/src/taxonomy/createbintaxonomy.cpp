@@ -1,7 +1,7 @@
-#include "Debug.h"
-#include "FileUtil.h"
-#include "NcbiTaxonomy.h"
-#include "Parameters.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "ncbiTaxonomy.h"
+#include "parameters.h"
 #include "output.h"
 
 int createbintaxonomy(mmseqs_output* out, Parameters& par) {

@@ -1,10 +1,10 @@
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Debug.h"
-#include "FastSort.h"
-#include "FileUtil.h"
-#include "Parameters.h"
-#include "Util.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "fastSort.h"
+#include "fileUtil.h"
+#include "parameters.h"
+#include "util.h"
 #include "output.h"
 
 #include <climits>

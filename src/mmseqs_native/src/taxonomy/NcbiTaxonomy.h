@@ -6,7 +6,7 @@
 #ifndef MMSEQS_NCBITAXONOMY_H
 #define MMSEQS_NCBITAXONOMY_H
 
-#include "StringBlock.h"
+#include "stringBlock.h"
 
 #include <map>
 #include <string>

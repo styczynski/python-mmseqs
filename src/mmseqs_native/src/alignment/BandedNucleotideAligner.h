@@ -6,11 +6,11 @@
 //
 #include <NucleotideMatrix.h>
 #include <Parameters.h>
-#include "StripedSmithWaterman.h"
+#include "stripedSmithWaterman.h"
 
-#include "Debug.h"
-#include "SubstitutionMatrix.h"
-#include "Util.h"
+#include "debug.h"
+#include "substitutionMatrix.h"
+#include "util.h"
 
 class BandedNucleotideAligner {
  public:

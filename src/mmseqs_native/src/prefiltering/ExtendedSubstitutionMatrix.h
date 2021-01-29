@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-#include "BaseMatrix.h"
-#include "ScoreMatrix.h"  // ScoreMatrix
+#include "baseMatrix.h"
+#include "scoreMatrix.h"  // ScoreMatrix
 
 class ExtendedSubstitutionMatrix {
  public:

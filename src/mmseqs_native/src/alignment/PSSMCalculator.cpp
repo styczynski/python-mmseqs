@@ -1,14 +1,14 @@
 //
 // Created by mad on 3/24/15.
 //
-#include "PSSMCalculator.h"
+#include "pSSMCalculator.h"
 #include <_simd/simd.h>
-#include "BaseMatrix.h"
-#include "Debug.h"
-#include "MathUtil.h"
-#include "MultipleAlignment.h"
-#include "Sequence.h"
-#include "Util.h"
+#include "baseMatrix.h"
+#include "debug.h"
+#include "mathUtil.h"
+#include "multipleAlignment.h"
+#include "sequence.h"
+#include "util.h"
 
 PSSMCalculator::PSSMCalculator(BaseMatrix *subMat, size_t maxSeqLength,
                                size_t maxSetSize, float pca, float pcb)

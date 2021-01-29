@@ -1,20 +1,20 @@
-#include "DBReader.h"
+#include "dBReader.h"
 #include <algorithm>
 #include <climits>
 #include <cstddef>
 #include <cstring>
 #include <random>
-#include "FastSort.h"
+#include "fastSort.h"
 
 #include <sys/mman.h>
 #include <sys/stat.h>
 
 #include <fcntl.h>
 
-#include "Debug.h"
-#include "FileUtil.h"
-#include "MemoryMapped.h"
-#include "Util.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "memoryMapped.h"
+#include "util.h"
 #include "itoa.h"
 
 #ifdef OPENMP

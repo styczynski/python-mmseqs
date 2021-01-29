@@ -1,7 +1,7 @@
 #ifndef BACKTRACE_TRANSLATOR_H
 #define BACKTRACE_TRANSLATOR_H
 
-#include "Matcher.h"
+#include "matcher.h"
 
 class BacktraceTranslator {
  public:

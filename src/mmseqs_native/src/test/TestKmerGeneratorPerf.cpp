@@ -1,11 +1,11 @@
-#include "BaseMatrix.h"
-#include "ExtendedSubstitutionMatrix.h"
-#include "Indexer.h"
-#include "KmerGenerator.h"
-#include "ReducedMatrix.h"
-#include "Sequence.h"
-#include "SubstitutionMatrix.h"
-#include "Timer.h"
+#include "baseMatrix.h"
+#include "extendedSubstitutionMatrix.h"
+#include "indexer.h"
+#include "kmerGenerator.h"
+#include "reducedMatrix.h"
+#include "sequence.h"
+#include "substitutionMatrix.h"
+#include "timer.h"
 
 #include <unistd.h>
 #include <iostream>

@@ -1,11 +1,11 @@
-#include "Util.h"
+#include "util.h"
 #include <sys/resource.h>
-#include "BaseMatrix.h"
-#include "Debug.h"
-#include "FileUtil.h"
-#include "Parameters.h"
-#include "Sequence.h"
-#include "SubstitutionMatrix.h"
+#include "baseMatrix.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "parameters.h"
+#include "sequence.h"
+#include "substitutionMatrix.h"
 #include "itoa.h"
 
 #include <unistd.h>
@@ -18,8 +18,8 @@
 #include <sys/mman.h>
 #include <algorithm>
 #include <fstream>  // std::ifstream
-#include "MemoryMapped.h"
-#include "MemoryTracker.h"
+#include "memoryMapped.h"
+#include "memoryTracker.h"
 
 #ifdef OPENMP
 #include <omp.h>

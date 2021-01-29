@@ -6,7 +6,7 @@
 #define MMSEQS_MSAFILTER_H
 
 #include <SubstitutionMatrix.h>
-#include "MultipleAlignment.h"
+#include "multipleAlignment.h"
 
 class MsaFilter {
  public:

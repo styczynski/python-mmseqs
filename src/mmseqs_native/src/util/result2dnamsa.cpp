@@ -6,11 +6,11 @@
 #include <string>
 #include <vector>
 
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Debug.h"
-#include "Parameters.h"
-#include "Util.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "parameters.h"
+#include "util.h"
 #include "output.h"
 
 #ifdef OPENMP

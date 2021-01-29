@@ -1,7 +1,7 @@
 #ifndef ReducedMatrix_H
 #define ReducedMatrix_H
-#include "BaseMatrix.h"
-#include "Debug.h"
+#include "baseMatrix.h"
+#include "debug.h"
 
 class ReducedMatrix : public BaseMatrix {
  public:

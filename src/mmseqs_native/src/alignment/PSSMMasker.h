@@ -2,8 +2,8 @@
 #define PSSMMASKER_H
 
 #include <cstring>
-#include "BaseMatrix.h"
-#include "PSSMCalculator.h"
+#include "baseMatrix.h"
+#include "pSSMCalculator.h"
 #include "tantan.h"
 
 class PSSMMasker {

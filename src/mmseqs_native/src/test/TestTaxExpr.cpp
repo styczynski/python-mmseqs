@@ -2,8 +2,8 @@
 #include <tinyexpr.h>
 #include <cassert>
 #include <iostream>
-#include "TaxonomyExpression.h"
-#include "Util.h"
+#include "taxonomyExpression.h"
+#include "util.h"
 
 const char* binary_name = "test_taxexpr";
 

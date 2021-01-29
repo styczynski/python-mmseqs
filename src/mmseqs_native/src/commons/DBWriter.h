@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 
-#include "DBReader.h"
-#include "MemoryTracker.h"
+#include "dBReader.h"
+#include "memoryTracker.h"
 
 template <typename T>
 class DBReader;

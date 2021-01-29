@@ -1,10 +1,10 @@
 #include <fstream>
 #include <sstream>
 
-#include "DBWriter.h"
-#include "Debug.h"
-#include "Parameters.h"
-#include "Util.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "parameters.h"
+#include "util.h"
 #include "output.h"
 
 int tsv2db(mmseqs_output *out, Parameters &par) {

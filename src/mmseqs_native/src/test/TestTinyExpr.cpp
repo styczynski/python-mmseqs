@@ -1,7 +1,7 @@
 #include <cassert>
 #include <iostream>
 
-#include "ExpressionParser.h"
+#include "expressionParser.h"
 
 const char* binary_name = "test_tinyexpr";
 

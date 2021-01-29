@@ -5,17 +5,17 @@
 //  Copyright (c) 2012 -. All rights reserved.
 //
 #include <iostream>
-#include "ExtendedSubstitutionMatrix.h"
-#include "Indexer.h"
-#include "Sequence.h"
+#include "extendedSubstitutionMatrix.h"
+#include "indexer.h"
+#include "sequence.h"
 
-#include "BaseMatrix.h"
-#include "KmerGenerator.h"
-#include "Parameters.h"
-#include "ReducedMatrix.h"
-#include "StripedSmithWaterman.h"
-#include "SubstitutionMatrix.h"
-#include "Util.h"
+#include "baseMatrix.h"
+#include "kmerGenerator.h"
+#include "parameters.h"
+#include "reducedMatrix.h"
+#include "stripedSmithWaterman.h"
+#include "substitutionMatrix.h"
+#include "util.h"
 
 const char* binary_name = "test_alignmenttraceback";
 

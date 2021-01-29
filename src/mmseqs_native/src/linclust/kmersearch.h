@@ -5,7 +5,7 @@
 #ifndef MMSEQS_KMERSEARCH_H
 #define MMSEQS_KMERSEARCH_H
 
-#include "KmerIndex.h"
+#include "kmerIndex.h"
 #include "kmermatcher.h"
 
 class KmerSearch {

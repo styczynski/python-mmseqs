@@ -1,6 +1,6 @@
-#include "ReducedMatrix.h"
+#include "reducedMatrix.h"
 #include <cmath>
-#include "Util.h"
+#include "util.h"
 
 ReducedMatrix::ReducedMatrix(double** probMatrix, float** rMatrix,
                              unsigned char* aa2num, char* num2aa,

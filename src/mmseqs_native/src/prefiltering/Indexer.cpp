@@ -1,5 +1,5 @@
-#include "Indexer.h"
-#include "Debug.h"
+#include "indexer.h"
+#include "debug.h"
 
 Indexer::Indexer(const size_t alphabetSize, const int maxKmerSize) {
   this->maxKmerSize = maxKmerSize;

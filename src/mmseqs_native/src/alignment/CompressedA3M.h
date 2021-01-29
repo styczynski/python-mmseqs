@@ -1,8 +1,8 @@
 #ifndef MMSEQS_COMPRESSEDA3M_H
 #define MMSEQS_COMPRESSEDA3M_H
 
-#include "DBReader.h"
-#include "Matcher.h"
+#include "dBReader.h"
+#include "matcher.h"
 
 class DBConcat;
 

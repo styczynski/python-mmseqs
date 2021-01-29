@@ -1,7 +1,7 @@
-#include "QueryMatcher.h"
-#include "FastSort.h"
-#include "SubstitutionMatrix.h"
-#include "Util.h"
+#include "queryMatcher.h"
+#include "fastSort.h"
+#include "substitutionMatrix.h"
+#include "util.h"
 
 #define FE_1(WHAT, X) WHAT(X)
 #define FE_2(WHAT, X, ...) WHAT(X) FE_1(WHAT, __VA_ARGS__)

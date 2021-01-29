@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#include "Debug.h"
-#include "UniprotKB.h"
-#include "Util.h"
+#include "debug.h"
+#include "uniprotKB.h"
+#include "util.h"
 
 const std::string UniprotKB::columnNames[] = {
     "ID", "AC",  "DT", "DE", "GN", "OS", "OG", "OC", "OX",

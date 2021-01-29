@@ -7,11 +7,11 @@
 #include <MsaFilter.h>
 #include <StripedSmithWaterman.h>
 #include <iostream>
-#include "MultipleAlignment.h"
-#include "PSSMCalculator.h"
-#include "Parameters.h"
-#include "Sequence.h"
-#include "SubstitutionMatrix.h"
+#include "multipleAlignment.h"
+#include "pSSMCalculator.h"
+#include "parameters.h"
+#include "sequence.h"
+#include "substitutionMatrix.h"
 
 const char* binary_name = "test_multiplealignment";
 

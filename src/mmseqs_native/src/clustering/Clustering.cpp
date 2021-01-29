@@ -1,8 +1,8 @@
-#include "Clustering.h"
-#include "ClusteringAlgorithms.h"
-#include "Debug.h"
-#include "Timer.h"
-#include "Util.h"
+#include "clustering.h"
+#include "clusteringAlgorithms.h"
+#include "debug.h"
+#include "timer.h"
+#include "util.h"
 #include "itoa.h"
 
 Clustering::Clustering(const std::string &seqDB, const std::string &seqDBIndex,

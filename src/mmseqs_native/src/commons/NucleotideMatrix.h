@@ -1,7 +1,7 @@
 #ifndef NUCLEOTIDE_MATRIX_H
 #define NUCLEOTIDE_MATRIX_H
 
-#include "SubstitutionMatrix.h"
+#include "substitutionMatrix.h"
 
 class NucleotideMatrix : public SubstitutionMatrix {
  public:

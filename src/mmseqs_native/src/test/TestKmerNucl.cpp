@@ -1,9 +1,9 @@
-#include "BaseMatrix.h"
-#include "Indexer.h"
-#include "NucleotideMatrix.h"
-#include "Orf.h"
-#include "Parameters.h"
-#include "Sequence.h"
+#include "baseMatrix.h"
+#include "indexer.h"
+#include "nucleotideMatrix.h"
+#include "orf.h"
+#include "parameters.h"
+#include "sequence.h"
 
 const char* binary_name = "test_kmernucl";
 

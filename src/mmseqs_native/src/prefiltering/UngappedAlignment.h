@@ -6,9 +6,9 @@
 #define MMSEQS_DIAGONALMATCHER_H
 
 #include <_simd/simd.h>
-#include "CacheFriendlyOperations.h"
-#include "SequenceLookup.h"
-#include "SubstitutionMatrix.h"
+#include "cacheFriendlyOperations.h"
+#include "sequenceLookup.h"
+#include "substitutionMatrix.h"
 class UngappedAlignment {
  public:
   UngappedAlignment(const unsigned int maxSeqLen,

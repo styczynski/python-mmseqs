@@ -15,8 +15,8 @@
 #include <unistd.h>
 #include <algorithm>
 
-#include "Debug.h"
-#include "Util.h"
+#include "debug.h"
+#include "util.h"
 #define SAFE_READ_ERROR ((size_t)-1)
 
 class Concat {

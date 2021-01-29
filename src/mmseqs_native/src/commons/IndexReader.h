@@ -1,10 +1,10 @@
 #ifndef MMSEQS_INDEXREADER_H
 #define MMSEQS_INDEXREADER_H
 
-#include "DBReader.h"
-#include "Debug.h"
-#include "FileUtil.h"
-#include "PrefilteringIndexReader.h"
+#include "dBReader.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "prefilteringIndexReader.h"
 
 class IndexReader {
  public:

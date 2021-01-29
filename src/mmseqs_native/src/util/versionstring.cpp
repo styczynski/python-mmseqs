@@ -1,7 +1,7 @@
-#include "Command.h"
-#include "Debug.h"
-#include "Parameters.h"
-#include "Util.h"
+#include "command.h"
+#include "debug.h"
+#include "parameters.h"
+#include "util.h"
 #include "output.h"
 
 int versionstring(mmseqs_output* out, Parameters& par) {

@@ -1,4 +1,4 @@
-#include "KmerGenerator.h"
+#include "kmerGenerator.h"
 #include <MathUtil.h>
 #include <_simd/simd.h>
 #include <algorithm>  // std::reverse

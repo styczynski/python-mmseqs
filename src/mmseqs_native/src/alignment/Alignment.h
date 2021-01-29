@@ -1,11 +1,11 @@
 #ifndef ALIGNMENT_H
 #define ALIGNMENT_H
 
-#include "BaseMatrix.h"
-#include "DBReader.h"
-#include "IndexReader.h"
-#include "Matcher.h"
-#include "Parameters.h"
+#include "baseMatrix.h"
+#include "dBReader.h"
+#include "indexReader.h"
+#include "matcher.h"
+#include "parameters.h"
 
 class Alignment {
  public:

@@ -1,10 +1,10 @@
-#include "Parameters.h"
+#include "parameters.h"
 #include "../alignment/DistanceCalculator.h"
-#include "ByteParser.h"
-#include "CommandCaller.h"
-#include "Debug.h"
-#include "FileUtil.h"
-#include "Util.h"
+#include "byteParser.h"
+#include "commandCaller.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "util.h"
 
 #include <regex.h>
 #include <unistd.h>

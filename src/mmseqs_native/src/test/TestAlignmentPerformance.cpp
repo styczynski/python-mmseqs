@@ -14,12 +14,12 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include "ExtendedSubstitutionMatrix.h"
-#include "Parameters.h"
-#include "Sequence.h"
-#include "StripedSmithWaterman.h"
-#include "SubstitutionMatrix.h"
-#include "Util.h"
+#include "extendedSubstitutionMatrix.h"
+#include "parameters.h"
+#include "sequence.h"
+#include "stripedSmithWaterman.h"
+#include "substitutionMatrix.h"
+#include "util.h"
 #include "kseq.h"
 
 const char* binary_name = "test_alignmentperformance";

@@ -7,11 +7,11 @@
 #include <sstream>
 #include <utility>
 
-#include "Parameters.h"
+#include "parameters.h"
 
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Util.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "util.h"
 #include "output.h"
 
 #ifdef OPENMP

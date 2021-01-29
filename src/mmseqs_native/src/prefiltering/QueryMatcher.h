@@ -6,10 +6,10 @@
 #define MMSEQS_QUERYTEMPLATEMATCHEREXACTMATCH_H
 
 #include <cstdlib>
-#include "CacheFriendlyOperations.h"
-#include "EvalueComputation.h"
-#include "KmerGenerator.h"
-#include "UngappedAlignment.h"
+#include "cacheFriendlyOperations.h"
+#include "evalueComputation.h"
+#include "kmerGenerator.h"
+#include "ungappedAlignment.h"
 #include "itoa.h"
 
 struct statistics_t {

@@ -1,9 +1,9 @@
 #ifndef MMSEQS_KMERMATCHER_H
 #define MMSEQS_KMERMATCHER_H
-#include "BaseMatrix.h"
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Parameters.h"
+#include "baseMatrix.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "parameters.h"
 
 #include <queue>
 

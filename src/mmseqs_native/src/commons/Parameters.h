@@ -11,8 +11,8 @@
 #include <utility>
 #include <vector>
 
-#include "Command.h"
-#include "MultiParam.h"
+#include "command.h"
+#include "multiParam.h"
 
 static const char *version = "1.0";
 

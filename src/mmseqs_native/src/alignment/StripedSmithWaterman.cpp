@@ -25,12 +25,12 @@
    support). Please send bug reports and/or suggestions to
    martin.steinegger@snu.ac.kr.
 */
-#include "StripedSmithWaterman.h"
-#include "Parameters.h"
+#include "stripedSmithWaterman.h"
+#include "parameters.h"
 
-#include "Debug.h"
-#include "SubstitutionMatrix.h"
-#include "Util.h"
+#include "debug.h"
+#include "substitutionMatrix.h"
+#include "util.h"
 
 #include <iostream>
 

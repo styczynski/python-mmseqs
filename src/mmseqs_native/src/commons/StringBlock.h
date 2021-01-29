@@ -6,7 +6,7 @@
 #include <cstring>
 #include <numeric>
 
-#include "FastSort.h"
+#include "fastSort.h"
 
 template <typename T>
 class StringBlock {

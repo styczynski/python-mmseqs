@@ -1,11 +1,11 @@
 #include <cassert>
-#include "CommandCaller.h"
-#include "Debug.h"
-#include "FileUtil.h"
-#include "LinsearchIndexReader.h"
-#include "Parameters.h"
-#include "PrefilteringIndexReader.h"
-#include "Util.h"
+#include "commandCaller.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "linsearchIndexReader.h"
+#include "parameters.h"
+#include "prefilteringIndexReader.h"
+#include "util.h"
 #include "easyrbh.sh.h"
 #include "output.h"
 

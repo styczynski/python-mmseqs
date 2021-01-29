@@ -5,9 +5,9 @@
 #include <iostream>
 #include <queue>
 
-#include "Parameters.h"
-#include "Sequence.h"
-#include "SubstitutionMatrix.h"
+#include "parameters.h"
+#include "sequence.h"
+#include "substitutionMatrix.h"
 
 const char *binary_name = "test_kwaymerge";
 struct KmerEntry {

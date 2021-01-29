@@ -1,9 +1,9 @@
-#include "DBReader.h"
-#include "FileUtil.h"
-#include "Parameters.h"
-#include "Prefiltering.h"
-#include "PrefilteringIndexReader.h"
-#include "Util.h"
+#include "dBReader.h"
+#include "fileUtil.h"
+#include "parameters.h"
+#include "prefiltering.h"
+#include "prefilteringIndexReader.h"
+#include "util.h"
 #include "output.h"
 
 #ifdef OPENMP

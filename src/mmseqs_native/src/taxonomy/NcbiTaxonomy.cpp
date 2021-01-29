@@ -2,11 +2,11 @@
 // https://github.com/emepyc/Blast2lca
 // Originally licensed under GPLv2 or later
 
-#include "NcbiTaxonomy.h"
-#include "Debug.h"
-#include "FileUtil.h"
-#include "MathUtil.h"
-#include "Util.h"
+#include "ncbiTaxonomy.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "mathUtil.h"
+#include "util.h"
 #include "sys/mman.h"
 
 #include <algorithm>

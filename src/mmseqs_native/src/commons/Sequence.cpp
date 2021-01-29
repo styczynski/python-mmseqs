@@ -1,12 +1,12 @@
-#include "Sequence.h"
+#include "sequence.h"
 #include <_simd/simd.h>
-#include "Debug.h"
-#include "MathUtil.h"
-#include "PSSMCalculator.h"
-#include "Parameters.h"
-#include "SubstitutionMatrix.h"
-#include "SubstitutionMatrixProfileStates.h"
-#include "Util.h"
+#include "debug.h"
+#include "mathUtil.h"
+#include "pSSMCalculator.h"
+#include "parameters.h"
+#include "substitutionMatrix.h"
+#include "substitutionMatrixProfileStates.h"
+#include "util.h"
 
 #include <climits>  // short_max
 #include <cstddef>

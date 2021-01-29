@@ -11,16 +11,16 @@
 
 #include <stdlib.h>
 #include <algorithm>
-#include "DBReader.h"
-#include "Debug.h"
-#include "FastSort.h"
-#include "Indexer.h"
-#include "KmerGenerator.h"
-#include "MathUtil.h"
-#include "Parameters.h"
-#include "Sequence.h"
-#include "SequenceLookup.h"
-#include "Util.h"
+#include "dBReader.h"
+#include "debug.h"
+#include "fastSort.h"
+#include "indexer.h"
+#include "kmerGenerator.h"
+#include "mathUtil.h"
+#include "parameters.h"
+#include "sequence.h"
+#include "sequenceLookup.h"
+#include "util.h"
 #include "output.h"
 
 // IndexEntryLocal is an entry with position and seqId for a kmer

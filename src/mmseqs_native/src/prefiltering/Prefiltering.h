@@ -1,13 +1,13 @@
 #ifndef PREFILTERING_H
 #define PREFILTERING_H
 
-#include "BaseMatrix.h"
-#include "DBReader.h"
-#include "IndexTable.h"
-#include "Parameters.h"
-#include "PrefilteringIndexReader.h"
-#include "QueryMatcher.h"
-#include "ScoreMatrix.h"
+#include "baseMatrix.h"
+#include "dBReader.h"
+#include "indexTable.h"
+#include "parameters.h"
+#include "prefilteringIndexReader.h"
+#include "queryMatcher.h"
+#include "scoreMatrix.h"
 #include "output.h"
 
 #include <list>

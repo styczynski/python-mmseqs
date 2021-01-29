@@ -1,10 +1,10 @@
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Debug.h"
-#include "NcbiTaxonomy.h"
-#include "Parameters.h"
-#include "TaxonomyExpression.h"
-#include "Util.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "ncbiTaxonomy.h"
+#include "parameters.h"
+#include "taxonomyExpression.h"
+#include "util.h"
 #include "output.h"
 
 #ifdef OPENMP

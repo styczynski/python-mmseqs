@@ -1,7 +1,7 @@
 #ifndef MMSEQS_KSEQWRAPPER_H
 #define MMSEQS_KSEQWRAPPER_H
 
-#include "KSeqBufferReader.h"
+#include "kSeqBufferReader.h"
 #include "kseq.h"
 
 #include <string>

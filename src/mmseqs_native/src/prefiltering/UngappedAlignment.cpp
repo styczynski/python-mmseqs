@@ -1,7 +1,7 @@
 //
 // Created by mad on 12/15/15.
 
-#include "UngappedAlignment.h"
+#include "ungappedAlignment.h"
 
 UngappedAlignment::UngappedAlignment(const unsigned int maxSeqLen,
                                      BaseMatrix *substitutionMatrix,

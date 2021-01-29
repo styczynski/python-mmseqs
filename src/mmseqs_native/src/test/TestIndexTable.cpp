@@ -6,10 +6,10 @@
 
 #include <cstdio>
 #include <iostream>
-#include "IndexBuilder.h"
-#include "IndexTable.h"
-#include "Parameters.h"
-#include "SubstitutionMatrix.h"
+#include "indexBuilder.h"
+#include "indexTable.h"
+#include "parameters.h"
+#include "substitutionMatrix.h"
 
 const char *binary_name = "test_indextable";
 

@@ -1,10 +1,10 @@
-#include "DBReader.h"
-#include "FileUtil.h"
-#include "MMseqsMPI.h"
-#include "Parameters.h"
-#include "Prefiltering.h"
-#include "Timer.h"
-#include "Util.h"
+#include "dBReader.h"
+#include "fileUtil.h"
+#include "mMseqsMPI.h"
+#include "parameters.h"
+#include "prefiltering.h"
+#include "timer.h"
+#include "util.h"
 #include "output.h"
 
 #ifdef OPENMP

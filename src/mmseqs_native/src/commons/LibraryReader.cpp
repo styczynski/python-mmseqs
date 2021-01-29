@@ -1,9 +1,9 @@
 //
 // Created by mad on 11/29/16.
 //
-#include "LibraryReader.h"
+#include "libraryReader.h"
 #include <cstring>
-#include "Debug.h"
+#include "debug.h"
 
 // Returns pointer to first non-white-space character in str OR to NULL if none
 // found

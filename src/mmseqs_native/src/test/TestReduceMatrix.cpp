@@ -6,10 +6,10 @@
 //  Copyright (c) 2012 -. All rights reserved.
 //
 
-#include "BaseMatrix.h"
-#include "Parameters.h"
-#include "ReducedMatrix.h"
-#include "SubstitutionMatrix.h"
+#include "baseMatrix.h"
+#include "parameters.h"
+#include "reducedMatrix.h"
+#include "substitutionMatrix.h"
 
 const char* binary_name = "test_reducematrix";
 

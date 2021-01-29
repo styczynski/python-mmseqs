@@ -1,7 +1,7 @@
 #include "Aggregation.h"
-#include "Debug.h"
-#include "Parameters.h"
-#include "Util.h"
+#include "debug.h"
+#include "parameters.h"
+#include "util.h"
 #include "output.h"
 
 #ifdef OPENMP

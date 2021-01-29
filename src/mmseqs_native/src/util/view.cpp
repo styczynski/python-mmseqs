@@ -1,7 +1,7 @@
-#include "Debug.h"
-#include "IndexReader.h"
-#include "Parameters.h"
-#include "Util.h"
+#include "debug.h"
+#include "indexReader.h"
+#include "parameters.h"
+#include "util.h"
 #include "output.h"
 
 int view(mmseqs_output* out, Parameters& par) {

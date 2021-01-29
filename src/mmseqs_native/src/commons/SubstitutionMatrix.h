@@ -11,8 +11,8 @@
 //
 
 #include <cstddef>
-#include "BaseMatrix.h"
-#include "ProfileStates.h"
+#include "baseMatrix.h"
+#include "profileStates.h"
 
 class SubstitutionMatrix : public BaseMatrix {
  public:

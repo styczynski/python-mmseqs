@@ -10,7 +10,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "DBReader.h"
+#include "dBReader.h"
 
 class ClusteringAlgorithms {
  public:

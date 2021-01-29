@@ -44,7 +44,7 @@
 #include "../commons/BaseMatrix.h"
 
 #include "../commons/Sequence.h"
-#include "EvalueComputation.h"
+#include "evalueComputation.h"
 typedef struct {
   short qStartPos;
   short dbStartPos;

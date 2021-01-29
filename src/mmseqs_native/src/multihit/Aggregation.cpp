@@ -1,6 +1,6 @@
 #include "Aggregation.h"
-#include "Debug.h"
-#include "Util.h"
+#include "debug.h"
+#include "util.h"
 
 #ifdef OPENMP
 #include <omp.h>

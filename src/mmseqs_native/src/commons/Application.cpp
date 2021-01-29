@@ -1,9 +1,9 @@
-#include "Application.h"
-#include "Command.h"
-#include "Debug.h"
-#include "Parameters.h"
-#include "Timer.h"
-#include "Util.h"
+#include "application.h"
+#include "command.h"
+#include "debug.h"
+#include "parameters.h"
+#include "timer.h"
+#include "util.h"
 #include "output.h"
 
 #include <iomanip>

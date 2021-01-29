@@ -1,7 +1,7 @@
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Debug.h"
-#include "Util.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "util.h"
 #include "itoa.h"
 #include "output.h"
 

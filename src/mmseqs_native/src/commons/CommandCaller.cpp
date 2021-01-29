@@ -1,6 +1,6 @@
-#include "CommandCaller.h"
-#include "Debug.h"
-#include "Util.h"
+#include "commandCaller.h"
+#include "debug.h"
+#include "util.h"
 
 #include <strings.h>
 #include <unistd.h>

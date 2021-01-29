@@ -6,13 +6,13 @@
 //
 
 #include <iostream>
-#include "MsaFilter.h"
-#include "MultipleAlignment.h"
-#include "PSSMCalculator.h"
-#include "Parameters.h"
-#include "Sequence.h"
-#include "StripedSmithWaterman.h"
-#include "SubstitutionMatrix.h"
+#include "msaFilter.h"
+#include "multipleAlignment.h"
+#include "pSSMCalculator.h"
+#include "parameters.h"
+#include "sequence.h"
+#include "stripedSmithWaterman.h"
+#include "substitutionMatrix.h"
 
 const char* binary_name = "test_pssm";
 

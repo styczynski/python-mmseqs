@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include "../alignment/Matcher.h"
-#include "DBReader.h"
+#include "dBReader.h"
 
 class Orf {
  public:

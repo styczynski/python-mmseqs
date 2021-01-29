@@ -1,7 +1,7 @@
 #ifndef COUNTIN32ARRAY_H
 #define COUNTIN32ARRAY_H
 
-#include "IndexTable.h"
+#include "indexTable.h"
 
 #define IS_REPRESENTIBLE_IN_D_BITS(D, N)                                   \
   (((unsigned long)N >= (1UL << (D - 1)) && (unsigned long)N < (1UL << D)) \

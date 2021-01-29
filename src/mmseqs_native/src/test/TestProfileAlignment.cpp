@@ -8,15 +8,15 @@
 #include <string.h>
 #include <cmath>
 #include <iostream>
-#include "BaseMatrix.h"
-#include "ExtendedSubstitutionMatrix.h"
-#include "Indexer.h"
-#include "KmerGenerator.h"
-#include "Parameters.h"
-#include "ReducedMatrix.h"
-#include "Sequence.h"
-#include "StripedSmithWaterman.h"
-#include "SubstitutionMatrix.h"
+#include "baseMatrix.h"
+#include "extendedSubstitutionMatrix.h"
+#include "indexer.h"
+#include "kmerGenerator.h"
+#include "parameters.h"
+#include "reducedMatrix.h"
+#include "sequence.h"
+#include "stripedSmithWaterman.h"
+#include "substitutionMatrix.h"
 
 const char* binary_name = "test_profilealignment";
 

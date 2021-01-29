@@ -1,4 +1,4 @@
-#include "NucleotideMatrix.h"
+#include "nucleotideMatrix.h"
 #include <climits>
 
 NucleotideMatrix::NucleotideMatrix(const char* scoringMatrixFileName,

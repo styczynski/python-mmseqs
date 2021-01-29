@@ -4,8 +4,8 @@
 #ifndef MMSEQS_TAXONOMYEXPRESSION_H
 #define MMSEQS_TAXONOMYEXPRESSION_H
 
-#include "ExpressionParser.h"
-#include "NcbiTaxonomy.h"
+#include "expressionParser.h"
+#include "ncbiTaxonomy.h"
 
 #include <ctype.h>
 #include <vector>

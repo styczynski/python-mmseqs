@@ -1,5 +1,5 @@
 #include <vector>
-#include "Concat.h"
+#include "concat.h"
 
 const char* binary_name = "test_merge";
 

@@ -6,7 +6,7 @@
 #define MMSEQS_SEQUENCEINDEX_H
 
 #include <cstddef>
-#include "Sequence.h"
+#include "sequence.h"
 
 class SequenceLookup {
  public:

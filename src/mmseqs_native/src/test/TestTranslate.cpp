@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 
-#include "TranslateNucl.h"
+#include "translateNucl.h"
 
 const char* binary_name = "test_translate";
 

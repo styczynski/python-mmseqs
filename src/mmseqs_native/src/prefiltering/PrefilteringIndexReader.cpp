@@ -1,10 +1,10 @@
-#include "PrefilteringIndexReader.h"
-#include "DBWriter.h"
-#include "ExtendedSubstitutionMatrix.h"
-#include "FileUtil.h"
-#include "IndexBuilder.h"
-#include "Parameters.h"
-#include "Prefiltering.h"
+#include "prefilteringIndexReader.h"
+#include "dBWriter.h"
+#include "extendedSubstitutionMatrix.h"
+#include "fileUtil.h"
+#include "indexBuilder.h"
+#include "parameters.h"
+#include "prefiltering.h"
 #include "output.h"
 
 const char *PrefilteringIndexReader::CURRENT_VERSION = "16";

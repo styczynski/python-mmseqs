@@ -1,6 +1,6 @@
-#include "SubstitutionMatrix.h"
-#include "Debug.h"
-#include "Util.h"
+#include "substitutionMatrix.h"
+#include "debug.h"
+#include "util.h"
 #include "lambda_calculator.h"
 
 #include <algorithm>

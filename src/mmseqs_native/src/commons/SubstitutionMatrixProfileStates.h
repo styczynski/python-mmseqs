@@ -1,8 +1,8 @@
 #ifndef SubstitutionMatrixProfileStates_H
 #define SubstitutionMatrixProfileStates_H
-#include "BaseMatrix.h"
-#include "Debug.h"
-#include "ProfileStates.h"
+#include "baseMatrix.h"
+#include "debug.h"
+#include "profileStates.h"
 
 class SubstitutionMatrixProfileStates : public BaseMatrix {
  public:

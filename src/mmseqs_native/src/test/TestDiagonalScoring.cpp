@@ -3,15 +3,15 @@
 #include <iostream>
 #include <list>
 
-#include "ExtendedSubstitutionMatrix.h"
-#include "SequenceLookup.h"
-#include "SubstitutionMatrix.h"
-#include "UngappedAlignment.h"
+#include "extendedSubstitutionMatrix.h"
+#include "sequenceLookup.h"
+#include "substitutionMatrix.h"
+#include "ungappedAlignment.h"
 
-#include "Clustering.h"
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Parameters.h"
+#include "clustering.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "parameters.h"
 
 const char* binary_name = "test_diagonalscoring";
 

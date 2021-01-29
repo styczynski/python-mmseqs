@@ -1,12 +1,12 @@
 #include <PSSMCalculator.h>
 #include <ProfileStates.h>
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Debug.h"
-#include "Parameters.h"
-#include "Sequence.h"
-#include "SubstitutionMatrix.h"
-#include "Util.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "parameters.h"
+#include "sequence.h"
+#include "substitutionMatrix.h"
+#include "util.h"
 #include "itoa.h"
 #include "output.h"
 

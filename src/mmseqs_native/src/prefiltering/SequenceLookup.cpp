@@ -1,12 +1,12 @@
 //
 // Created by mad on 12/14/15.
 //
-#include "SequenceLookup.h"
+#include "sequenceLookup.h"
 #include <sys/mman.h>
 #include <cstring>
 #include <new>
-#include "Debug.h"
-#include "Util.h"
+#include "debug.h"
+#include "util.h"
 
 SequenceLookup::SequenceLookup(size_t sequenceCount, size_t dataSize)
     : sequenceCount(sequenceCount),

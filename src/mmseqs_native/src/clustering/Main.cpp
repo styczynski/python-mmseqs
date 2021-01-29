@@ -1,5 +1,5 @@
-#include "Clustering.h"
-#include "Parameters.h"
+#include "clustering.h"
+#include "parameters.h"
 #include "output.h"
 
 int clust(mmseqs_output* out, Parameters& par) {

@@ -9,7 +9,7 @@
 #include <list>
 #include <set>
 
-#include "DBReader.h"
+#include "dBReader.h"
 
 class AlignmentSymmetry {
  public:

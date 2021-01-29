@@ -1,8 +1,8 @@
 #ifndef MMSEQS_AGGREGATION_H
 #define MMSEQS_AGGREGATION_H
 
-#include "DBReader.h"
-#include "DBWriter.h"
+#include "dBReader.h"
+#include "dBWriter.h"
 
 #include <map>
 #include <vector>

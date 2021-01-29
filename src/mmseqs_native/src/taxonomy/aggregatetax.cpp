@@ -1,12 +1,12 @@
 #include <algorithm>
 #include <map>
-#include "DBWriter.h"
-#include "Debug.h"
-#include "FileUtil.h"
-#include "Matcher.h"
-#include "NcbiTaxonomy.h"
-#include "Parameters.h"
-#include "Util.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "matcher.h"
+#include "ncbiTaxonomy.h"
+#include "parameters.h"
+#include "util.h"
 #include "output.h"
 
 #ifdef OPENMP

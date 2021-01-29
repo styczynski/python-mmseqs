@@ -1,5 +1,5 @@
-#include "DBReader.h"
-#include "Debug.h"
+#include "dBReader.h"
+#include "debug.h"
 
 const char* binary_name = "test_dbreaderindexserialization";
 

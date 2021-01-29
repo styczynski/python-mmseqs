@@ -3,12 +3,12 @@
 
 #include <cstdlib>
 
-#include "Debug.h"
-#include "LibraryReader.h"
-#include "MathUtil.h"
-#include "Sequence.h"
-#include "SubstitutionMatrix.h"
-#include "Util.h"
+#include "debug.h"
+#include "libraryReader.h"
+#include "mathUtil.h"
+#include "sequence.h"
+#include "substitutionMatrix.h"
+#include "util.h"
 
 #define kScale \
   1000  // Scaling factor for the profile scores in the library file

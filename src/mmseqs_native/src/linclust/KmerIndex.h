@@ -7,12 +7,12 @@
 #include <sys/mman.h>
 #include <algorithm>
 #include <string>
-#include "MathUtil.h"
-#include "Indexer.h"
-#include "DBWriter.h"
-#include "BaseMatrix.h"
-#include "Parameters.h"
-#include "Debug.h"
+#include "mathUtil.h"
+#include "indexer.h"
+#include "dBWriter.h"
+#include "baseMatrix.h"
+#include "parameters.h"
+#include "debug.h"
 
 class KmerIndex {
  private:

@@ -2,12 +2,12 @@
 // Created by mad on 2/3/16.
 //
 
-#include "MsaFilter.h"
+#include "msaFilter.h"
 #include <Debug.h>
 #include <Util.h>
 #include <_simd/simd.h>
-#include "MathUtil.h"
-#include "MultipleAlignment.h"
+#include "mathUtil.h"
+#include "multipleAlignment.h"
 
 MsaFilter::MsaFilter(int maxSeqLen, int maxSetSize, SubstitutionMatrix *m,
                      int gapOpen, int gapExtend)

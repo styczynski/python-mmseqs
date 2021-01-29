@@ -7,7 +7,7 @@
 #include <map>
 #include <string>
 #include <vector>
-#include "MMseqsMPI.h"
+#include "mMseqsMPI.h"
 
 #ifndef EXIT
 #define EXIT(exitCode)         \

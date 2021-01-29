@@ -23,13 +23,13 @@
  * THE SOFTWARE.
  *
  */
-#include "A3MReader.h"
+#include "a3MReader.h"
 
 #include <algorithm>
 #include <iterator>
 #include <sstream>
 
-#include "KSeqBufferReader.h"
+#include "kSeqBufferReader.h"
 #include "kseq.h"
 
 KSEQ_INIT(kseq_buffer_t*, kseq_buffer_reader)

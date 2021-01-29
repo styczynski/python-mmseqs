@@ -2,17 +2,17 @@
 // Created by Martin Steinegger on 17.09.18.
 //
 
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Debug.h"
-#include "DistanceCalculator.h"
-#include "FastSort.h"
-#include "Matcher.h"
-#include "NucleotideMatrix.h"
-#include "Parameters.h"
-#include "QueryMatcher.h"
-#include "SubstitutionMatrixProfileStates.h"
-#include "Util.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "distanceCalculator.h"
+#include "fastSort.h"
+#include "matcher.h"
+#include "nucleotideMatrix.h"
+#include "parameters.h"
+#include "queryMatcher.h"
+#include "substitutionMatrixProfileStates.h"
+#include "util.h"
 #include "output.h"
 
 #ifdef OPENMP

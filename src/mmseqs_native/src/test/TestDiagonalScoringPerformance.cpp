@@ -3,21 +3,21 @@
 #include <iostream>
 #include <list>
 
-#include "ExtendedSubstitutionMatrix.h"
-#include "FileUtil.h"
-#include "SequenceLookup.h"
-#include "SubstitutionMatrix.h"
-#include "UngappedAlignment.h"
+#include "extendedSubstitutionMatrix.h"
+#include "fileUtil.h"
+#include "sequenceLookup.h"
+#include "substitutionMatrix.h"
+#include "ungappedAlignment.h"
 
 #include <unistd.h>  // read
 #include "kseq.h"
 
 KSEQ_INIT(int, read)
 
-#include "Clustering.h"
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Parameters.h"
+#include "clustering.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "parameters.h"
 
 const char* binary_name = "test_diagonalscoringperformance";
 

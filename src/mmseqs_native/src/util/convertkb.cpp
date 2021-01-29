@@ -1,9 +1,9 @@
-#include "DBWriter.h"
-#include "Debug.h"
-#include "FileUtil.h"
-#include "Parameters.h"
-#include "UniprotKB.h"
-#include "Util.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "parameters.h"
+#include "uniprotKB.h"
+#include "util.h"
 #include "output.h"
 
 #ifdef HAVE_ZLIB

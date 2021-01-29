@@ -29,8 +29,8 @@
 #include <cmath>
 #include <set>
 #include <string>
-#include "Debug.h"
-#include "Util.h"
+#include "debug.h"
+#include "util.h"
 
 // standard genetic code
 //

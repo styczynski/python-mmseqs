@@ -8,13 +8,13 @@
 #include <stdlib.h>
 #include <iostream>
 
-#include "BaseMatrix.h"
-#include "ExtendedSubstitutionMatrix.h"
-#include "Indexer.h"
-#include "KmerGenerator.h"
-#include "ReducedMatrix.h"
-#include "Sequence.h"
-#include "SubstitutionMatrix.h"
+#include "baseMatrix.h"
+#include "extendedSubstitutionMatrix.h"
+#include "indexer.h"
+#include "kmerGenerator.h"
+#include "reducedMatrix.h"
+#include "sequence.h"
+#include "substitutionMatrix.h"
 
 const char* binary_name = "test_kmergeneratorprofile";
 

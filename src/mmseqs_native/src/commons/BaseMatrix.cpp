@@ -1,11 +1,11 @@
-#include "BaseMatrix.h"
+#include "baseMatrix.h"
 #include <climits>
 
 #include <_simd/simd.h>
-#include "Debug.h"
-#include "MathUtil.h"
-#include "Sequence.h"
-#include "Util.h"
+#include "debug.h"
+#include "mathUtil.h"
+#include "sequence.h"
+#include "util.h"
 
 const double BaseMatrix::ANY_BACK = 1E-5;
 

@@ -15,9 +15,9 @@
 
 #include "../commons/BaseMatrix.h"
 #include "../commons/Sequence.h"
-#include "BandedNucleotideAligner.h"
-#include "EvalueComputation.h"
-#include "StripedSmithWaterman.h"
+#include "bandedNucleotideAligner.h"
+#include "evalueComputation.h"
+#include "stripedSmithWaterman.h"
 
 class Matcher {
  public:

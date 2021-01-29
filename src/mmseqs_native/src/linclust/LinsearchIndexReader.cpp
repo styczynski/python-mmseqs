@@ -1,15 +1,15 @@
 //
 // Created by Martin Steinegger on 2019-01-04.
 //
-#include "LinsearchIndexReader.h"
-#include "Debug.h"
-#include "FileUtil.h"
-#include "KmerIndex.h"
-#include "NucleotideMatrix.h"
-#include "PrefilteringIndexReader.h"
-#include "ReducedMatrix.h"
-#include "SubstitutionMatrix.h"
-#include "Timer.h"
+#include "linsearchIndexReader.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "kmerIndex.h"
+#include "nucleotideMatrix.h"
+#include "prefilteringIndexReader.h"
+#include "reducedMatrix.h"
+#include "substitutionMatrix.h"
+#include "timer.h"
 #include "kmersearch.h"
 #ifndef SIZE_T_MAX
 #define SIZE_T_MAX ((size_t)-1)

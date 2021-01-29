@@ -1,14 +1,14 @@
-#include "CompressedA3M.h"
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "FileUtil.h"
-#include "MathUtil.h"
-#include "MsaFilter.h"
-#include "PSSMCalculator.h"
-#include "Parameters.h"
+#include "compressedA3M.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "fileUtil.h"
+#include "mathUtil.h"
+#include "msaFilter.h"
+#include "pSSMCalculator.h"
+#include "parameters.h"
 #include "output.h"
 
-#include "KSeqBufferReader.h"
+#include "kSeqBufferReader.h"
 #include "kseq.h"
 
 KSEQ_INIT(kseq_buffer_t *, kseq_buffer_reader)

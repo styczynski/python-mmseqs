@@ -1,5 +1,5 @@
-#include "Command.h"
-#include "Parameters.h"
+#include "command.h"
+#include "parameters.h"
 
 std::vector<int> DbValidator::sequenceDb = {
     Parameters::DBTYPE_INDEX_DB, Parameters::DBTYPE_NUCLEOTIDES,

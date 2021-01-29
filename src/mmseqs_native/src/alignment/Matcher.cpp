@@ -1,9 +1,9 @@
-#include "Matcher.h"
+#include "matcher.h"
 #include <itoa.h>
 #include <iomanip>
-#include "Parameters.h"
-#include "StripedSmithWaterman.h"
-#include "Util.h"
+#include "parameters.h"
+#include "stripedSmithWaterman.h"
+#include "util.h"
 
 Matcher::Matcher(int querySeqType, int maxSeqLen, BaseMatrix *m,
                  EvalueComputation *evaluer, bool aaBiasCorrection, int gapOpen,

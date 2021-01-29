@@ -1,5 +1,5 @@
-#include "Debug.h"
-#include "NcbiTaxonomy.h"
+#include "debug.h"
+#include "ncbiTaxonomy.h"
 
 const char* binary_name = "test_taxonomy";
 

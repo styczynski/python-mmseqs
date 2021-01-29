@@ -1,12 +1,12 @@
-#include "CompressedA3M.h"
-#include "DBReader.h"
-#include "DBWriter.h"
-#include "Debug.h"
-#include "Domain.h"
-#include "MathUtil.h"
-#include "Parameters.h"
-#include "SubstitutionMatrix.h"
-#include "Util.h"
+#include "compressedA3M.h"
+#include "dBReader.h"
+#include "dBWriter.h"
+#include "debug.h"
+#include "domain.h"
+#include "mathUtil.h"
+#include "parameters.h"
+#include "substitutionMatrix.h"
+#include "util.h"
 #include "output.h"
 
 #include <fstream>
@@ -16,7 +16,7 @@
 #include <omp.h>
 #endif
 
-#include "KSeqBufferReader.h"
+#include "kSeqBufferReader.h"
 #include "kseq.h"
 
 KSEQ_INIT(kseq_buffer_t *, kseq_buffer_reader)

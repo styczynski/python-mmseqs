@@ -7,10 +7,10 @@
 // array form.
 //
 
-#include "BaseMatrix.h"
-#include "MathUtil.h"
-#include "Parameters.h"
-#include "ScoreMatrix.h"
+#include "baseMatrix.h"
+#include "mathUtil.h"
+#include "parameters.h"
+#include "scoreMatrix.h"
 
 #include <_simd/simd.h>
 #include <cstddef>

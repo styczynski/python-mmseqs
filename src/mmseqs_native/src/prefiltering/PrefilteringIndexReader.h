@@ -2,9 +2,9 @@
 #define PREFILTERINGINDEXREADER_H
 
 #include <string>
-#include "BaseMatrix.h"
-#include "DBReader.h"
-#include "IndexTable.h"
+#include "baseMatrix.h"
+#include "dBReader.h"
+#include "indexTable.h"
 #include "output.h"
 
 struct PrefilteringIndexData {

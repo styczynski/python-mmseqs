@@ -1,6 +1,6 @@
-#include "FileUtil.h"
-#include "Debug.h"
-#include "Util.h"
+#include "fileUtil.h"
+#include "debug.h"
+#include "util.h"
 
 #include <dirent.h>
 #include <fcntl.h>

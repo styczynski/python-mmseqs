@@ -1,8 +1,8 @@
-#include "KSeqWrapper.h"
+#include "kSeqWrapper.h"
 #include <unistd.h>
-#include "Debug.h"
-#include "FileUtil.h"
-#include "Util.h"
+#include "debug.h"
+#include "fileUtil.h"
+#include "util.h"
 #include "kseq.h"
 
 namespace KSEQFILE {

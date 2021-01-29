@@ -1,9 +1,9 @@
 #include <Parameters.h>
 #include <cstdio>
 
-#include "DBReader.h"
-#include "Debug.h"
-#include "Util.h"
+#include "dBReader.h"
+#include "debug.h"
+#include "util.h"
 #include "output.h"
 
 int result2flat(mmseqs_output *out, Parameters &par) {

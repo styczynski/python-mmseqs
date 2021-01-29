@@ -6,9 +6,9 @@
 #include <unistd.h>
 #include <cstddef>
 #include <iostream>
-#include "MathUtil.h"
-#include "Timer.h"
-#include "Util.h"
+#include "mathUtil.h"
+#include "timer.h"
+#include "util.h"
 
 class TtyCheck {
  public:

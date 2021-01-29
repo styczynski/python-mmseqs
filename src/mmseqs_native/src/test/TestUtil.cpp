@@ -2,8 +2,8 @@
 #include <iostream>
 #include <string>
 
-#include "Debug.h"
-#include "Util.h"
+#include "debug.h"
+#include "util.h"
 
 const char* binary_name = "test_util";
 

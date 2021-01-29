@@ -5,9 +5,9 @@
 #include <math.h>
 #include <cstring>
 #include <iostream>
-#include "Parameters.h"
-#include "Sequence.h"
-#include "SubstitutionMatrix.h"
+#include "parameters.h"
+#include "sequence.h"
+#include "substitutionMatrix.h"
 #include "tantan.h"
 
 const char* binary_name = "test_tantan";

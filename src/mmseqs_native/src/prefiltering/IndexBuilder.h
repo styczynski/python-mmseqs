@@ -1,7 +1,7 @@
 #ifndef MMSEQS_INDEXBUILDER_H
 #define MMSEQS_INDEXBUILDER_H
 
-#include "IndexTable.h"
+#include "indexTable.h"
 
 class IndexBuilder {
  public:
