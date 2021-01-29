@@ -14,7 +14,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 set(CMAKE_BUILD_TYPE Debug)
-add_compile_options(-g)
+if (MSVC)
+    add_compile_options(/DEBUG:FULL)
+else ()
+    add_compile_options(-g)
+endif ()
 
 # No VLA
 if (MSVC)
