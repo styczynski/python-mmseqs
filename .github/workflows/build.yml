@@ -55,7 +55,7 @@ jobs:
         run: poetry build
       - name: Copy all prebuilt wheels
         shell: bash
-        run: cp ./_build_wheel/* dist
+        run: cp ./_build_wheels/* dist
       - name: Publish a Python distribution to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
