@@ -35,7 +35,7 @@ int mergeclusters(mmseqs_output *out, Parameters &par) {
   std::string firstCluStepIndex = firstClu + ".index";
   clusterings.pop_front();
 
-  Debug(Debug::INFO) << "Clustering step 1\n";
+  out->info("Clustering step 1");
   DBReader<unsigned int> cluDb(
       firstClu.c_str(), firstCluStepIndex.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
@@ -117,7 +117,7 @@ int mergeclusters(mmseqs_output *out, Parameters &par) {
     cnt++;
   }
 
-  Debug(Debug::INFO) << "Write merged clustering\n";
+  out->info("Write merged clustering");
   DBWriter dbw(par.db2.c_str(), par.db2Index.c_str(), par.threads,
                par.compressed, Parameters::DBTYPE_CLUSTER_RES);
   dbw.open();

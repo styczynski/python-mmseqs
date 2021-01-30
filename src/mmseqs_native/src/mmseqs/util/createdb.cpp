@@ -89,7 +89,7 @@ int createdb(mmseqs_output* out, Parameters& par) {
   for (size_t i = 0; i < shuffleSplits; ++i) {
     sourceLookup[i].reserve(16384);
   }
-  Debug(Debug::INFO) << "Converting sequences\n";
+  out->info("Converting sequences");
 
   std::string sourceFile = dataFile + ".source";
 
@@ -270,7 +270,7 @@ redoComputation:
       seqFileOffset += fileSize;
     }
   }
-  Debug(Debug::INFO) << "\n";
+  out->info("\n");
   if (fclose(source) != 0) {
     Debug(Debug::ERROR) << "Cannot close file " << sourceFile << "\n";
     EXIT(EXIT_FAILURE);

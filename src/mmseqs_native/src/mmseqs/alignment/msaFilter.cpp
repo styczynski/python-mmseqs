@@ -264,18 +264,14 @@ size_t MsaFilter::filter(const int N_in, const int L, const int coverage,
             qsc_sum -= PLTY_GAPOPEN;
         }
       }
-      //        printf("k=%3i qsc=%6.2f\n",k,qsc_sum);
       if (qsc_sum < qsc_min) {
         keep[k] = 0;
         continue;
       }  // too different from query? => reject once and for all
     }
-    //                  printf("  diff=%4i\n",diff);
     // Check if sequence similarity with query at least qid?
     if (qdiff_max_frac < 0.999) {
       qdiff_max = int(qdiff_max_frac * nres[k] + 0.9999);
-      //                  printf("k=%-4i  nres=%-4i  qdiff_max=%-4i first=%-4i
-      //                  last=%-4i",k,nres[k],qdiff_max,first[k],last[k]);
       diff = 0;
       for (int i = first[k]; i <= last[k]; ++i)
         // enough different residues to reject based on minimum qid with query?
@@ -283,14 +279,11 @@ size_t MsaFilter::filter(const int N_in, const int L, const int coverage,
         if (X[k][i] < MultipleAlignment::NAA && X[k][i] != X[kfirst][i] &&
             ++diff >= qdiff_max)
           break;
-      //                  printf("  diff=%4i\n",diff);
       if (diff >= qdiff_max) {
         keep[k] = 0;
         continue;
       }  // too different from query? => reject once and for all
     }
-    // printf("%d  qsc=%6.2f  %d  %d qid=%6.2f  \n",k,qsc_sum/nres[k],nres[k],
-    // diff, 100.0*(1.0-(float)(diff)/nres[k]));
   }
 
   // If no sequence left, issue warning and put back first real sequence into
@@ -310,21 +303,9 @@ size_t MsaFilter::filter(const int N_in, const int L, const int coverage,
       }
     }
     if (keep[k] == 1) {
-      //            Debug(Debug::WARNING) << "Warning in " << __FILE__ << ":" <<
-      //            __LINE__
-      //            << ": " << __func__ << ":" << "\n";
-      //            Debug(Debug::WARNING)
-      //            << "\tFiltering removed all sequences in alignment.
-      //            Inserting back first sequence.\n";
       ;
     } else if (display[kfirst] == 2) {  // the only sequence in the alignment is
                                         // the consensus sequence :-(
-      //            Debug(Debug::WARNING) << "Warning in " << __FILE__ << ":" <<
-      //            __LINE__
-      //            << ": " << __func__ << ":" << "\n";
-      //            Debug(Debug::WARNING)
-      //            << "\tAlignment contains no sequence except consensus
-      //            sequence. Using consensus sequence for searching.\n";
       ;
     } else {
       Debug(Debug::WARNING)
@@ -361,22 +342,9 @@ size_t MsaFilter::filter(const int N_in, const int L, const int coverage,
       }
     }
 
-    //        printf("seqid=%3i  diffNmax_prev= %-4i   diffNmax= %-4i   n=%-5i
-    //        N_in-N_ss=%-5i\n",seqid,diffNmax_prev,diffNmax,n,N_in);
     if (stop) {
       break;
     }
-
-    //       // DEBUG
-    //       printf("idmax    ");
-    //       for (i=1; i<=L; ++i) printf("%2i ",idmax[i]);
-    //       printf("\n");
-    //       printf("idmaxwin ");
-    //       for (i=1; i<=L; ++i) printf("%2i ",idmaxwin[i]);
-    //       printf("\n");
-    //       printf("N[i]     ");
-    //       for (i=1; i<=L; ++i) printf("%2i ",N[i]);
-    //       printf("\n");
 
     // Loop over all candidate sequences kk (-> k)
     for (kk = 0; kk < N_in; ++kk) {
@@ -414,14 +382,6 @@ size_t MsaFilter::filter(const int N_in, const int L, const int coverage,
       for (jj = 0; jj < kk; ++jj) {
         if (!inkk[jj]) continue;
         j = ksort[jj];
-        //                for (int i = first[k]; i <= last[k]; ++i) {
-        //                    printf("%02d", (int)X[k][i]);
-        //                }
-        //                std::cout << std::endl;
-        //                for (int i = first[j]; i <= last[j]; ++i) {
-        //                    printf("%02d", (int)X[j][i]);
-        //                }
-        //                std::cout << std::endl;
 
         first_kj = std::max(first[k], first[j]);
         last_kj = std::min(last[k], last[j]);
@@ -449,10 +409,6 @@ size_t MsaFilter::filter(const int N_in, const int L, const int coverage,
         for (int i = first_kj_simd; i < last_kj_simd && diff < diff_suff; ++i) {
           // None SIMD function
           // enough different residues to accept? => break
-          // if (X[k][i] >= NAA || X[j][i] >= NAA)
-          //    cov_kj--;
-          // else if (X[k][i] != X[j][i] && ++diff >= diff_suff)
-          //    break; // accept (k,j)
 
           const simd_int NO_AA_K =
               simdi8_gt(XK[i], NAAx16);  // pos without amino acid in seq k
@@ -464,12 +420,6 @@ size_t MsaFilter::filter(const int N_in, const int L, const int coverage,
           // most significant bits of the 16 signed or unsigned 8-bit integers
           // in a and zero-extends the upper bits.
           int res = simdi8_movemask(simdi_or(NO_AA_K, NO_AA_J));
-          //                    for (int u = 0; u < 32; ++u) {
-          //                        printf("%02d:%02d ", (int)
-          //                        ((char*)&XK[i])[u], (int)
-          //                        ((char*)&XK[i])[u]);
-          //                    }
-          //                    std::cout << std::endl;
           cov_kj -= MathUtil::popCount(res);  // subtract positions that should
                                               // not contribute to coverage
 
@@ -483,11 +433,7 @@ size_t MsaFilter::filter(const int N_in, const int L, const int coverage,
           //  contain ANY, GAP, or ENDGAP
           diff += (VECSIZE_INT * 4) - MathUtil::popCount(c | res);
         }
-        //            // DEBUG
-        //            printf("%20.20s with %20.20s:  diff=%i
-        //            diff_min_frac*cov_kj=%f  diff_suff=%i  nres=%i
-        //            cov_kj=%i\n",sname[k],sname[j],diff,diff_min_frac*cov_kj,diff_suff,nres[k],cov_kj);
-        //            printf("%s\n%s\n\n",seq[k],seq[j]);
+
         if (diff < diff_suff && float(diff) <= diff_min_frac * cov_kj &&
             cov_kj > 0)
           break;  // dissimilarity < acceptace threshold? Reject!
@@ -501,21 +447,8 @@ size_t MsaFilter::filter(const int N_in, const int L, const int coverage,
           N[i]++;  // update number of sequences at position i
                    //            printf("%i %20.20s accepted\n",k,sname[k]);
       }
-      //        else
-      //          {
-      //            printf("%20.20s rejected: too similar with seq %20.20s
-      //            diff=%i  diff_min_frac*cov_kj=%f  diff_suff=%i  nres=%i
-      //            cov_kj=%i\n","blub","blub",diff,diff_min_frac*cov_kj,diff_suff,nres[k],cov_kj);
-      //            printf("%s\n%s\n\n",msaSequence[k],msaSequence[j]);
-      //          }
 
     }  // End Loop over all candidate sequences kk
-
-    //       // DEBUG
-    //       printf("\n");
-    //       printf("seqid_prev[k]= \n");
-    //       for (k=0; k<N_in; ++k) printf("%2i ",seqid_prev[k]);
-    //       printf("\n");
 
     // Increment seqid
     seqid_step =
@@ -524,27 +457,6 @@ size_t MsaFilter::filter(const int N_in, const int L, const int coverage,
     seqid += seqid_step;
 
   }  // End Loop over seqid
-
-  //    Debug(Debug::WARNING) << n << " out of " << N_in << " sequences passed
-  //    filter ("; if (coverage) {
-  //        Debug(Debug::WARNING) << coverage << "% min coverage, ";
-  //    }
-  //    if (qid) {
-  //        Debug(Debug::WARNING) << qid << "% min sequence identity to query,
-  //        ";
-  //    }
-  //    if (qsc > -10) {
-  //        Debug(Debug::WARNING) << qsc << " bits min score per column to
-  //        query, ";
-  //    }
-  //    if (Ndiff < N_in && Ndiff > 0) {
-  //        Debug(Debug::WARNING)
-  //        << "up to " << seqid
-  //        << "% position-dependent max pairwise sequence identity)\n";
-  //    } else {
-  //        Debug(Debug::WARNING) << seqid1 << "% max pairwise sequence
-  //        identity)\n";
-  //    }
 
   for (k = 0; k < N_in; ++k) {
     keep[k] = in[k];

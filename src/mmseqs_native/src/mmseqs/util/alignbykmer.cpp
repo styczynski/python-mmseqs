@@ -20,7 +20,7 @@
 #endif
 
 int alignbykmer(mmseqs_output *out, Parameters &par) {
-  Debug(Debug::INFO) << "Rescore diagonals.\n";
+  out->info("Rescore diagonals.");
   //    Parameters &par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 

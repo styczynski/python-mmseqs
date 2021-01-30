@@ -226,12 +226,12 @@ class KmerIndex {
       } else {
         indexer.printKmer(kmerIdx, kmerSize, mat->num2aa);
       }
-      Debug(Debug::INFO) << "\t";
+      out->info("\t");
       Debug(Debug::INFO) << kmerIdx << "\t";
       Debug(Debug::INFO) << kmer.id << "\t";
       Debug(Debug::INFO) << kmer.pos << "\t";
       Debug(Debug::INFO) << kmer.seqLen << "\t";
-      Debug(Debug::INFO) << "\n";
+      out->info("\n");
     }
   }
 

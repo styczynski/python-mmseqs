@@ -14,7 +14,7 @@ int tsv2db(mmseqs_output *out, Parameters &par) {
   Debug(Debug::INFO) << "Output database type: "
                      << Parameters::getDbTypeName(par.outputDbType) << "\n";
   if (par.PARAM_OUTPUT_DBTYPE.wasSet == false) {
-    Debug(Debug::INFO) << "Consider setting --output-dbtype.\n";
+    out->info("Consider setting --output-dbtype.");
   }
 
   DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), 1, par.compressed,

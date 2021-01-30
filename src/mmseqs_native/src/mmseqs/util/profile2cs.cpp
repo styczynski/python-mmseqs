@@ -43,7 +43,7 @@ int profile2cs(mmseqs_output* out, Parameters& par) {
     SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, 0.0);
     Debug::Progress progress(entries);
 
-    Debug(Debug::INFO) << "Start converting profiles.\n";
+    out->info("Start converting profiles.");
 #pragma omp parallel
     {
       Sequence seq(par.maxSeqLen, Parameters::DBTYPE_HMM_PROFILE, &subMat, 0,

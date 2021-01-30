@@ -20,7 +20,7 @@ void MMseqsMPI::init(int argc, const char **argv) {
     Debug::setDebugLevel(Debug::ERROR);
   }
 
-  Debug(Debug::INFO) << "MPI Init\n";
+  out->info("MPI Init");
   Debug(Debug::INFO) << "Rank: " << rank << " Size: " << numProc << "\n";
 }
 #else

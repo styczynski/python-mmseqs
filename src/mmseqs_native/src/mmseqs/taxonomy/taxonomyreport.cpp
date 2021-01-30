@@ -180,7 +180,7 @@ int taxonomyreport(mmseqs_output* out, Parameters& par) {
 
   // 2. Read LCA file
   Debug::Progress progress(reader.getSize());
-  Debug(Debug::INFO) << "Reading LCA results\n";
+  out->info("Reading LCA results");
 
   std::unordered_map<TaxID, unsigned int> taxCounts;
 
@@ -211,7 +211,7 @@ int taxonomyreport(mmseqs_output* out, Parameters& par) {
       }
     }
   };
-  Debug(Debug::INFO) << "\n";
+  out->info("\n");
   Debug(Debug::INFO) << "Found " << taxCounts.size() << " different taxa for "
                      << reader.getSize() << " different reads.\n";
   unsigned int unknownCnt =

@@ -42,7 +42,7 @@ int clusthash(mmseqs_output *out, Parameters &par) {
   DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads,
                   par.compressed, Parameters::DBTYPE_ALIGNMENT_RES);
   writer.open();
-  Debug(Debug::INFO) << "Hashing sequences...\n";
+  out->info("Hashing sequences...");
   std::pair<size_t, unsigned int> *hashSeqPair =
       new std::pair<size_t, unsigned int>[reader.getSize() + 1];
   // needed later to check if one of array

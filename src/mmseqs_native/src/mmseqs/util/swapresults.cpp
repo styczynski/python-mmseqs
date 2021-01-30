@@ -113,7 +113,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
   resultDbr.open(DBReader<unsigned int>::SORT_BY_OFFSET);
 
   const size_t resultSize = resultDbr.getSize();
-  Debug(Debug::INFO) << "Computing offsets.\n";
+  out->info("Computing offsets.");
   size_t *targetElementSize =
       new size_t[maxTargetId + 2];  // extra element for offset + 1 index id
   memset(targetElementSize, 0, sizeof(size_t) * (maxTargetId + 2));
@@ -185,7 +185,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
     size_t bytesToWrite = splits[split].second;
     char *tmpData = new char[bytesToWrite];
     Util::checkAllocation(tmpData, "Can not allocate tmpData memory in doswap");
-    Debug(Debug::INFO) << "\nReading results.\n";
+    out->info("\nReading results.");
     Debug::Progress progress(resultSize);
 #pragma omp parallel
     {
@@ -343,7 +343,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
         }
       }
     };
-    Debug(Debug::INFO) << "\n";
+    out->info("\n");
     if (splits.size() > 1) {
       resultWriter.close(true);
     } else {

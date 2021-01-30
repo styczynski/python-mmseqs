@@ -95,7 +95,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
   // memoryLimit in bytes
   size_t memoryLimit = Util::computeMemory(par.splitMemoryLimit);
 
-  Debug(Debug::INFO) << "\n";
+  out->info("\n");
 
   float kmersPerSequenceScale =
       (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_NUCLEOTIDES))

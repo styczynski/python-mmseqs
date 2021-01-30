@@ -73,7 +73,7 @@ void LinsearchIndexReader::mergeAndWriteIndex(DBWriter &dbw,
   KmerIndex kmerIndex(alphSize, kmerSize);
 
   dbw.writeStart(0);
-  Debug(Debug::INFO) << "Merge splits ... ";
+  out->info("Merge splits ... ");
   const int fileCnt = tmpFiles.size();
   FILE **files = new FILE *[fileCnt];
   KmerPosition<short> **entries = new KmerPosition<short> *[fileCnt];

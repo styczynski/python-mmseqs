@@ -54,7 +54,7 @@ KmerSearch::ExtractKmerAndSortResult KmerSearch::extractKmerAndSort(
     seqDbr.unmapData();
   }
 
-  Debug(Debug::INFO) << "Sort kmer ... ";
+  out->info("Sort kmer ... ");
   timer.reset();
   if (Parameters::isEqualDbtype(seqDbr.getDbtype(),
                                 Parameters::DBTYPE_NUCLEOTIDES)) {

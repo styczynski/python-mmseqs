@@ -115,7 +115,7 @@ std::vector<std::string> splitByDelimiter(const std::string& s,
 
 size_t NcbiTaxonomy::loadNodes(std::vector<TaxonNode>& tmpNodes,
                                const std::string& nodesFile) {
-  Debug(Debug::INFO) << "Loading nodes file ...";
+  out->info("Loading nodes file ...");
   std::ifstream ss(nodesFile);
   if (ss.fail()) {
     Debug(Debug::ERROR) << "File " << nodesFile << " not found!\n";
@@ -172,7 +172,7 @@ std::pair<int, std::string> parseName(const std::string& line) {
 
 void NcbiTaxonomy::loadNames(std::vector<TaxonNode>& tmpNodes,
                              const std::string& namesFile) {
-  Debug(Debug::INFO) << "Loading names file ...";
+  out->info("Loading names file ...");
   std::ifstream ss(namesFile);
   if (ss.fail()) {
     Debug(Debug::ERROR) << "File " << namesFile << " not found!\n";
@@ -194,7 +194,7 @@ void NcbiTaxonomy::loadNames(std::vector<TaxonNode>& tmpNodes,
     tmpNodes[nodeId(entry.first)].nameIdx =
         block->append(entry.second.c_str(), entry.second.size());
   }
-  Debug(Debug::INFO) << " Done\n";
+  out->info(" Done");
 }
 
 // Euler traversal of tree
@@ -220,7 +220,7 @@ void NcbiTaxonomy::elh(std::vector<std::vector<TaxID>> const& children,
 }
 
 void NcbiTaxonomy::InitRangeMinimumQuery() {
-  Debug(Debug::INFO) << "Init RMQ ...";
+  out->info("Init RMQ ...");
 
   for (unsigned int i = 0; i < (maxNodes * 2); ++i) {
     M[i][0] = i;
@@ -237,7 +237,7 @@ void NcbiTaxonomy::InitRangeMinimumQuery() {
       }
     }
   }
-  Debug(Debug::INFO) << "Done\n";
+  out->info("Done");
 }
 
 int NcbiTaxonomy::RangeMinimumQuery(int i, int j) const {
@@ -448,7 +448,7 @@ std::map<std::string, std::string> NcbiTaxonomy::AllRanks(
 }
 
 size_t NcbiTaxonomy::loadMerged(const std::string& mergedFile) {
-  Debug(Debug::INFO) << "Loading merged file ...";
+  out->info("Loading merged file ...");
   std::ifstream ss(mergedFile);
   if (ss.fail()) {
     Debug(Debug::ERROR) << "File " << mergedFile << " not found!\n";
@@ -477,7 +477,7 @@ size_t NcbiTaxonomy::loadMerged(const std::string& mergedFile) {
 
 std::unordered_map<TaxID, TaxonCounts> NcbiTaxonomy::getCladeCounts(
     std::unordered_map<TaxID, unsigned int>& taxonCounts) const {
-  Debug(Debug::INFO) << "Calculating clade counts ... ";
+  out->info("Calculating clade counts ... ");
   std::unordered_map<TaxID, TaxonCounts> cladeCounts;
 
   for (std::unordered_map<TaxID, unsigned int>::const_iterator it =
@@ -504,7 +504,7 @@ std::unordered_map<TaxID, TaxonCounts> NcbiTaxonomy::getCladeCounts(
     }
   }
 
-  Debug(Debug::INFO) << " Done\n";
+  out->info(" Done");
   return cladeCounts;
 }
 
@@ -535,7 +535,7 @@ NcbiTaxonomy* NcbiTaxonomy::openTaxonomy(const std::string& database) {
                                "with createtaxdb.\n";
     }
   }
-  Debug(Debug::INFO) << "Loading NCBI taxonomy\n";
+  out->info("Loading NCBI taxonomy");
   std::string nodesFile = database + "_nodes.dmp";
   std::string namesFile = database + "_names.dmp";
   std::string mergedFile = database + "_merged.dmp";

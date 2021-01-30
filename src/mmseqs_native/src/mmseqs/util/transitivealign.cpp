@@ -205,7 +205,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
   resultDbr.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
   const size_t resultSize = resultDbr.getSize();
-  Debug(Debug::INFO) << "Computing offsets.\n";
+  out->info("Computing offsets.");
   size_t *targetElementSize =
       new size_t[maxTargetId + 2];  // extra element for offset + 1 index id
   memset(targetElementSize, 0, sizeof(size_t) * (maxTargetId + 2));
@@ -269,7 +269,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
     char *tmpData = new char[bytesToWrite];
     Util::checkAllocation(tmpData,
                           "Could not allocate tmpData memory in doswap");
-    Debug(Debug::INFO) << "\nReading results.\n";
+    out->info("\nReading results.");
 #pragma omp parallel
     {
       int thread_idx = 0;
@@ -351,7 +351,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
         }
       }
     };
-    Debug(Debug::INFO) << "\n";
+    out->info("\n");
     if (splits.size() > 1) {
       resultWriter.close(true);
     } else {

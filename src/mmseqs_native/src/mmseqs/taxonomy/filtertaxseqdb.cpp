@@ -57,7 +57,7 @@ int filtertaxseqdb(mmseqs_output* out, Parameters& par) {
 
   Debug::Progress progress(reader.getSize());
 
-  Debug(Debug::INFO) << "Computing LCA\n";
+  out->info("Computing LCA");
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;
@@ -113,7 +113,7 @@ int filtertaxseqdb(mmseqs_output* out, Parameters& par) {
       }
     }
   };
-  Debug(Debug::INFO) << "\n";
+  out->info("\n");
 
   writer.close(true);
   if (par.subDbMode == Parameters::SUBDB_MODE_SOFT) {

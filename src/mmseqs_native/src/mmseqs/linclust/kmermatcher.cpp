@@ -451,7 +451,7 @@ KmerPosition<T> *doComputation(size_t totalKmers, size_t hashStartRange,
     seqDbr.unmapData();
   }
 
-  Debug(Debug::INFO) << "Sort kmer ";
+  out->info("Sort kmer ");
   Timer timer;
   if (Parameters::isEqualDbtype(seqDbr.getDbtype(),
                                 Parameters::DBTYPE_NUCLEOTIDES)) {
@@ -478,7 +478,7 @@ KmerPosition<T> *doComputation(size_t totalKmers, size_t hashStartRange,
   }
 
   // sort by rep. sequence (stored in kmer) and sequence id
-  Debug(Debug::INFO) << "Sort by rep. sequence ";
+  out->info("Sort by rep. sequence ");
   timer.reset();
   if (Parameters::isEqualDbtype(seqDbr.getDbtype(),
                                 Parameters::DBTYPE_NUCLEOTIDES)) {
@@ -700,7 +700,7 @@ int kmermatcherInner(Parameters &par, DBReader<unsigned int> &seqDbr) {
   // memoryLimit in bytes
   size_t memoryLimit = Util::computeMemory(par.splitMemoryLimit);
 
-  Debug(Debug::INFO) << "\n";
+  out->info("\n");
   float kmersPerSequenceScale =
       (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_NUCLEOTIDES))
           ? par.kmersPerSequenceScale.nucleotides
@@ -1080,7 +1080,7 @@ size_t queueNextEntry(KmerPositionQueue &queue, int file, size_t offsetPos,
 template <int TYPE, typename T>
 void mergeKmerFilesAndOutput(DBWriter &dbw, std::vector<std::string> tmpFiles,
                              std::vector<char> &repSequence) {
-  Debug(Debug::INFO) << "Merge splits ... ";
+  out->info("Merge splits ... ");
 
   const int fileCnt = tmpFiles.size();
   FILE **files = new FILE *[fileCnt];

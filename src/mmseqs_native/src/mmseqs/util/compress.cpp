@@ -17,11 +17,11 @@ int doCompression(mmseqs_output* out, Parameters& par, bool shouldCompress) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::NOSORT);
   if (shouldCompress == true && reader.isCompressed() == true) {
-    Debug(Debug::INFO) << "Database is already compressed.\n";
+    out->info("Database is already compressed.");
     return EXIT_SUCCESS;
   }
   if (shouldCompress == false && reader.isCompressed() == false) {
-    Debug(Debug::INFO) << "Database is already decompressed.\n";
+    out->info("Database is already decompressed.");
     return EXIT_SUCCESS;
   }
 

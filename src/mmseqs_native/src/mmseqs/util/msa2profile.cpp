@@ -61,7 +61,7 @@ int msa2profile(mmseqs_output *out, Parameters &par) {
                               mode);
   qDbr.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  Debug(Debug::INFO) << "Finding maximum sequence length and set size.\n";
+  out->info("Finding maximum sequence length and set size.");
   unsigned int maxSeqLength = 0;
   unsigned int maxSetSize = 0;
 #pragma omp parallel

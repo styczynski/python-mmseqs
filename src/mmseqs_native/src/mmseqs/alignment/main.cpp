@@ -21,7 +21,7 @@ int align(mmseqs_output* out, Parameters& par) {
   Alignment aln(par.db1, par.db2, par.db3, par.db3Index, par.db4, par.db4Index,
                 par, false);
 
-  Debug(Debug::INFO) << "Calculation of alignments\n";
+  out->info("Calculation of alignments");
 
 #ifdef HAVE_MPI
   aln.run(MMseqsMPI::rank, MMseqsMPI::numProc);

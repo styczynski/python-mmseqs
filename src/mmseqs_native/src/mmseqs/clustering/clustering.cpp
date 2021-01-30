@@ -43,16 +43,16 @@ void Clustering::run(int mode) {
       seqDbr, alnDbr, threads, similarityScoreType, maxIteration);
 
   if (mode == Parameters::GREEDY) {
-    Debug(Debug::INFO) << "Clustering mode: Greedy\n";
+    out->info("Clustering mode: Greedy");
     ret = algorithm->execute(4);
   } else if (mode == Parameters::GREEDY_MEM) {
-    Debug(Debug::INFO) << "Clustering mode: Greedy Low Mem\n";
+    out->info("Clustering mode: Greedy Low Mem");
     ret = algorithm->execute(4);
   } else if (mode == Parameters::SET_COVER) {
-    Debug(Debug::INFO) << "Clustering mode: Set Cover\n";
+    out->info("Clustering mode: Set Cover");
     ret = algorithm->execute(1);
   } else if (mode == Parameters::CONNECTED_COMPONENT) {
-    Debug(Debug::INFO) << "Clustering mode: Connected Component\n";
+    out->info("Clustering mode: Connected Component");
     ret = algorithm->execute(3);
   } else {
     Debug(Debug::ERROR) << "Wrong clustering mode!\n";
@@ -73,7 +73,7 @@ void Clustering::run(int mode) {
   Debug(Debug::INFO) << "Size of the alignment database: " << dbSize << "\n";
   Debug(Debug::INFO) << "Number of clusters: " << cluNum << "\n\n";
 
-  Debug(Debug::INFO) << "Writing results ";
+  out->info("Writing results ");
   writeData(dbw, ret, dbSize);
   Debug(Debug::INFO) << timerWrite.lap() << "\n";
   delete[] ret;

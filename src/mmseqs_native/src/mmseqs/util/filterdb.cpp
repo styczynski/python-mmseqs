@@ -124,10 +124,10 @@ int filterdb(mmseqs_output *out, Parameters &par) {
   int mode;
   if (par.sortEntries != 0) {
     mode = SORT_ENTRIES;
-    Debug(Debug::INFO) << "Filtering by sorting entries\n";
+    out->info("Filtering by sorting entries");
   } else if (par.filteringFile.empty() == false) {
     mode = FILE_FILTERING;
-    Debug(Debug::INFO) << "Filtering using file(s)\n";
+    out->info("Filtering using file(s)");
     // Fill the filter with the data contained in the file
     std::vector<std::string> filenames;
     if (FileUtil::fileExists(par.filteringFile.c_str())) {
@@ -189,7 +189,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
     filter.erase(last, filter.end());
   } else if (par.mappingFile.empty() == false) {
     mode = FILE_MAPPING;
-    Debug(Debug::INFO) << "Filtering by mapping values\n";
+    out->info("Filtering by mapping values");
     std::ifstream ss(par.mappingFile);
     std::string line;
     std::string keyOld, keyNew;
@@ -211,18 +211,18 @@ int filterdb(mmseqs_output *out, Parameters &par) {
         par.joinDB.c_str(), joinIndex.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     helper->open(DBReader<unsigned int>::NOSORT);
-    Debug(Debug::INFO) << "Joining databases by column value\n";
+    out->info("Joining databases by column value");
   } else if (par.beatsFirst == true) {
     mode = BEATS_FIRST;
-    Debug(Debug::INFO) << "Filtering by numerical comparison to first row\n";
+    out->info("Filtering by numerical comparison to first row");
   } else if (par.compOperator.empty() == false) {
     mode = NUMERIC_COMPARISON;
-    Debug(Debug::INFO) << "Filtering by numerical comparison\n";
+    out->info("Filtering by numerical comparison");
   } else if (par.filterExpression.empty() == false) {
     mode = EXPRESSION_FILTERING;
   } else {
     mode = REGEX_FILTERING;
-    Debug(Debug::INFO) << "Filtering using regular expression\n";
+    out->info("Filtering using regular expression");
     int status = regcomp(&regex, par.filterColumnRegex.c_str(),
                          REG_EXTENDED | REG_NEWLINE);
     if (status != 0) {

@@ -311,7 +311,7 @@ int apply(mmseqs_output *out, Parameters &par) {
   memset(shared_memory, 0, sizeof(worker_s));
 #endif
 
-  Debug(Debug::INFO) << "Start applying.\n";
+  out->info("Start applying.");
   for (int thread = 0; thread < par.threads; ++thread) {
     switch (fork()) {
       default:

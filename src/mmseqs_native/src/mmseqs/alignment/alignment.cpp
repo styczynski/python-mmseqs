@@ -122,13 +122,13 @@ Alignment::Alignment(const std::string &querySeqDB,
   // print out mode and check for errors
   switch (swMode) {
     case Matcher::SCORE_ONLY:
-      Debug(Debug::INFO) << "Compute score only\n";
+      out->info("Compute score only");
       break;
     case Matcher::SCORE_COV:
-      Debug(Debug::INFO) << "Compute score and coverage\n";
+      out->info("Compute score and coverage");
       break;
     case Matcher::SCORE_COV_SEQID:
-      Debug(Debug::INFO) << "Compute score, coverage and sequence identity\n";
+      out->info("Compute score, coverage and sequence identity");
       break;
     default:
       Debug(Debug::ERROR) << "Wrong swMode mode\n";
@@ -652,7 +652,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
     Debug(Debug::INFO) << " (" << ((float)totalPassedNum / (float)alignmentsNum)
                        << " of overall calculated)";
   }
-  Debug(Debug::INFO) << "\n";
+  out->info("\n");
   if (dbSize > 0) {
     size_t hits = totalPassedNum / dbSize;
     size_t hits_rest = totalPassedNum % dbSize;
