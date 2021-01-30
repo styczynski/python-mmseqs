@@ -461,7 +461,7 @@ KmerPosition<T> *doComputation(size_t totalKmers, size_t hashStartRange,
     SORT_PARALLEL(hashSeqPair, hashSeqPair + elementsToSort,
                   KmerPosition<T>::compareRepSequenceAndIdAndPos);
   }
-  Debug(Debug::INFO) << timer.lap() << "\n";
+  out->info("Took: {}", timer.lap());
 
   // assign rep. sequence to same kmer members
   // The longest sequence is the first since we sorted by kmer, seq.Len and id
@@ -488,13 +488,7 @@ KmerPosition<T> *doComputation(size_t totalKmers, size_t hashStartRange,
     SORT_PARALLEL(hashSeqPair, hashSeqPair + writePos,
                   KmerPosition<T>::compareRepSequenceAndIdAndDiag);
   }
-  // kx::radix_sort(hashSeqPair, hashSeqPair + elementsToSort,
-  // SequenceComparision());
-  //    for(size_t i = 0; i < writePos; i++){
-  //        std::cout << BIT_CLEAR(hashSeqPair[i].kmer, 63) << "\t" <<
-  //        hashSeqPair[i].id << "\t" << hashSeqPair[i].pos << std::endl;
-  //    }
-  Debug(Debug::INFO) << timer.lap() << "\n";
+  out->info("Took: {}", timer.lap());
 
   if (hashEndRange != SIZE_T_MAX) {
     if (Parameters::isEqualDbtype(seqDbr.getDbtype(),
@@ -851,8 +845,7 @@ std::vector<std::pair<size_t, size_t>> setupKmerSplits(
     size_t totalKmers, size_t splits) {
   std::vector<std::pair<size_t, size_t>> hashRanges;
   if (splits > 1) {
-    Debug(Debug::INFO)
-        << "Not enough memory to process at once need to split\n";
+    out->info("Not enough memory to process at once need to split");
     // compute exact k-mer dist
     size_t *hashDist = new size_t[USHRT_MAX + 1];
     memset(hashDist, 0, sizeof(size_t) * (USHRT_MAX + 1));
@@ -873,10 +866,7 @@ std::vector<std::pair<size_t, size_t>> setupKmerSplits(
       }
     }
     if (maxBucketSize > totalKmers) {
-      Debug(Debug::INFO)
-          << "Not enough memory to run the kmermatcher. Minimum is at least "
-          << maxBucketSize * sizeof(KmerPosition<T>) << " bytes\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Not enough memory to run the kmermatcher. Minimum is at least {} bytes", maxBucketSize * sizeof(KmerPosition<T>));
     }
     // define splits
     size_t currBucketSize = 0;
@@ -1098,8 +1088,7 @@ void mergeKmerFilesAndOutput(DBWriter &dbw, std::vector<std::string> tmpFiles,
       entries[file] = (T *)FileUtil::mmapFile(files[file], &dataSize);
 #if HAVE_POSIX_MADVISE
       if (posix_madvise(entries[file], dataSize, POSIX_MADV_SEQUENTIAL) != 0) {
-        Debug(Debug::ERROR) << "posix_madvise returned an error for file "
-                            << tmpFiles[file] << "\n";
+        out->error("posix_madvise returned an error for file {}", tmpFiles[file]);
       }
 #endif
     } else {
@@ -1229,14 +1218,10 @@ void mergeKmerFilesAndOutput(DBWriter &dbw, std::vector<std::string> tmpFiles,
   }
   for (size_t file = 0; file < tmpFiles.size(); file++) {
     if (fclose(files[file]) != 0) {
-      Debug(Debug::ERROR) << "Cannot close file " << tmpFiles[file] << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot close file {}", tmpFiles[file]);
     }
-    if (dataSizes[file] > 0 &&
-        munmap((void *)entries[file], dataSizes[file]) < 0) {
-      Debug(Debug::ERROR) << "Failed to munmap memory dataSize="
-                          << dataSizes[file] << "\n";
-      EXIT(EXIT_FAILURE);
+    if (dataSizes[file] > 0 && munmap((void *)entries[file], dataSizes[file]) < 0) {
+      out->failure("Failed to munmap memory dataSize={}", dataSizes[file]);
     }
   }
 

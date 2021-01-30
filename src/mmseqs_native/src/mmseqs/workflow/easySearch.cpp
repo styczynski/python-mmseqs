@@ -86,8 +86,7 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
   }
 
   if (needBacktrace) {
-    Debug(Debug::INFO) << "Alignment backtraces will be computed, since they "
-                          "were requested by output format.\n";
+    out->info("Alignment backtraces will be computed, since they were requested by output format");
     par.addBacktrace = true;
     par.PARAM_ADD_BACKTRACE.wasSet = true;
   }

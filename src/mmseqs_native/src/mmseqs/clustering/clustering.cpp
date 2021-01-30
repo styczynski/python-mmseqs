@@ -55,8 +55,7 @@ void Clustering::run(int mode) {
     out->info("Clustering mode: Connected Component");
     ret = algorithm->execute(3);
   } else {
-    Debug(Debug::ERROR) << "Wrong clustering mode!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Wrong clustering mode");
   }
 
   Timer timerWrite;
@@ -73,9 +72,9 @@ void Clustering::run(int mode) {
   out->info("Size of the alignment database: {}\n", dbSize);
   out->info("Number of clusters: {}\n", cluNum);
 
-  out->info("Writing results ");
+  out->info("Writing results");
   writeData(dbw, ret, dbSize);
-  Debug(Debug::INFO) << timerWrite.lap() << "\n";
+  out->info("Took {}", timerWrite.lap());
   delete[] ret;
   delete algorithm;
 

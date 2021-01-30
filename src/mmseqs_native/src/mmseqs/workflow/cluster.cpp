@@ -88,30 +88,22 @@ void setClusterAutomagicParameters(Parameters &par) {
       par.clusteringMode = Parameters::SET_COVER;
     }
     par.PARAM_CLUSTER_MODE.wasSet = true;
-    Debug(Debug::INFO) << "Set cluster mode "
-                       << ((par.clusteringMode == Parameters::GREEDY_MEM)
+    out->info("Set cluster mode: {}", ((par.clusteringMode == Parameters::GREEDY_MEM)
                                ? "GREEDY MEM"
-                               : "SET COVER")
-                       << "\n";
+                               : "SET COVER"));
   }
   if (nonsymetric && par.clusteringMode != Parameters::GREEDY &&
       par.clusteringMode != Parameters::GREEDY_MEM) {
-    Debug(Debug::WARNING) << "Combining cluster mode " << par.clusteringMode
-                          << " in combination with coverage mode "
-                          << par.covMode << " can produce wrong results.\n"
-                          << "Please use --cov-mode 2\n";
+    out->warn("Combining cluster mode {} in combination with coverage mode {} can produce wrong results. Please use --cov-mode 2", par.clusteringMode, par.covMode);
   }
   if (par.singleStepClustering == false &&
       par.clusteringMode == Parameters::CONNECTED_COMPONENT) {
-    Debug(Debug::WARNING) << "Connected component clustering produces less "
-                             "clusters in a single step clustering.\n"
-                          << "Please use --single-step-cluster";
+    out->warn("Connected component clustering produces less clusters in a single step clustering. Please use --single-step-cluster");
   }
   if (par.PARAM_CLUSTER_STEPS.wasSet == false) {
     par.clusterSteps = setAutomaticIterations(par.sensitivity);
     par.PARAM_CLUSTER_STEPS.wasSet = true;
-    out->info("Set cluster iterations to {}\n", par.clusterSteps
-                      );
+    out->info("Set cluster iterations to {}\n", par.clusterSteps);
   }
 }
 
@@ -139,9 +131,7 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
       par.alignmentMode == Parameters::ALIGNMENT_MODE_UNGAPPED;
   if (isUngappedMode &&
       Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_HMM_PROFILE)) {
-    Debug(Debug::ERROR)
-        << "Cannot use ungapped alignment mode with profile databases\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot use ungapped alignment mode with profile databases");
   }
   setClusterAutomagicParameters(par);
 

@@ -52,8 +52,7 @@ Alignment::Alignment(const std::string &querySeqDB,
       tDbrIdx(NULL) {
   unsigned int alignmentMode = par.alignmentMode;
   if (alignmentMode == Parameters::ALIGNMENT_MODE_UNGAPPED) {
-    Debug(Debug::ERROR) << "Use rescorediagonal for ungapped alignment mode.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Use rescorediagonal for ungapped alignment mode");
   }
 
   if (addBacktrace == true) {
@@ -79,7 +78,7 @@ Alignment::Alignment(const std::string &querySeqDB,
     realignCov = par.covThr;
     covThr = 0.0;
     if (addBacktrace == false && lcaAlign == false) {
-      Debug(Debug::WARNING) << "Turn on backtrace for realign.\n";
+      out->warn("Turn on backtrace for realign");
       addBacktrace = true;
     }
   }
@@ -106,14 +105,8 @@ Alignment::Alignment(const std::string &querySeqDB,
   if (altAlignment > 0) {
     if (Parameters::isEqualDbtype(querySeqType,
                                   Parameters::DBTYPE_NUCLEOTIDES)) {
-      Debug(Debug::ERROR)
-          << "Alternative alignments are not supported for nucleotides.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Alternative alignments are not supported for nucleotides");
     }
-    //        if(realign==true){
-    //            Debug(Debug::ERROR) << "Alternative alignments do not
-    //            supported realignment.\n"; EXIT(EXIT_FAILURE);
-    //        }
     alignmentMode = std::max(
         alignmentMode, (unsigned int)Parameters::ALIGNMENT_MODE_SCORE_COV);
   }
@@ -131,23 +124,18 @@ Alignment::Alignment(const std::string &querySeqDB,
       out->info("Compute score, coverage and sequence identity");
       break;
     default:
-      Debug(Debug::ERROR) << "Wrong swMode mode\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Wrong swMode mode");
   }
 
   if (wrappedScoring) {
     maxSeqLen = maxSeqLen * 2;
     if (!Parameters::isEqualDbtype(querySeqType,
                                    Parameters::DBTYPE_NUCLEOTIDES)) {
-      Debug(Debug::ERROR)
-          << "Wrapped scoring is only supported for nucleotides\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Wrapped scoring is only supported for nucleotides");
     }
 
     if (realign == true) {
-      Debug(Debug::ERROR)
-          << "Alternative alignments do not support wrapped scoring\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Alternative alignments do not support wrapped scoring");
     }
   }
 
@@ -165,24 +153,18 @@ Alignment::Alignment(const std::string &querySeqDB,
   }
 
   if (querySeqType == -1 || targetSeqType == -1) {
-    Debug(Debug::ERROR) << "Please recreate your database or add a .dbtype "
-                           "file to your sequence/profile database.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Please recreate your database or add a .dbtype file to your sequence/profile database.")
   }
   if (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_HMM_PROFILE) &&
       Parameters::isEqualDbtype(targetSeqType,
                                 Parameters::DBTYPE_HMM_PROFILE)) {
-    Debug(Debug::ERROR)
-        << "Only the query OR the target database can be a profile database.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Only the query OR the target database can be a profile database.");
   }
   if (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_HMM_PROFILE) ==
           false &&
       Parameters::isEqualDbtype(targetSeqType,
                                 Parameters::DBTYPE_PROFILE_STATE_SEQ)) {
-    Debug(Debug::ERROR) << "The query has to be a profile when using a target "
-                           "profile state database.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("The query has to be a profile when using a target profile state database.");
   } else if (Parameters::isEqualDbtype(querySeqType,
                                        Parameters::DBTYPE_HMM_PROFILE) &&
              Parameters::isEqualDbtype(targetSeqType,
@@ -402,11 +384,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
           size_t qId = qdbr->getId(queryDbKey);
           char *querySeqData = qdbr->getData(qId, thread_idx);
           if (querySeqData == NULL) {
-            Debug(Debug::ERROR) << "Query sequence " << queryDbKey
-                                << " is required in the prefiltering, but is "
-                                   "not contained in the query sequence "
-                                   "database.\nPlease check your database.\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("Query sequence {} is required in the prefiltering, but is not contained in the query sequence database. Please check your database.", queryDbKey);
           }
           size_t queryLen = qdbr->getSeqLen(qId);
           origQueryLen = queryLen;
@@ -443,11 +421,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
           size_t dbId = tdbr->getId(dbKey);
           char *dbSeqData = tdbr->getData(dbId, thread_idx);
           if (dbSeqData == NULL) {
-            Debug(Debug::ERROR) << "Sequence " << dbKey
-                                << " is required in the prefiltering, but is "
-                                   "not contained in the target sequence "
-                                   "database!\nPlease check your database.\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("Query sequence {} is required in the prefiltering, but is not contained in the target sequence database. Please check your database.", dbKey);
           }
           dbSeq.mapSequence(dbId, dbKey, dbSeqData, tdbr->getSeqLen(dbId));
 
@@ -506,11 +480,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
             size_t dbId = tdbr->getId(swResults[result].dbKey);
             char *dbSeqData = tdbr->getData(dbId, thread_idx);
             if (dbSeqData == NULL) {
-              Debug(Debug::ERROR) << "Sequence " << swResults[result].dbKey
-                                  << " is required in the prefiltering, but is "
-                                     "not contained in the target sequence "
-                                     "database!\nPlease check your database.\n";
-              EXIT(EXIT_FAILURE);
+              out->failure("Sequence {} is required in the prefiltering, but is not contained in the target sequence database. Please check your database.", swResults[result].dbKey);
             }
             dbSeq.mapSequence(dbId, swResults[result].dbKey, dbSeqData,
                               tdbr->getSeqLen(dbId));
@@ -554,11 +524,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
           size_t dbId = tdbr->getId(topHitKey);
           char *qSeqData = tdbr->getData(dbId, thread_idx);
           if (qSeqData == NULL) {
-            Debug(Debug::ERROR) << "Sequence " << topHitKey
-                                << " is required in the prefiltering, but is "
-                                   "not contained in the target sequence "
-                                   "database!\nPlease check your database.\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("Sequence {} is required in the prefiltering, but is not contained in the target sequence database. Please check your database.", topHitKey);
           }
           qSeq.mapSequence(dbId, topHitKey, qSeqData + topHit.dbStartPos,
                            topHit.dbEndPos - topHit.dbStartPos + 1);
@@ -589,11 +555,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
             dbId = tdbr->getId(dbKey);
             char *dbSeqData = tdbr->getData(dbId, thread_idx);
             if (dbSeqData == NULL) {
-              Debug(Debug::ERROR) << "Sequence " << dbKey
-                                  << " is required in the prefiltering, but is "
-                                     "not contained in the target sequence "
-                                     "database!\nPlease check your database.\n";
-              EXIT(EXIT_FAILURE);
+              out->failure("Sequence {} is required in the prefiltering, but is not contained in the target sequence database. Please check your database.", dbKey);
             }
             dbSeq.mapSequence(dbId, dbKey, dbSeqData, tdbr->getSeqLen(dbId));
 
@@ -645,9 +607,9 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
   }
   dbw.close(merge);
 
-  Debug(Debug::INFO) << alignmentsNum << " alignments calculated\n";
-  Debug(Debug::INFO) << totalPassedNum
-                     << " sequence pairs passed the thresholds";
+  out->info("{} alignments calculated", alignmentsNum);
+  out->info("{} sequence pairs passed the thresholds", totalPassedNum);
+
   if (alignmentsNum > 0) {
     out->info(" ({} of overall calculated)", ((float)totalPassedNum / (float)alignmentsNum)
                       );
@@ -657,7 +619,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
     size_t hits = totalPassedNum / dbSize;
     size_t hits_rest = totalPassedNum % dbSize;
     float hits_f = ((float)hits) + ((float)hits_rest) / (float)dbSize;
-    Debug(Debug::INFO) << hits_f << " hits per query sequence\n";
+    out->info("{} hits per query sequence", hits_f);
   }
 }
 
@@ -700,11 +662,7 @@ void Alignment::computeAlternativeAlignment(
     size_t dbId = tdbr->getId(swResults[i].dbKey);
     char *dbSeqData = tdbr->getData(dbId, thread_idx);
     if (dbSeqData == NULL) {
-      Debug(Debug::ERROR)
-          << "Sequence " << swResults[i].dbKey
-          << " is required in the prefiltering, but is not contained in the "
-             "target sequence database!\nPlease check your database.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Sequence {} is required in the prefiltering, but is not contained in the target sequence database. Please check your database.", swResults[i].dbKey);
     }
 
     dbSeq.mapSequence(dbId, swResults[i].dbKey, dbSeqData,

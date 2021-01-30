@@ -655,9 +655,7 @@ void DBWriter::mergeResults(const char *outFileName,
   } else {
     FileUtil::move(indexFileNames[0], outFileNameIndex);
   }
-  Debug(Debug::INFO) << "Time for merging to "
-                     << FileUtil::baseName(outFileName) << ": " << timer.lap()
-                     << "\n";
+  out->info("Time for merging to {}: {}", FileUtil::baseName(outFileName), timer.lap());
 }
 
 void DBWriter::mergeIndex(const char **indexFilenames, unsigned int fileCount,
@@ -687,9 +685,7 @@ void DBWriter::mergeIndex(const char **indexFilenames, unsigned int fileCount,
     globalOffset += dataSizes[fileIdx];
   }
   if (fclose(index_file) != 0) {
-    Debug(Debug::ERROR) << "Cannot close index file " << indexFilenames[0]
-                        << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close index file {}", indexFilenames[0]);
   }
 }
 
@@ -705,9 +701,7 @@ void DBWriter::sortIndex(const char *inFileNameIndex,
     FILE *index_file = FileUtil::openAndDelete(outFileNameIndex, "w");
     writeIndex(index_file, indexReader.getSize(), index);
     if (fclose(index_file) != 0) {
-      Debug(Debug::ERROR) << "Cannot close index file " << outFileNameIndex
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot close index file {}", outFileNameIndex);
     }
     indexReader.close();
 
@@ -719,9 +713,7 @@ void DBWriter::sortIndex(const char *inFileNameIndex,
     FILE *index_file = FileUtil::openAndDelete(outFileNameIndex, "w");
     writeIndex(index_file, indexReader.getSize(), index);
     if (fclose(index_file) != 0) {
-      Debug(Debug::ERROR) << "Cannot close index file " << outFileNameIndex
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot close index file {}", outFileNameIndex);
     }
     indexReader.close();
   }
@@ -730,9 +722,7 @@ void DBWriter::sortIndex(const char *inFileNameIndex,
 void DBWriter::writeThreadBuffer(unsigned int idx, size_t dataSize) {
   size_t written = fwrite(threadBuffer[idx], 1, dataSize, dataFiles[idx]);
   if (written != dataSize) {
-    Debug(Debug::ERROR) << "writeThreadBuffer: Could not write to data file "
-                        << dataFileNames[idx] << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("writeThreadBuffer: Could not write to data file {}", dataFileNames[idx]);
   }
 }
 
@@ -768,9 +758,7 @@ void DBWriter::createRenumberedDB(const std::string &dataFile,
     size_t len = DBWriter::indexToBuffer(buffer, i, idx->offset, idx->length);
     int written = fwrite(buffer, sizeof(char), len, sIndex);
     if (written != (int)len) {
-      Debug(Debug::ERROR) << "Can not write to data file " << indexFile
-                          << "_tmp\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not write to data file {}_tmp", indexFile);
     }
     if (lookupReader != NULL) {
       size_t lookupId = lookupReader->getLookupIdByKey(idx->id);
@@ -781,24 +769,20 @@ void DBWriter::createRenumberedDB(const std::string &dataFile,
       written =
           fwrite(strBuffer.c_str(), sizeof(char), strBuffer.size(), sLookup);
       if (written != (int)strBuffer.size()) {
-        Debug(Debug::ERROR)
-            << "Could not write to lookup file " << indexFile << "_tmp\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Could not write to lookup file {}_tmp", indexFile);
       }
       strBuffer.clear();
     }
   }
   if (fclose(sIndex) != 0) {
-    Debug(Debug::ERROR) << "Cannot close index file " << indexTmp << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close index file {}", indexTmp);
   }
   reader.close();
   std::rename(indexTmp.c_str(), indexFile.c_str());
 
   if (lookupReader != NULL) {
     if (fclose(sLookup) != 0) {
-      Debug(Debug::ERROR) << "Cannot close file " << dataFile << ".lookup\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot close file {}", dataFile);
     }
     lookupReader->close();
   }

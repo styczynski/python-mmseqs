@@ -148,9 +148,7 @@ class KmerIndex {
     prevKmerStartRange = kmerStartRange;
     entryOffsets[gridPosition]++;
     if (writingPosition >= maxWriteEntries) {
-      Debug(Debug::ERROR) << "addElement overflows. Current write position is "
-                          << writingPosition << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("addElement overflows. Current write position is {}", writingPosition);
     }
     entries[writingPosition].id = id;
     entries[writingPosition].kmerOffset = kmer - kmerStartRange;
@@ -162,13 +160,6 @@ class KmerIndex {
     writingPosition++;
     entryCount++;
   }
-  //
-  //    std::pair<size_t, size_t> getEntryRange(size_t kmer) {
-  //        size_t gridPosition = getGridPosition(kmer);
-  //        size_t abundanceEntrySize = entryOffsets[gridPosition + 1] -
-  //        entryOffsets[gridPosition]; return
-  //        std::make_pair(entryOffsets[gridPosition], abundanceEntrySize);
-  //    }
 
   const size_t *getOffsets() { return entryOffsets; }
 
@@ -189,7 +180,7 @@ class KmerIndex {
 #if HAVE_POSIX_MADVISE
     if (posix_madvise(entriesData, entryCount * sizeof(KmerEntryRelative),
                       POSIX_MADV_SEQUENTIAL) != 0) {
-      Debug(Debug::ERROR) << "KmerIndex posix_madvise returned an error\n";
+      out->error("KmerIndex posix_madvise returned an error");
     }
 #endif
 
@@ -217,7 +208,7 @@ class KmerIndex {
     size_t id = 0;
     while (hasNextEntry()) {
       KmerEntry kmer = getNextEntry<TYPE>();
-      Debug(Debug::INFO) << id++ << "\t";
+      out->info("{}", id++);
       size_t kmerIdx = kmer.kmer;
       if (TYPE == Parameters::DBTYPE_NUCLEOTIDES) {
         kmerIdx = BIT_CLEAR(kmerIdx, 15);
@@ -226,12 +217,7 @@ class KmerIndex {
       } else {
         indexer.printKmer(kmerIdx, kmerSize, mat->num2aa);
       }
-      out->info("\t");
-      Debug(Debug::INFO) << kmerIdx << "\t";
-      Debug(Debug::INFO) << kmer.id << "\t";
-      Debug(Debug::INFO) << kmer.pos << "\t";
-      Debug(Debug::INFO) << kmer.seqLen << "\t";
-      out->info("\n");
+      out->info("    ({} {} {} {})", kmerIdx, kmer.id, kmer.pos, kmer.seqLen);
     }
   }
 

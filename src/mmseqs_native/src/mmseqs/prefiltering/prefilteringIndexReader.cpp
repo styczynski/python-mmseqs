@@ -256,8 +256,7 @@ void PrefilteringIndexReader::createIndexFile(
     writer.alignToPageSize(SPLIT_INDX + s);
 
     // save the size
-    Debug(Debug::INFO) << "Write ENTRIESOFFSETS ("
-                       << (keyOffset + ENTRIESOFFSETS) << ")\n";
+    out->info("Write ENTRIESOFFSETS ({})", keyOffset + ENTRIESOFFSETS);
     char *offsets = (char *)indexTable.getOffsets();
     size_t offsetsSize = (indexTable.getTableSize() + 1) * sizeof(size_t);
     writer.writeData(offsets, offsetsSize, (keyOffset + ENTRIESOFFSETS),
@@ -265,8 +264,7 @@ void PrefilteringIndexReader::createIndexFile(
     writer.alignToPageSize(SPLIT_INDX + s);
     indexTable.deleteEntries();
 
-    Debug(Debug::INFO) << "Write SEQINDEXDATASIZE ("
-                       << (keyOffset + SEQINDEXDATASIZE) << ")\n";
+    out->info("Write SEQINDEXDATASIZE ({})", keyOffset + SEQINDEXDATASIZE);
     int64_t seqindexDataSize = sequenceLookup->getDataSize();
     char *seqindexDataSizePtr = (char *)&seqindexDataSize;
     writer.writeData(seqindexDataSizePtr, 1 * sizeof(int64_t),
@@ -275,15 +273,14 @@ void PrefilteringIndexReader::createIndexFile(
 
     size_t *sequenceOffsets = sequenceLookup->getOffsets();
     size_t sequenceCount = sequenceLookup->getSequenceCount();
-    Debug(Debug::INFO) << "Write SEQINDEXSEQOFFSET ("
-                       << (keyOffset + SEQINDEXSEQOFFSET) << ")\n";
+    
+    out->info("Write SEQINDEXSEQOFFSET ({})", keyOffset + SEQINDEXSEQOFFSET);
     writer.writeData((char *)sequenceOffsets,
                      (sequenceCount + 1) * sizeof(size_t),
                      (keyOffset + SEQINDEXSEQOFFSET), SPLIT_INDX + s);
     writer.alignToPageSize(SPLIT_INDX + s);
 
-    out->info("Write SEQINDEXDATA ({})\n", (keyOffset + SEQINDEXDATA)
-                      );
+    out->info("Write SEQINDEXDATA ({})\n", keyOffset + SEQINDEXDATA);
     writer.writeData(sequenceLookup->getData(),
                      (sequenceLookup->getDataSize() + 1) * sizeof(char),
                      (keyOffset + SEQINDEXDATA), SPLIT_INDX + s);
@@ -291,8 +288,7 @@ void PrefilteringIndexReader::createIndexFile(
     delete sequenceLookup;
 
     // ENTRIESNUM
-    out->info("Write ENTRIESNUM ({})\n", (keyOffset + ENTRIESNUM)
-                      );
+    out->info("Write ENTRIESNUM ({})\n", keyOffset + ENTRIESNUM);
     uint64_t entriesNum = indexTable.getTableEntriesNum();
     char *entriesNumPtr = (char *)&entriesNum;
     writer.writeData(entriesNumPtr, 1 * sizeof(uint64_t),
@@ -378,9 +374,7 @@ SequenceLookup *PrefilteringIndexReader::getSequenceLookup(
     unsigned int split, DBReader<unsigned int> *dbr, int preloadMode) {
   PrefilteringIndexData data = getMetadata(dbr);
   if (split >= (unsigned int)data.splits) {
-    Debug(Debug::ERROR) << "Invalid split " << split << " out of "
-                        << data.splits << " chosen.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid split {} out of {} chosen.", split, data.splits);
   }
 
   unsigned int splitOffset = split * 1000;
@@ -425,9 +419,7 @@ IndexTable *PrefilteringIndexReader::getIndexTable(unsigned int split,
                                                    int preloadMode) {
   PrefilteringIndexData data = getMetadata(dbr);
   if (split >= (unsigned int)data.splits) {
-    Debug(Debug::ERROR) << "Invalid split " << split << " out of "
-                        << data.splits << " chosen.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid split {} out of {} chosen.", split, data.splits);
   }
 
   unsigned int splitOffset = split * 1000;
@@ -498,22 +490,18 @@ void PrefilteringIndexReader::printSummary(DBReader<unsigned int> *dbr) {
 }
 
 void PrefilteringIndexReader::printMeta(int *metadata_tmp) {
-  out->info("MaxSeqLength: {}\n", metadata_tmp[0]);
-  out->info("KmerSize:     {}\n", metadata_tmp[1]);
-  out->info("CompBiasCorr: {}\n", metadata_tmp[2]);
-  out->info("AlphabetSize: {}\n", metadata_tmp[3]);
-  out->info("Masked:       {}\n", metadata_tmp[4]);
-  out->info("Spaced:       {}\n", metadata_tmp[5]);
-  out->info("KmerScore:    {}\n", metadata_tmp[6]);
-  Debug(Debug::INFO) << "SequenceType: "
-                     << Parameters::getDbTypeName(metadata_tmp[7]) << "\n";
-  Debug(Debug::INFO) << "SourcSeqType: "
-                     << Parameters::getDbTypeName(metadata_tmp[8]) << "\n";
-  out->info("Headers1:     {}\n", metadata_tmp[9]);
-  out->info("Headers2:     {}\n", metadata_tmp[10]);
-  // Keep compatible to index version 15
-  Debug(Debug::INFO) << "Splits:       "
-                     << (metadata_tmp[11] == 0 ? 1 : metadata_tmp[11]) << "\n";
+  out->info("MaxSeqLength: {}", metadata_tmp[0]);
+  out->info("KmerSize:     {}", metadata_tmp[1]);
+  out->info("CompBiasCorr: {}", metadata_tmp[2]);
+  out->info("AlphabetSize: {}", metadata_tmp[3]);
+  out->info("Masked:       {}", metadata_tmp[4]);
+  out->info("Spaced:       {}", metadata_tmp[5]);
+  out->info("KmerScore:    {}", metadata_tmp[6]);
+  out->info("SequenceType: {}", Parameters::getDbTypeName(metadata_tmp[7]));
+  out->info("SourcSeqType: {}", Parameters::getDbTypeName(metadata_tmp[8]));
+  out->info("Headers1:     {}", metadata_tmp[9]);
+  out->info("Headers2:     {}", metadata_tmp[10]);
+  out->info("Splits:       {}", metadata_tmp[11] == 0 ? 1 : metadata_tmp[11]);
 }
 
 PrefilteringIndexData PrefilteringIndexReader::getMetadata(
