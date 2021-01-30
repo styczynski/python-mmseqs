@@ -20,8 +20,7 @@ ClusteringAlgorithms::ClusteringAlgorithms(DBReader<unsigned int> *seqDbr,
                                            int maxiterations) {
   this->seqDbr = seqDbr;
   if (seqDbr->getSize() != alnDbr->getSize()) {
-    Debug(Debug::ERROR) << "Sequence db size != result db size\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Sequence db size != result db size");
   }
   this->alnDbr = alnDbr;
   this->dbSize = alnDbr->getSize();
@@ -95,8 +94,7 @@ std::pair<unsigned int, unsigned int> *ClusteringAlgorithms::execute(int mode) {
       setCover(elementLookupTable, scoreLookupTable, assignedcluster, bestscore,
                elementOffsets);
     } else if (mode == 3) {
-      Debug(Debug::INFO) << "connected component mode"
-                         << "\n";
+      out->info("Clustering: connected component mode");
       for (int cl_size = dbSize - 1; cl_size >= 0; cl_size--) {
         unsigned int representative = sorted_clustersizes[cl_size];
         if (assignedcluster[representative] == UINT_MAX) {
@@ -148,8 +146,7 @@ std::pair<unsigned int, unsigned int> *ClusteringAlgorithms::execute(int mode) {
 #pragma omp for schedule(static)
     for (size_t i = 0; i < dbSize; i++) {
       if (assignedcluster[i] == UINT_MAX) {
-        Debug(Debug::ERROR) << "there must be an error: " << seqDbr->getDbKey(i)
-                            << "\t" << i << "\tis not assigned to a cluster\n";
+        out->error("There must be an error: {} ({}) is not assigned to a cluster", seqDbr->getDbKey(i), i);
         continue;
       }
 
@@ -281,19 +278,13 @@ void ClusteringAlgorithms::setCover(unsigned int **elementLookupTable,
           representativefound = true;
         }
         if (clustersizes[elementtodecrease] == 1) {
-          Debug(Debug::ERROR)
-              << "there must be an error: " << seqDbr->getDbKey(elementtodelete)
-              << " deleted from " << seqDbr->getDbKey(elementtodecrease)
-              << " that now is empty, but not assigned to a cluster\n";
+          out->error("There must be an error: {} deleted from {} that now is empty, but not assigned to a cluster", seqDbr->getDbKey(elementtodelete), seqDbr->getDbKey(elementtodecrease));
         } else if (clustersizes[elementtodecrease] > 0) {
           decreaseClustersize(elementtodecrease);
         }
       }
       if (!representativefound) {
-        Debug(Debug::ERROR)
-            << "error with cluster:\t" << seqDbr->getDbKey(representative)
-            << "\tis not contained in set:\t"
-            << seqDbr->getDbKey(elementtodelete) << ".\n";
+        out->error("Error with cluster: {} is not contained in set: {}", seqDbr->getDbKey(representative), seqDbr->getDbKey(elementtodelete));
       }
     }
   }
@@ -347,10 +338,7 @@ void ClusteringAlgorithms::greedyIncrementalLowMem(
             __ATOMIC_RELAXED, __ATOMIC_RELAXED));
 
         if (currElement == UINT_MAX || currElement > seqDbr->getSize()) {
-          Debug(Debug::ERROR) << "Element " << dbKey
-                              << " contained in some alignment list, but not "
-                                 "contained in the sequence database!\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Element {} contained in some alignment list, but not contained in the sequence database.", dbKey);
         }
         data = Util::skipLine(data);
       }
@@ -400,9 +388,10 @@ void ClusteringAlgorithms::readInClusterData(unsigned int **elementLookupTable,
   // fill elements
   AlignmentSymmetry::readInData(alnDbr, seqDbr, elementLookupTable, NULL, 0,
                                 elementOffsets);
-  Debug(Debug::INFO) << "Sort entries\n";
+
+  out->info("Sort entries");
   AlignmentSymmetry::sortElements(elementLookupTable, elementOffsets, dbSize);
-  Debug(Debug::INFO) << "Find missing connections\n";
+  out->info("Find missing connections");
 
   size_t *newElementOffsets = new size_t[dbSize + 1];
   memcpy(newElementOffsets, elementOffsets, sizeof(size_t) * (dbSize + 1));
@@ -422,8 +411,7 @@ void ClusteringAlgorithms::readInClusterData(unsigned int **elementLookupTable,
   Util::checkAllocation(scores,
                         "Can not allocate scores memory in readInClusterData");
   std::fill_n(scores, symmetricElementCount, 0);
-  Debug(Debug::INFO) << "Found " << symmetricElementCount - totalElementCount
-                     << " new connections.\n";
+  out->info("Found {} new connections", symmetricElementCount - totalElementCount);
   AlignmentSymmetry::setupPointers<unsigned int>(elements, elementLookupTable,
                                                  newElementOffsets, dbSize,
                                                  symmetricElementCount);
@@ -431,12 +419,12 @@ void ClusteringAlgorithms::readInClusterData(unsigned int **elementLookupTable,
                                                    newElementOffsets, dbSize,
                                                    symmetricElementCount);
   // time
-  Debug(Debug::INFO) << "Reconstruct initial order\n";
+  out->info("Reconstruct initial order");
   alnDbr->remapData();  // need to free memory
   AlignmentSymmetry::readInData(alnDbr, seqDbr, elementLookupTable,
                                 scoreLookupTable, scoretype, elementOffsets);
   alnDbr->remapData();  // need to free memory
-  Debug(Debug::INFO) << "Add missing connections\n";
+  out->info("Add missing connections");
   AlignmentSymmetry::addMissingLinks(elementLookupTable, elementOffsets,
                                      newElementOffsets, dbSize,
                                      scoreLookupTable);
@@ -449,5 +437,5 @@ void ClusteringAlgorithms::readInClusterData(unsigned int **elementLookupTable,
 
   memcpy(elementOffsets, newElementOffsets, sizeof(size_t) * (dbSize + 1));
   delete[] newElementOffsets;
-  Debug(Debug::INFO) << "\nTime for read in: " << timer.lap() << "\n";
+  out->info("Time for read in: {}", timer.lap());
 }

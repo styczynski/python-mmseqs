@@ -326,9 +326,7 @@ int databases(mmseqs_output *out, Parameters &par) {
   if (downloadIdx == -1) {
     // par.printUsageMessage(par, par.help ? MMseqsParameter::COMMAND_EXPERT :
     // 0, description.c_str());
-    Debug(Debug::ERROR) << "Selected database " << par.db1
-                        << " was not found\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Selected database {} was not found", par.db1);
   }
   //    par.printParameters(command.cmd, argc, argv, par.databases);
   std::string tmpDir = par.db3;

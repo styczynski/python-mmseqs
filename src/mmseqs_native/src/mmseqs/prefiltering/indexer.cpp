@@ -29,9 +29,13 @@ void Indexer::reset() { this->lastKmerIndex = this->maxKmerIndex; }
 
 void Indexer::printKmer(size_t kmerIdx, int kmerSize, char* num2aa) {
   index2int(workspace, kmerIdx, kmerSize);
-  for (int j = 0; j < kmerSize; j++) Debug(Debug::INFO) << num2aa[workspace[j]];
+  for (int j = 0; j < kmerSize; j++) {
+    out->info("{}", num2aa[workspace[j]]);
+  }
 }
 
 void Indexer::printKmer(const unsigned char* kmer, int kmerSize, char* num2aa) {
-  for (int j = 0; j < kmerSize; j++) Debug(Debug::INFO) << num2aa[kmer[j]];
+  for (int j = 0; j < kmerSize; j++) {
+    out->info("{}", num2aa[kmer[j]]);
+  }
 }

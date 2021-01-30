@@ -54,13 +54,11 @@ class IndexReader {
               touchData);
         }
         if (sequenceReader == NULL) {
-          Debug(Debug::INFO) << "Index does not contain plain sequences. Using "
-                                "normal database instead.\n";
+          out->info("Index does not contain plain sequences. Using normal database instead.");
         }
         seqType = Parameters::DBTYPE_INDEX_DB;
       } else {
-        Debug(Debug::WARNING)
-            << "Outdated index version. Please recompute with 'createindex'!\n";
+        out->warn("Outdated index version. Please recompute with 'createindex'");
         index->close();
         delete index;
         index = NULL;

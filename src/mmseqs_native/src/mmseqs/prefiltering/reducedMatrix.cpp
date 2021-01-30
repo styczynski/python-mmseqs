@@ -7,9 +7,7 @@ ReducedMatrix::ReducedMatrix(double** probMatrix, float** rMatrix,
                              size_t orgAlphabetSize, size_t reducedAlphabetSize,
                              float bitFactor) {
   if (reducedAlphabetSize >= orgAlphabetSize) {
-    Debug(Debug::ERROR)
-        << "Reduced alphabet has to be smaller than the original one!";
-    EXIT(EXIT_FAILURE);
+    out->failure("Reduced alphabet has to be smaller than the original one!");
   }
   initMatrixMemory(orgAlphabetSize);
   // swap the matrix and alphabet mappings
@@ -82,7 +80,7 @@ ReducedMatrix::ReducedMatrix(double** probMatrix, float** rMatrix,
   }
 
   // map big index to new small index
-  Debug(Debug::INFO) << "Reduced amino acid alphabet: ";
+  out->info("Reduced amino acid alphabet: ");
   unsigned char* aa2num_new = new unsigned char[UCHAR_MAX + 1];
   for (int i = 0; i <= UCHAR_MAX; ++i) {
     aa2num_new[i] = UCHAR_MAX;
@@ -90,21 +88,20 @@ ReducedMatrix::ReducedMatrix(double** probMatrix, float** rMatrix,
   char* num2aa_new = new char[origAlphabetSize];
   for (size_t i = 0; i < reducedAlphabet.size(); i++) {
     const char representative_aa = reducedAlphabet.at(i);
-    Debug(Debug::INFO) << "(" << representative_aa;
+    out->info("( {}", representative_aa);
     for (size_t j = 0; j < UCHAR_MAX; j++) {
       if (this->aa2num[static_cast<int>(j)] ==
           this->aa2num[static_cast<int>(representative_aa)]) {
         if (j >= 65 && j <= 90 && static_cast<char>(j) != representative_aa &&
             representative_aa != 'X') {  // only upper case letters
-          Debug(Debug::INFO) << " " << static_cast<char>(j);
+          out->info(" {}", static_cast<char>(j));
         }
         aa2num_new[j] = i;
       }
     }
-    Debug(Debug::INFO) << ") ";
+    out->info(") ");
     num2aa_new[i] = representative_aa;
   }
-  Debug(Debug::INFO) << "\n";
 
   // compute background
   computeBackground(probMatrix_new, pBack, alphabetSize, true);

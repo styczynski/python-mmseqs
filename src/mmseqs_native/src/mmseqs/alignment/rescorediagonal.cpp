@@ -39,10 +39,7 @@ float parsePrecisionLib(const std::string &scoreFile, double targetSeqid,
       return scorePerCol;
     }
   }
-  Debug(Debug::WARNING) << "Can not find any score per column for coverage "
-                        << targetCov << " and sequence identity " << targetSeqid
-                        << ". No hit will be filtered.\n";
-
+  out->warn("Can not find any score per column for coverage {} and sequence identity {}. No hit will be filtered.", targetCov, targetSeqid);
   return 0;
 }
 
@@ -74,9 +71,7 @@ int doRescorediagonal(Parameters &par, DBWriter &resultWriter,
   if (par.wrappedScoring) {
     if (!Parameters::isEqualDbtype(querySeqType,
                                    Parameters::DBTYPE_NUCLEOTIDES)) {
-      Debug(Debug::ERROR)
-          << "Wrapped scoring is only supported for nucleotides.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Wrapped scoring is only supported for nucleotides");
     }
   }
 
@@ -98,8 +93,7 @@ int doRescorediagonal(Parameters &par, DBWriter &resultWriter,
   float scorePerColThr = 0.0;
   if (par.filterHits) {
     if (par.rescoreMode == Parameters::RESCORE_MODE_HAMMING) {
-      Debug(Debug::WARNING) << "HAMMING distance can not be used to filter "
-                               "hits. Using --rescore-mode 1\n";
+      out->warn("HAMMING distance can not be used to filter hits. Using --rescore-mode 1");
       par.rescoreMode = Parameters::RESCORE_MODE_SUBSTITUTION;
     }
 
@@ -229,9 +223,7 @@ int doRescorediagonal(Parameters &par, DBWriter &resultWriter,
           DistanceCalculator::LocalAlignment alignment;
           if (par.wrappedScoring) {
             if (dbLen > origQueryLen) {
-              Debug(Debug::WARNING)
-                  << "WARNING: target sequence " << targetId
-                  << " is skipped, no valid wrapped scoring possible\n";
+              out->warn("WARNING: target sequence {} is skipped, no valid wrapped scoring possible", targetId);
               continue;
             }
 
@@ -434,8 +426,7 @@ int rescorediagonal(mmseqs_output *out, Parameters &par) {
 
   if (par.wrappedScoring &&
       par.rescoreMode != Parameters::RESCORE_MODE_HAMMING) {
-    Debug(Debug::ERROR)
-        << "ERROR: wrapped scoring is only allowed with RESCORE_MODE_HAMMING\n";
+    out->error("ERROR: wrapped scoring is only allowed with RESCORE_MODE_HAMMING");
     return EXIT_FAILURE;
   }
 

@@ -20,9 +20,7 @@ CommandCaller::CommandCaller() {
   if (procBind != NULL && strcasecmp(procBind, "false") != 0 &&
       strcasecmp(procBind, "0") != 0) {
 #endif
-    Debug(Debug::ERROR) << "Calling program has OMP_PROC_BIND set in its "
-                           "environment. Please unset OMP_PROC_BIND.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Calling program has OMP_PROC_BIND set in its environment. Please unset OMP_PROC_BIND.");
   }
 #endif
 
@@ -39,9 +37,7 @@ unsigned int CommandCaller::getCallDepth() {
   char* rest;
   int depth = strtol(currentCallDepth, &rest, 10);
   if (rest == currentCallDepth || errno == ERANGE) {
-    Debug(Debug::ERROR) << "Invalid non-numeric value for environment variable "
-                           "MMSEQS_CALL_DEPTH!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid non-numeric value for environment variable MMSEQS_CALL_DEPTH");
   }
   return depth + 1;
 }
@@ -88,8 +84,8 @@ void CommandCaller::execProgram(const char* program,
   int res = execvp(program, (char* const*)pArgv);
 
   if (res == -1) {
-    Debug(Debug::ERROR) << "Failed to execute " << program << " with error "
-                        << errno << ".\n";
+    delete[] pArgv;
+    out->failure("Failed to execute {} with error {}", program, errno);
   }
 
   // should not be reached in the normal case

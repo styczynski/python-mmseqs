@@ -292,15 +292,8 @@ class IndexTable {
     }
 
     double avgKmer = ((double)entrySize) / ((double)tableSize);
-    Debug(Debug::INFO) << "Index statistics\n";
-    Debug(Debug::INFO) << "Entries:          " << entrySize << "\n";
-    Debug(Debug::INFO) << "DB size:          "
-                       << (entrySize * sizeof(IndexEntryLocal) +
-                           tableSize * sizeof(size_t)) /
-                              1024 / 1024
-                       << " MB\n";
-    Debug(Debug::INFO) << "Avg k-mer size:   " << avgKmer << "\n";
-    Debug(Debug::INFO) << "Top " << top_N << " k-mers\n";
+
+    out->info("Generated index with {} entries (size {} MB)", entrySize, (entrySize * sizeof(IndexEntryLocal) + tableSize * sizeof(size_t)) / 1024 / 1024);
 
     out->output_string("INDEX_TABLE_ENTRIES", std::to_string(entrySize));
     out->output_string("INDEX_TABLE_DB_SIZE",
@@ -308,12 +301,6 @@ class IndexTable {
                                        tableSize * sizeof(size_t)) /
                                       1024 / 1024));
     out->output_string("INDEX_AVG_KMER_SIZE", std::to_string(avgKmer));
-
-    for (size_t j = 0; j < top_N; j++) {
-      Debug(Debug::INFO) << "    ";
-      indexer->printKmer(topElements[j].second, kmerSize, num2aa);
-      Debug(Debug::INFO) << "\t" << topElements[j].first << "\n";
-    }
   }
 
   // FUNCTIONS TO OVERWRITE
@@ -430,11 +417,10 @@ class IndexTable {
       if (entrySize > 0) {
         indexer->printKmer(i, kmerSize, num2aa);
 
-        Debug(Debug::INFO) << "\n";
+        out->info("Index table:");
         IndexEntryLocal *e = &entries[offsets[i]];
         for (unsigned int j = 0; j < entrySize; j++) {
-          Debug(Debug::INFO)
-              << "\t(" << e[j].seqId << ", " << e[j].position_j << ")\n";
+          out->info("   ({}, {})", e[j].seqId, e[j].position_j);
         }
       }
     }
@@ -467,8 +453,7 @@ class IndexTable {
       case 7:
         return (SIZE_MAX - 1);  // SIZE_MAX is often reserved as safe flag
       default:
-        Debug(Debug::ERROR) << "Invalid kmer size of " << kmerSize << "!\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Invalid kmer size of {}", kmerSize);
     }
   }
 
@@ -479,8 +464,7 @@ class IndexTable {
       case 15:
         return (SIZE_MAX - 1);  // SIZE_MAX is often reserved as safe flag
       default:
-        Debug(Debug::ERROR) << "Invalid kmer size of " << kmerSize << "!\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Invalid kmer size of {}", kmerSize);
     }
   }
 
