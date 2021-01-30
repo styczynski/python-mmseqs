@@ -34,7 +34,7 @@ int LibraryReader::ReadInt(const char* line, const char* label,
     const char* ptr = line + strlen(label);
     rv = atoi(ptr);
   } else if (errmsg) {
-    Debug(Debug::WARNING) << errmsg;
+    out->warn("Reading library (int): {}", errmsg);
   }
   return rv;
 }
@@ -47,7 +47,7 @@ double LibraryReader::ReadDouble(const char* line, const char* label,
   if (strstr(line, label)) {
     rv = atof(line + strlen(label));
   } else if (errmsg) {
-    Debug(Debug::WARNING) << errmsg;
+    out->warn("Reading library (double): {}", errmsg);
   }
   return rv;
 }
@@ -61,7 +61,7 @@ std::string LibraryReader::ReadString(const char* line, const char* label,
     const char* ptr = strscn(line + strlen(label));
     rv = ptr;
   } else if (errmsg) {
-    Debug(Debug::WARNING) << errmsg;
+    out->warn("Reading library (string): {}", errmsg);
   }
   return rv;
 }
@@ -86,9 +86,9 @@ bool LibraryReader::ReadBool(const char* line, const char* label,
     else if (strchr(ptr, 'F') != NULL || strchr(ptr, '0') != NULL)
       rv = false;
     else if (errmsg)
-      Debug(Debug::WARNING) << errmsg;
+      out->warn("Reading library (bool): {}", errmsg);
   } else if (errmsg) {
-    Debug(Debug::WARNING) << errmsg;
+    out->warn("Reading library (bool): {}", errmsg);
   }
   return rv;
 }

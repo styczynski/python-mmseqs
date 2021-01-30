@@ -158,9 +158,7 @@ void BaseMatrix::generateSubMatrix(double** probMatrix,
 std::string BaseMatrix::getMatrixName() { return matrixName; }
 
 double BaseMatrix::getBackgroundProb(size_t) {
-  Debug(Debug::ERROR)
-      << "getBackground is not Impl. for this type of Matrix \n";
-  EXIT(EXIT_FAILURE);
+  out->failure("getBackground is not Impl. for this type of Matrix");
 }
 
 size_t BaseMatrix::memorySize(std::string& matrixName,

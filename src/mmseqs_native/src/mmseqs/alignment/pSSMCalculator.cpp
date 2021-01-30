@@ -249,25 +249,17 @@ void PSSMCalculator::computeSequenceWeights(float *seqWeight,
         ++distinct_aa_count;
       }
     }
-    //        if(distinct_aa_count == 0){
-    //            Debug(Debug::ERROR) << "Error in computeSequenceWeights.
-    //            Distinct amino acid count is 0.\n"; EXIT(EXIT_FAILURE);
-    //        }
     // Compute sequence Weight
     // "Position-based Sequence Weights", Henikoff (1994)
     for (size_t k = 0; k < setSize; ++k) {
       if (msaSeqs[k][pos] != MultipleAlignment::GAP) {
         if (distinct_aa_count != 0) {
           const unsigned int aa_pos = msaSeqs[k][pos];
-          //                    std::cout << "k="<< k << "\t";
           if (aa_pos < Sequence::PROFILE_AA_SIZE) {  // Treat score of X with
                                                      // other amino acid as 0.0
             seqWeight[k] +=
                 1.0f / (float(nl[aa_pos]) * float(distinct_aa_count) *
                         (float(number_res[k]) + 30.0f));
-            //                        std::cout << number_res[k] << "\t" <<
-            //                        distinct_aa_count << "\t" <<  nl[aa_pos]
-            //                        << "\t";
           }
         }
         // ensure that each residue of a short sequence contributes as much as a
@@ -276,11 +268,6 @@ void PSSMCalculator::computeSequenceWeights(float *seqWeight,
       }
     }
   }
-  //    std::cout << setSize << std::endl;
-  //    std::cout << " Seq. Weight: " << std::endl;
-  //    for (size_t k = 0; k < setSize; ++k) {
-  //        std::cout << " k="<< k << "\t" << seqWeight[k] << std::endl;
-  //    }
   delete[] number_res;
 }
 
@@ -291,19 +278,12 @@ void PSSMCalculator::computePseudoCounts(float *profile, float *frequency,
                                          float pcb) {
   for (size_t pos = 0; pos < queryLength; pos++) {
     float tau = fmin(1.0, pca / (1.0 + Neff_M[pos] / pcb));
-    // float tau = fmin(1.0, pca * (1.0 + pcb)/ (Neff_M[pos] + pcb));
-
-    // std::cout<< "Tau: "<< tau << ", Neff: " << Neff_M[pos] <<std::endl;
-    //        printf("%.6f\n", tau);
-
     for (size_t aa = 0; aa < Sequence::PROFILE_AA_SIZE; ++aa) {
       // compute proportion of pseudo counts and signal
       float pseudoCounts =
           tau * frequency_with_pseudocounts[pos * entrySize + aa];
       float frequencySignal = (1.0 - tau) * frequency[pos * entrySize + aa];
       profile[pos * entrySize + aa] = frequencySignal + pseudoCounts;
-      //            printf("%f %f %f %f\n", tau, frequencySignal, pseudoCounts,
-      //            profile[pos * Sequence::PROFILE_AA_SIZE + aa]);
     }
   }
 }
@@ -342,12 +322,6 @@ void PSSMCalculator::computeContextSpecificWeights(float *matchWeight,
                            // contribute to tansition counts
 
   int nseqi = 0;
-  //    unsigned int NAA_VECSIZE = ((MultipleAlignment::NAA+ 3 + VECSIZE_INT -
-  //    1) / VECSIZE_INT) * VECSIZE_INT; // round NAA+3 up to next multiple of
-  //    VECSIZE_INT for (size_t j = 0; j < queryLength; j++) {
-  //        memset(n[j], 0, NAA_VECSIZE * sizeof(int));
-  //        memset(w_contrib[j], 0, NAA_VECSIZE * sizeof(int));
-  //    }
   unsigned int NAA_ALIGNSIZE =
       ((((MultipleAlignment::NAA + 3) + VECSIZE_FLOAT - 1) / VECSIZE_FLOAT) *
        VECSIZE_FLOAT) *
@@ -399,7 +373,6 @@ void PSSMCalculator::computeContextSpecificWeights(float *matchWeight,
     }  // end for (k)
     nseqs[i] = nseqi;
 
-    //        printf("%d\n", nseqi);
     // Only if subalignment changed we need to update weights wi[k] and Neff[i]
     if (change) {
       // We gained a factor ~8.0 for the following computation of weights
@@ -425,7 +398,6 @@ void PSSMCalculator::computeContextSpecificWeights(float *matchWeight,
            jmax >= 0 && n[jmax][ENDGAP] > MAXENDGAPFRAC * nseqi; --jmax) {
       };
       ncol = jmax - jmin + 1;
-      //            printf("%d %d %d\n", ncol, jmax, jmin);
 
       // Check whether number of columns in subalignment is sufficient
       if (ncol < NCOLMIN) {
@@ -442,9 +414,6 @@ void PSSMCalculator::computeContextSpecificWeights(float *matchWeight,
           }
         }
         // Compute the contribution of amino acid a to the weight
-        // for (a = 0; a < ANY; ++a)
-        //      w_contrib[j][a] = (n[j][a] > 0) ? 1.0/ float(naa[j]*n[j][a]):
-        //      0.0f;
         for (int j = jmin; j <= jmax; ++j) {
           simd_float naa_j = simdi32_i2f(simdi32_set(naa[j]));
           const simd_int *nj = (const simd_int *)n[j];

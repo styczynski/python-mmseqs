@@ -118,8 +118,7 @@ size_t NcbiTaxonomy::loadNodes(std::vector<TaxonNode>& tmpNodes,
   out->info("Loading nodes file ...");
   std::ifstream ss(nodesFile);
   if (ss.fail()) {
-    Debug(Debug::ERROR) << "File " << nodesFile << " not found!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("File {} not found", nodesFile);
   }
 
   std::map<TaxID, int> Dm;  // temporary map TaxID -> internal ID;
@@ -150,10 +149,7 @@ size_t NcbiTaxonomy::loadNodes(std::vector<TaxonNode>& tmpNodes,
   for (std::vector<TaxonNode>::iterator it = tmpNodes.begin();
        it != tmpNodes.end(); ++it) {
     if (!nodeExists(it->parentTaxId)) {
-      Debug(Debug::ERROR) << "Inconsistent nodes.dmp taxonomy file! Cannot "
-                             "find parent taxon with ID "
-                          << it->parentTaxId << "!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Inconsistent nodes.dmp taxonomy file! Cannot find parent taxon with ID: {}", it->parentTaxId);
     }
   }
 
@@ -164,8 +160,7 @@ size_t NcbiTaxonomy::loadNodes(std::vector<TaxonNode>& tmpNodes,
 std::pair<int, std::string> parseName(const std::string& line) {
   std::vector<std::string> result = splitByDelimiter(line, "\t|\t", 2);
   if (result.size() != 2) {
-    Debug(Debug::ERROR) << "Invalid name entry!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid name entry");
   }
   return std::make_pair((int)strtol(result[0].c_str(), NULL, 10), result[1]);
 }
@@ -175,8 +170,7 @@ void NcbiTaxonomy::loadNames(std::vector<TaxonNode>& tmpNodes,
   out->info("Loading names file ...");
   std::ifstream ss(namesFile);
   if (ss.fail()) {
-    Debug(Debug::ERROR) << "File " << namesFile << " not found!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("File {} not found", namesFile);
   }
 
   std::string line;
@@ -187,9 +181,7 @@ void NcbiTaxonomy::loadNames(std::vector<TaxonNode>& tmpNodes,
 
     std::pair<int, std::string> entry = parseName(line);
     if (!nodeExists(entry.first)) {
-      Debug(Debug::ERROR) << "loadNames: Taxon " << entry.first
-                          << " not present in nodes file!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("loadNames: Taxon {} not present in nodes file", entry.first);
     }
     tmpNodes[nodeId(entry.first)].nameIdx =
         block->append(entry.second.c_str(), entry.second.size());
@@ -304,7 +296,7 @@ TaxID NcbiTaxonomy::LCA(TaxID taxonA, TaxID taxonB) const {
 TaxonNode const* NcbiTaxonomy::LCA(const std::vector<TaxID>& taxa) const {
   std::vector<int>::const_iterator it = taxa.begin();
   while (it != taxa.end() && !nodeExists(*it)) {
-    Debug(Debug::WARNING) << "No node for taxID " << *it << ", ignoring it.\n";
+    out->warn("No node for taxID {}, ignoring it", *it);
     ++it;
   }
   if (it == taxa.end()) {
@@ -315,8 +307,7 @@ TaxonNode const* NcbiTaxonomy::LCA(const std::vector<TaxID>& taxa) const {
     if (nodeExists(*it)) {
       red = lcaHelper(red, nodeId(*it));
     } else {
-      Debug(Debug::WARNING)
-          << "No node for taxID " << *it << ", ignoring it.\n";
+      out->warn("No node for taxID {}, ignoring it", *it);
     }
   }
 
@@ -361,8 +352,7 @@ std::vector<std::string> NcbiTaxonomy::parseRanks(const std::string& ranks) {
   std::vector<std::string> temp = Util::split(ranks, ",");
   for (size_t i = 0; i < temp.size(); ++i) {
     if (findRankIndex(temp[i]) == -1) {
-      Debug(Debug::ERROR) << "Invalid taxonomic rank " << temp[i] << "given\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid taxonomic rank {} given", temp[i]);
     }
   }
   return temp;
@@ -411,8 +401,7 @@ std::string NcbiTaxonomy::taxLineage(TaxonNode const* node, bool infoAsName) {
 
 int NcbiTaxonomy::nodeId(TaxID taxonId) const {
   if (taxonId < 0 || !nodeExists(taxonId)) {
-    Debug(Debug::ERROR) << "Invalid node " << taxonId << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid node {}", taxonId);
   }
   return D[taxonId];
 }
@@ -451,8 +440,7 @@ size_t NcbiTaxonomy::loadMerged(const std::string& mergedFile) {
   out->info("Loading merged file ...");
   std::ifstream ss(mergedFile);
   if (ss.fail()) {
-    Debug(Debug::ERROR) << "File " << mergedFile << " not found!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("File {} not found", mergedFile);
   }
 
   std::string line;
@@ -460,8 +448,7 @@ size_t NcbiTaxonomy::loadMerged(const std::string& mergedFile) {
   while (std::getline(ss, line)) {
     std::vector<std::string> result = splitByDelimiter(line, "\t|\t", 2);
     if (result.size() != 2) {
-      Debug(Debug::ERROR) << "Invalid name entry!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid name entry");
     }
 
     unsigned int oldId = (unsigned int)strtoul(result[0].c_str(), NULL, 10);
@@ -514,15 +501,12 @@ NcbiTaxonomy* NcbiTaxonomy::openTaxonomy(const std::string& database) {
     FILE* handle = fopen(binFile.c_str(), "r");
     struct stat sb;
     if (fstat(fileno(handle), &sb) < 0) {
-      Debug(Debug::ERROR) << "Failed to fstat file " << binFile << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Failed to fstat file {}", binFile);
     }
     char* data = (char*)mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE,
                              fileno(handle), 0);
     if (data == MAP_FAILED) {
-      Debug(Debug::ERROR) << "Failed to mmap file " << binFile << " with error "
-                          << errno << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Failed to mmap file {} with error {}", binFile, errno);
     }
     fclose(handle);
     NcbiTaxonomy* t = NcbiTaxonomy::unserialize(data);
@@ -531,8 +515,7 @@ NcbiTaxonomy* NcbiTaxonomy::openTaxonomy(const std::string& database) {
       t->mmapSize = sb.st_size;
       return t;
     } else {
-      Debug(Debug::WARNING) << "Outdated taxonomy information, please recreate "
-                               "with createtaxdb.\n";
+      out->warn("Outdated taxonomy information, please recreate with createtaxdb");
     }
   }
   out->info("Loading NCBI taxonomy");
@@ -549,9 +532,7 @@ NcbiTaxonomy* NcbiTaxonomy::openTaxonomy(const std::string& database) {
     namesFile = "names.dmp";
     mergedFile = "merged.dmp";
   } else {
-    Debug(Debug::ERROR) << "names.dmp, nodes.dmp, merged.dmp from NCBI taxdump "
-                           "could not be found!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("names.dmp, nodes.dmp, merged.dmp from NCBI taxdump could not be found!");
   }
   return new NcbiTaxonomy(namesFile, nodesFile, mergedFile);
 }
@@ -601,8 +582,7 @@ WeightedTaxHit::WeightedTaxHit(const TaxID taxon, const float evalue,
       weight = evalue;
       break;
     default:
-      Debug(Debug::ERROR) << "Invalid weight vote mode\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid weight vote mode");
   }
 }
 
@@ -626,9 +606,7 @@ WeightedTaxResult NcbiTaxonomy::weightedMajorityLCA(
     }
     TaxonNode const* node = taxonNode(currTaxId, false);
     if (node == NULL) {
-      Debug(Debug::ERROR) << "taxonid: " << currTaxId
-                          << " does not match a legal taxonomy node.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("taxonid: {} does not match a legal taxonomy node", currTaxId);
     }
     totalAssignedSeqsWeights += currWeight;
     assignedSeqs++;

@@ -241,8 +241,7 @@ void PrefilteringIndexReader::createIndexFile(
     indexTable.printStatistics(out, subMat->num2aa);
 
     if (sequenceLookup == NULL) {
-      Debug(Debug::ERROR) << "Invalid mask mode. No sequence lookup created!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid mask mode. No sequence lookup created");
     }
 
     // save the entries

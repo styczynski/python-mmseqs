@@ -143,16 +143,14 @@ int result2msa(mmseqs_output *out, Parameters &par) {
                                       par.gapOpen.aminoacids,
                                       par.gapExtend.aminoacids);
   if (qDbr.getDbtype() == -1 || tDbr->getDbtype() == -1) {
-    Debug(Debug::ERROR) << "Please recreate your database or add a .dbtype "
-                           "file to your sequence/profile database\n";
+    out->failure("Please recreate your database or add a .dbtype file to your sequence/profile database");
     return EXIT_FAILURE;
   }
   if (Parameters::isEqualDbtype(qDbr.getDbtype(),
                                 Parameters::DBTYPE_HMM_PROFILE) &&
       Parameters::isEqualDbtype(tDbr->getDbtype(),
                                 Parameters::DBTYPE_HMM_PROFILE)) {
-    Debug(Debug::ERROR)
-        << "Only the query OR the target database can be a profile database\n";
+    out->failure("Only the query OR the target database can be a profile database");
     return EXIT_FAILURE;
   }
   out->info("Query database size: {}\n", qDbr.getSize()
@@ -215,25 +213,16 @@ int result2msa(mmseqs_output *out, Parameters &par) {
       unsigned int queryKey = resultReader.getDbKey(id);
       size_t queryId = qDbr.getId(queryKey);
       if (queryId == UINT_MAX) {
-        Debug(Debug::WARNING) << "Invalid query sequence " << queryKey << "\n";
+        out->warn("Invalid query sequence {}", queryKey);
         continue;
       }
       centerSequence.mapSequence(queryId, queryKey,
                                  qDbr.getData(queryId, thread_idx),
                                  qDbr.getSeqLen(queryId));
 
-      // TODO: Do we still need this?
-      //            if (centerSequence.L) {
-      //                // remove last in it is a *
-      //                if(centerSequence.numSequence[centerSequence.L-1] == 20)
-      //                {
-      //                    centerSequence.L--;
-      //                }
-      //            }
-
       size_t centerHeaderId = queryHeaderReader.getId(queryKey);
       if (centerHeaderId == UINT_MAX) {
-        Debug(Debug::WARNING) << "Invalid query header " << queryKey << "\n";
+        out->warn("Invalid query header {}", queryKey);
         continue;
       }
       char *centerSequenceHeader =
@@ -258,10 +247,7 @@ int result2msa(mmseqs_output *out, Parameters &par) {
 
         const size_t edgeId = tDbr->getId(key);
         if (edgeId == UINT_MAX) {
-          Debug(Debug::ERROR)
-              << "Sequence " << key
-              << " does not exist in target sequence database\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Sequence {} does not exist in target sequence database", key);
         }
         edgeSequence.mapSequence(edgeId, key, tDbr->getData(edgeId, thread_idx),
                                  tDbr->getSeqLen(edgeId));
@@ -408,10 +394,7 @@ int result2msa(mmseqs_output *out, Parameters &par) {
         if (par.formatAlignmentMode == Parameters::FORMAT_MSA_CA3M_CONSENSUS) {
           for (size_t pos = 0; pos < res.centerLength; pos++) {
             if (res.msaSequence[0][pos] == MultipleAlignment::GAP) {
-              Debug(Debug::ERROR)
-                  << "Error in computePSSMFromMSA. First sequence of MSA is "
-                     "not allowed to contain gaps.\n";
-              EXIT(EXIT_FAILURE);
+              out->failure("Error in computePSSMFromMSA. First sequence of MSA is not allowed to contain gaps");
             }
           }
 

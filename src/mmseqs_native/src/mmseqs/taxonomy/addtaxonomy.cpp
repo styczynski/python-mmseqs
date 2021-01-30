@@ -23,20 +23,14 @@ int addtaxonomy(mmseqs_output *out, Parameters &par) {
 
   std::vector<std::pair<unsigned int, unsigned int>> mapping;
   if (FileUtil::fileExists((par.db1 + "_mapping").c_str()) == false) {
-    Debug(Debug::ERROR) << par.db1
-                        << "_mapping does not exist. Run createtaxdb to create "
-                           "taxonomy mapping.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("{}_mapping does not exist. Run createtaxdb to create taxonomy mapping", par.db1);
   }
   const bool isSorted = Util::readMapping(par.db1 + "_mapping", mapping);
   if (isSorted == false) {
     std::stable_sort(mapping.begin(), mapping.end(), compareToFirstInt);
   }
   if (mapping.size() == 0) {
-    Debug(Debug::ERROR) << par.db1
-                        << "_mapping is empty. Rerun createtaxdb to recreate "
-                           "taxonomy mapping.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("{}_mapping is empty. Rerun createtaxdb to recreate taxonomy mapping", par.db1);
   }
   NcbiTaxonomy *t = NcbiTaxonomy::openTaxonomy(par.db1);
   std::vector<std::string> ranks = NcbiTaxonomy::parseRanks(par.lcaRanks);
@@ -89,7 +83,7 @@ int addtaxonomy(mmseqs_output *out, Parameters &par) {
       while (*data != '\0') {
         const size_t columns = Util::getWordsOfLine(data, entry, 255);
         if (columns == 0) {
-          Debug(Debug::WARNING) << "Empty entry: " << i << "\n";
+          out->warn("Empty entry: {}", i);
           data = Util::skipLine(data);
           continue;
         }

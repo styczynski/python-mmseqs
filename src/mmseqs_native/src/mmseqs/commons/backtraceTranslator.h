@@ -136,8 +136,7 @@ class BacktraceTranslator {
           dbAlnLength++;
           break;
         default:
-          Debug(Debug::ERROR) << "Invalid backtrace translation state.\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Invalid backtrace translation state");
       }
       resultAC.backtrace.append(1, t);
     next:
@@ -174,8 +173,7 @@ class BacktraceTranslator {
     } else if (state == 'D') {
       return D;
     } else {
-      Debug(Debug::ERROR) << "Invalid alignment state.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid alignment state");
     }
   }
 };

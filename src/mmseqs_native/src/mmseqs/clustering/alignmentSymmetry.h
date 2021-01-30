@@ -43,10 +43,7 @@ class AlignmentSymmetry {
                             size_t totalElementCount) {
     for (size_t i = 0; i < dbSize; i++) {
       if (totalElementCount < elementOffset[i]) {
-        Debug(Debug::ERROR) << "Error in setupPointers. totalElementCount "
-                            << "(" << totalElementCount << ") < elementOffset["
-                            << i << "] (" << elementOffset[i] << ")\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Error in setupPointers. totalElementCount ({}) < elementOffset[{}] ({})", totalElementCount, i, elementOffset[i]);
       }
       elementLookupTable[i] = elements + elementOffset[i];
     }

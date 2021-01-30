@@ -27,8 +27,6 @@ Matcher::Matcher(int querySeqType, int maxSeqLen, BaseMatrix *m,
     nuclaligner = NULL;
     aligner = new SmithWaterman(maxSeqLen, m->alphabetSize, aaBiasCorrection);
   }
-  // std::cout << "lambda=" << lambdaLog2 << " logKLog2=" << logKLog2 <<
-  // std::endl;
 }
 
 void Matcher::setSubstitutionMatrix(BaseMatrix *m) {
@@ -79,17 +77,6 @@ Matcher::result_t Matcher::getSWResult(Sequence *dbSeq, const int diagonal,
   int32_t maskLen = currentQuery->L / 2;
   int origQueryLen = wrappedScoring ? currentQuery->L / 2 : currentQuery->L;
 
-  // calcuate stop score
-  //    const double qL = static_cast<double>(currentQuery->L);
-  //    const double dbL = static_cast<double>(dbSeq->L);
-
-  // avoid nummerical issues -log(evalThr/(qL*dbL*seqDbSize))
-  //    double datapoints = -log(static_cast<double>(seqDbSize)) - log(qL) -
-  //    log(dbL) + log(evalThr);
-  // std::cout << seqDbSize << " " << 100 << " " << scoreThr << std::endl;
-  // std::cout <<datapoints << " " << m->getBitFactor() <<" "<< evalThr << " "
-  // << seqDbSize << " " << currentQuery->L << " " << dbSeq->L<< " " << scoreThr
-  // << " " << std::endl;
   s_align alignment;
   // compute sequence identity
   std::string backtrace;
@@ -192,14 +179,10 @@ Matcher::result_t Matcher::getSWResult(Sequence *dbSeq, const int diagonal,
         std::max(qEndPos - qStartPos, static_cast<unsigned int>(1));
     unsigned int dbAlnLen =
         std::max(dbEndPos - dbStartPos, static_cast<unsigned int>(1));
-    // seqId = (alignment.score1 / static_cast<float>(std::max(qAlnLength,
-    // dbAlnLength)))  * 0.1656 + 0.1141;
     seqId = estimateSeqIdByScorePerCol(alignment.score1, qAlnLen, dbAlnLen);
   } else if (alignmentMode == Matcher::SCORE_ONLY) {
     unsigned int qAlnLen = std::max(qEndPos, static_cast<unsigned int>(1));
     unsigned int dbAlnLen = std::max(dbEndPos, static_cast<unsigned int>(1));
-    // seqId = (alignment.score1 / static_cast<float>(std::max(dbAlnLen,
-    // qAlnLen)))  * 0.1656 + 0.1141;
     seqId = estimateSeqIdByScorePerCol(alignment.score1, qAlnLen, dbAlnLen);
   }
 

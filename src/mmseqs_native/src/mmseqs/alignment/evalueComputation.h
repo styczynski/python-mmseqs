@@ -152,10 +152,7 @@ class EvalueComputation {
       delete[] tmpMat;
     }
     if (evaluer.isGood() == false) {
-      Debug(Debug::ERROR) << "ALP did not converge for the substitution "
-                             "matrix, gap open, gap extend input.\n"
-                             "Please change your input parameters. \n";
-      EXIT(EXIT_FAILURE);
+      out->failure("ALP did not converge for the substitution matrix, gap open, gap extend input. Please change your input parameters");
     }
     logK = log(evaluer.parameters().K);
   }

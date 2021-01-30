@@ -71,9 +71,7 @@ void AlignmentSymmetry::readInData(DBReader<unsigned int> *alnDbr,
         size_t writePos = 0;
         while (*data != '\0') {
           if (writePos >= setSize) {
-            Debug(Debug::ERROR)
-                << "Set " << i << " has more elements than allocated ("
-                << setSize << ")!\n";
+            out->error("Set {} has more elements than allocated ({})", i, setSize);
             continue;
           }
           char similarity[255 + 1];
@@ -105,15 +103,11 @@ void AlignmentSymmetry::readInData(DBReader<unsigned int> *alnDbr,
               elementScoreTable[i][writePos] =
                   (unsigned short)(sim > 0 ? sim : -sim);
             } else {
-              Debug(Debug::ERROR) << "Alignment format is not supported!\n";
-              EXIT(EXIT_FAILURE);
+              out->failure("Alignment format is not supported");
             }
           }
           if (currElement == UINT_MAX || currElement > seqDbr->getSize()) {
-            Debug(Debug::ERROR) << "Element " << dbKey
-                                << " contained in some alignment list, but not "
-                                   "contained in the sequence database!\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("Element {} contained in some alignment list, but not contained in the sequence database", dbKey);
           }
           elementLookupTable[i][writePos] = currElement;
           writePos++;
@@ -190,19 +184,12 @@ void AlignmentSymmetry::addMissingLinks(unsigned int **elementLookupTable,
     const size_t oldElementSize = LEN(offsetTableWithOutNewLinks, setId);
     const size_t newElementSize = LEN(offsetTableWithNewLinks, setId);
     if (oldElementSize > newElementSize) {
-      Debug(Debug::ERROR) << "SetId=" << setId << " NewElementSize("
-                          << newElementSize
-                          << ") <"
-                             " OldElementSize("
-                          << oldElementSize << ") in addMissingLinks";
-      EXIT(EXIT_FAILURE);
+      out->failure("SetId={}, NewElementSize({}) < OldElementSize({}) in addMissingLinks", setId, newElementSize, oldElementSize);
     }
     for (size_t elementId = 0; elementId < oldElementSize; elementId++) {
       const unsigned int currElm = elementLookupTable[setId][elementId];
       if (currElm == UINT_MAX || currElm > dbSize) {
-        Debug(Debug::ERROR) << "currElm > dbSize in element list "
-                               "(addMissingLinks). This should not happen.\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("currElm > dbSize in element list (addMissingLinks). This should not happen.");
       }
       const unsigned int oldCurrElementSize =
           LEN(offsetTableWithOutNewLinks, currElm);
@@ -224,10 +211,7 @@ void AlignmentSymmetry::addMissingLinks(unsigned int **elementLookupTable,
         }
 
         if (pos >= newCurrElementSize) {
-          Debug(Debug::ERROR)
-              << "pos(" << pos << ") > newCurrElementSize("
-              << newCurrElementSize << "). This should not happen.\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("pos({}) > newCurrElementSize({}). This should not happen", pos, newCurrElementSize);
         }
         elementLookupTable[currElm][pos] = setId;
         elementScoreTable[currElm][pos] = elementScoreTable[setId][elementId];
