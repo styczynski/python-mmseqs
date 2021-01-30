@@ -26,14 +26,11 @@ SubstitutionMatrix::SubstitutionMatrix(const char *filename, float bitFactor,
     matrixName = Util::base_name(fileName, "/\\");
     if (fileName.length() < 4 ||
         fileName.substr(fileName.length() - 4, 4).compare(".out") != 0) {
-      Debug(Debug::ERROR) << "Invalid format of the substitution matrix input "
-                             "file! Only .out files are accepted.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid format of the substitution matrix input file! Only .out files are accepted.");
     }
     std::ifstream in(fileName);
     if (in.fail()) {
-      Debug(Debug::ERROR) << "Cannot read " << filename << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot read {}", filename);
     }
     matrixData = std::string((std::istreambuf_iterator<char>(in)),
                              std::istreambuf_iterator<char>());
@@ -43,8 +40,7 @@ SubstitutionMatrix::SubstitutionMatrix(const char *filename, float bitFactor,
   std::pair<int, bool> alphSizeAndX = setAaMappingDetectAlphSize(matrixData);
   alphabetSize = alphSizeAndX.first;
   if (alphabetSize == -1) {
-    Debug(Debug::ERROR) << "Could not estimate alphabet size.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not estimate alphabet size");
   }
   initMatrixMemory(alphabetSize);
   readProbMatrix(matrixData, alphSizeAndX.second);
@@ -363,9 +359,7 @@ void SubstitutionMatrix::readProbMatrix(const std::string &matrixData,
     }
     if (wordCnt > 1 && probMatrixStart == true) {
       if (isalpha(words[0][0]) == false) {
-        Debug(Debug::ERROR) << "First element in probability line must be an "
-                               "alphabet letter.\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("First element in probability line must be an alphabet letter");
       }
       int aa = static_cast<int>(aa2num[toupper(words[0][0])]);
       for (int i = 0; i < alphabetSize; i++) {
@@ -386,17 +380,14 @@ void SubstitutionMatrix::readProbMatrix(const std::string &matrixData,
   }
 
   if (containsX == false) {
-    Debug(Debug::ERROR) << "Please add X to your substitution matrix.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Please add X to your substitution matrix.")
   }
 
   if (hasLambda == false || hasBackground == false) {
     if (estimateLambdaAndBackground(const_cast<const double **>(probMatrix),
                                     alphabetSize - ((xIsPositive) ? 0 : 1),
                                     pBack, lambda) == false) {
-      Debug(Debug::ERROR)
-          << "Computing inverse of substitution matrix failed\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Computing inverse of substitution matrix failed");
     }
     pBack[static_cast<int>(aa2num[static_cast<int>('X')])] = ANY_BACK;
   }
@@ -433,9 +424,7 @@ std::pair<int, bool> SubstitutionMatrix::setAaMappingDetectAlphSize(
     if (wordCnt > 1) {
       for (size_t i = 0; i < wordCnt; i++) {
         if (isalpha(words[i][0]) == false) {
-          Debug(Debug::ERROR)
-              << "Probability matrix must start with alphabet header.\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Probability matrix must start with alphabet header");
         }
         int aa = toupper(words[i][0]);
         aa2num[aa] = static_cast<unsigned char>(i);
@@ -443,8 +432,6 @@ std::pair<int, bool> SubstitutionMatrix::setAaMappingDetectAlphSize(
         if (aa == 'X') {
           containsX = true;
         }
-        //                column_aa[i] = parseAlphabet(words[i], num2aa,
-        //                aa2num);
       }
       alphabetSize = wordCnt;
       return std::make_pair(alphabetSize, containsX);

@@ -33,8 +33,7 @@ bool KSeqFile::ReadEntry() {
 KSeqFile::~KSeqFile() {
   kseq_destroy((KSEQFILE::kseq_t*)seq);
   if (fclose(file) != 0) {
-    Debug(Debug::ERROR) << "Cannot close KSeq input file\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close KSeq input file");
   }
 }
 
@@ -170,9 +169,7 @@ KSeqWrapper* KSeqFactory(const char* file) {
   }
 #else
   else if (Util::endsWith(".gz", file) == true) {
-    Debug(Debug::ERROR) << "MMseqs was not compiled with zlib support. Can not "
-                           "read compressed input!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("MMseqs was not compiled with zlib support. Can not read compressed input");
   }
 #endif
 
@@ -183,9 +180,7 @@ KSeqWrapper* KSeqFactory(const char* file) {
   }
 #else
   else if (Util::endsWith(".bz2", file) == true) {
-    Debug(Debug::ERROR) << "MMseqs was not compiled with bz2lib support. Can "
-                           "not read compressed input!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("MMseqs was not compiled with bz2lib support. Can not read compressed input");
   }
 #endif
 

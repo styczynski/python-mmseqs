@@ -303,8 +303,7 @@ class TranslateNucl {
             "----------**-----------------------M----------------------------";
         break;
       default:
-        Debug(Debug::ERROR) << "Invalid translation table selected!\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Invalid translation table selected");
         break;
     }
     // init table
