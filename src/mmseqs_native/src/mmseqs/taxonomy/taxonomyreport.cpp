@@ -160,10 +160,7 @@ int taxonomyreport(mmseqs_output* out, Parameters& par) {
   std::vector<std::pair<unsigned int, unsigned int>> mapping;
   if (FileUtil::fileExists(std::string(par.db1 + "_mapping").c_str()) ==
       false) {
-    Debug(Debug::ERROR)
-        << par.db1 + "_mapping"
-        << " does not exist. Please create the taxonomy mapping!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("{}_mapping does not exist. Please create the taxonomy mapping", par.db1);
   }
   bool isSorted = Util::readMapping(par.db1 + "_mapping", mapping);
   if (isSorted == false) {
@@ -203,11 +200,10 @@ int taxonomyreport(mmseqs_output* out, Parameters& par) {
 
       const size_t columns = Util::getWordsOfLine(data, entry, 255);
       if (columns == 0) {
-        Debug(Debug::WARNING) << "Empty entry: " << i << "!";
+        out->warn("Empty entry: {}", i);
       } else {
         int taxon = Util::fast_atoi<int>(entry[0]);
         ++taxCounts[taxon];
-        //__sync_fetch_and_add(&(offsets[kmerIdx]), 1);
       }
     }
   };
@@ -216,7 +212,7 @@ int taxonomyreport(mmseqs_output* out, Parameters& par) {
                      << reader.getSize());
   unsigned int unknownCnt =
       (taxCounts.find(0) != taxCounts.end()) ? taxCounts.at(0) : 0;
-  Debug(Debug::INFO) << unknownCnt << " reads are unclassified.\n";
+  out->info("{} reads are unclassified.", unknownCnt);
 
   std::unordered_map<TaxID, TaxonCounts> cladeCounts =
       taxDB->getCladeCounts(taxCounts);

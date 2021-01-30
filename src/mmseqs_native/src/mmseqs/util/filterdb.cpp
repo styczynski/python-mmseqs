@@ -135,9 +135,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
     } else if (FileUtil::fileExists((par.filteringFile + ".dbtype").c_str())) {
       filenames = FileUtil::findDatafiles(par.filteringFile.c_str());
     } else {
-      Debug(Debug::ERROR) << "File " << par.filteringFile
-                          << " does not exist\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("File {} does not exist", par.filteringFile);
     }
     char key[65536];
     for (size_t i = 0; i < filenames.size(); i++) {
@@ -169,9 +167,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
         offset++;
 
         if (offset == 65536) {
-          Debug(Debug::ERROR)
-              << "Input in file " << filenames[i] << " too long\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Input file {} is too long.", filenames[i]);
         }
       }
       if (inKey == true && offset > 0) {
@@ -179,8 +175,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
         filter.emplace_back(key);
       }
       if (fclose(orderFile) != 0) {
-        Debug(Debug::ERROR) << "Cannot close file " << filenames[i] << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot close file {}", filenames[i]);
       }
     }
     SORT_PARALLEL(filter.begin(), filter.end());
@@ -202,8 +197,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
     std::stable_sort(mapping.begin(), mapping.end(), compareFirstString());
   } else if (par.extractLines > 0) {
     mode = GET_FIRST_LINES;
-    Debug(Debug::INFO) << "Filtering by extracting the first "
-                       << par.extractLines << " lines\n";
+    out->info("Filtering by extracting the first {} lines", par.extractLines);
   } else if (par.joinDB.empty() == false) {
     mode = JOIN_DB;
     std::string joinIndex = par.joinDB + ".index";
@@ -226,8 +220,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
     int status = regcomp(&regex, par.filterColumnRegex.c_str(),
                          REG_EXTENDED | REG_NEWLINE);
     if (status != 0) {
-      Debug(Debug::ERROR) << "Error in regex " << par.filterColumnRegex << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Error in regex {}", par.filterColumnRegex);
     }
   }
 
@@ -289,7 +282,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
         }
 
         if (!Util::getLine(data, dataLength, lineBuffer, LINE_BUFFER_SIZE)) {
-          Debug(Debug::WARNING) << "Identifier was too long and was cut off!\n";
+          out->warn("Identifier was too long and was cut off");
           data = Util::skipLine(data);
           continue;
         }
@@ -300,10 +293,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
           foundElements =
               Util::getWordsOfLine(lineBuffer, columnPointer, column + 1);
           if (foundElements < column) {
-            Debug(Debug::ERROR)
-                << "Column=" << column << " does not exist in line "
-                << lineBuffer << "\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("Column={} does not exist in line {}", column, lineBuffer);
           }
 
           size_t colStrLen;
@@ -354,8 +344,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
             char *rest;
             const double value = strtod(columnPointers[columnToBind], &rest);
             if ((rest == columnPointers[columnToBind]) || errno == ERANGE) {
-              Debug(Debug::WARNING)
-                  << "Can not parse column " << columnToBind << "!\n";
+              out->warn("Can not parse column {}", columnToBind);
               continue;
             }
             parser->bind(columnToBind, value);

@@ -80,20 +80,6 @@ void parseHMM(char *data, std::string *sequence, std::string *header,
         // back scaling from hhm
         const float p = MathUtil::fpow2(-(entry / 1000.0f));
         probs[aa_num] = p;
-        //                const float backProb =
-        //                subMat->getBackgroundProb(aa_num); float score =
-        //                MathUtil::flog2(p / backProb) *
-        //                Sequence::PROFILE_SCALING; float truncPssmVal =
-        //                std::min(score, 127.0f); truncPssmVal       =
-        //                std::max(-128.0f, truncPssmVal);
-        // rounding
-        //                profileBuffer[curr_pos]  =
-        //                static_cast<char>((truncPssmVal < 0.0) ? truncPssmVal
-        //                - 0.5 : truncPssmVal + 0.5); Debug(Debug::INFO) <<
-        //                aa_num << " " << subMat->num2aa[aa_num] << " " <<
-        //                profile_score[pos_in_profile] << " " << score << " "
-        //                << entry << " " << p << " " << backProb << " " <<
-        //                bitFactor << std::endl;
       }
       // shifted score by -128 to avoid \0
       profileBuffer[curr_pos] = Sequence::scoreMask(probs[aa_num]);

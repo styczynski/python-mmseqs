@@ -117,8 +117,7 @@ int indexdb(mmseqs_output *out, Parameters &par) {
                                   Parameters::DBTYPE_NUCLEOTIDES) &&
         par.searchType == Parameters::SEARCH_TYPE_NUCLEOTIDES &&
         par.PARAM_ALPH_SIZE.wasSet) {
-      Debug(Debug::WARNING) << "Alphabet size is not taken into account for "
-                               "compatibility check in nucleotide search.\n";
+      out->warn("Alphabet size is not taken into account for compatibility check in nucleotide search");
     }
 
     std::string check;
@@ -127,21 +126,15 @@ int indexdb(mmseqs_output *out, Parameters &par) {
         (check = findIncompatibleParameter(index, par, dbr.getDbtype())) == "";
     index.close();
     if (compatible) {
-      Debug(Debug::INFO)
-          << "Index is up to date and compatible. Force recreation with "
-             "--check-compatibility 0 parameter.\n";
+      out->info("Index is up to date and compatible. Force recreation with --check-compatibility 0 parameter");
       recreate = false;
     } else {
       if (par.checkCompatible == 2) {
-        Debug(Debug::ERROR)
-            << "Index is incompatible. Incompatible parameter: " << check
-            << "\n";
+        out->error("Index is incompatible. Incompatible parameter: {}", check);
         recreate = false;
         status = EXIT_FAILURE;
       } else {
-        Debug(Debug::WARNING) << "Index is incompatible and will be recreated. "
-                                 "Incompatible parameter: "
-                              << check << "\n";
+        out->warn("Index is incompatible and will be recreated. Incompatible parameter: {}", check);
         recreate = true;
       }
     }

@@ -290,11 +290,7 @@ std::pair<size_t, size_t> fillKmerPositionArray(
                        sizeof(KmerPosition<T>) * bufferPos);
               }
             } else {
-              Debug(Debug::ERROR)
-                  << "Kmer array overflow. currKmerArrayOffset=" << writeOffset
-                  << ", kmerBufferPos=" << bufferPos
-                  << ", kmerArraySize=" << kmerArraySize << ".\n";
-              EXIT(EXIT_FAILURE);
+              out->failure("Kmer array overflow. currKmerArrayOffset={}, kmerBufferPos={}, kmerArraySize={}", writeOffset, bufferPos, kmerArraySize);
             }
             bufferPos = 0;
           }
@@ -372,12 +368,7 @@ std::pair<size_t, size_t> fillKmerPositionArray(
                            sizeof(KmerPosition<T>) * bufferPos);
                   }
                 } else {
-                  Debug(Debug::ERROR)
-                      << "Kmer array overflow. currKmerArrayOffset="
-                      << writeOffset << ", kmerBufferPos=" << bufferPos
-                      << ", kmerArraySize=" << kmerArraySize << ".\n";
-
-                  EXIT(EXIT_FAILURE);
+                  out->failure("Kmer array overflow. currKmerArrayOffset={}, kmerBufferPos={}, kmerArraySize={}", writeOffset, bufferPos, kmerArraySize);
                 }
 
                 bufferPos = 0;
@@ -1324,14 +1315,12 @@ void writeKmersToDisk(std::string tmpFile,
     fwrite(&nullEntry, sizeof(T), 1, filePtr);
   }
   if (fclose(filePtr) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << tmpFile << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close file {}", tmpFile);
   }
   std::string fileName = tmpFile + ".done";
   FILE *done = FileUtil::openFileOrDie(fileName.c_str(), "w", false);
   if (fclose(done) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << fileName << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close file {}", fileName);
   }
 }
 

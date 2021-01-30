@@ -148,8 +148,7 @@ void LinsearchIndexReader::mergeAndWriteIndex(DBWriter &dbw,
   // clear memory
   for (size_t file = 0; file < tmpFiles.size(); file++) {
     if (fclose(files[file]) != 0) {
-      Debug(Debug::ERROR) << "Cannot close file " << tmpFiles[file] << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot close file {}", tmpFiles[file]);
     }
     FileUtil::munmapData((void *)entries[file], dataSizes[file]);
   }
@@ -160,8 +159,7 @@ void LinsearchIndexReader::mergeAndWriteIndex(DBWriter &dbw,
   delete[] files;
 
   // write index
-  Debug(Debug::INFO) << "Write ENTRIESOFFSETS ("
-                     << PrefilteringIndexReader::ENTRIESOFFSETS << ")\n";
+  out->info("Write ENTRIESOFFSETS ({})", PrefilteringIndexReader::ENTRIESOFFSETS);
   kmerIndex.setupOffsetTable();
   dbw.writeData((char *)kmerIndex.getOffsets(),
                 kmerIndex.getOffsetsSize() * sizeof(size_t),
@@ -169,8 +167,7 @@ void LinsearchIndexReader::mergeAndWriteIndex(DBWriter &dbw,
   dbw.alignToPageSize();
 
   // write index
-  Debug(Debug::INFO) << "Write ENTRIESGRIDSIZE ("
-                     << PrefilteringIndexReader::ENTRIESGRIDSIZE << ")\n";
+  out->info("Write ENTRIESGRIDSIZE ({})", PrefilteringIndexReader::ENTRIESGRIDSIZE);
   uint64_t gridResolution =
       static_cast<uint64_t>(kmerIndex.getGridResolution());
   char *gridResolutionPtr = (char *)&gridResolution;
@@ -179,8 +176,7 @@ void LinsearchIndexReader::mergeAndWriteIndex(DBWriter &dbw,
   dbw.alignToPageSize();
 
   // ENTRIESNUM
-  Debug(Debug::INFO) << "Write ENTRIESNUM ("
-                     << PrefilteringIndexReader::ENTRIESNUM << ")\n";
+  out->info("Write ENTRIESNUM ({})", PrefilteringIndexReader::ENTRIESNUM);
   uint64_t entriesNum = kmerIndex.getTableEntriesNum();
   char *entriesNumPtr = (char *)&entriesNum;
   dbw.writeData(entriesNumPtr, 1 * sizeof(uint64_t),
@@ -225,8 +221,7 @@ void LinsearchIndexReader::writeIndex(DBWriter &dbw,
   dbw.alignToPageSize();
 
   // write index
-  Debug(Debug::INFO) << "Write ENTRIESOFFSETS ("
-                     << PrefilteringIndexReader::ENTRIESOFFSETS << ")\n";
+  out->info("Write ENTRIESOFFSETS ({})", PrefilteringIndexReader::ENTRIESOFFSETS);
   kmerIndex.setupOffsetTable();
   dbw.writeData((char *)kmerIndex.getOffsets(),
                 kmerIndex.getOffsetsSize() * sizeof(size_t),
@@ -234,8 +229,7 @@ void LinsearchIndexReader::writeIndex(DBWriter &dbw,
   dbw.alignToPageSize();
 
   // write index
-  Debug(Debug::INFO) << "Write ENTRIESGRIDSIZE ("
-                     << PrefilteringIndexReader::ENTRIESGRIDSIZE << ")\n";
+  out->info("Write ENTRIESGRIDSIZE ({})", PrefilteringIndexReader::ENTRIESGRIDSIZE);
   uint64_t gridResolution =
       static_cast<uint64_t>(kmerIndex.getGridResolution());
   char *gridResolutionPtr = (char *)&gridResolution;
@@ -244,8 +238,7 @@ void LinsearchIndexReader::writeIndex(DBWriter &dbw,
   dbw.alignToPageSize();
 
   // ENTRIESNUM
-  Debug(Debug::INFO) << "Write ENTRIESNUM ("
-                     << PrefilteringIndexReader::ENTRIESNUM << ")\n";
+  out->info("Write ENTRIESNUM ({})", PrefilteringIndexReader::ENTRIESNUM);
   uint64_t entriesNum = kmerIndex.getTableEntriesNum();
   char *entriesNumPtr = (char *)&entriesNum;
   dbw.writeData(entriesNumPtr, 1 * sizeof(uint64_t),
@@ -287,8 +280,7 @@ void LinsearchIndexReader::writeKmerIndexToDisk(std::string fileName,
   }
   fwrite(kmers, sizeof(KmerPosition<unsigned short>), kmerCnt, filePtr);
   if (fclose(filePtr) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << fileName << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close file {}", fileName);
   }
 }
 

@@ -44,8 +44,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
     if (Parameters::isEqualDbtype(seqDbr.getDbtype(),
                                   Parameters::DBTYPE_NUCLEOTIDES) &&
         par.PARAM_ALPH_SIZE.wasSet) {
-      Debug(Debug::WARNING) << "Alphabet size is not taken into account for "
-                               "compatibility check in nucleotide search.\n";
+      out->warn("Alphabet size is not taken into account for compatibility check in nucleotide search");
     }
 
     std::string check;
@@ -56,20 +55,14 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
     index.close();
     seqDbr.close();
     if (compatible) {
-      Debug(Debug::INFO)
-          << "Index is already up to date and compatible. Force recreation "
-             "with --check-compatibility 0 parameter.\n";
+      out->info("Index is already up to date and compatible. Force recreation with --check-compatibility 0 parameter");
       return EXIT_SUCCESS;
     } else {
       if (par.checkCompatible == 2) {
-        Debug(Debug::ERROR)
-            << "Index is incompatible. Incompatible parameter: " << check
-            << "\n";
+        out->error("Index is incompatible. Incompatible parameter: {}", check);
         return EXIT_FAILURE;
       } else {
-        Debug(Debug::WARNING) << "Index is incompatible and will be recreated. "
-                                 "Incompatible parameter: "
-                              << check << "\n";
+        out->warn("Index is incompatible and will be recreated. Incompatible parameter: {}", check);
       }
     }
   }
@@ -282,16 +275,14 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
       hashSeqPair = NULL;
     }
     // SEQCOUNT
-    Debug(Debug::INFO) << "Write SEQCOUNT ("
-                       << PrefilteringIndexReader::SEQCOUNT << ")\n";
+    out->info("Write SEQCOUNT ({})", PrefilteringIndexReader::SEQCOUNT);
     size_t tablesize = {seqDbr.getSize()};
     char *tablesizePtr = (char *)&tablesize;
     dbw.writeData(tablesizePtr, 1 * sizeof(size_t),
                   PrefilteringIndexReader::SEQCOUNT, 0);
     dbw.alignToPageSize();
 
-    Debug(Debug::INFO) << "Write SCOREMATRIXNAME ("
-                       << PrefilteringIndexReader::SCOREMATRIXNAME << ")\n";
+    out->info("Write SCOREMATRIXNAME ({})", PrefilteringIndexReader::SCOREMATRIXNAME);
     char *subData =
         BaseMatrix::serialize(subMat->matrixName, subMat->matrixData);
     dbw.writeData(
@@ -301,8 +292,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
     free(subData);
 
     if (par.spacedKmerPattern.empty() != false) {
-      Debug(Debug::INFO) << "Write SPACEDPATTERN ("
-                         << PrefilteringIndexReader::SPACEDPATTERN << ")\n";
+      out->info("Write SPACEDPATTERN ({})", PrefilteringIndexReader::SPACEDPATTERN);
       dbw.writeData(par.spacedKmerPattern.c_str(),
                     par.spacedKmerPattern.length(),
                     PrefilteringIndexReader::SPACEDPATTERN, 0);
@@ -315,16 +305,14 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
         par.db1.c_str(), par.db1Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     dbr1.open(DBReader<unsigned int>::NOSORT);
-    Debug(Debug::INFO) << "Write DBR1INDEX ("
-                       << PrefilteringIndexReader::DBR1INDEX << ")\n";
+    out->info("Write DBR1INDEX ({})", PrefilteringIndexReader::DBR1INDEX);
     char *data = DBReader<unsigned int>::serialize(dbr1);
     size_t offsetIndex = dbw.getOffset(0);
     dbw.writeData(data, DBReader<unsigned int>::indexMemorySize(dbr1),
                   PrefilteringIndexReader::DBR1INDEX, 0);
     dbw.alignToPageSize();
 
-    Debug(Debug::INFO) << "Write DBR1DATA ("
-                       << PrefilteringIndexReader::DBR1DATA << ")\n";
+    out->info("Write DBR1DATA ({})", PrefilteringIndexReader::DBR1DATA);
     size_t offsetData = dbw.getOffset(0);
     dbw.writeStart(0);
     for (size_t fileIdx = 0; fileIdx < dbr1.getDataFileCnt(); fileIdx++) {
@@ -347,14 +335,12 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
           par.db2.c_str(), par.db2Index.c_str(), par.threads,
           DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
       dbr2.open(DBReader<unsigned int>::NOSORT);
-      Debug(Debug::INFO) << "Write DBR2INDEX ("
-                         << PrefilteringIndexReader::DBR2INDEX << ")\n";
+      out->info("Write DBR2INDEX ({})", PrefilteringIndexReader::DBR2INDEX);
       data = DBReader<unsigned int>::serialize(dbr2);
       dbw.writeData(data, DBReader<unsigned int>::indexMemorySize(dbr2),
                     PrefilteringIndexReader::DBR2INDEX, 0);
       dbw.alignToPageSize();
-      Debug(Debug::INFO) << "Write DBR2DATA ("
-                         << PrefilteringIndexReader::DBR2DATA << ")\n";
+      out->info("Write DBR2DATA ({})", PrefilteringIndexReader::DBR2DATA);
       dbw.writeStart(0);
       for (size_t fileIdx = 0; fileIdx < dbr2.getDataFileCnt(); fileIdx++) {
         dbw.writeAdd(dbr2.getDataForFile(fileIdx),
@@ -367,8 +353,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
     }
 
     {
-      Debug(Debug::INFO) << "Write HDR1INDEX ("
-                         << PrefilteringIndexReader::HDR1INDEX << ")\n";
+      out->info("Write HDR1INDEX ({})", PrefilteringIndexReader::HDR1INDEX);
       DBReader<unsigned int> hdbr1(
           par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
           DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
@@ -379,8 +364,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
       dbw.writeData(data, DBReader<unsigned int>::indexMemorySize(hdbr1),
                     PrefilteringIndexReader::HDR1INDEX, 0);
       dbw.alignToPageSize();
-      Debug(Debug::INFO) << "Write HDR1DATA ("
-                         << PrefilteringIndexReader::HDR1DATA << ")\n";
+      out->info("Write HDR1DATA ({})", PrefilteringIndexReader::HDR1DATA);
       size_t offsetData = dbw.getOffset(0);
       dbw.writeStart(0);
       for (size_t fileIdx = 0; fileIdx < hdbr1.getDataFileCnt(); fileIdx++) {
@@ -404,14 +388,12 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
                                      DBReader<unsigned int>::USE_INDEX |
                                          DBReader<unsigned int>::USE_DATA);
         hdbr2.open(DBReader<unsigned int>::NOSORT);
-        Debug(Debug::INFO) << "Write HDR2INDEX ("
-                           << PrefilteringIndexReader::HDR2INDEX << ")\n";
+        out->info("Write HDR2INDEX ({})", PrefilteringIndexReader::HDR2INDEX);
         data = DBReader<unsigned int>::serialize(hdbr2);
         dbw.writeData(data, DBReader<unsigned int>::indexMemorySize(hdbr2),
                       PrefilteringIndexReader::HDR2INDEX, 0);
         dbw.alignToPageSize();
-        Debug(Debug::INFO) << "Write HDR2DATA ("
-                           << PrefilteringIndexReader::HDR2DATA << ")\n";
+        out->info("Write HDR2DATA ({})", PrefilteringIndexReader::HDR2DATA);
         dbw.writeStart(0);
         for (size_t fileIdx = 0; fileIdx < hdbr2.getDataFileCnt(); fileIdx++) {
           dbw.writeAdd(hdbr2.getDataForFile(fileIdx),
@@ -424,8 +406,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
       }
     }
 
-    Debug(Debug::INFO) << "Write GENERATOR ("
-                       << PrefilteringIndexReader::GENERATOR << ")\n";
+    out->info("Write GENERATOR ({})", PrefilteringIndexReader::GENERATOR);
     dbw.writeData(version, strlen(version), PrefilteringIndexReader::GENERATOR,
                   0);
     dbw.alignToPageSize();

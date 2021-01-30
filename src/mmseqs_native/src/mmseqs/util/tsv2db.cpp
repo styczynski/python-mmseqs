@@ -11,8 +11,7 @@ int tsv2db(mmseqs_output *out, Parameters &par) {
   //    Parameters &par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
-  Debug(Debug::INFO) << "Output database type: "
-                     << Parameters::getDbTypeName(par.outputDbType) << "\n";
+  out->info("Output database type: {}", Parameters::getDbTypeName(par.outputDbType));
   if (par.PARAM_OUTPUT_DBTYPE.wasSet == false) {
     out->info("Consider setting --output-dbtype.");
   }
@@ -23,8 +22,7 @@ int tsv2db(mmseqs_output *out, Parameters &par) {
 
   std::ifstream tsv(par.db1);
   if (tsv.fail()) {
-    Debug(Debug::ERROR) << "File " << par.db1 << " not found!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("File {} not found", par.db1);
   }
 
   std::ostringstream ss;
