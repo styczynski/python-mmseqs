@@ -41,7 +41,7 @@ int convert2fasta(mmseqs_output* out, Parameters& par) {
     from = &db_header;
   }
 
-  Debug(Debug::INFO) << "Start writing file to " << par.db2 << "\n";
+  out->info("Start writing file to {}\n", par.db2);
   for (size_t i = 0; i < from->getSize(); i++) {
     unsigned int key = from->getDbKey(i);
     unsigned int headerKey = db_header.getId(key);

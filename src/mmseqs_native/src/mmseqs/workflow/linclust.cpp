@@ -82,7 +82,7 @@ int linclust(mmseqs_output *out, Parameters &par) {
     std::string cluMode = (par.clusteringMode == Parameters::GREEDY_MEM)
                               ? "GREEDY MEM"
                               : "SET COVER";
-    Debug(Debug::INFO) << "Set cluster mode " << cluMode << ".\n";
+    out->info("Set cluster mode {}.", cluMode);
   }
 
   if (kmerSizeWasSet == false) {

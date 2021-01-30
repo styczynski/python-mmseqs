@@ -44,8 +44,8 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
 #ifdef HAVE_MPI
   resultReader.decomposeDomainByAminoAcid(MMseqsMPI::rank, MMseqsMPI::numProc,
                                           &dbFrom, &dbSize);
-  Debug(Debug::INFO) << "Compute split from " << dbFrom << " to "
-                     << dbFrom + dbSize << "\n";
+  out->info("Compute split from {}\n", dbFrom << " to "
+                     << dbFrom + dbSize);
   std::pair<std::string, std::string> tmpOutput =
       Util::createTmpFileNames(par.db4, par.db4Index, MMseqsMPI::rank);
 #else
@@ -140,11 +140,11 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
     return EXIT_FAILURE;
   }
 
-  Debug(Debug::INFO) << "Query database size: " << qDbr->getSize()
-                     << " type: " << qDbr->getDbTypeName() << "\n";
-  Debug(Debug::INFO) << "Target database size: " << tDbr->getSize()
+  out->info("Query database size: {}\n", qDbr->getSize()
+                     << " type: " << qDbr->getDbTypeName());
+  out->info("Target database size: {}\n", tDbr->getSize()
                      << " type: " << Parameters::getDbTypeName(targetSeqType)
-                     << "\n";
+                    );
 
   const bool isFiltering = par.filterMsa != 0 || returnAlnRes;
   Debug::Progress progress(dbSize - dbFrom);

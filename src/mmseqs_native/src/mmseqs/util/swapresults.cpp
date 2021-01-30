@@ -233,7 +233,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
     }
     targetElementSize[0] = 0;
 
-    Debug(Debug::INFO) << "\nOutput database: " << parOutDbStr << "\n";
+    out->info("\nOutput database: {}\n", parOutDbStr);
     bool isAlignmentResult = false;
     bool hasBacktrace = false;
     const char *entry[255];

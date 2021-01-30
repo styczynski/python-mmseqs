@@ -41,7 +41,7 @@ KmerSearch::ExtractKmerAndSortResult KmerSearch::extractKmerAndSort(
             hashEndRange, NULL);
     elementsToSort = ret.first;
     par.kmerSize = ret.second;
-    Debug(Debug::INFO) << "\nAdjusted k-mer length " << par.kmerSize << "\n";
+    out->info("\nAdjusted k-mer length {}\n", par.kmerSize);
   } else {
     std::pair<size_t, size_t> ret =
         fillKmerPositionArray<Parameters::DBTYPE_AMINO_ACIDS, short>(
@@ -49,7 +49,7 @@ KmerSearch::ExtractKmerAndSortResult KmerSearch::extractKmerAndSort(
             hashEndRange, NULL);
     elementsToSort = ret.first;
   }
-  Debug(Debug::INFO) << "\nTime for fill: " << timer.lap() << "\n";
+  out->info("\nTime for fill: {}\n", timer.lap());
   if (hashEndRange == SIZE_T_MAX) {
     seqDbr.unmapData();
   }
@@ -65,7 +65,7 @@ KmerSearch::ExtractKmerAndSortResult KmerSearch::extractKmerAndSort(
                   KmerPosition<short>::compareRepSequenceAndIdAndPos);
   }
 
-  Debug(Debug::INFO) << "Time for sort: " << timer.lap() << "\n";
+  out->info("Time for sort: {}\n", timer.lap());
 
   return ExtractKmerAndSortResult(elementsToSort, hashSeqPair, par.kmerSize);
 }
@@ -271,7 +271,7 @@ int kmersearch(mmseqs_output *out, Parameters &par) {
                                              Parameters::DBTYPE_NUCLEOTIDES))
                       ? Parameters::DBTYPE_PREFILTER_REV_RES
                       : Parameters::DBTYPE_PREFILTER_RES;
-  Debug(Debug::INFO) << "Process file into " << hashRanges.size() << " parts\n";
+  out->info("Process file into {} parts\n", hashRanges.size());
 
   std::vector<std::string> splitFiles;
   for (size_t split = 0; split < hashRanges.size(); split++) {
@@ -514,7 +514,7 @@ std::pair<KmerPosition<short> *, size_t> KmerSearch::searchInIndex(
       }
     }
   }
-  Debug(Debug::INFO) << "Time to find k-mers: " << timer.lap() << "\n";
+  out->info("Time to find k-mers: {}\n", timer.lap());
   timer.reset();
   if (TYPE == Parameters::DBTYPE_NUCLEOTIDES) {
     SORT_PARALLEL(kmers, kmers + writePos,
@@ -524,7 +524,7 @@ std::pair<KmerPosition<short> *, size_t> KmerSearch::searchInIndex(
                   KmerPosition<short>::compareRepSequenceAndIdAndDiag);
   }
 
-  Debug(Debug::INFO) << "Time to sort: " << timer.lap() << "\n";
+  out->info("Time to sort: {}\n", timer.lap());
   return std::make_pair(kmers, writePos);
 }
 

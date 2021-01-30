@@ -75,8 +75,8 @@ void setClusterAutomagicParameters(Parameters &par) {
   if (par.PARAM_S.wasSet == false) {
     par.sensitivity = setAutomaticThreshold(par.seqIdThr);
     par.PARAM_S.wasSet = true;
-    Debug(Debug::INFO) << "Set cluster sensitivity to -s " << par.sensitivity
-                       << "\n";
+    out->info("Set cluster sensitivity to -s {}\n", par.sensitivity
+                      );
   }
 
   const bool nonsymetric = (par.covMode == Parameters::COV_MODE_TARGET ||
@@ -110,8 +110,8 @@ void setClusterAutomagicParameters(Parameters &par) {
   if (par.PARAM_CLUSTER_STEPS.wasSet == false) {
     par.clusterSteps = setAutomaticIterations(par.sensitivity);
     par.PARAM_CLUSTER_STEPS.wasSet = true;
-    Debug(Debug::INFO) << "Set cluster iterations to " << par.clusterSteps
-                       << "\n";
+    out->info("Set cluster iterations to {}\n", par.clusterSteps
+                      );
   }
 }
 

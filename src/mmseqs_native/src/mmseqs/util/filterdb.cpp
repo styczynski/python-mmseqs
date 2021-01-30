@@ -262,8 +262,8 @@ int filterdb(mmseqs_output *out, Parameters &par) {
     if (mode == EXPRESSION_FILTERING) {
       parser = new ExpressionParser(par.filterExpression.c_str());
       if (parser->isOk() == false) {
-        Debug(Debug::INFO) << "Error in expression " << par.filterExpression
-                           << "\n";
+        out->info("Error in expression {}\n", par.filterExpression
+                          );
         EXIT(EXIT_FAILURE);
       }
       bindableParserColumns = parser->findBindableIndices();

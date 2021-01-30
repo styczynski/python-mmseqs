@@ -439,7 +439,7 @@ KmerPosition<T> *doComputation(size_t totalKmers, size_t hashStartRange,
             hashEndRange, NULL);
     elementsToSort = ret.first;
     par.kmerSize = ret.second;
-    Debug(Debug::INFO) << "\nAdjusted k-mer length " << par.kmerSize << "\n";
+    out->info("\nAdjusted k-mer length {}\n", par.kmerSize);
   } else {
     std::pair<size_t, size_t> ret =
         fillKmerPositionArray<Parameters::DBTYPE_AMINO_ACIDS, T>(
@@ -720,8 +720,8 @@ int kmermatcherInner(Parameters &par, DBReader<unsigned int> &seqDbr) {
   std::vector<std::pair<size_t, size_t>> hashRanges =
       setupKmerSplits<T>(par, subMat, seqDbr, totalKmersPerSplit, splits);
   if (splits > 1) {
-    Debug(Debug::INFO) << "Process file into " << hashRanges.size()
-                       << " parts\n";
+    out->info("Process file into {} parts\n", hashRanges.size()
+                      );
   }
   std::vector<std::string> splitFiles;
   KmerPosition<T> *hashSeqPair = NULL;
@@ -761,8 +761,8 @@ int kmermatcherInner(Parameters &par, DBReader<unsigned int> &seqDbr) {
 #else
   for (size_t split = 0; split < hashRanges.size(); split++) {
     std::string splitFileName = par.db2 + "_split_" + SSTR(split);
-    Debug(Debug::INFO) << "Generate k-mers list for " << (split + 1)
-                       << " split\n";
+    out->info("Generate k-mers list for {} split\n", (split + 1)
+                      );
 
     std::string splitFileNameDone = splitFileName + ".done";
     if (FileUtil::fileExists(splitFileNameDone.c_str()) == false) {
@@ -811,7 +811,7 @@ int kmermatcherInner(Parameters &par, DBReader<unsigned int> &seqDbr) {
             dbw, hashSeqPair, totalKmersPerSplit, repSequence, 1);
       }
     }
-    Debug(Debug::INFO) << "Time for fill: " << timer.lap() << "\n";
+    out->info("Time for fill: {}\n", timer.lap());
     // add missing entries to the result (needed for clustering)
 
 #pragma omp parallel num_threads(1)
@@ -914,8 +914,8 @@ int kmermatcher(mmseqs_output *out, Parameters &par) {
   setKmerLengthAndAlphabet(par, seqDbr.getAminoAcidDBSize(), querySeqType);
   //    std::vector<MMseqsParameter *> *params = command.params;
   //    par.printParameters(command.cmd, argc, argv, *params);
-  Debug(Debug::INFO) << "Database size: " << seqDbr.getSize()
-                     << " type: " << seqDbr.getDbTypeName() << "\n";
+  out->info("Database size: {}\n", seqDbr.getSize()
+                     << " type: " << seqDbr.getDbTypeName());
 
   if (seqDbr.getMaxSeqLen() < SHRT_MAX) {
     kmermatcherInner<short>(par, seqDbr);

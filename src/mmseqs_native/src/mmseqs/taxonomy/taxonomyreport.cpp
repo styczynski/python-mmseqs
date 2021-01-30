@@ -212,8 +212,8 @@ int taxonomyreport(mmseqs_output* out, Parameters& par) {
     }
   };
   out->info("\n");
-  Debug(Debug::INFO) << "Found " << taxCounts.size() << " different taxa for "
-                     << reader.getSize() << " different reads.\n";
+  out->info("Found {} different reads.\n", taxCounts.size() << " different taxa for "
+                     << reader.getSize());
   unsigned int unknownCnt =
       (taxCounts.find(0) != taxCounts.end()) ? taxCounts.at(0) : 0;
   Debug(Debug::INFO) << unknownCnt << " reads are unclassified.\n";

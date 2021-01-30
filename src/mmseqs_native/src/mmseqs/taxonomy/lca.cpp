@@ -223,8 +223,8 @@ int dolca(mmseqs_output* out, Parameters& par, bool majority) {
       result.clear();
     }
   }
-  Debug(Debug::INFO) << "Taxonomy for " << taxonNotFound << " out of "
-                     << taxonNotFound + found << " entries not found\n";
+  out->info("Taxonomy for {} entries not found\n", taxonNotFound << " out of "
+                     << taxonNotFound + found);
   writer.close();
   reader.close();
   delete t;

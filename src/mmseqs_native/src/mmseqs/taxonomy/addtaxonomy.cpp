@@ -139,9 +139,9 @@ int addtaxonomy(mmseqs_output *out, Parameters &par) {
       result.clear();
     }
   }
-  Debug(Debug::INFO) << "Taxonomy for " << taxonNotFound
+  out->info("Taxonomy for {} are deleted\n", taxonNotFound
                      << " entries not found and " << deletedNodes
-                     << " are deleted\n";
+                    );
   writer.close();
   reader.close();
   delete t;

@@ -201,8 +201,8 @@ void LinsearchIndexReader::writeIndex(DBWriter &dbw,
                                       size_t totalKmers, int alphSize,
                                       int kmerSize) {
   KmerIndex kmerIndex(alphSize - 1, kmerSize);
-  Debug(Debug::INFO) << "Write ENTRIES (" << PrefilteringIndexReader::ENTRIES
-                     << ")\n";
+  out->info("Write ENTRIES ({})\n", PrefilteringIndexReader::ENTRIES
+                    );
   // write entries
   dbw.writeStart(0);
   for (size_t pos = 0; pos < totalKmers && hashSeqPair[pos].kmer != SIZE_T_MAX;

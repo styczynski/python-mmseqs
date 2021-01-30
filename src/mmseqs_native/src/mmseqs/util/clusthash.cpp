@@ -109,7 +109,7 @@ int clusthash(mmseqs_output *out, Parameters &par) {
     prevHash = hashSeqPair[id].first;
   }
 
-  Debug(Debug::INFO) << "Found " << uniqHashes << " unique hashes\n";
+  out->info("Found {} unique hashes", uniqHashes);
 #pragma omp parallel
   {
     int thread_idx = 0;

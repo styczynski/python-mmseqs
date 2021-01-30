@@ -392,10 +392,10 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
       contigOffsets[i] = contigOffsets[i - 1];
     }
     contigOffsets[0] = 0;
-    Debug(Debug::INFO) << "Time for contig lookup: " << timer.lap() << "\n";
+    out->info("Time for contig lookup: {}\n", timer.lap());
   }
 
-  Debug(Debug::INFO) << "Writing results to: " << par.db6 << "\n";
+  out->info("Writing results to: {}\n", par.db6);
   DBWriter resultWriter(par.db6.c_str(), par.db6Index.c_str(), localThreads,
                         par.compressed, Parameters::DBTYPE_ALIGNMENT_RES);
   resultWriter.open();

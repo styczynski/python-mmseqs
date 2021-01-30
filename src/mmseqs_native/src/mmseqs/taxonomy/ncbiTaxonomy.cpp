@@ -157,7 +157,7 @@ size_t NcbiTaxonomy::loadNodes(std::vector<TaxonNode>& tmpNodes,
     }
   }
 
-  Debug(Debug::INFO) << " Done, got " << tmpNodes.size() << " nodes\n";
+  out->info(" Done, got {} nodes\n", tmpNodes.size());
   return tmpNodes.size();
 }
 
@@ -471,7 +471,7 @@ size_t NcbiTaxonomy::loadMerged(const std::string& mergedFile) {
       ++count;
     }
   }
-  Debug(Debug::INFO) << " Done, added " << count << " merged nodes.\n";
+  out->info(" Done, added {} merged nodes.", count);
   return count;
 }
 

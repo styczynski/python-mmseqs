@@ -93,8 +93,8 @@ class QueryMatcher {
       result.diagonal =
           static_cast<unsigned short>(Util::fast_atoi<short>(wordCnt[2]));
     } else {
-      Debug(Debug::INFO) << "Invalid prefilter input: cols = " << cols
-                         << " wordCnt[0]: " << wordCnt[0] << "\n";
+      out->info("Invalid prefilter input: cols = {}\n", cols
+                         << " wordCnt[0]: " << wordCnt[0]);
       EXIT(EXIT_FAILURE);
     }
     return result;

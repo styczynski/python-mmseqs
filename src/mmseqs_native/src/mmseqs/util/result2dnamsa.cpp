@@ -57,10 +57,10 @@ int result2dnamsa(mmseqs_output *out, Parameters &par) {
                         par.compressed, Parameters::DBTYPE_MSA_DB);
   resultWriter.open();
 
-  Debug(Debug::INFO) << "Query database size: " << qDbr.getSize()
-                     << " type: " << qDbr.getDbTypeName() << "\n";
-  Debug(Debug::INFO) << "Target database size: " << tDbr->getSize()
-                     << " type: " << tDbr->getDbTypeName() << "\n";
+  out->info("Query database size: {}\n", qDbr.getSize()
+                     << " type: " << qDbr.getDbTypeName());
+  out->info("Target database size: {}\n", tDbr->getSize()
+                     << " type: " << tDbr->getDbTypeName());
 
   Debug::Progress progress(resultReader.getSize());
 

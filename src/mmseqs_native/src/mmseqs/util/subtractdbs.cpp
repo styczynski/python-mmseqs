@@ -20,7 +20,7 @@ int subtractdbs(mmseqs_output *out, Parameters &par) {
   // par.printParameters(command.cmd, argc, argv, *command.params);
   const double evalThreshold = par.evalProfile;
 
-  Debug(Debug::INFO) << "Remove " << par.db2 << " ids from " << par.db1 << "\n";
+  out->info("Remove {}\n", par.db2 << " ids from " << par.db1);
   DBReader<unsigned int> leftDbr(
       par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);

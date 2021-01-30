@@ -107,7 +107,7 @@ int indexdb(mmseqs_output *out, Parameters &par) {
   bool recreate = true;
   std::string indexDbType = indexDB + ".dbtype";
   if (par.checkCompatible > 0 && FileUtil::fileExists(indexDbType.c_str())) {
-    Debug(Debug::INFO) << "Check index " << indexDB << "\n";
+    out->info("Check index {}\n", indexDB);
     DBReader<unsigned int> index(
         indexDB.c_str(), (indexDB + ".index").c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);

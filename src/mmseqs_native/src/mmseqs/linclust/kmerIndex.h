@@ -213,7 +213,7 @@ class KmerIndex {
   void printIndex(BaseMatrix *mat) {
     Indexer indexer(alphabetSize, kmerSize);
     reset();
-    Debug(Debug::INFO) << "Entry Count: " << entryCount << "\n";
+    out->info("Entry Count: {}\n", entryCount);
     size_t id = 0;
     while (hasNextEntry()) {
       KmerEntry kmer = getNextEntry<TYPE>();

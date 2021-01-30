@@ -286,8 +286,8 @@ redoComputation:
     seqWriter.writeDbtypeFile(seqWriter.getDataFileName(), dbType,
                               par.compressed);
   }
-  Debug(Debug::INFO) << "Database type: " << Parameters::getDbTypeName(dbType)
-                     << "\n";
+  out->info("Database type: {}\n", Parameters::getDbTypeName(dbType)
+                    );
   if (dbInput == true) {
     reader->close();
     delete reader;

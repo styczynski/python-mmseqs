@@ -315,7 +315,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
     }
     targetElementSize[0] = 0;
 
-    Debug(Debug::INFO) << "\nOutput database: " << par.db3 << "\n";
+    out->info("\nOutput database: {}\n", par.db3);
     std::string splitDbw = parOutDbStr + "_" + SSTR(split);
     std::pair<std::string, std::string> splitNamePair =
         (splits.size() > 1) ? std::make_pair(splitDbw, splitDbw + ".index")

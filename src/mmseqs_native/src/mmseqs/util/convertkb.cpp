@@ -131,7 +131,7 @@ int convertkb(mmseqs_output *out, Parameters &par) {
       EXIT(EXIT_FAILURE);
     }
 
-    Debug(Debug::INFO) << "Extracting data from " << (*it) << "\n";
+    out->info("Extracting data from {}\n", (*it));
     std::string line;
     unsigned int i = 0;
     while (std::getline(*kbIn, line)) {

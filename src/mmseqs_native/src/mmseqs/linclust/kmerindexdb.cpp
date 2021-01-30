@@ -31,11 +31,11 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
   setKmerLengthAndAlphabet(par, seqDbr.getAminoAcidDBSize(), querySeqType);
   // par.printParameters(command.cmd, argc, argv, *command.params);
 
-  Debug(Debug::INFO) << "Database size: " << seqDbr.getSize()
-                     << " type: " << seqDbr.getDbTypeName() << "\n";
+  out->info("Database size: {}\n", seqDbr.getSize()
+                     << " type: " << seqDbr.getDbTypeName());
   std::string indexDB = LinsearchIndexReader::indexName(par.db2);
   if (par.checkCompatible > 0 && FileUtil::fileExists(indexDB.c_str())) {
-    Debug(Debug::INFO) << "Check index " << indexDB << "\n";
+    out->info("Check index {}\n", indexDB);
     DBReader<unsigned int> index(
         indexDB.c_str(), (indexDB + ".index").c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
@@ -116,7 +116,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
   std::vector<std::pair<size_t, size_t>> hashRanges =
       setupKmerSplits<short>(par, subMat, seqDbr, totalKmersPerSplit, splits);
 
-  Debug(Debug::INFO) << "Process file into " << hashRanges.size() << " parts\n";
+  out->info("Process file into {} parts\n", hashRanges.size());
   std::vector<std::string> splitFiles;
   KmerPosition<short> *hashSeqPair = NULL;
 
@@ -180,7 +180,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
   }
 #else
   for (size_t split = 0; split < hashRanges.size(); split++) {
-    Debug(Debug::INFO) << "Generate k-mers list " << split << "\n";
+    out->info("Generate k-mers list {}\n", split);
 
     std::string splitFileName = par.db2 + "_split_" + SSTR(split);
 
@@ -219,16 +219,16 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
                  par.compressed, Parameters::DBTYPE_INDEX_DB);
     dbw.open();
 
-    Debug(Debug::INFO) << "Write VERSION (" << PrefilteringIndexReader::VERSION
-                       << ")\n";
+    out->info("Write VERSION ({})\n", PrefilteringIndexReader::VERSION
+                      );
     dbw.writeData(
         (char *)PrefilteringIndexReader::CURRENT_VERSION,
         strlen(PrefilteringIndexReader::CURRENT_VERSION) * sizeof(char),
         PrefilteringIndexReader::VERSION, 0);
     dbw.alignToPageSize();
 
-    Debug(Debug::INFO) << "Write META (" << PrefilteringIndexReader::META
-                       << ")\n";
+    out->info("Write META ({})\n", PrefilteringIndexReader::META
+                      );
     const int mask = par.maskMode > 0;
     const int spacedKmer = (par.spacedKmer) ? 1 : 0;
     const bool sameDB = (par.db1 == par.db2);
@@ -430,7 +430,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
                   0);
     dbw.alignToPageSize();
 
-    Debug(Debug::INFO) << "Time for fill: " << timer.lap() << "\n";
+    out->info("Time for fill: {}\n", timer.lap());
     // add missing entries to the result (needed for clustering)
     dbw.close();
   }

@@ -189,12 +189,12 @@ Alignment::Alignment(const std::string &querySeqDB,
                                        Parameters::DBTYPE_PROFILE_STATE_SEQ)) {
     querySeqType = Parameters::DBTYPE_PROFILE_STATE_PROFILE;
   }
-  Debug(Debug::INFO) << "Query database size: " << qdbr->getSize()
+  out->info("Query database size: {}\n", qdbr->getSize()
                      << " type: " << Parameters::getDbTypeName(querySeqType)
-                     << "\n";
-  Debug(Debug::INFO) << "Target database size: " << tdbr->getSize()
+                    );
+  out->info("Target database size: {}\n", tdbr->getSize()
                      << " type: " << Parameters::getDbTypeName(targetSeqType)
-                     << "\n";
+                    );
 
   prefdbr = new DBReader<unsigned int>(
       prefDB.c_str(), prefDBIndex.c_str(), threads,
@@ -295,8 +295,8 @@ void Alignment::run(const unsigned int mpiRank, const unsigned int mpiNumProc) {
   size_t dbSize = 0;
   prefdbr->decomposeDomainByAminoAcid(mpiRank, mpiNumProc, &dbFrom, &dbSize);
 
-  Debug(Debug::INFO) << "Compute split from " << dbFrom << " to "
-                     << (dbFrom + dbSize) << "\n";
+  out->info("Compute split from {}\n", dbFrom << " to "
+                     << (dbFrom + dbSize));
   std::pair<std::string, std::string> tmpOutput =
       Util::createTmpFileNames(outDB, outDBIndex, mpiRank);
   run(tmpOutput.first, tmpOutput.second, dbFrom, dbSize, true);
@@ -649,8 +649,8 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
   Debug(Debug::INFO) << totalPassedNum
                      << " sequence pairs passed the thresholds";
   if (alignmentsNum > 0) {
-    Debug(Debug::INFO) << " (" << ((float)totalPassedNum / (float)alignmentsNum)
-                       << " of overall calculated)";
+    out->info(" ({} of overall calculated)", ((float)totalPassedNum / (float)alignmentsNum)
+                      );
   }
   out->info("\n");
   if (dbSize > 0) {
