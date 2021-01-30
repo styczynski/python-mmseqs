@@ -168,12 +168,12 @@ bool UniprotKB::readLine(const char* line) {
 
 std::string UniprotKB::getColumn(size_t column) {
   if (hasEntry == false) {
-    Debug(Debug::WARNING) << "No UniprotKB entry ready to read!\n";
+    out->warn("No UniprotKB entry ready to read!");
     return "";
   }
 
   if (column >= dbColumns) {
-    Debug(Debug::WARNING) << "Invalid column selected\n";
+    out->warn("Invalid column selected");
     return std::string();
   }
 

@@ -669,7 +669,7 @@ char Util::touchMemory(const char *memory, size_t size) {
   }
 #endif
   if (size > Util::getTotalSystemMemory()) {
-    Debug(Debug::WARNING) << "Can not touch " << size << " into main memory\n";
+    out->warn("Can not touch {} into main memory", size);
     return 0;
   }
   size_t pageSize = getPageSize();

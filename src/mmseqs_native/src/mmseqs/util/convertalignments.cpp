@@ -345,7 +345,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
           int count = snprintf(buffer, sizeof(buffer), "@SQ\tSN:%s\tLN:%d\n",
                                targetId.c_str(), (int32_t)seqLen);
           if (count < 0 || static_cast<size_t>(count) >= sizeof(buffer)) {
-            Debug(Debug::WARNING) << "Truncated line in header " << i << "!\n";
+            out->warn("Truncated line in header {}!", i);
             continue;
           }
           resultWriter.writeAdd(buffer, count, 0);
@@ -437,7 +437,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
         int count = snprintf(buffer, sizeof(buffer), jsStart, queryId.c_str(),
                              querySeqData);
         if (count < 0 || static_cast<size_t>(count) >= sizeof(buffer)) {
-          Debug(Debug::WARNING) << "Truncated line in entry" << i << "!\n";
+          out->warn("Truncated line in entry{}!", i);
           continue;
         }
         result.append(buffer, count);
@@ -759,7 +759,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
                 res.score, res.qLen, res.dbLen);
 
             if (count < 0 || static_cast<size_t>(count) >= sizeof(buffer)) {
-              Debug(Debug::WARNING) << "Truncated line in entry" << i << "!\n";
+              out->warn("Truncated line in entry{}!", i);
               continue;
             }
 
@@ -777,7 +777,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
                                  queryId.c_str(), (strand) ? 16 : 0,
                                  targetId.c_str(), res.dbStartPos + 1, mapq);
             if (count < 0 || static_cast<size_t>(count) >= sizeof(buffer)) {
-              Debug(Debug::WARNING) << "Truncated line in entry" << i << "!\n";
+              out->warn("Truncated line in entry{}!", i);
               continue;
             }
             result.append(buffer, count);
@@ -801,7 +801,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
             count = snprintf(buffer, sizeof(buffer), "\t*\tAS:i:%d\tNM:i:%d\n",
                              rawScore, missMatchCount);
             if (count < 0 || static_cast<size_t>(count) >= sizeof(buffer)) {
-              Debug(Debug::WARNING) << "Truncated line in entry" << i << "!\n";
+              out->warn("Truncated line in entry{}!", i);
               continue;
             }
             result.append(buffer, count);
@@ -821,7 +821,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
                 res.score, res.qLen, res.dbLen);
 
             if (count < 0 || static_cast<size_t>(count) >= sizeof(buffer)) {
-              Debug(Debug::WARNING) << "Truncated line in entry" << i << "!\n";
+              out->warn("Truncated line in entry{}!", i);
               continue;
             }
             result.append(buffer, count);

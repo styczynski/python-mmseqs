@@ -116,7 +116,7 @@ int renamedbkeys(mmseqs_output* out, Parameters& par) {
   while (getline(&line, &len, orderFile) != -1) {
     const size_t columns = Util::getWordsOfLine(line, fields, 2);
     if (columns < 2) {
-      Debug(Debug::WARNING) << "Not enough columns in mapping file\n";
+      out->warn("Not enough columns in mapping file");
       continue;
     }
     const unsigned int oldKey = Util::fast_atoi<unsigned int>(fields[0]);

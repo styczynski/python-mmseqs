@@ -81,7 +81,7 @@ int extractorfs(mmseqs_output* out, Parameters& par) {
       const char* data = reader.getData(i, thread_idx);
       size_t sequenceLength = reader.getSeqLen(i);
       if (!orf.setSequence(data, sequenceLength)) {
-        Debug(Debug::WARNING) << "Invalid sequence with index " << i << "!\n";
+        out->warn("Invalid sequence with index {}!", i);
         continue;
       }
 

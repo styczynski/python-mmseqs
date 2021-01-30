@@ -56,7 +56,7 @@ int dolca(mmseqs_output* out, Parameters& par, bool majority) {
   for (size_t i = 0; i < splits.size(); ++i) {
     TaxID taxon = Util::fast_atoi<int>(splits[i].c_str());
     if (taxon == 0) {
-      Debug(Debug::WARNING) << "Cannot block root taxon 0\n";
+      out->warn("Cannot block root taxon 0");
       continue;
     }
     if (t->nodeExists(taxon) == false) {
@@ -127,7 +127,7 @@ int dolca(mmseqs_output* out, Parameters& par, bool majority) {
         const size_t columns = Util::getWordsOfLine(data, entry, 255);
         data = Util::skipLine(data);
         if (columns == 0) {
-          Debug(Debug::WARNING) << "Empty entry: " << i << "!";
+          out->warn("Empty entry: {}!", i);
           continue;
         }
 

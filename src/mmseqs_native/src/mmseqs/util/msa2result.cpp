@@ -331,12 +331,12 @@ int msa2result(mmseqs_output *out, Parameters &par) {
       kseq_rewind(seq);
 
       if (fastaError == true) {
-        Debug(Debug::WARNING) << "Invalid msa " << id << "! Skipping entry.\n";
+        out->warn("Invalid msa {}! Skipping entry.", id);
         continue;
       }
 
       if (setSize == 0) {
-        Debug(Debug::WARNING) << "Empty msa " << id << "! Skipping entry.\n";
+        out->warn("Empty msa {}! Skipping entry.", id);
         continue;
       }
 

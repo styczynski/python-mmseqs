@@ -52,7 +52,7 @@ int createdb(mmseqs_output* out, Parameters& par) {
       par.shuffleDatabase) {
     Debug(Debug::WARNING)
         << "Shuffle database cannot be combined with --createdb-mode 0\n";
-    Debug(Debug::WARNING) << "We recompute with --shuffle 0\n";
+    out->warn("We recompute with --shuffle 0");
     par.shuffleDatabase = false;
   }
 
@@ -60,7 +60,7 @@ int createdb(mmseqs_output* out, Parameters& par) {
       par.filenames[0] == "stdin") {
     Debug(Debug::WARNING)
         << "Stdin input cannot be combined with --createdb-mode 0\n";
-    Debug(Debug::WARNING) << "We recompute with --createdb-mode 1\n";
+    out->warn("We recompute with --createdb-mode 1");
     par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_HARD;
   }
 
@@ -69,7 +69,7 @@ int createdb(mmseqs_output* out, Parameters& par) {
       par.compressed) {
     Debug(Debug::WARNING)
         << "Compressed database cannot be combined with --createdb-mode 0\n";
-    Debug(Debug::WARNING) << "We recompute with --compressed 0\n";
+    out->warn("We recompute with --compressed 0");
     par.compressed = 0;
   }
 
@@ -154,7 +154,7 @@ redoComputation:
         kseq->type != KSeqWrapper::KSEQ_FILE) {
       Debug(Debug::WARNING) << "Only uncompressed fasta files can be used with "
                                "--createdb-mode 0.\n";
-      Debug(Debug::WARNING) << "We recompute with --createdb-mode 1.\n";
+      out->warn("We recompute with --createdb-mode 1.");
       par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_HARD;
       progress.reset(SIZE_MAX);
       hdrWriter.close();
@@ -224,7 +224,7 @@ redoComputation:
             e.multiline == true) {
           Debug(Debug::WARNING)
               << "Multiline fasta can not be combined with --createdb-mode 0\n";
-          Debug(Debug::WARNING) << "We recompute with --createdb-mode 1\n";
+          out->warn("We recompute with --createdb-mode 1");
           par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_HARD;
           progress.reset(SIZE_MAX);
           hdrWriter.close();

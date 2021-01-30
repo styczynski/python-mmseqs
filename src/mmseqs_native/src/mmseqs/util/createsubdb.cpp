@@ -46,7 +46,7 @@ int createsubdb(mmseqs_output *out, Parameters &par) {
     prevKey = key;
     const size_t id = reader.getId(key);
     if (id >= UINT_MAX) {
-      Debug(Debug::WARNING) << "Key " << dbKey << " not found in database\n";
+      out->warn("Key {} not found in database", dbKey);
       continue;
     }
     if (par.subDbMode == Parameters::SUBDB_MODE_SOFT) {

@@ -182,7 +182,7 @@ int StatsComputer::meanValue() {
         errno = 0;
         double value = strtod(results, &rest);
         if (rest == results || errno != 0) {
-          Debug(Debug::WARNING) << "Invalid value in entry " << id << "!\n";
+          out->warn("Invalid value in entry {}!", id);
           continue;
         }
 
@@ -222,7 +222,7 @@ int StatsComputer::sumValue() {
         errno = 0;
         size_t value = strtoull(results, &rest, 10);
         if (rest == results || errno != 0) {
-          Debug(Debug::WARNING) << "Invalid value in entry " << id << "!\n";
+          out->warn("Invalid value in entry {}!", id);
           continue;
         }
 
@@ -315,7 +315,7 @@ int StatsComputer::sequenceWise(typename PerSequence<T>::type call,
           char *rest;
           const unsigned int key = (unsigned int)strtoul(dbKey, &rest, 10);
           if ((rest != dbKey && *rest != '\0') || errno == ERANGE) {
-            Debug(Debug::WARNING) << "Invalid key in entry " << id << "!\n";
+            out->warn("Invalid key in entry {}!", id);
             continue;
           }
 

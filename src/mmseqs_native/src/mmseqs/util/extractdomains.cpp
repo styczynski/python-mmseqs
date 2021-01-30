@@ -143,7 +143,7 @@ std::vector<Domain> mapMsa(const std::string &msa,
   kseq_t *seq = kseq_init(&d);
   while (kseq_read(seq) >= 0) {
     if (seq->name.l == 0 || seq->seq.l == 0) {
-      Debug(Debug::WARNING) << "Invalid fasta entry!\n";
+      out->warn("Invalid fasta entry!");
       continue;
     }
 
@@ -288,7 +288,7 @@ int doExtract(Parameters &par, DBReader<unsigned int> &blastTabReader,
       unsigned int id = blastTabReader.getDbKey(i);
       size_t entry = msaReader.getId(id);
       if (entry == UINT_MAX) {
-        Debug(Debug::WARNING) << "Can not find MSA for key " << id << "!\n";
+        out->warn("Can not find MSA for key {}!", id);
         continue;
       }
 

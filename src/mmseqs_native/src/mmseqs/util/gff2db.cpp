@@ -57,7 +57,7 @@ int gff2db(mmseqs_output *out, Parameters &par) {
     const size_t columns = Util::getWordsOfLine(data, fields, 255);
     data = Util::skipLine(data);
     if (columns < 9) {
-      Debug(Debug::WARNING) << "Not enough columns in GFF file\n";
+      out->warn("Not enough columns in GFF file");
       continue;
     }
 

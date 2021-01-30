@@ -53,7 +53,7 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
   setTaxonomyMustPassAlong(&par);
 
   if (par.taxonomySearchMode == Parameters::TAXONOMY_2BLCA) {
-    Debug(Debug::WARNING) << "2bLCA was replaced by Accelerated 2bLCA\n";
+    out->warn("2bLCA was replaced by Accelerated 2bLCA");
     par.taxonomySearchMode = Parameters::TAXONOMY_ACCEL_2BLCA;
   }
 

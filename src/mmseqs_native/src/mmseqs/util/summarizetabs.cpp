@@ -113,7 +113,7 @@ std::vector<Domain> getEntries(
     if (it != lengths.end()) {
       qLength = (*it).second;
     } else {
-      Debug(Debug::WARNING) << "Missing query length! Skipping line.\n";
+      out->warn("Missing query length! Skipping line.");
       continue;
     }
 
@@ -126,7 +126,7 @@ std::vector<Domain> getEntries(
     if (it != lengths.end()) {
       tLength = (*it).second;
     } else {
-      Debug(Debug::WARNING) << "Missing target length! Skipping line.\n";
+      out->warn("Missing target length! Skipping line.");
       continue;
     }
 

@@ -136,7 +136,7 @@ int convertkb(mmseqs_output *out, Parameters &par) {
     unsigned int i = 0;
     while (std::getline(*kbIn, line)) {
       if (line.length() < 2) {
-        Debug(Debug::WARNING) << "Invalid entry\n";
+        out->warn("Invalid entry");
         continue;
       }
 

@@ -189,7 +189,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
       unsigned int queryKey = resultReader.getDbKey(id);
       size_t queryId = qDbr->getId(queryKey);
       if (queryId == UINT_MAX) {
-        Debug(Debug::WARNING) << "Invalid query sequence " << queryKey << "\n";
+        out->warn("Invalid query sequence {}\n", queryKey);
         continue;
       }
       centerSequence.mapSequence(queryId, queryKey,
