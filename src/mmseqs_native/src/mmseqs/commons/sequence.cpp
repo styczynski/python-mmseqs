@@ -45,10 +45,7 @@ Sequence::Sequence(size_t maxLen, int seqType, const BaseMatrix *subMat,
     memset(this->kmerWindow, 0, simdKmerLen * sizeof(unsigned char));
     this->aaPosInSpacedPattern = new unsigned char[kmerSize];
     if (spacedPattern == NULL) {
-      Debug(Debug::ERROR) << "Sequence does not have a kmerSize (kmerSize= "
-                          << spacedPatternSize << ") to use nextKmer.\n";
-      Debug(Debug::ERROR) << "Please report this bug to the developer\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Sequence does not have a kmerSize (kmerSize={}) to use nextKmer. Please report this bug to the developer.", spacedPatternSize);
     }
     size_t pos = 0;
     for (int i = 0; i < this->spacedPatternSize; i++) {
@@ -178,11 +175,6 @@ std::pair<const char *, unsigned int> Sequence::getSpacedPattern(
       return std::make_pair<const char *, unsigned int>(
           const_cast<const char *>(pattern),
           static_cast<unsigned int>(kmerSize));
-
-      //            Debug(Debug::ERROR) << "Did not find spaced pattern for
-      //            kmerSize: " << kmerSize << ". \n"; Debug(Debug::ERROR) <<
-      //            "Please report this bug to the developer\n";
-      //            EXIT(EXIT_FAILURE);
       break;
   }
   char *pattern = new char[pair.second];
@@ -211,20 +203,14 @@ std::pair<const char *, unsigned int> Sequence::parseSpacedPattern(
         pattern[i] = 1;
         break;
       default:
-        Debug(Debug::ERROR)
-            << "Invalid character in user-specified k-mer pattern\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Invalid character in user-specified k-mer pattern");
         break;
     }
   }
   if (spacedKmerPatternKmerSize != kmerSize) {
-    Debug(Debug::ERROR) << "User-specified k-mer pattern is not consistent "
-                           "with stated k-mer size\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("User-specified k-mer pattern is not consistent with stated k-mer size");
   } else if (spacedKmerPatternSpaced != spaced) {
-    Debug(Debug::ERROR) << "User-specified k-mer pattern is not consistent "
-                           "with spaced k-mer true/false\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("User-specified k-mer pattern is not consistent with spaced k-mer true/false");
   }
   return std::make_pair<const char *, unsigned int>((const char *)pattern,
                                                     spacedKmerPattern.size());
@@ -262,13 +248,11 @@ void Sequence::mapSequence(size_t id, unsigned int dbKey, const char *sequence,
         mapProfileState<255>(sequence, seqLen);
         break;
       default:
-        Debug(Debug::ERROR) << "Invalid alphabet size type!\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Invalid alphabet size type");
         break;
     }
   } else {
-    Debug(Debug::ERROR) << "Invalid sequence type!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid sequence type");
   }
   currItPos = -1;
 }
@@ -292,8 +276,7 @@ void Sequence::mapSequence(
     }
     memcpy(this->numSequence, data.first, this->L);
   } else {
-    Debug(Debug::ERROR) << "Invalid sequence type!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid sequence type");
   }
   currItPos = -1;
 }
@@ -308,9 +291,7 @@ void Sequence::mapProfileStateSequence(const char *profileStateSeq,
 
     l++;
     if (l > maxLen) {
-      Debug(Debug::ERROR) << "Sequence too long! Max length allowed would be "
-                          << maxLen << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Sequence too long! Max length allowed would be {}", maxLen);
     }
     pos++;
     curr = profileStateSeq[pos];
@@ -357,8 +338,7 @@ void Sequence::mapProfile(const char *profileData, bool mapScores,
     }
     this->L = l;
     if (l > maxLen) {
-      Debug(Debug::INFO) << "Entry " << dbKey << " is longer than max seq. len "
-                         << maxLen << "\n";
+      out->info("Entry {} is longer than max seq. len {}", dbKey, maxLen);
     }
   }
 
@@ -481,8 +461,7 @@ void Sequence::mapProfileState(const char *profileState, unsigned int seqLen) {
                                  (unsigned int *)&indexArray);
           break;
         default:
-          Debug(Debug::ERROR) << "Sort for T of " << T << " is not defined \n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Sort for T of {} is not defined.", T);
           break;
       }
 

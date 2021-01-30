@@ -155,11 +155,7 @@ class DBReader : public MemoryTracker {
 
   size_t getSeqLen(size_t id) {
     if (id >= size) {
-      Debug(Debug::ERROR) << "Invalid database read for id=" << id
-                          << ", database index=" << indexFileName << "\n";
-      Debug(Debug::ERROR) << "getSeqLen: local id (" << id << ") >= db size ("
-                          << size << ")\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid database read for id={}, database index={}\ngetSeqLen: local id ({}) >= db size ({})", id, indexFileName, id, size);
     }
     unsigned int length;
     if (local2id != NULL) {
@@ -181,11 +177,7 @@ class DBReader : public MemoryTracker {
 
   size_t getEntryLen(size_t id) {
     if (id >= size) {
-      Debug(Debug::ERROR) << "Invalid database read for id=" << id
-                          << ", database index=" << indexFileName << "\n";
-      Debug(Debug::ERROR) << "getEntryLen: local id (" << id << ") >= db size ("
-                          << size << ")\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid database read for id={}, database index={}\ngetEntryLen: local id ({}) >= db size ({})", id, indexFileName, id, size);
     }
     if (local2id != NULL) {
       return index[local2id[id]].length;

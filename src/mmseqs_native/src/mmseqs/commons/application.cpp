@@ -19,7 +19,7 @@ Command *getCommandByName(const char *s) {
 int runCommand(mmseqs_output *out, Command *c, Parameters &par) {
   Timer timer;
   int status = c->commandFunction(out, par);
-  Debug(Debug::INFO) << "Time for processing: " << timer.lap() << "\n";
+  out->info("Time for processing: {}", timer.lap());
   return status;
 }
 

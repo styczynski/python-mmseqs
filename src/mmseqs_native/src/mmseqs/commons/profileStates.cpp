@@ -60,9 +60,7 @@ ProfileStates::ProfileStates(int pAlphSize, double *pBack) {
                                   Library255_may17_lib_len);
       break;
     default:
-      Debug(Debug::ERROR) << "Could not load library for alphabet size "
-                          << alphSize << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Could not load library for alphabet size {}", alphSize);
   }
   // std::string libraryString((const char *)LibraryExpOpt3_8_polished2_lib,
   // LibraryExpOpt3_8_polished2_lib_len); std::string libraryString((const char
@@ -95,8 +93,7 @@ int ProfileStates::readProfile(std::stringstream &in, float *profile,
                                float *normalizedProfile, float &prior) {
   // Parse and check header information
   if (!reader.StreamStartsWith(in, "ContextProfile")) {
-    Debug(Debug::WARNING)
-        << "Stream does not start with class id 'ContextProfile'!\n";
+    out->warn("Stream does not start with class id 'ContextProfile'");
     return -1;
   }
 
@@ -136,9 +133,7 @@ int ProfileStates::readProfile(std::stringstream &in, float *profile,
   // assert(len == 1); // no context
 
   if (nalph != 20) {
-    Debug(Debug::WARNING)
-        << "Alphabet size of serialized context profile should be " << 20
-        << " but is actually " << nalph << "!\n";
+    out->warn("Alphabet size of serialized context profile should be {} but is actually {}", 20, nalph);
     return -1;
   }
 
@@ -166,8 +161,7 @@ int ProfileStates::readProfile(std::stringstream &in, float *profile,
 
       if (pos == oldPos)  // we reached the end of the line
       {
-        Debug(Debug::WARNING) << "Context profile should have " << nalph
-                              << " columns but actually has " << k + 1 << "!\n";
+        out->warn("Context profile should have {} columns but actually has {}", nalph, k+1);
         return -1;
       }
     }
@@ -177,13 +171,12 @@ int ProfileStates::readProfile(std::stringstream &in, float *profile,
       normalizedProfile[k] = profile[k] / norm;
     }
   } else {
-    Debug(Debug::WARNING)
-        << "Cannot find the probabilities of the state in the file !\n";
+    out->warn("Cannot find the probabilities of the state in the file");
     return -1;
   }
 
   if (!reader.StreamStartsWith(in, "//")) {
-    Debug(Debug::WARNING) << "Expected end of profile description!\n";
+    out->warn("Expected end of profile description");
     return -1;
   }
   return 0;
@@ -193,8 +186,7 @@ int ProfileStates::read(std::string libraryData) {
   std::stringstream in(libraryData);
   // Parse and check header information
   if (!reader.StreamStartsWith(in, "ContextLibrary")) {
-    Debug(Debug::WARNING) << "LibraryData does not start with ContextLibrary"
-                          << "!\n";
+    out->warn("LibraryData does not start with ContextLibrary");
     return -1;
   }
 
@@ -231,9 +223,7 @@ int ProfileStates::read(std::string libraryData) {
   }
 
   if (k != alphSize) {
-    Debug(Debug::WARNING) << "Serialized context library should have "
-                          << alphSize << " profiles but actually has "
-                          << (unsigned int)k << "\n";
+    out->warn("Serialized context library should have {} profiles but actually has {}", alphSize, (unsigned int)k);
     return -1;
   }
 
@@ -301,7 +291,7 @@ float ProfileStates::getScoreNormalization() {
 
   exp = 1.0 + (exp - 1.0) / 2;
 
-  Debug(Debug::INFO) << "Score normalization : " << 1.0 / exp << "\n";
+  out->info("Score normalization: {}", 1.0 / exp);
 
   exp = 1.0;
   return exp;

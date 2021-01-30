@@ -2,6 +2,7 @@
 #define OUTPUT_H
 
 #include <mmseqs/commons/util.h>
+#include <mmseqs/commons/log.h>
 
 #include <iostream>
 #include <map>
@@ -41,9 +42,32 @@ struct mmseqs_output {
   mmseqs_output() {
     vars_str = std::map<std::string, std::string>();
     blast_tab_records = std::vector<std::vector<mmseqs_blast_tab_record>>();
+    logger = Log();
   }
+
   std::map<std::string, std::string> vars_str;
   std::vector<std::vector<mmseqs_blast_tab_record>> blast_tab_records;
+  Log logger;
+
+  template<typename FormatString, typename... Args>
+  void error(const FormatString &fmt, Args&&...args) {
+      logger.error(fmt, std::forward<Args>(args)...);
+  }
+
+  template<typename FormatString, typename... Args>
+  void info(const FormatString &fmt, Args&&...args) {
+      loggger.info(fmt, std::forward<Args>(args)...);
+  }
+
+  template<typename FormatString, typename... Args>
+  void debug(const FormatString &fmt, Args&&...args) {
+      logger.debug(fmt, std::forward<Args>(args)...);
+  }
+
+  template<typename FormatString, typename... Args>
+  void failure(const FormatString &fmt, Args&&...args) {
+      logger.failure(fmt, std::forward<Args>(args)...);
+  }
 
   void output_string(std::string name, std::string value) {
     vars_str[name] = value;

@@ -193,9 +193,7 @@ unsigned char MemoryMapped::operator[](size_t offset) const {
 unsigned char MemoryMapped::at(size_t offset) const {
   // checks
   if (offset >= _filesize) {
-    Debug(Debug::ERROR) << "offset (" << offset << ") >= _filesize ("
-                        << _filesize << ")\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Memory mapped file lookup failure: offset ({}) >= _filesize({})", offset, _filesize);
   }
   return operator[](offset);
 }

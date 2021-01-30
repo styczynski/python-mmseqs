@@ -94,7 +94,6 @@ void DBReader<T>::setDataFile(const char *dataFileName_) {
 template <typename T>
 void DBReader<T>::readMmapedDataInMemory() {
   if ((dataMode & USE_DATA) && (dataMode & USE_FREAD) == 0) {
-    // Debug(Debug::INFO) << "Touch data file " << dataFileName << "\n";
     for (size_t fileIdx = 0; fileIdx < dataFileCnt; fileIdx++) {
       size_t dataSize = dataSizeOffset[fileIdx + 1] - dataSizeOffset[fileIdx];
       magicBytes += Util::touchMemory(dataFiles[fileIdx], dataSize);
@@ -117,7 +116,7 @@ void DBReader<T>::mlock() {
 
 template <typename T>
 void DBReader<T>::printMagicNumber() {
-  Debug(Debug::INFO) << magicBytes << "\n";
+  out->info("Magic bytes: {}", magicBytes);
 }
 
 template <typename T>
@@ -149,9 +148,7 @@ bool DBReader<T>::open(int accessType) {
   if (dataMode & USE_DATA) {
     dataFileNames = FileUtil::findDatafiles(dataFileName);
     if (dataFileNames.empty()) {
-      Debug(Debug::ERROR) << "No datafile could be found for " << dataFileName
-                          << "!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("No datafile could be found for {}", dataFileName);
     }
     totalDataSize = 0;
     dataFileCnt = dataFileNames.size();
@@ -160,17 +157,14 @@ bool DBReader<T>::open(int accessType) {
     for (size_t fileIdx = 0; fileIdx < dataFileNames.size(); fileIdx++) {
       FILE *dataFile = fopen(dataFileNames[fileIdx].c_str(), "r");
       if (dataFile == NULL) {
-        Debug(Debug::ERROR)
-            << "Can not open data file " << dataFileName << "!\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Can not open data file {}", dataFileName);
       }
       size_t dataSize;
       dataFiles[fileIdx] = mmapData(dataFile, &dataSize);
       dataSizeOffset[fileIdx] = totalDataSize;
       totalDataSize += dataSize;
       if (fclose(dataFile) != 0) {
-        Debug(Debug::ERROR) << "Cannot close file " << dataFileName << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot close file {}", dataFileName);
       }
     }
     dataSizeOffset[dataFileNames.size()] = totalDataSize;
@@ -182,9 +176,7 @@ bool DBReader<T>::open(int accessType) {
   if (dataMode & USE_LOOKUP || dataMode & USE_LOOKUP_REV) {
     std::string lookupFilename = (std::string(dataFileName) + ".lookup");
     if (FileUtil::fileExists(lookupFilename.c_str()) == false) {
-      Debug(Debug::ERROR) << "Can not open lookup file " << lookupFilename
-                          << "!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not open lookup file {}", lookupFilename);
     }
     MemoryMapped indexData(lookupFilename, MemoryMapped::WholeFile,
                            MemoryMapped::SequentialScan);
@@ -205,16 +197,12 @@ bool DBReader<T>::open(int accessType) {
   bool isSortedById = false;
   if (externalData == false) {
     if (FileUtil::fileExists(indexFileName) == false) {
-      Debug(Debug::ERROR) << "Can not open index file " << indexFileName
-                          << "!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not open index file {}", indexFileName);
     }
     MemoryMapped indexData(indexFileName, MemoryMapped::WholeFile,
                            MemoryMapped::SequentialScan);
     if (!indexData.isValid()) {
-      Debug(Debug::ERROR) << "Can map open index file " << indexFileName
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can map open index file {}", indexFileName);
     }
     char *indexDataChar = (char *)indexData.getData();
     size_t indexDataSize = indexData.size();
@@ -251,13 +239,11 @@ bool DBReader<T>::open(int accessType) {
       compressedBuffers[i] = (char *)malloc(compressedBufferSizes[i]);
       incrementMemory(compressedBufferSizes[i]);
       if (compressedBuffers[i] == NULL) {
-        Debug(Debug::ERROR) << "Can not allocate compressedBuffer!\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Can not allocate compressedBuffer");
       }
       dstream[i] = ZSTD_createDStream();
       if (dstream == NULL) {
-        Debug(Debug::ERROR) << "ZSTD_createDStream() error \n";
-        EXIT(EXIT_FAILURE);
+        out->failure("ZSTD_createDStream() error")
       }
     }
   }
@@ -283,9 +269,7 @@ void DBReader<std::string>::sortIndex(bool isSortedById) {
     SORT_PARALLEL(index, index + size, Index::compareById);
   } else {
     if (accessType != NOSORT && accessType != HARDNOSORT) {
-      Debug(Debug::ERROR)
-          << "DBReader<std::string> can not be opened in sort mode\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("DBReader<std::string> can not be opened in sort mode");
     }
   }
 }
@@ -467,9 +451,7 @@ char *DBReader<T>::mmapData(FILE *file, size_t *dataSize) {
   struct stat sb;
   if (fstat(fileno(file), &sb) < 0) {
     int errsv = errno;
-    Debug(Debug::ERROR) << "Failed to fstat File=" << dataFileName << ". Error "
-                        << errsv << ".\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Failed to fstat File={}. Error {}", dataFileName, errsv);
   }
 
   *dataSize = sb.st_size;
@@ -488,10 +470,7 @@ char *DBReader<T>::mmapData(FILE *file, size_t *dataSize) {
           static_cast<char *>(mmap(NULL, *dataSize, mode, MAP_PRIVATE, fd, 0));
       if (ret == MAP_FAILED) {
         int errsv = errno;
-        Debug(Debug::ERROR)
-            << "Failed to mmap memory dataSize=" << *dataSize
-            << " File=" << dataFileName << ". Error " << errsv << ".\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Failed to mmap memory dataSize={} File={}. Error {}", *dataSize, dataFileName, errsv);
       }
     } else {
       ret = static_cast<char *>(malloc(*dataSize));
@@ -500,9 +479,7 @@ char *DBReader<T>::mmapData(FILE *file, size_t *dataSize) {
           ret, "Not enough system memory to read in the whole data file.");
       size_t result = fread(ret, 1, *dataSize, file);
       if (result != *dataSize) {
-        Debug(Debug::ERROR) << "Failed to read in datafile (" << dataFileName
-                            << "). Error " << errno << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Failed to read in datafile ({}). Error {}", dataFileName, errno);
       }
     }
     return ret;
@@ -518,16 +495,12 @@ void DBReader<T>::remapData() {
     for (size_t fileIdx = 0; fileIdx < dataFileNames.size(); fileIdx++) {
       FILE *dataFile = fopen(dataFileNames[fileIdx].c_str(), "r");
       if (dataFile == NULL) {
-        Debug(Debug::ERROR)
-            << "Can not open data file " << dataFileNames[fileIdx] << "!\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Can not open data file {}", dataFileNames[fileIdx]);
       }
       size_t dataSize = 0;
       dataFiles[fileIdx] = mmapData(dataFile, &dataSize);
       if (fclose(dataFile) != 0) {
-        Debug(Debug::ERROR)
-            << "Cannot close file " << dataFileNames[fileIdx] << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Can not close file {}", dataFileNames[fileIdx]);
       }
     }
     dataMapped = true;
@@ -597,9 +570,7 @@ char *DBReader<T>::getDataCompressed(size_t id, int thrIdx) {
       // size of next compressed block
       size_t toRead = ZSTD_decompressStream(dstream[thrIdx], &output, &input);
       if (ZSTD_isError(toRead)) {
-        Debug(Debug::ERROR) << id << " ZSTD_decompressStream "
-                            << ZSTD_getErrorName(toRead) << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("{} ZSTD_decompressStream {}", id, ZSTD_getErrorName(toRead));
       }
       totalSize += output.pos;
     }
@@ -638,18 +609,10 @@ template <typename T>
 char *DBReader<T>::getDataUncompressed(size_t id) {
   checkClosed();
   if (!(dataMode & USE_DATA)) {
-    Debug(Debug::ERROR) << "DBReader is just open in INDEXONLY mode. Call of "
-                           "getData is not allowed"
-                        << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("DBReader is just open in INDEXONLY mode. Call of getData is not allowed");
   }
   if (id >= size) {
-    Debug(Debug::ERROR) << "Invalid database read for database data file="
-                        << dataFileName << ", database index=" << indexFileName
-                        << "\n";
-    Debug(Debug::ERROR) << "getData: local id (" << id << ") >= db size ("
-                        << size << ")\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid database read for database data file={}, database index={}.\ngetData: local id ({}) >= db size ({})", dataFileName, indexFileName, id, size);
   }
 
   if (local2id != NULL) {
@@ -662,12 +625,8 @@ char *DBReader<T>::getDataUncompressed(size_t id) {
 template <typename T>
 char *DBReader<T>::getDataByOffset(size_t offset) {
   if (offset >= totalDataSize) {
-    Debug(Debug::ERROR) << "Invalid database read for database data file="
-                        << dataFileName << ", database index=" << indexFileName
-                        << "\n";
-    Debug(Debug::ERROR) << "Size of data: " << totalDataSize << "\n";
-    Debug(Debug::ERROR) << "Requested offset: " << offset << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid database read for database data file={}, database index={}.\nSize of data: {} requested offset: {}", dataFileName, indexFileName, totalDataSize, offset);
+
   }
   size_t cnt = 0;
   while ((offset >= dataSizeOffset[cnt] && offset < dataSizeOffset[cnt + 1]) ==
@@ -715,11 +674,7 @@ template <typename T>
 T DBReader<T>::getDbKey(size_t id) {
   checkClosed();
   if (id >= size) {
-    Debug(Debug::ERROR) << "Invalid database read for id=" << id
-                        << ", database index=" << indexFileName << "\n";
-    Debug(Debug::ERROR) << "getDbKey: local id (" << id << ") >= db size ("
-                        << size << ")\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid database read for id={}, database index={}.\ngetDbKey: local id ({}) >= db size ({})", id, indexFileName, id, size);
   }
   if (local2id != NULL) {
     id = local2id[id];
@@ -730,9 +685,7 @@ T DBReader<T>::getDbKey(size_t id) {
 template <typename T>
 size_t DBReader<T>::getLookupIdByKey(T dbKey) {
   if ((dataMode & USE_LOOKUP) == 0) {
-    Debug(Debug::ERROR) << "DBReader for datafile=" << dataFileName
-                        << ".lookup was not opened with lookup mode\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("DBReader for datafile={}. Lookup was not opened with lookup mode", dataFileName);
   }
   LookupEntry val;
   val.id = dbKey;
@@ -746,9 +699,7 @@ size_t DBReader<T>::getLookupIdByKey(T dbKey) {
 template <typename T>
 size_t DBReader<T>::getLookupIdByAccession(const std::string &accession) {
   if ((dataMode & USE_LOOKUP_REV) == 0) {
-    Debug(Debug::ERROR) << "DBReader for datafile=" << dataFileName
-                        << ".lookup was not opened with lookup mode\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("DBReader for datafile={}. Lookup was not opened with lookup mode", dataFileName);
   }
   LookupEntry val;
   val.entryName = accession;
@@ -762,11 +713,7 @@ size_t DBReader<T>::getLookupIdByAccession(const std::string &accession) {
 template <typename T>
 T DBReader<T>::getLookupKey(size_t id) {
   if (id >= lookupSize) {
-    Debug(Debug::ERROR) << "Invalid database read for id=" << id
-                        << ", database index=" << dataFileName << ".lookup\n";
-    Debug(Debug::ERROR) << "getLookupKey: local id (" << id << ") >= db size ("
-                        << lookupSize << ")\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid database read for id={}, database index={}.\ngetLookupKey: local id ({}) >= db size ({})", id, dataFileName, id, lookupSize);
   }
   return lookup[id].id;
 }
@@ -774,11 +721,7 @@ T DBReader<T>::getLookupKey(size_t id) {
 template <typename T>
 std::string DBReader<T>::getLookupEntryName(size_t id) {
   if (id >= lookupSize) {
-    Debug(Debug::ERROR) << "Invalid database read for id=" << id
-                        << ", database index=" << dataFileName << ".lookup\n";
-    Debug(Debug::ERROR) << "getLookupEntryName: local id (" << id
-                        << ") >= db size (" << lookupSize << ")\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid database read for id={}, database index={}.\ngetLookupEntryName: local id ({}) >= db size ({})", id, dataFileName, id, lookupSize);
   }
   return lookup[id].entryName;
 }
@@ -786,11 +729,7 @@ std::string DBReader<T>::getLookupEntryName(size_t id) {
 template <typename T>
 unsigned int DBReader<T>::getLookupFileNumber(size_t id) {
   if (id >= lookupSize) {
-    Debug(Debug::ERROR) << "Invalid database read for id=" << id
-                        << ", database index=" << dataFileName << ".lookup\n";
-    Debug(Debug::ERROR) << "getLookupFileNumber: local id (" << id
-                        << ") >= db size (" << lookupSize << ")\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid database read for id={}, database index={}.\ngetLookupFileNumber: local id ({}) >= db size ({})", id, dataFileName, id, lookupSize);
   }
   return lookup[id].fileNumber;
 }
@@ -879,8 +818,7 @@ size_t DBReader<T>::maxCount(char c) {
 template <typename T>
 void DBReader<T>::checkClosed() const {
   if (closed == 1) {
-    Debug(Debug::ERROR) << "Trying to read a closed database.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Trying to read a closed database");
   }
 }
 
@@ -913,9 +851,7 @@ bool DBReader<T>::readIndex(char *data, size_t indexDataSize, Index *index,
 
     while (currPos < indexDataSize) {
       if (currLine >= this->size) {
-        Debug(Debug::ERROR) << "Corrupt memory, too many entries: " << currLine
-                            << " >= " << this->size << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Corrupt memory, too many entries: {} >= {}", currLine, this->size);
       }
       if (currLine == lineStartId) {
         for (size_t startIndex = lineStartId;
@@ -989,10 +925,7 @@ void DBReader<T>::unmapData() {
         }
         if ((dataMode & USE_FREAD) == 0) {
           if (munmap(dataFiles[fileIdx], fileSize) < 0) {
-            Debug(Debug::ERROR)
-                << "Failed to munmap memory dataSize=" << fileSize
-                << " File=" << dataFileName << "\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("Failed to munmap memory dataSize={}. File={}", fileSize, dataFileName);
           }
         } else {
           free(dataFiles[fileIdx]);
@@ -1078,9 +1011,7 @@ void DBReader<T>::setData(char *data, size_t dataSize) {
     dataFileCnt = 1;
     dataFiles[0] = data;
   } else {
-    Debug(Debug::ERROR) << "DataFiles is already set."
-                        << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("DataFiles is already set.");
   }
 }
 
@@ -1092,11 +1023,7 @@ void DBReader<T>::setMode(const int mode) {
 template <typename T>
 size_t DBReader<T>::getOffset(size_t id) {
   if (id >= size) {
-    Debug(Debug::ERROR) << "Invalid database read for id=" << id
-                        << ", database index=" << indexFileName << "\n";
-    Debug(Debug::ERROR) << "getOffset: local id (" << id << ") >= db size ("
-                        << size << ")\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid database read for id={}, database index={}.\ngetOffset: local id ({}) >= db size ({})", id, indexFileName, id, size);
   }
   if (local2id != NULL) {
     id = local2id[id];
@@ -1131,8 +1058,7 @@ void DBReader<T>::setSequentialAdvice() {
   for (size_t i = 0; i < dataFileCnt; i++) {
     size_t dataSize = dataSizeOffset[i + 1] - dataSizeOffset[i];
     if (posix_madvise(dataFiles[i], dataSize, POSIX_MADV_SEQUENTIAL) != 0) {
-      Debug(Debug::ERROR) << "posix_madvise returned an error " << dataFileName
-                          << "\n";
+      out->error("posix_madvise returned an error {}", dataFileName);
     }
   }
 #endif
@@ -1147,8 +1073,7 @@ void DBReader<T>::readLookup(char *data, size_t dataSize,
   const char *cols[3];
   while (currPos < dataSize) {
     if (i >= this->lookupSize) {
-      Debug(Debug::ERROR) << "Corrupt memory, too many entries!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Corrupt memory, too many entries");
     }
     Util::getWordsOfLine(lookupData, cols, 3);
     lookup[i].id = Util::fast_atoi<size_t>(cols[0]);
@@ -1174,9 +1099,7 @@ void DBReader<T>::moveDatafiles(const std::vector<std::string> &files,
       FileUtil::move(files[i].c_str(), dst.c_str());
     } else {
       if (files.size() > 1) {
-        Debug(Debug::ERROR)
-            << "Both merged and unmerged database exist at the same path\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Both merged and unmerged database exist at the same path");
       }
 
       FileUtil::move(files[i].c_str(), destination.c_str());
@@ -1247,10 +1170,7 @@ void copyLinkDb(const std::string &databaseName, const std::string &outDb,
         if (idx != std::string::npos) {
           ext = names[i].substr(idx);
         } else {
-          Debug(Debug::ERROR) << "File extension was not found but it is "
-                                 "expected to be there!\n"
-                              << "Filename: " << names[i] << ".\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("File extension was not found but it is expected to be there. Filename: {}", names[i]);
         }
         if (link) {
           FileUtil::symlinkAbs(names[i], outDb + ext);
@@ -1320,9 +1240,7 @@ void DBReader<T>::decomposeDomainByAminoAcid(size_t worldRank, size_t worldSize,
   const size_t dbEntries = getSize();
   if (worldSize > dataSize) {
     // Assume the domain numEntries is greater than the world numEntries.
-    Debug(Debug::ERROR) << "World Size: " << worldSize
-                        << " dbSize: " << dataSize << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("World Size: {}, dbSize: {}", worldSize, dbSize);
   }
 
   if (worldSize == 1) {

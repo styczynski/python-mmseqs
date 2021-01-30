@@ -8,8 +8,7 @@ class PatternCompiler {
  public:
   PatternCompiler(const char *pattern) {
     if (regcomp(&regex, pattern, REG_EXTENDED | REG_NEWLINE) != 0) {
-      Debug(Debug::ERROR) << "Error in regex " << pattern << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Error in regex {}", pattern);
     }
   }
 

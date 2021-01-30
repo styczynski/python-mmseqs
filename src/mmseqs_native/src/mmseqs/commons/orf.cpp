@@ -64,9 +64,7 @@ Orf::Orf(const unsigned int requestedGenCode, bool useAllTableStarts) {
   }
   stopCodonCount = codons.size();
   if (stopCodonCount > 8) {
-    Debug(Debug::ERROR)
-        << "Invalid translation table with more than 8 stop codons.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid translation table with more than 8 stop codons");
   }
 
   codons.clear();
@@ -87,9 +85,7 @@ Orf::Orf(const unsigned int requestedGenCode, bool useAllTableStarts) {
   }
   startCodonCount = codons.size();
   if (startCodonCount > 8) {
-    Debug(Debug::ERROR)
-        << "Invalid translation table with more than 8 start codons.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid translation table with more than 8 start codons.");
   }
 
   sequence = (char *)mem_align(ALIGN_INT, 32000 * sizeof(char));
@@ -119,8 +115,7 @@ Matcher::result_t Orf::getFromDatabase(const size_t id,
 
   size_t contigLen = contigsReader.getSeqLen(contigId);
   if (contigLen < 2) {
-    Debug(Debug::ERROR) << "Invalid contig record has less than two bytes\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid contig record has less than two bytes");
   }
 
   // compute orf length

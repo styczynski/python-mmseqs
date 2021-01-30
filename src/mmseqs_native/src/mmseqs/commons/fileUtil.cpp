@@ -47,9 +47,7 @@ void *FileUtil::mmapFile(FILE *file, size_t *dataSize) {
   struct stat sb;
   if (fstat(fileno(file), &sb) < 0) {
     int errsv = errno;
-    Debug(Debug::ERROR) << "Failed to fstat."
-                        << ". Error " << errsv << ".\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Failed to fstat. Error {}", errsv);
   }
   *dataSize = sb.st_size;
   int mode = PROT_READ;
@@ -58,17 +56,14 @@ void *FileUtil::mmapFile(FILE *file, size_t *dataSize) {
   void *ret = mmap(NULL, *dataSize, mode, MAP_PRIVATE, fd, 0);
   if (ret == MAP_FAILED) {
     int errsv = errno;
-    Debug(Debug::ERROR) << "Failed to mmap memory dataSize=" << *dataSize
-                        << ". Error " << errsv << ".\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Failed to mmap memory dataSize={}. Error {}.", *dataSize, errsv);
   }
   return ret;
 }
 
 void FileUtil::munmapData(void *ptr, size_t dataSize) {
   if (munmap(ptr, dataSize) < 0) {
-    Debug(Debug::ERROR) << "Failed to munmap memory\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Failed to munmap memory");
   }
 }
 
@@ -102,8 +97,7 @@ size_t FileUtil::countLines(const char *name) {
     cnt += (ch == '\n') ? 1 : 0;
   }
   if (fclose(fp) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << name << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close file {}", name);
   }
   return cnt;
 }
@@ -111,7 +105,7 @@ size_t FileUtil::countLines(const char *name) {
 void FileUtil::deleteTempFiles(const std::list<std::string> &tmpFiles) {
   for (std::list<std::string>::const_iterator it = tmpFiles.begin();
        it != tmpFiles.end(); it++) {
-    Debug(Debug::INFO) << "Deleting " << *it << "\n";
+    out->debug("Deleting {}", *it);
     std::string file = *it;
     FileUtil::remove(file.c_str());
   }
@@ -122,19 +116,16 @@ void FileUtil::writeFile(const std::string &pathToFile,
   int fd = open(pathToFile.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
                 S_IRUSR | S_IWUSR | S_IXUSR);
   if (fd == -1) {
-    Debug(Debug::ERROR) << "Could not write file " << pathToFile << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not write file {}", pathToFile);
   }
 
   ssize_t res = write(fd, data, len);
   if (res == -1) {
-    Debug(Debug::ERROR) << "Error writing file " << pathToFile << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Error writing file {}", pathToFile);
   }
 
   if (close(fd) != 0) {
-    Debug(Debug::ERROR) << "Error closing file " << pathToFile << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Error closing file {}", pathToFile);
   }
 }
 
@@ -163,8 +154,7 @@ size_t FileUtil::getFreeSpace(const char *path) {
 std::string FileUtil::getRealPathFromSymLink(const std::string path) {
   char *p = realpath(path.c_str(), NULL);
   if (p == NULL) {
-    Debug(Debug::ERROR) << "Could not get path of " << path << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not get path of {}", path);
   }
 
   std::string name(p);
@@ -175,8 +165,7 @@ std::string FileUtil::getRealPathFromSymLink(const std::string path) {
 std::string FileUtil::getHashFromSymLink(const std::string path) {
   char *p = realpath(path.c_str(), NULL);
   if (p == NULL) {
-    Debug(Debug::ERROR) << "Could not get path of " << path << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not get path of {}", path);
   }
 
   std::string base = baseName(p);
@@ -188,8 +177,7 @@ std::string FileUtil::getHashFromSymLink(const std::string path) {
 void FileUtil::symlinkAlias(const std::string &file, const std::string &alias) {
   char *p = realpath(file.c_str(), NULL);
   if (p == NULL) {
-    Debug(Debug::ERROR) << "Could not get path of " << file << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not get path of {}", file);
   }
 
   std::string path = dirName(p);
@@ -198,8 +186,7 @@ void FileUtil::symlinkAlias(const std::string &file, const std::string &alias) {
 
   DIR *dir = opendir(path.c_str());
   if (dir == NULL) {
-    Debug(Debug::ERROR) << "Error opening directory " << path << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Error opening directory {}", path);
   }
 
   std::string pathToAlias = (path + "/" + alias);
@@ -211,22 +198,16 @@ void FileUtil::symlinkAlias(const std::string &file, const std::string &alias) {
   // We emulate symlinkat by manipulating the CWD instead
   std::string oldWd = FileUtil::getCurrentWorkingDirectory();
   if (chdir(path.c_str()) != 0) {
-    Debug(Debug::ERROR) << "Could not change working directory to " << path
-                        << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not change working directory to {}", path);
   }
   if (symlink(base.c_str(), alias.c_str()) != 0) {
-    Debug(Debug::ERROR) << "Could not create symlink of " << file << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not create symlink of {}", file);
   }
   if (chdir(oldWd.c_str()) != 0) {
-    Debug(Debug::ERROR) << "Could not change working directory to " << oldWd
-                        << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not change working directory to {}", oldWd);
   }
   if (closedir(dir) != 0) {
-    Debug(Debug::ERROR) << "Error closing directory " << path << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Error closing directory {}", path);
   }
 }
 
@@ -242,8 +223,7 @@ std::string FileUtil::getCurrentWorkingDirectory() {
     }
     wd = getcwd(NULL, bufferSize);
     if (wd == NULL && errno != ERANGE && errno != 0) {
-      Debug(Debug::ERROR) << "Could not get current working directory\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Could not get current working directory");
     }
   } while (wd == NULL && errno == ERANGE);
   std::string cwd(wd);
@@ -257,8 +237,7 @@ void FileUtil::symlinkAbs(const std::string &target, const std::string &link) {
   }
   char *t = realpath(target.c_str(), NULL);
   if (t == NULL) {
-    Debug(Debug::ERROR) << "Could not get realpath of " << target << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not get realpath of {}", target);
   }
 
   std::string realLink;
@@ -268,8 +247,7 @@ void FileUtil::symlinkAbs(const std::string &target, const std::string &link) {
     std::string base = baseName(link);
     l = realpath(path.c_str(), NULL);
     if (l == NULL) {
-      Debug(Debug::ERROR) << "Could not get realpath of " << link << "!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Could not get realpath of {}", link);
     } else {
       realLink = (std::string(l) + "/" + base);
     }
@@ -281,8 +259,7 @@ void FileUtil::symlinkAbs(const std::string &target, const std::string &link) {
   }
 
   if (symlink(t, realLink.c_str()) != 0) {
-    Debug(Debug::ERROR) << "Could not create symlink of " << target << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not create symlink of {}", target);
   }
 
   free(t);
@@ -308,19 +285,16 @@ void FileUtil::copyFile(const char *src, const char *dst) {
 
   int source = open(src, O_RDONLY, 0);
   if (source == -1) {
-    Debug(Debug::ERROR) << "Could not open file " << src << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not open file {}", src);
   }
   int dest = open(dst, O_WRONLY | O_CREAT | O_TRUNC, 0644);
   if (dest == -1) {
-    Debug(Debug::ERROR) << "Could not open file " << dst << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not open file {}", dst);
   }
   while ((size = read(source, buf, BUFSIZ)) > 0) {
     size_t res = write(dest, buf, size);
     if (res != size) {
-      Debug(Debug::ERROR) << "Error writing file " << dst << "!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Error writing file {}", dst);
     }
   }
   close(source);
@@ -330,17 +304,14 @@ void FileUtil::copyFile(const char *src, const char *dst) {
 FILE *FileUtil::openAndDelete(const char *fileName, const char *mode) {
   if (FileUtil::fileExists(fileName) == true) {
     if (FileUtil::directoryExists(fileName)) {
-      Debug(Debug::ERROR) << "Can not open " << fileName
-                          << " for writing. It is a directory.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not open {} for writing. It is a directory.", fileName);
     } else {
       FileUtil::remove(fileName);
     }
   }
   FILE *file = fopen(fileName, mode);
   if (file == NULL) {
-    Debug(Debug::ERROR) << "Could not open " << fileName << " for writing!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Can not open {} for writing", fileName);
   }
   return file;
 }
@@ -365,8 +336,7 @@ std::vector<std::string> FileUtil::findDatafiles(const char *datafiles) {
 
 void FileUtil::remove(const char *file) {
   if (std::remove(file) != 0) {
-    Debug(Debug::ERROR) << "Could not delete " << file << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not delete {}", file);
   }
 }
 
@@ -375,33 +345,25 @@ void FileUtil::move(const char *src, const char *dst) {
   FILE *srcFile = FileUtil::openFileOrDie(src, "rw", true);
   if (fstat(fileno(srcFile), &srcFileInfo) < 0) {
     int errsv = errno;
-    Debug(Debug::ERROR) << "Failed to fstat File=" << src << ". Error " << errsv
-                        << ".\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Failed to fstat File={}. Error {}", src, errsv);
   }
   struct stat srcDirInfo;
   std::string dirName = FileUtil::dirName(dst);
   FILE *dstDir = FileUtil::openFileOrDie(dirName.c_str(), "r", true);
   if (fstat(fileno(dstDir), &srcDirInfo) < 0) {
     int errsv = errno;
-    Debug(Debug::ERROR) << "Failed to fstat File=" << dirName << ". Error "
-                        << errsv << ".\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Failed to fstat File={}. Error {}", dirName, errsv);
   }
   bool sameFileSystem = (srcDirInfo.st_dev == srcFileInfo.st_dev);
   if (fclose(srcFile) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << src << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close file {}", src);
   }
   if (fclose(dstDir) != 0) {
-    Debug(Debug::ERROR) << "Cannot close directory " << dirName << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close directory {}", dirName);
   }
   if (sameFileSystem) {
     if (std::rename(src, dst) != 0) {
-      Debug(Debug::ERROR) << "Could not copy file " << src << " to " << dst
-                          << "!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot copy file {} to {}", src, dst);
     }
   } else {
     FileUtil::copyFile(src, dst);
@@ -417,26 +379,19 @@ int FileUtil::parseDbType(const char *name) {
 
   size_t fileSize = FileUtil::getFileSize(dbTypeFile);
   if (fileSize != sizeof(int)) {
-    Debug(Debug::ERROR) << "File size of " << dbTypeFile
-                        << " seems to be wrong!\n";
-    Debug(Debug::ERROR) << "It should have 4 bytes but it has " << fileSize
-                        << " bytes.";
-    EXIT(EXIT_FAILURE);
+    out->failure("File size of {} seems to be wrong. It should have {} bytes but it has {} bytes.", dbTypeFile, sizeof(int), fileSize);
   }
   FILE *file = fopen(dbTypeFile.c_str(), "r");
   if (file == NULL) {
-    Debug(Debug::ERROR) << "Could not open data file " << dbTypeFile << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not open data file {}", dbTypeFile);
   }
   int dbtype;
   size_t result = fread(&dbtype, 1, fileSize, file);
   if (result != fileSize) {
-    Debug(Debug::ERROR) << "Could not read " << dbTypeFile << "!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not read {}", dbTypeFile);
   }
   if (fclose(file) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << dbTypeFile << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close file {}", dbTypeFile);
   }
   return dbtype;
 }
@@ -447,22 +402,17 @@ std::string FileUtil::createTemporaryDirectory(
   std::string basePath = baseTmpPath + tmpPath;
   std::string tmpDir(basePath);
   if (FileUtil::directoryExists(tmpDir.c_str()) == false) {
-    Debug(Debug::INFO) << "Path " << tmpDir
-                       << " does not exist or is not a directory.\n";
+    out->info("Temporary path {} does not exist or is not a directory. It will be created.", tmpDir);
     if (FileUtil::makeDir(tmpDir.c_str()) == false) {
-      Debug(Debug::ERROR) << "Cannot create temporary folder " << tmpDir
-                          << ".\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot create temporary folder {}", tmpDir)
     } else {
-      Debug(Debug::INFO) << "Created directory " << tmpDir << "\n";
+      out->info("Created temporary directory {}", tmpDir);
     }
   }
   tmpDir += "/" + subDirectory;
   if (FileUtil::directoryExists(tmpDir.c_str()) == false) {
     if (FileUtil::makeDir(tmpDir.c_str()) == false) {
-      Debug(Debug::ERROR) << "Cannot create temporary subfolder " << tmpDir
-                          << ".\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot create temporary subfolder {}", tmpDir);
     }
   }
   FileUtil::symlinkAlias(tmpDir, "latest");
@@ -475,18 +425,14 @@ void FileUtil::fixRlimitNoFile() {
     increasedRlimitNoFile = true;
     struct rlimit limit;
     if (getrlimit(RLIMIT_NOFILE, &limit) != 0) {
-      Debug(Debug::WARNING)
-          << "Could not increase maximum number of open files (getrlimit "
-          << errno << "). Use ulimit manually\n";
+      out->warn("Could not increase maximum number of open files (getrlimit {}). Use ulimit manually.", errno);
       return;
     }
     limit.rlim_cur =
         std::min(std::max((rlim_t)8192, limit.rlim_cur), limit.rlim_max);
     limit.rlim_max = std::min(RLIM_INFINITY, limit.rlim_max);
     if (setrlimit(RLIMIT_NOFILE, &limit) != 0) {
-      Debug(Debug::WARNING)
-          << "Could not increase maximum number of open files (setrlimit "
-          << errno << "). Use ulimit manually\n";
+      out->warn("Could not increase maximum number of open files (setrlimit {}). Use ulimit manually.", errno);
     }
   }
 }
