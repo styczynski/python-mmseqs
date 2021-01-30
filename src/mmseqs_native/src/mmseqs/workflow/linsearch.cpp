@@ -36,9 +36,7 @@ int linsearch(mmseqs_output *out, Parameters &par) {
   const int queryDbType = FileUtil::parseDbType(par.db1.c_str());
   std::string indexStr = LinsearchIndexReader::searchForIndex(par.db2);
   if (indexStr.empty()) {
-    Debug(Debug::ERROR) << par.db2 << " needs to be index.\n";
-    Debug(Debug::ERROR) << "createlinindex " << par.db2 << ".\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Database {} needs to be index: createlinindex {}", par.db2, par.db2);
   }
   int targetDbType = 0;
   if (indexStr != "") {
@@ -52,15 +50,12 @@ int linsearch(mmseqs_output *out, Parameters &par) {
   }
 
   if (queryDbType == -1 || targetDbType == -1) {
-    Debug(Debug::ERROR) << "Please recreate your database or add a .dbtype "
-                           "file to your sequence/profile database.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Please recreate your database or add a .dbtype file to your sequence/profile database.");
   }
 
   if (Parameters::isEqualDbtype(queryDbType, Parameters::DBTYPE_HMM_PROFILE) &&
       Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_HMM_PROFILE)) {
-    Debug(Debug::ERROR) << "Profile-Profile searches are not supported.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Profile-Profile searches are not supported.");
   }
 
   const bool isNuclSearch =
@@ -89,9 +84,7 @@ int linsearch(mmseqs_output *out, Parameters &par) {
                                  Parameters::DBTYPE_HMM_PROFILE))) {
     // par.printUsageMessage(command, MMseqsParameter::COMMAND_ALIGN |
     // MMseqsParameter::COMMAND_PREFILTER);
-    Debug(Debug::ERROR)
-        << "Cannot use ungapped alignment mode with profile databases.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot use ungapped alignment mode with profile databases.");
   }
 
   // par.printParameters(command.cmd, argc, argv, par.searchworkflow);

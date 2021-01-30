@@ -11,7 +11,7 @@ char *getScoreLookup(BaseMatrix &matrix) {
   for (int aa = 0; aa < matrix.alphabetSize; aa++) {
     short score = matrix.subMatrix[aa][aa];
     if (score > SCHAR_MAX || score < SCHAR_MIN) {
-      Debug(Debug::WARNING) << "Truncating substitution matrix diagonal score!";
+      out->warn( "Truncating substitution matrix diagonal score");
     }
     idScoreLookup[aa] = (char)score;
   }
@@ -54,7 +54,7 @@ void IndexBuilder::fillDatabase(IndexTable *indexTable,
                                 DBReader<unsigned int> *dbr, size_t dbFrom,
                                 size_t dbTo, int kmerThr, bool mask,
                                 bool maskLowerCaseMode) {
-  Debug(Debug::INFO) << "Index table: counting k-mers\n";
+  out->info("Index table: counting k-mers");
 
   const bool isProfile = Parameters::isEqualDbtype(
       seq->getSeqType(), Parameters::DBTYPE_HMM_PROFILE);
@@ -75,8 +75,7 @@ void IndexBuilder::fillDatabase(IndexTable *indexTable,
     *maskedLookup = new SequenceLookup(dbSize, info->aaDbSize);
     sequenceLookup = *maskedLookup;
   } else {
-    Debug(Debug::ERROR) << "This should not happen\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Failed assertion that should never fail during database filling.")
   }
 
   // need to prune low scoring k-mers through masking
@@ -190,39 +189,16 @@ void IndexBuilder::fillDatabase(IndexTable *indexTable,
     delete probMatrix;
   }
 
-  Debug(Debug::INFO) << "Index table: Masked residues: " << maskedResidues
-                     << "\n";
+  out->info("Index table: Masked residues: {}", maskedResidues);
   if (totalKmerCount == 0) {
-    Debug(Debug::ERROR)
-        << "No k-mer could be extracted for the database "
-        << dbr->getDataFileName() << ".\n"
-        << "Maybe the sequences length is less than 14 residues.\n";
-    if (maskedResidues == true) {
-      Debug(Debug::ERROR) << " or contains only low complexity regions.";
-      Debug(Debug::ERROR)
-          << "Use --mask 0 to deactivate the low complexity filter.\n";
+    if (!maskedResidues) {
+       out->failure("No k-mer could be extracted for the database {}. Maybe the sequences length is less than 14 residues.", dbr->getDataFileName());
+    } else {
+       out->failure("No k-mer could be extracted for the database {}. Maybe the sequences length is less than 14 residues or contains only low complexity regions. Use mask=False to deactivate the low complexity filter.", dbr->getDataFileName());
     }
-    EXIT(EXIT_FAILURE);
   }
 
   dbr->remapData();
-
-  // TODO find smart way to remove extrem k-mers without harming huge protein
-  // families
-  //    size_t lowSelectiveResidues = 0;
-  //    const float dbSize = static_cast<float>(dbTo - dbFrom);
-  //    for(size_t kmerIdx = 0; kmerIdx < indexTable->getTableSize();
-  //    kmerIdx++){
-  //        size_t res = (size_t) indexTable->getOffset(kmerIdx);
-  //        float selectivityOfKmer = (static_cast<float>(res)/dbSize);
-  //        if(selectivityOfKmer > 0.005){
-  //            indexTable->getOffset()[kmerIdx] = 0;
-  //            lowSelectiveResidues += res;
-  //        }
-  //    }
-  //    Debug(Debug::INFO) << "Index table: Remove "<< lowSelectiveResidues <<"
-  //    none selective residues\n"; Debug(Debug::INFO) << "Index table: init...
-  //    from "<< dbFrom << " to "<< dbTo << "\n";
 
   indexTable->initMemory(info->tableSize);
   indexTable->init();
@@ -230,7 +206,7 @@ void IndexBuilder::fillDatabase(IndexTable *indexTable,
   delete info;
   Debug::Progress progress2(dbTo - dbFrom);
 
-  Debug(Debug::INFO) << "Index table: fill\n";
+  out->info("Index table: fill");
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

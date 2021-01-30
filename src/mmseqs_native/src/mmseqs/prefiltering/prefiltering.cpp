@@ -87,8 +87,7 @@ Prefiltering::Prefiltering(mmseqs_output *out, const std::string &queryDB,
       alphabetSize = kmerSubMat->alphabetSize;
       break;
     default:
-      Debug(Debug::ERROR) << "Query sequence type not implemented!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Query sequence type not implemented");
   }
 
   if (Parameters::isEqualDbtype(FileUtil::parseDbType(targetDB.c_str()),
@@ -120,56 +119,30 @@ Prefiltering::Prefiltering(mmseqs_output *out, const std::string &queryDB,
         }
         if (par.prefilter[i]->uniqid == par.PARAM_K.uniqid) {
           if (kmerSize != 0 && data.kmerSize != kmerSize) {
-            Debug(Debug::WARNING)
-                << "Index was created with -k " << data.kmerSize
-                << " but the prefilter was called with -k " << kmerSize
-                << "!\n";
-            Debug(Debug::WARNING) << "Search with -k " << data.kmerSize << "\n";
+            out->warn("Index was created with -k {} but the prefilter was called with -k {}", data.kmerSize, kmerSize);
           }
         }
         if (par.prefilter[i]->uniqid == par.PARAM_ALPH_SIZE.uniqid) {
           if (data.alphabetSize != alphabetSize) {
-            Debug(Debug::WARNING)
-                << "Index was created with --alph-size  " << data.alphabetSize
-                << " but the prefilter was called with --alph-size "
-                << alphabetSize << "!\n";
-            Debug(Debug::WARNING) << "Current search will use --alph-size "
-                                  << data.alphabetSize << "\n";
+            out->warn("Index was created with --alph-size {} but the prefilter was called with --alph-size {}", data.alphabetSize, alphabetSize);
           }
         }
         if (par.prefilter[i]->uniqid == par.PARAM_SPACED_KMER_MODE.uniqid) {
           if (data.spacedKmer != spacedKmer) {
-            Debug(Debug::WARNING)
-                << "Index was created with --spaced-kmer-mode "
-                << data.spacedKmer
-                << " but the prefilter was called with --spaced-kmer-mode "
-                << spacedKmer << "!\n";
-            Debug(Debug::WARNING)
-                << "Current search will use  --spaced-kmer-mode "
-                << data.spacedKmer << "\n";
+            out->warn("Index was created with --spaced-kmer-mode {} but the prefilter was called with --spaced-kmer-mode {}", data.spacedKmer, spacedKmer);
           }
         }
         if (par.prefilter[i]->uniqid == par.PARAM_NO_COMP_BIAS_CORR.uniqid) {
           if (data.compBiasCorr != aaBiasCorrection &&
               Parameters::isEqualDbtype(targetSeqType,
                                         Parameters::DBTYPE_HMM_PROFILE)) {
-            Debug(Debug::WARNING)
-                << "Index was created with --comp-bias-corr "
-                << data.compBiasCorr
-                << " please recreate index with --comp-bias-corr "
-                << aaBiasCorrection << "!\n";
-            Debug(Debug::WARNING) << "Current search will use --comp-bias-corr "
-                                  << data.compBiasCorr << "\n";
+            out->warn("Index was created with --comp-bias-corr {} but the prefilter was called with --comp-bias-corr {}", data.compBiasCorr, aaBiasCorrection);
           }
         }
         if (par.prefilter[i]->uniqid == par.PARAM_SPLIT.uniqid) {
           if (splitMode == Parameters::TARGET_DB_SPLIT &&
               data.splits != splits) {
-            Debug(Debug::WARNING)
-                << "Index was created with --splits " << data.splits
-                << " please recreate index with --splits " << splits << "!\n";
-            Debug(Debug::WARNING)
-                << "Current search will use --splits " << data.splits << "\n";
+            out->warn("Index was created with --splits {} but the prefilter was called with --splits {}", data.splits, splits);
           }
         }
       }
@@ -187,9 +160,7 @@ Prefiltering::Prefiltering(mmseqs_output *out, const std::string &queryDB,
                                     Parameters::DBTYPE_HMM_PROFILE) &&
           Parameters::isEqualDbtype(targetSeqType,
                                     Parameters::DBTYPE_HMM_PROFILE)) {
-        Debug(Debug::ERROR) << "Query-profiles cannot be searched against a "
-                               "target-profile database!\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Query-profiles cannot be searched against a target-profile database");
       }
 
       splits = data.splits;
@@ -201,9 +172,7 @@ Prefiltering::Prefiltering(mmseqs_output *out, const std::string &queryDB,
       seedScoringMatrixFile = MultiParam<char *>(
           PrefilteringIndexReader::getSubstitutionMatrix(tidxdbr));
     } else {
-      Debug(Debug::ERROR) << "Outdated index version. Please recompute it with "
-                             "'createindex'!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Outdated index version. Please recompute it with 'createindex'");
     }
   } else {
     tdbr = new DBReader<unsigned int>(
@@ -246,10 +215,8 @@ Prefiltering::Prefiltering(mmseqs_output *out, const std::string &queryDB,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     qdbr->open(DBReader<unsigned int>::LINEAR_ACCCESS);
   }
-  Debug(Debug::INFO) << "Query database size: " << qdbr->getSize()
-                     << " type: " << Parameters::getDbTypeName(querySeqType)
-                     << "\n";
 
+  out->info("Query database size: {}, type: {}", qdbr->getSize(), Parameters::getDbTypeName(querySeqType));
   setupSplit(*tdbr, alphabetSize - 1, querySeqType, threads, templateDBIsIndex,
              memoryLimit, qdbr->getSize(), maxResListLen, kmerSize, splits,
              splitMode);
@@ -267,9 +234,7 @@ Prefiltering::Prefiltering(mmseqs_output *out, const std::string &queryDB,
     kmerThr = 0;
   }
 
-  Debug(Debug::INFO) << "Target database size: " << tdbr->getSize()
-                     << " type: " << Parameters::getDbTypeName(targetSeqType)
-                     << "\n";
+  out->info("Target database size: {}, type: {}", tdbr->getSize(), Parameters::getDbTypeName(targetSeqType));
 
   if (splitMode == Parameters::QUERY_DB_SPLIT) {
     // create the whole index table
@@ -278,8 +243,7 @@ Prefiltering::Prefiltering(mmseqs_output *out, const std::string &queryDB,
     sequenceLookup = NULL;
     indexTable = NULL;
   } else {
-    Debug(Debug::ERROR) << "Invalid split mode: " << splitMode << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid split mode was specified: {}", splitMode);
   }
 
   if (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_AMINO_ACIDS)) {
@@ -341,12 +305,7 @@ void Prefiltering::setupSplit(DBReader<unsigned int> &tdbr,
   int optimalSplitMode = Parameters::TARGET_DB_SPLIT;
   if (memoryNeeded > 0.9 * memoryLimit) {
     if (splitMode == Parameters::QUERY_DB_SPLIT) {
-      Debug(Debug::ERROR) << "--split-mode was set to query-split ("
-                          << Parameters::QUERY_DB_SPLIT
-                          << ") but memory limit requires target-split."
-                          << " Please use a computer with more main memory or "
-                             "run with default --split-mode setting.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("--split-mode was set to query-split ({}) but memory limit requires target-split. Please use a computer with more main memory or run with default --split-mode setting.", Parameters::QUERY_DB_SPLIT);
     }
   } else {
 #ifdef HAVE_MPI
@@ -376,10 +335,7 @@ void Prefiltering::setupSplit(DBReader<unsigned int> &tdbr,
     std::pair<int, int> splitSettings = Prefiltering::optimizeSplit(
         memoryLimit, &tdbr, alphabetSize, kmerSize, querySeqTyp, threads);
     if (splitSettings.second == -1) {
-      Debug(Debug::ERROR) << "Cannot fit databases into "
-                          << ByteParser::format(memoryLimit)
-                          << ". Please use a computer with more main memory.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot fit databases into {}. Please use a computer with more main memory.", ByteParser::format(memoryLimit));
     }
     if (kmerSize == 0) {
       // set k-mer based on aa size in database
@@ -403,22 +359,16 @@ void Prefiltering::setupSplit(DBReader<unsigned int> &tdbr,
   // set the final number of splits
   if (split == 0) {
     if (optimalNumSplits > INT_MAX) {
-      Debug(Debug::ERROR) << "optimalNumSplits is greater INT_MAX\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("optimalNumSplits is greater INT_MAX");
     }
     split = optimalNumSplits;
   }
 
   // templateDBIsIndex = false when called from indexdb
   if ((static_cast<size_t>(split) < minimalNumSplits) && (templateDBIsIndex)) {
-    Debug(Debug::WARNING)
-        << "split was set to " << split << " but at least " << minimalNumSplits
-        << " are required. Please run with default paramerters\n";
+    out->warn("split was set to {} but at least  {} are required. Please run with default paramerters", split, minimalNumSplits);
   } else if (static_cast<size_t>(split) > sizeOfDbToSplit) {
-    Debug(Debug::ERROR) << "split was set to " << split
-                        << " but the db to split has only " << sizeOfDbToSplit
-                        << " sequences. Please run with default paramerters\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("split was set to {} but the db to split has only {} sequences. Please run with default paramerters", split, sizeOfDbToSplit);
   }
 
   if (kmerSize == 0) {
@@ -437,26 +387,19 @@ void Prefiltering::setupSplit(DBReader<unsigned int> &tdbr,
   }
 
   if (split > 1) {
-    Debug(Debug::INFO) << Parameters::getSplitModeName(splitMode)
-                       << " split mode. Searching through " << split
-                       << " splits\n";
+    out->info("{} split mode. Searching through {} splits", Parameters::getSplitModeName(splitMode), split);
   }
 
   size_t memoryNeededPerSplit = estimateMemoryConsumption(
       (splitMode == Parameters::TARGET_DB_SPLIT) ? split : 1, tdbr.getSize(),
       tdbr.getAminoAcidDBSize(), maxResListLen, alphabetSize, kmerSize,
       querySeqTyp, threads);
-  Debug(Debug::INFO) << "Estimated memory consumption: "
-                     << ByteParser::format(memoryNeededPerSplit) << "\n";
+
+  out->info("Estimated memory consumption: {}", ByteParser::format(memoryNeededPerSplit));
   if (memoryNeededPerSplit > 0.9 * memoryLimit) {
-    Debug(Debug::WARNING) << "Process needs more than "
-                          << ByteParser::format(memoryLimit)
-                          << " main memory.\n"
-                          << "Increase the size of --split or set it to 0 to "
-                             "automatically optimize target database split.\n";
+    out->warn("Process needs more than {} main memory. Increase the size of --split or set it to 0 to automatically optimize target database split.", ByteParser::format(memoryLimit));
     if (templateDBIsIndex == true) {
-      Debug(Debug::WARNING)
-          << "Computed index is too large. Avoid using the index.\n";
+      out->warn("Computed index is too large. Avoid using the index.");
     }
   }
 }
@@ -470,13 +413,13 @@ void Prefiltering::mergeTargetSplits(
 
   if (splits < 2) {
     DBReader<unsigned int>::moveDb(fileNames[0].first, outDB);
-    Debug(Debug::INFO) << "No merging needed.\n";
+    out->info("No merging needed.");
     return;
   }
 
   Timer timer;
-  Debug(Debug::INFO) << "Merging " << splits << " target splits to "
-                     << FileUtil::baseName(outDB) << "\n";
+  out->info("Merging {} target splits to {}", splits, FileUtil::baseName(outDB));
+
   DBReader<unsigned int> reader1(fileNames[0].first.c_str(),
                                  fileNames[0].second.c_str(), 1,
                                  DBReader<unsigned int>::USE_INDEX);
@@ -517,13 +460,11 @@ void Prefiltering::mergeTargetSplits(
 #ifdef HAVE_POSIX_MADVISE
     if (posix_madvise(dataFile[i], dataFileSize[i], POSIX_MADV_SEQUENTIAL) !=
         0) {
-      Debug(Debug::ERROR) << "posix_madvise returned an error "
-                          << fileNames[i].first << "\n";
+      out->error("posix_madvise returned an error {}", fileNames[i].first);
     }
 #endif
   }
-  Debug(Debug::INFO) << "Preparing offsets for merging: " << timer.lap()
-                     << "\n";
+  out->info("Preparing offsets for merging: {}", timer.lap());
   // merge target splits data files and sort the hits at the same time
   // TODO: compressed?
   DBWriter writer(outDB.c_str(), outDBIndex.c_str(), threads, 0,
@@ -583,16 +524,14 @@ void Prefiltering::mergeTargetSplits(
     DBReader<unsigned int>::removeDb(fileNames[i].first);
     FileUtil::munmapData(dataFile[i], dataFileSize[i]);
     if (fclose(files[i]) != 0) {
-      Debug(Debug::ERROR) << "Cannot close file " << fileNames[i].first << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot close file {}", fileNames[i].first);
     }
   }
   delete[] dataFile;
   delete[] dataFileSize;
   delete[] files;
 
-  Debug(Debug::INFO) << "Time for merging target splits: " << timer.lap()
-                     << "\n";
+  out->info("Time for merging target splits: {}", timer.lap());
 }
 
 ScoreMatrix Prefiltering::getScoreMatrix(const BaseMatrix &matrix,
@@ -654,8 +593,7 @@ void Prefiltering::getIndexTable(mmseqs_output *out, int split, size_t dbFrom,
         maskMode == 1 || maskLowerCaseMode == 1 ? &sequenceLookup : NULL;
     SequenceLookup **unmaskedLookup = maskMode == 0 ? &sequenceLookup : NULL;
 
-    Debug(Debug::INFO) << "Index table k-mer threshold: " << localKmerThr
-                       << " at k-mer size " << kmerSize << " \n";
+    out->info("Index table k-mer threshold: {} at k-mer size {}", localKmerThr, kmerSize);
     IndexBuilder::fillDatabase(
         indexTable, maskedLookup, unmaskedLookup, *kmerSubMat, &tseq, tdbr,
         dbFrom, dbFrom + dbSize, localKmerThr, maskMode, maskLowerCaseMode);
@@ -669,7 +607,7 @@ void Prefiltering::getIndexTable(mmseqs_output *out, int split, size_t dbFrom,
 
     indexTable->printStatistics(out, kmerSubMat->num2aa);
     tdbr->remapData();
-    Debug(Debug::INFO) << "Time for index table init: " << timer.lap() << "\n";
+    out->info("Time for index table init: {}", timer.lap());
   }
 }
 
@@ -699,9 +637,7 @@ void Prefiltering::runMpiSplits(mmseqs_output *out, const std::string &resultDB,
                                 const std::string &localTmpPath,
                                 const int runRandomId) {
   if (compressed == true && splitMode == Parameters::TARGET_DB_SPLIT) {
-    Debug(Debug::WARNING) << "The output of the prefilter cannot be compressed "
-                             "during target split mode. "
-                             "Prefilter result will not be compressed.\n";
+    out->warn("The output of the prefilter cannot be compressed during target split mode. Prefilter result will not be compressed.");
     compressed = false;
   }
 
@@ -733,14 +669,11 @@ void Prefiltering::runMpiSplits(mmseqs_output *out, const std::string &resultDB,
         procTmpResultDBIndex + "/" + FileUtil::baseName(resultDBIndex);
 
     if (FileUtil::directoryExists(localTmpPath.c_str()) == false) {
-      Debug(Debug::INFO) << "Local tmp dir " << localTmpPath
-                         << " does not exist or is not a directory\n";
+      out->info("Local tmp dir {} does not exist or is not a directory", localTmpPath);
       if (FileUtil::makeDir(localTmpPath.c_str()) == false) {
-        Debug(Debug::ERROR)
-            << "Cannot create local tmp dir " << localTmpPath << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot create local tmp dir {}", localTmpPath);
       } else {
-        Debug(Debug::INFO) << "Created local tmp dir " << localTmpPath << "\n";
+        out->info("Created local tmp dir {}", localTmpPath);
       }
     }
   }
@@ -786,8 +719,7 @@ void Prefiltering::runMpiSplits(mmseqs_output *out, const std::string &resultDB,
       // merge output databases
       mergePrefilterSplits(resultDB, resultDBIndex, splitFiles);
     } else {
-      Debug(Debug::ERROR) << "Aborting. No results were computed!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Aborting. No results were computed");
     }
 
     delete[] results;
@@ -799,10 +731,7 @@ int Prefiltering::runSplits(mmseqs_output *out, const std::string &resultDB,
                             const std::string &resultDBIndex, size_t fromSplit,
                             size_t splitProcessCount, bool merge) {
   if (fromSplit + splitProcessCount > static_cast<size_t>(splits)) {
-    Debug(Debug::ERROR) << "Start split " << fromSplit << " plus split count "
-                        << splitProcessCount << " cannot be larger than splits "
-                        << splits << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Start split {} plus split count {} cannot be larger than splits {}", fromSplit, splitProcessCount, splits);
   }
 
   size_t freeSpace =
@@ -813,18 +742,13 @@ int Prefiltering::runSplits(mmseqs_output *out, const std::string &resultDB,
     std::string freeSpaceToPrint = ByteParser::format(freeSpace);
     std::string estimatedHDDMemoryToPrint =
         ByteParser::format(estimatedHDDMemory);
-    Debug(Debug::WARNING) << "Hard disk might not have enough free space ("
-                          << freeSpaceToPrint << " left)."
-                          << "The prefilter result might need up to "
-                          << estimatedHDDMemoryToPrint << ".\n";
+    out->warn("Hard disk might not have enough free space ({} left). The prefilter result might need up to {}.", freeSpaceToPrint, estimatedHDDMemoryToPrint);
   }
 
   bool hasResult = false;
   if (splitProcessCount > 1) {
     if (compressed == true && splitMode == Parameters::TARGET_DB_SPLIT) {
-      Debug(Debug::WARNING) << "The output of the prefilter cannot be "
-                               "compressed during target split mode. "
-                               "Prefilter result will not be compressed.\n";
+      out->warn("The output of the prefilter cannot be compressed during target split mode. Prefilter result will not be compressed.");
       compressed = false;
     }
     // splits template database into x sequence steps
@@ -873,8 +797,7 @@ int Prefiltering::runSplits(mmseqs_output *out, const std::string &resultDB,
 bool Prefiltering::runSplit(mmseqs_output *out, const std::string &resultDB,
                             const std::string &resultDBIndex, size_t split,
                             bool merge) {
-  Debug(Debug::INFO) << "Process prefiltering step " << (split + 1) << " of "
-                     << splits << "\n\n";
+  out->info("Process prefiltering step {} of {}", split+1, splits);
 
   size_t dbFrom = 0;
   size_t dbSize = tdbr->getSize();
@@ -906,7 +829,7 @@ bool Prefiltering::runSplit(mmseqs_output *out, const std::string &resultDB,
     }
   }
 
-  Debug(Debug::INFO) << "k-mer similarity threshold: " << kmerThr << "\n";
+  out->info("k-mer similarity threshold: {}", kmerThr);
 
   double kmersPerPos = 0;
   size_t dbMatches = 0;
@@ -936,12 +859,10 @@ bool Prefiltering::runSplit(mmseqs_output *out, const std::string &resultDB,
     reslens[i] = new std::list<int>();
   }
 
-  Debug(Debug::INFO) << "Starting prefiltering scores calculation (step "
-                     << (split + 1) << " of " << splits << ")\n";
-  Debug(Debug::INFO) << "Query db start " << (queryFrom + 1) << " to "
-                     << queryFrom + querySize << "\n";
-  Debug(Debug::INFO) << "Target db start " << (dbFrom + 1) << " to "
-                     << dbFrom + dbSize << "\n";
+  out->info("Starting prefiltering scores calculation (step {} of {})", split+1, splits);
+  out->info("Query db start {} to {}", queryFrom + 1, queryFrom + querySize);
+  out->info("Target db start {} to {}", dbFrom + 1, dbFrom + dbSize);
+
   Debug::Progress progress(querySize);
 
 #pragma omp parallel num_threads(localThreads)
@@ -986,10 +907,7 @@ bool Prefiltering::runSplit(mmseqs_output *out, const std::string &resultDB,
             targetSeqId != UINT_MAX) {
           targetSeqId = targetSeqId - dbFrom;
           if (targetSeqId > tdbr->getSize()) {
-            Debug(Debug::ERROR)
-                << "targetSeqId: " << targetSeqId
-                << " > target database size: " << tdbr->getSize() << "\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("targetSeqId: {} > target database size: {}", targetSeqId, tdbr->getSize());
           }
         } else {
           targetSeqId = UINT_MAX;
@@ -1007,9 +925,7 @@ bool Prefiltering::runSplit(mmseqs_output *out, const std::string &resultDB,
         // replace id with key
         res->seqId = tdbr->getDbKey(targetSeqId1);
         if (UNLIKELY(targetSeqId1 >= tdbr->getSize())) {
-          Debug(Debug::WARNING)
-              << "Wrong prefiltering result for query: " << qdbr->getDbKey(id)
-              << " -> " << targetSeqId1 << "\t" << res->prefScore << "\n";
+          out->warn("Wrong prefiltering result for query: {} -> {}  (score: {})", qdbr->getDbKey(id), targetSeqId1, res->prefScore);
         }
 
         // TODO: check if this should happen when diagonalScoring == false
@@ -1130,24 +1046,23 @@ void Prefiltering::printStatistics(const statistics_t &stats,
     reslens[i]->sort();
     reslens[0]->merge(*reslens[i]);
   }
-  Debug(Debug::INFO) << "\n" << stats.kmersPerPos << " k-mers per position\n";
-  Debug(Debug::INFO) << stats.dbMatches << " DB matches per sequence\n";
-  Debug(Debug::INFO) << stats.diagonalOverflow << " overflows\n";
-  Debug(Debug::INFO) << stats.truncated
-                     << " queries produce too many hits (truncated result)\n";
-  Debug(Debug::INFO) << stats.resultsPassedPrefPerSeq
-                     << " sequences passed prefiltering per query sequence";
-  if (stats.resultsPassedPrefPerSeq > maxResults)
-    Debug(Debug::WARNING) << " (ATTENTION: max. " << maxResults
-                          << " best scoring sequences were written to the "
-                             "output prefiltering database)\n";
-  else
-    Debug(Debug::INFO) << "\n";
+
+  out->info("{} k-mers per position", stats.kmersPerPos);
+  out->info("{} DB matches per sequence", stats.dbMatches);
+  out->info("{} overflows", stats.diagonalOverflow);
+  out->info("{} queries produce too many hits (truncated result)", stats.truncated);
+  out->info("{} sequences passed prefiltering per query sequence", stats.resultsPassedPrefPerSeq);
+
+  if (stats.resultsPassedPrefPerSeq > maxResults) {
+    out->warn("(ATTENTION: max. {} best scoring sequences were written to the output prefiltering database)", maxResults);
+  }
+
   size_t mid = reslens[0]->size() / 2;
   std::list<int>::iterator it = reslens[0]->begin();
   std::advance(it, mid);
-  Debug(Debug::INFO) << *it << " median result list length\n";
-  Debug(Debug::INFO) << empty << " sequences with 0 size result lists\n";
+
+  out->info("{} median result list length", *it);
+  out->info("{} sequences with 0 size result lists", empty);
 }
 
 BaseMatrix *Prefiltering::getSubstitutionMatrix(
@@ -1201,9 +1116,7 @@ int Prefiltering::getKmerThreshold(const float sensitivity,
         float base = 171.75;
         kmerThrBest = base - (sensitivity * 9.75);
       } else {
-        Debug(Debug::ERROR)
-            << "The k-mer size " << kmerSize << " is not valid.\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("The k-mer size {} is not valid.", kmerSize);
       }
     } else {
       if (kmerSize == 5) {
@@ -1216,9 +1129,7 @@ int Prefiltering::getKmerThreshold(const float sensitivity,
         float base = 186.15;
         kmerThrBest = base - (sensitivity * 11.22);
       } else {
-        Debug(Debug::ERROR)
-            << "The k-mer size " << kmerSize << " is not valid.\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("The k-mer size {} is not valid.", kmerSize);
       }
     }
   }

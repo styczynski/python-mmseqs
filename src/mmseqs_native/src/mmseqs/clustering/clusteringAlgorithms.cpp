@@ -232,10 +232,10 @@ void ClusteringAlgorithms::setCover(unsigned int **elementLookupTable,
     if (representative == UINT_MAX) {
       continue;
     }
-    //          Debug(Debug::INFO)<<alnDbr->getDbKey(representative)<<"\n";
     removeClustersize(representative);
     assignedcluster[representative] = representative;
-    // delete clusters of members;
+
+    // Delete clusters of members;
     size_t elementSize = (newElementOffsets[representative + 1] -
                           newElementOffsets[representative]);
     for (size_t elementId = 0; elementId < elementSize; elementId++) {
@@ -243,13 +243,12 @@ void ClusteringAlgorithms::setCover(unsigned int **elementLookupTable,
           elementLookupTable[representative][elementId];
       // float seqId = elementScoreTable[representative][elementId];
       const short seqId = elementScoreLookupTable[representative][elementId];
-      //  Debug(Debug::INFO)<<seqId<<"\t"<<bestscore[elementtodelete]<<"\n";
-      // becareful of this criteria
+
+      // Be careful of this criteria
       if (seqId > bestscore[elementtodelete]) {
         assignedcluster[elementtodelete] = representative;
         bestscore[elementtodelete] = seqId;
       }
-      // Debug(Debug::INFO)<<bestscore[elementtodelete]<<"\n";
       if (elementtodelete == representative) {
         continue;
       }

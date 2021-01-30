@@ -158,8 +158,7 @@ std::pair<hit_t *, size_t> QueryMatcher::matchQuery(Sequence *querySeq,
       }
       stats->truncated = 0;
     } else {
-      // Debug(Debug::WARNING) << "Sequence " << querySeq->getDbKey() << "
-      // produces too many hits. Results might be truncated\n";
+      out->warn("Sequence {} produces too many hits. Results might be truncated.", querySeq->getDbKey());
       queryResult = getResult<UNGAPPED_DIAGONAL_SCORE>(
           foundDiagonals, resultSize, identityId, diagonalThr,
           ungappedAlignment, false);
@@ -177,8 +176,7 @@ std::pair<hit_t *, size_t> QueryMatcher::matchQuery(Sequence *querySeq,
           thr, ungappedAlignment, false);
       stats->truncated = 0;
     } else {
-      //            Debug(Debug::WARNING) << "Sequence " << querySeq->getDbKey()
-      //            << " produces too many hits. Results might be truncated\n";
+      out->warn("Sequence {} produces too many hits. Results might be truncated.", querySeq->getDbKey());
       queryResult =
           getResult<KMER_SCORE>(foundDiagonals, resultSize, identityId, thr,
                                 ungappedAlignment, false);

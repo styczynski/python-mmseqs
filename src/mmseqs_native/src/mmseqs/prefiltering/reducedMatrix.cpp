@@ -44,10 +44,6 @@ ReducedMatrix::ReducedMatrix(double** probMatrix, float** rMatrix,
   generateSubMatrix(this->probMatrix, subMatrix_tmp, rMatrix,
                     origAlphabetSize - 1, false);
 
-  //    double info = calculateMutualInformation(probMatrix, subMatrix_tmp,
-  //    origAlphabetSize-1); Debug(Debug::INFO) << "20 " << info << "\n";
-  // print(subMatrix, origAlphabetSize -1,  )
-
   size_t reduce_steps = origAlphabetSize - reducedAlphabetSize;
 
   for (size_t step = 0; step < reduce_steps; step++) {
@@ -67,7 +63,6 @@ ReducedMatrix::ReducedMatrix(double** probMatrix, float** rMatrix,
     char reduced_aa = reducedAlphabet.at(reduced_index);
     char lost_aa = reducedAlphabet.at(lost_index);
 
-    // Debug(Debug::INFO)  << lost_aa  << " -> " << reduced_aa << "\n";
     reducedAlphabet.erase(reducedAlphabet.begin() + lost_index);
 
     int reduced_int = this->orig_aa2num[(int)reduced_aa];
@@ -232,11 +227,8 @@ std::pair<size_t, size_t> ReducedMatrix::coupleWithBestInfo(double** pinput,
         besti = i;
         bestj = j;
       }
-      //            Debug(Debug::INFO) << " i = " << i << "; j = " << j << "
-      //            info " << temp << '\n';
     }
   }
-  // Debug(Debug::INFO) << (size-1) <<  " " << bestInfo << "\n";
   // Finally coupling the best option.
   coupleBases(pinput, pMatrix, size, besti, bestj);
   for (size_t i = 0; i < size; i++) {

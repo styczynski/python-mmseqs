@@ -109,16 +109,14 @@ class Concat {
     int output_desc = fileno(outFile);
     struct stat stat_buf;
     if (fstat(output_desc, &stat_buf) < 0) {
-      Debug(Debug::ERROR) << "Error with output file\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Error with output file");
     }
     size_t outsize = io_blksize(stat_buf);
     /* Actual number of characters read, and therefore written.  */
     for (size_t fileIdx = 0; fileIdx < files.size(); fileIdx++) {
       int input_desc = fileno(files[fileIdx]);
       if (fstat(input_desc, &stat_buf) < 0) {
-        Debug(Debug::ERROR) << "Error with input descriptor\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Error with input descriptor");
       }
 
       size_t insize = io_blksize(stat_buf);
@@ -128,13 +126,9 @@ class Concat {
       char *inbuf = (char *)mem_align(page_size, insize);
 #if HAVE_POSIX_FADVISE
       if (posix_fadvise(input_desc, 0, 0, POSIX_FADV_SEQUENTIAL) != 0) {
-        Debug(Debug::ERROR) << "posix_fadvise returned an error\n";
+        out->failure("posix_fadvise returned an error");
       }
 #endif
-      /* Loop until the end of the file.  */
-      //            std::cout << "(size_t) p1 % alignment=" << (size_t) (inbuf +
-      //            page_size - 1) % page_size << std::endl; static char const
-      //            *buf = (char *) ptr_align(inbuf, page_size);
       doConcat(input_desc, output_desc, inbuf, insize);
       free(inbuf);
     }
@@ -147,8 +141,7 @@ class Concat {
 
       size_t n_read = safe_read(input_desc, buf, bufsize);
       if (n_read == SAFE_READ_ERROR) {
-        Debug(Debug::ERROR) << "read error nr: " << errno << "\n";
-        // EXIT(EXIT_FAILURE);
+        out->error("Read error nr: {}", errno);
         return false;
       }
 
@@ -161,8 +154,7 @@ class Concat {
       {
         /* The following is ok, since we know that 0 < n_read.  */
         if (full_write(out_desc, buf, n_read) != (ssize_t)n_read) {
-          Debug(Debug::ERROR) << "write error\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Read error.");
         }
       }
     }

@@ -32,37 +32,30 @@ int prefilter(mmseqs_output* out, Parameters& par) {
     dbr.close();
   }
   if (queryDbType == -1 || targetDbType == -1) {
-    Debug(Debug::ERROR) << "Please recreate your database or add a .dbtype "
-                           "file to your sequence/profile database.\n";
+    out->error("Please recreate your database or add a .dbtype file to your sequence/profile database.");
     return EXIT_FAILURE;
   }
   if (Parameters::isEqualDbtype(queryDbType, Parameters::DBTYPE_HMM_PROFILE) &&
       Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_HMM_PROFILE)) {
-    Debug(Debug::ERROR)
-        << "Only the query OR the target database can be a profile database.\n";
+    out->error("Only the query OR the target database can be a profile database.");
     return EXIT_FAILURE;
   }
 
   if (Parameters::isEqualDbtype(queryDbType, Parameters::DBTYPE_AMINO_ACIDS) &&
       Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_NUCLEOTIDES)) {
-    Debug(Debug::ERROR)
-        << "The prefilter can not search amino acids against nucleotides. "
-           "Something might got wrong while createdb or createindex.\n";
+    out->error("The prefilter can not search amino acids against nucleotides. Something might got wrong while createdb or createindex");
     return EXIT_FAILURE;
   }
   if (Parameters::isEqualDbtype(queryDbType, Parameters::DBTYPE_NUCLEOTIDES) &&
       Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_AMINO_ACIDS)) {
-    Debug(Debug::ERROR)
-        << "The prefilter can not search nucleotides against amino acids. "
-           "Something might got wrong while createdb or createindex.\n";
+    out->error("The prefilter can not search nucleotides against amino acids. Something might got wrong while createdb or createindex.");
     return EXIT_FAILURE;
   }
   if (Parameters::isEqualDbtype(queryDbType, Parameters::DBTYPE_HMM_PROFILE) ==
           false &&
       Parameters::isEqualDbtype(targetDbType,
                                 Parameters::DBTYPE_PROFILE_STATE_SEQ)) {
-    Debug(Debug::ERROR) << "The query has to be a profile when using a target "
-                           "profile state database.\n";
+    out->error("The query has to be a profile when using a target profile state database.");
     return EXIT_FAILURE;
   } else if (Parameters::isEqualDbtype(queryDbType,
                                        Parameters::DBTYPE_HMM_PROFILE) &&
