@@ -100,9 +100,7 @@ int linclust(mmseqs_output *out, Parameters &par) {
       Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_HMM_PROFILE)) {
     // par.printUsageMessage(command,
     // MMseqsParameter::COMMAND_ALIGN|MMseqsParameter::COMMAND_PREFILTER);
-    Debug(Debug::ERROR)
-        << "Cannot use ungapped alignment mode with profile databases.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot use ungapped alignment mode with profile databases");
   }
 
   cmd.addVariable("ALIGN_MODULE", isUngappedMode ? "rescorediagonal" : "align");

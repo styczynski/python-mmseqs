@@ -24,17 +24,14 @@ int createdb(mmseqs_output* out, Parameters& par) {
 
   for (size_t i = 0; i < filenames.size(); i++) {
     if (FileUtil::directoryExists(filenames[i].c_str()) == true) {
-      Debug(Debug::ERROR) << "File " << filenames[i] << " is a directory\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("File {} is a directory\n", filenames[i] );
     }
   }
 
   bool dbInput = false;
   if (FileUtil::fileExists(par.db1dbtype.c_str()) == true) {
     if (filenames.size() > 1) {
-      Debug(Debug::ERROR)
-          << "Only one database can be used with database input\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Only one database can be used with database input");
     }
     dbInput = true;
     par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_HARD;

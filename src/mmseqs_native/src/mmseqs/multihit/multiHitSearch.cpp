@@ -56,8 +56,7 @@ int multihitsearch(mmseqs_output *out, Parameters &par) {
     out->info("Tmp {} folder does not exist or is not a directory.\n", par.db4
                       );
     if (FileUtil::makeDir(par.db4.c_str()) == false) {
-      Debug(Debug::ERROR) << "Can not create tmp folder " << par.db4 << ".\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not create tmp folder {}", par.db4 );
     } else {
       out->info("Created dir {}\n", par.db4);
     }
@@ -67,9 +66,7 @@ int multihitsearch(mmseqs_output *out, Parameters &par) {
   std::string tmpDir = par.db4 + "/" + SSTR(hash);
   if (FileUtil::directoryExists(tmpDir.c_str()) == false) {
     if (FileUtil::makeDir(tmpDir.c_str()) == false) {
-      Debug(Debug::ERROR) << "Can not create sub tmp folder " << tmpDir
-                          << ".\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not create sub tmp folder {}", tmpDir);
     }
   }
   par.filenames.pop_back();

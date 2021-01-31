@@ -96,9 +96,7 @@ class ByteParser {
       unitFactor = 1;
     } else {
       // unrecognized unit
-      Debug(Debug::ERROR) << "Invalid unit " << unit
-                          << " for format conversion given\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid unit {} for format conversion given", unit);
     }
 
     size_t value = (size_t)(numBytes / unitFactor);

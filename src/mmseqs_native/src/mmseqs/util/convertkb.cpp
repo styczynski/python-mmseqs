@@ -16,8 +16,7 @@
 std::string getPrimaryAccession(const std::string &accession) {
   size_t end = accession.find_first_of(';');
   if (UNLIKELY(end == std::string::npos)) {
-    Debug(Debug::ERROR) << "Could not extract primary accession!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not extract primary accession!");
   }
   return accession.substr(0, end);
 }
@@ -34,13 +33,11 @@ std::vector<unsigned int> getEnabledColumns(const std::string &columns,
       unsigned int col =
           static_cast<unsigned int>(strtoul((*it).c_str(), &rest, 10));
       if ((rest != (*it).c_str() && *rest != '\0') || errno == ERANGE) {
-        Debug(Debug::ERROR) << "Invalid selected column: " << (*it) << "!\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Invalid selected column: {}!\n", (*it) );
       }
 
       if (col >= columnCount) {
-        Debug(Debug::ERROR) << "Invalid selected column: " << col << "!\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Invalid selected column: {}!", col);
       }
       enabledColumns.insert(col);
     } else {
@@ -100,8 +97,7 @@ int convertkb(mmseqs_output *out, Parameters &par) {
     std::string lookupFile = outputBase + ".lookup";
     lookupStream = new std::ofstream(lookupFile);
     if (lookupStream->fail()) {
-      Debug(Debug::ERROR) << "Could not open " << lookupFile << " for writing.";
-      EXIT(EXIT_FAILURE);
+      out->failure("Could not open {} for writing", lookupFile);
     }
   } else {
     reader = new DBReader<unsigned int>(par.mappingFile.c_str(),
@@ -118,17 +114,14 @@ int convertkb(mmseqs_output *out, Parameters &par) {
 #ifdef HAVE_ZLIB
       kbIn = new igzstream((*it).c_str());
 #else
-      Debug(Debug::ERROR) << "MMseqs2 was not compiled with zlib support. Can "
-                             "not read compressed input\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("MMseqs2 was not compiled with zlib support. Can not read compressed input");
 #endif
     } else {
       kbIn = new std::ifstream(*it);
     }
 
     if (kbIn->fail()) {
-      Debug(Debug::ERROR) << "File " << (*it) << " not found\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("File {} not found\n", (*it) );
     }
 
     out->info("Extracting data from {}\n", (*it));

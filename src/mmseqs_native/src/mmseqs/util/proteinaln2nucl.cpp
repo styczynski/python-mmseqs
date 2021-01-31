@@ -48,9 +48,7 @@ int proteinaln2nucl(mmseqs_output *out, Parameters &par) {
     tdbr_aa->open(DBReader<unsigned int>::NOSORT);
     tdbr_aa->readMmapedDataInMemory();
   } else {
-    Debug(Debug::ERROR) << "Either query database == target database for "
-                           "nucleotide and amino acid or != for both\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Either query database == target database for nucleotide and amino acid or != for both");
   }
 
   if (Parameters::isEqualDbtype(qdbr_nuc->getDbtype(),
@@ -61,8 +59,7 @@ int proteinaln2nucl(mmseqs_output *out, Parameters &par) {
                                 Parameters::DBTYPE_AMINO_ACIDS) == false ||
       Parameters::isEqualDbtype(tdbr_aa->getDbtype(),
                                 Parameters::DBTYPE_AMINO_ACIDS) == false) {
-    Debug(Debug::ERROR) << "Wrong query and target database input\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Wrong query and target database input");
   }
 
   NucleotideMatrix subMat(par.scoringMatrixFile.nucleotides, 1.0, 0.0);
@@ -120,15 +117,12 @@ int proteinaln2nucl(mmseqs_output *out, Parameters &par) {
         data = Util::skipLine(data);
 
         if (qStartCodon && res.qStartPos == 0) {
-          Debug(Debug::ERROR) << "Alignment contains unalignable character\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Alignment contains unalignable character");
         }
 
         bool hasBacktrace = res.backtrace.size() > 0;
         if (!hasBacktrace) {
-          Debug(Debug::ERROR) << "This module only supports database input "
-                                 "with backtrace string\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("This module only supports database input with backtrace string");
         }
 
         unsigned int targetId = tdbr_nuc->getId(res.dbKey);
@@ -141,8 +135,7 @@ int proteinaln2nucl(mmseqs_output *out, Parameters &par) {
           tStartCodon = true;
         }
         if (tStartCodon && res.dbStartPos == 0) {
-          Debug(Debug::ERROR) << "Alignment contains unalignable character\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Alignment contains unalignable character");
         }
 
         res.dbStartPos = res.dbStartPos * 3 + (tStartCodon ? -3 : 0);

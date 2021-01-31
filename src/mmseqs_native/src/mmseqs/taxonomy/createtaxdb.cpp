@@ -18,8 +18,7 @@ int createtaxdb(mmseqs_output* out, Parameters& par) {
     out->info("Tmp {} folder does not exist or is not a directory.\n", tmp
                       );
     if (FileUtil::makeDir(tmp.c_str()) == false) {
-      Debug(Debug::ERROR) << "Can not create tmp folder " << tmp << ".\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not create tmp folder {}.", tmp);
     } else {
       out->info("Created dir {}\n", tmp);
     }

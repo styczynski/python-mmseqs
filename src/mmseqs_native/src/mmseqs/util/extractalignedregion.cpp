@@ -83,8 +83,7 @@ int extractalignedregion(mmseqs_output *out, Parameters &par) {
           seq = tdbr->getDataByDBKey(res.dbKey, thread_idx) + res.dbStartPos;
           length = res.dbEndPos - res.dbStartPos + 1;
         } else {
-          Debug(Debug::ERROR) << "Missing extraction type!\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Missing extraction type!");
         }
 
         dbw.writeStart(thread_idx);

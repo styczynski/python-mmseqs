@@ -12,8 +12,7 @@ int mergedbs(mmseqs_output *out, Parameters &par) {
   //    Parameters::PARSE_VARIADIC, 0);
 
   if (par.filenames.size() <= 2) {
-    Debug(Debug::ERROR) << "Need at least two databases for merging\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Need at least two databases for merging");
   }
 
   const std::vector<std::string> prefices = Util::split(par.mergePrefixes, ",");

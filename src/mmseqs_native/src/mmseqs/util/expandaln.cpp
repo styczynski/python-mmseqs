@@ -138,7 +138,7 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
   const int cSeqDbType = cReader->getDbtype();
   if (Parameters::isEqualDbtype(aSeqDbType, Parameters::DBTYPE_HMM_PROFILE) &&
       Parameters::isEqualDbtype(cSeqDbType, Parameters::DBTYPE_HMM_PROFILE)) {
-    Debug(Debug::ERROR) << "Profile-profile is currently not supported\n";
+    out->error("Profile-profile is currently not supported");
     return EXIT_FAILURE;
   }
 
@@ -250,8 +250,7 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
           continue;
         }
         if (resultAb.backtrace.empty()) {
-          Debug(Debug::ERROR) << "Alignment must contain a backtrace\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Alignment must contain a backtrace");
         }
 
         unsigned int bResKey = resultAb.dbKey;
@@ -272,8 +271,7 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
         for (size_t k = 0; k < resultsBc.size(); ++k) {
           Matcher::result_t &resultBc = resultsBc[k];
           if (resultBc.backtrace.size() == 0) {
-            Debug(Debug::ERROR) << "Alignment must contain a backtrace\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("Alignment must contain a backtrace");
           }
           translator.translateResult(resultAb, resultBc, resultAc);
 

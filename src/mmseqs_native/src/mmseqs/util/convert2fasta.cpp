@@ -59,8 +59,7 @@ int convert2fasta(mmseqs_output* out, Parameters& par) {
     fwrite(newline, sizeof(char), 1, fastaFP);
   }
   if (fclose(fastaFP) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << par.db2 << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close file {}\n", par.db2 );
   }
   db_header.close();
   db.close();

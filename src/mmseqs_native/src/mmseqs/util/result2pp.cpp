@@ -138,10 +138,7 @@ int result2pp(mmseqs_output *out, Parameters &par) {
         const unsigned int key = (unsigned int)strtoul(dbKey, NULL, 10);
         const size_t columns = Util::getWordsOfLine(results, entry, 255);
         if (columns <= Matcher::ALN_RES_WITHOUT_BT_COL_CNT) {
-          Debug(Debug::ERROR)
-              << "Alignment must contain the alignment information. Compute "
-                 "the alignment with option -a.\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Alignment must contain the alignment information. Compute the alignment with option -a");
         }
 
         // just add sequences if eval < thr. and if key is not the same as the

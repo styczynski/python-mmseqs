@@ -127,16 +127,14 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
                                       par.gapExtend.aminoacids);
 
   if (qDbr->getDbtype() == -1 || targetSeqType == -1) {
-    Debug(Debug::ERROR) << "Please recreate your database or add a .dbtype "
-                           "file to your sequence/profile database\n";
+    out->error("Please recreate your database or add a .dbtype file to your sequence/profile database");
     return EXIT_FAILURE;
   }
   if (Parameters::isEqualDbtype(qDbr->getDbtype(),
                                 Parameters::DBTYPE_HMM_PROFILE) &&
       Parameters::isEqualDbtype(targetSeqType,
                                 Parameters::DBTYPE_HMM_PROFILE)) {
-    Debug(Debug::ERROR)
-        << "Only the query OR the target database can be a profile database\n";
+    out->error("Only the query OR the target database can be a profile database");
     return EXIT_FAILURE;
   }
 
@@ -216,10 +214,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
         if (evalue < par.evalProfile) {
           const size_t edgeId = tDbr->getId(key);
           if (edgeId == UINT_MAX) {
-            Debug(Debug::ERROR)
-                << "Sequence " << key
-                << " does not exist in target sequence database\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("Sequence {} does not exist in target sequence database", key);
           }
           edgeSequence.mapSequence(edgeId, key,
                                    tDbr->getData(edgeId, thread_idx),
@@ -268,10 +263,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
       } else {
         for (size_t pos = 0; pos < res.centerLength; pos++) {
           if (res.msaSequence[0][pos] == MultipleAlignment::GAP) {
-            Debug(Debug::ERROR)
-                << "Error in computePSSMFromMSA. First sequence of MSA is not "
-                   "allowed to contain gaps.\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("Error in computePSSMFromMSA. First sequence of MSA is not allowed to contain gaps");
           }
         }
 

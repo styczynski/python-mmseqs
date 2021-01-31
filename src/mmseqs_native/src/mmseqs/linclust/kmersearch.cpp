@@ -158,9 +158,7 @@ int kmersearch(mmseqs_output *out, Parameters &par) {
   int adjustedKmerSize = 0;
   if (Parameters::isEqualDbtype(FileUtil::parseDbType(par.db2.c_str()),
                                 Parameters::DBTYPE_INDEX_DB) == false) {
-    Debug(Debug::ERROR) << "Create index before calling kmersearch with mmseqs "
-                           "createlinindex.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Create index before calling kmersearch with mmseqs createlinindex");
   }
 
   DBReader<unsigned int> tidxdbr(
@@ -170,11 +168,7 @@ int kmersearch(mmseqs_output *out, Parameters &par) {
   PrefilteringIndexData data = PrefilteringIndexReader::getMetadata(&tidxdbr);
   if (par.PARAM_K.wasSet) {
     if (par.kmerSize != 0 && data.kmerSize != par.kmerSize) {
-      Debug(Debug::ERROR) << "Index was created with -k " << data.kmerSize
-                          << " but the prefilter was called with -k "
-                          << par.kmerSize << "!\n";
-      Debug(Debug::ERROR) << "createindex -k " << par.kmerSize << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Index was created with -k {} but the prefilter was called with -k {}. Please execute createindex -k {}", data.kmerSize, par.kmerSize, par.kmerSize);
     }
   }
   if (par.PARAM_ALPH_SIZE.wasSet) {
@@ -182,24 +176,12 @@ int kmersearch(mmseqs_output *out, Parameters &par) {
         (Parameters::isEqualDbtype(data.seqType, Parameters::DBTYPE_AMINO_ACIDS)
              ? par.alphabetSize.aminoacids
              : par.alphabetSize.nucleotides)) {
-      Debug(Debug::ERROR) << "Index was created with --alph-size  "
-                          << data.alphabetSize
-                          << " but the prefilter was called with --alph-size "
-                          << MultiParam<int>::format(par.alphabetSize) << "!\n";
-      Debug(Debug::ERROR) << "createindex --alph-size "
-                          << MultiParam<int>::format(par.alphabetSize) << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Index was created with --alph-size {} but the prefilter was called with --alph-size {}. Please execute createindex --alph-size {}", data.alphabetSize, MultiParam<int>::format(par.alphabetSize), MultiParam<int>::format(par.alphabetSize));
     }
   }
   if (par.PARAM_SPACED_KMER_MODE.wasSet) {
     if (data.spacedKmer != par.spacedKmer) {
-      Debug(Debug::ERROR)
-          << "Index was created with --spaced-kmer-mode " << data.spacedKmer
-          << " but the prefilter was called with --spaced-kmer-mode "
-          << par.spacedKmer << "!\n";
-      Debug(Debug::ERROR) << "createindex --spaced-kmer-mode " << par.spacedKmer
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Index was created with --spaced-kmer-mode {} but the prefilter was called with --spaced-kmer-mode {}. Please execute createindex --spaced-kmer-mode {}", data.spacedKmer, par.spacedKmer, par.spacedKmer);
     }
   }
   par.kmerSize = data.kmerSize;
@@ -217,9 +199,7 @@ int kmersearch(mmseqs_output *out, Parameters &par) {
   queryDbr.open(DBReader<unsigned int>::NOSORT);
   int querySeqType = queryDbr.getDbtype();
   if (Parameters::isEqualDbtype(querySeqType, targetSeqType) == false) {
-    Debug(Debug::ERROR)
-        << "Dbtype of query and target database do not match !\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Dbtype of query and target database do not match");
   }
 
   setKmerLengthAndAlphabet(par, queryDbr.getAminoAcidDBSize(), querySeqType);

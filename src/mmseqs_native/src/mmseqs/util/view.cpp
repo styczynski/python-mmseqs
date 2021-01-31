@@ -28,7 +28,7 @@ int view(mmseqs_output* out, Parameters& par) {
     const unsigned int key = Util::fast_atoi<unsigned int>(ids[i].c_str());
     const size_t id = reader.sequenceReader->getId(key);
     if (id >= UINT_MAX) {
-      Debug(Debug::ERROR) << "Key " << ids[i] << " not found in database\n";
+      out->error("Key {} not found in database", ids[i]);
       continue;
     }
     char* data = reader.sequenceReader->getData(id, 0);

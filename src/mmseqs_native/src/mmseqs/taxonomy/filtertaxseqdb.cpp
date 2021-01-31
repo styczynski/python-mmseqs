@@ -27,10 +27,7 @@ int filtertaxseqdb(mmseqs_output* out, Parameters& par) {
   std::vector<std::pair<unsigned int, unsigned int>> mapping;
   if (FileUtil::fileExists(std::string(par.db1 + "_mapping").c_str()) ==
       false) {
-    Debug(Debug::ERROR)
-        << par.db1 + "_mapping"
-        << " does not exist. Please create the taxonomy mapping!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("{}_mapping does not exist. Please create the taxonomy mapping", par.db1);
   }
   bool isSorted = Util::readMapping(par.db1 + "_mapping", mapping);
   if (isSorted == false) {

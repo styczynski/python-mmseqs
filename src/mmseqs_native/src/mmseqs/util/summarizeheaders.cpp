@@ -39,7 +39,7 @@ int summarizeheaders(mmseqs_output *out, Parameters &par) {
   } else if (par.headerType == Parameters::HEADER_TYPE_UNICLUST) {
     summarizer = new UniprotHeaderSummarizer;
   } else {
-    Debug(Debug::ERROR) << "Header type is not supported\n";
+    out->error("Header type is not supported");
     return EXIT_FAILURE;
   }
   Debug::Progress progress(reader.getSize());

@@ -43,9 +43,7 @@ int extractorfs(mmseqs_output* out, Parameters& par) {
   headerWriter.open();
 
   if ((par.orfStartMode == 1) && (par.contigStartMode < 2)) {
-    Debug(Debug::ERROR) << "Parameter combination is illegal, orf-start-mode 1 "
-                           "can only go with contig-start-mode 2\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Parameter combination is illegal, orf-start-mode 1 can only go with contig-start-mode 2");
   }
 
   unsigned int forwardFrames = Orf::getFrames(par.forwardFrames);

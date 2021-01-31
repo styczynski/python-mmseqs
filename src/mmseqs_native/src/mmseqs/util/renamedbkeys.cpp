@@ -19,8 +19,7 @@ void copyEntry(unsigned int oldKey, unsigned int newKey,
                bool isCompressed, int subDbMode) {
   const size_t id = reader.getId(oldKey);
   if (id >= UINT_MAX) {
-    Debug(Debug::ERROR) << "Key " << oldKey << " not found in database\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Key {} not found in database", oldKey);
   }
   if (subDbMode == Parameters::SUBDB_MODE_SOFT) {
     writer.writeIndexEntry(newKey, reader.getOffset(id), reader.getEntryLen(id),
@@ -52,8 +51,7 @@ int renamedbkeys(mmseqs_output* out, Parameters& par) {
   if (FileUtil::fileExists(par.db1.c_str())) {
     orderFile = fopen(par.db1.c_str(), "r");
   } else {
-    Debug(Debug::ERROR) << "File " << par.db1 << " does not exist.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("File {} does not exist", par.db1 );
   }
 
   FILE* newLookupFile = NULL;

@@ -85,11 +85,7 @@ void parseHMM(char *data, std::string *sequence, std::string *header,
       profileBuffer[curr_pos] = Sequence::scoreMask(probs[aa_num]);
 
       if (profileBuffer[curr_pos] == 0) {
-        Debug(Debug::ERROR)
-            << "PSSM score of 0 is too large at id: " << id
-            << ".hhm, pos: " << curr_pos
-            << ", score:" << (char)(profileBuffer[curr_pos] ^ 0x80) << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("PSSM score of 0 is too large at id: {}.hhm, pos: {}, socre: {}", id, curr_pos, (char)(profileBuffer[curr_pos] ^ 0x80));
       }
       curr_pos++;
     }

@@ -10,8 +10,7 @@ int splitdb(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   if (par.split < 1) {
-    Debug(Debug::ERROR) << "Cannot split databases into 0 or negative chunks.";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot split databases into 0 or negative chunks.");
   }
 
   DBReader<unsigned int> dbr(
@@ -20,9 +19,7 @@ int splitdb(mmseqs_output *out, Parameters &par) {
   dbr.open(DBReader<unsigned int>::NOSORT);
 
   if ((size_t)par.split > dbr.getSize()) {
-    Debug(Debug::ERROR)
-        << "Cannot split databases into more chunks than database contains.";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot split databases into more chunks than database contains");
   }
 
   for (int split = 0; split < par.split; split++) {

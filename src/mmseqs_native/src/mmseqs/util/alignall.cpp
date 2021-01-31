@@ -22,8 +22,7 @@ int alignall(mmseqs_output *out, Parameters &par) {
   //    argv, command, true, 0, 0);
 
   if (par.alignmentMode == Parameters::ALIGNMENT_MODE_UNGAPPED) {
-    Debug(Debug::ERROR) << "Use rescorediagonal for ungapped alignment mode.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Use rescorediagonal for ungapped alignment mode");
   }
   if (par.addBacktrace == true) {
     par.alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV_SEQID;

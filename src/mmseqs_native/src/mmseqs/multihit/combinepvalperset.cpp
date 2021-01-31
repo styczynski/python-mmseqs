@@ -225,8 +225,7 @@ class PvalueAggregator : public Aggregation {
     }
 
     else {
-      Debug(Debug::ERROR) << "Invalid aggregation function!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid aggregation function!");
     }
     double updatedEval = updatedPval * numTargetSets;
     buffer.append(SSTR(updatedEval));

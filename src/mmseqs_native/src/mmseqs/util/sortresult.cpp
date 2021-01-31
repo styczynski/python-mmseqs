@@ -58,9 +58,7 @@ int sortresult(mmseqs_output *out, Parameters &par) {
           prefResults.emplace_back(QueryMatcher::parsePrefilterHit(data));
           format = 2;
         } else {
-          Debug(Debug::ERROR)
-              << "Invalid input result format (" << columns << " columns).\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Invalid input result format ({} columns)", columns);
         }
         data = Util::skipLine(data);
       }

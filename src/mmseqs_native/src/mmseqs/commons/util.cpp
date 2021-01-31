@@ -31,9 +31,7 @@ int Util::readMapping(
   MemoryMapped indexData(mappingFilename, MemoryMapped::WholeFile,
                          MemoryMapped::SequentialScan);
   if (!indexData.isValid()) {
-    Debug(Debug::ERROR) << "Could not open index file " << mappingFilename
-                        << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not open index file {}", mappingFilename);
   }
 
   size_t currPos = 0;
@@ -73,9 +71,7 @@ void Util::decomposeDomain(size_t domain_size, size_t world_rank,
   if (world_size > domain_size) {
     // Don't worry about this special case. Assume the domain size
     // is greater than the world size.
-    Debug(Debug::ERROR) << "World Size: " << world_size
-                        << " aaSize: " << domain_size << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("World Size: {}, aaSize: {}", world_size, domain_size);
   }
   *subdomain_start = domain_size / world_size * world_rank;
   *subdomain_size = domain_size / world_size;
@@ -611,8 +607,7 @@ bool Util::getLine(const char *data, size_t dataLength, char *buffer,
 
 void Util::checkAllocation(void *pointer, std::string message) {
   if (pointer == NULL) {
-    Debug(Debug::ERROR) << message << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure(message);
   }
 }
 
@@ -665,7 +660,7 @@ uint64_t Util::getL2CacheSize() {
 char Util::touchMemory(const char *memory, size_t size) {
 #ifdef HAVE_POSIX_MADVISE
   if (posix_madvise((void *)memory, size, POSIX_MADV_WILLNEED) != 0) {
-    Debug(Debug::ERROR) << "posix_madvise returned an error (touchMemory)\n";
+    out->error("posix_madvise returned an error (touchMemory)");
   }
 #endif
   if (size > Util::getTotalSystemMemory()) {
@@ -774,8 +769,7 @@ std::map<unsigned int, std::string> Util::readLookup(const std::string &file,
   if (file.length() > 0) {
     std::ifstream mappingStream(file);
     if (mappingStream.fail()) {
-      Debug(Debug::ERROR) << "File " << file << " not found!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("File {} not found!", file);
     }
 
     std::string line;
@@ -859,8 +853,7 @@ int Util::swapCoverageMode(int covMode) {
     case Parameters::COV_MODE_LENGTH_SHORTER:
       return Parameters::COV_MODE_LENGTH_SHORTER;
   }
-  Debug(Debug::ERROR) << "Unknown coverage mode " << covMode << ".\n";
-  EXIT(EXIT_FAILURE);
+  out->failure("Unknown coverage mode {}.", covMode);
 }
 
 float Util::computeSeqId(int seqIdMode, int aaIds, int qLen, int tLen,
@@ -932,12 +925,7 @@ size_t Util::computeMemory(size_t limit) {
     memoryLimit = static_cast<size_t>(Util::getTotalSystemMemory() * 0.9);
   }
   if (MemoryTracker::getSize() > memoryLimit) {
-    Debug(Debug::ERROR)
-        << "Not enough memory to keep dbreader/write in memory!\n";
-    Debug(Debug::ERROR) << "Memory limit: " << memoryLimit
-                        << " dbreader/writer need: " << MemoryTracker::getSize()
-                        << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Not enough memory to keep dbreader/write in memory. Memory limit: {}, dbreader/writer need: {}", memoryLimit, MemoryTracker::getSize());
   } else {
     memoryLimit -= MemoryTracker::getSize();
   }

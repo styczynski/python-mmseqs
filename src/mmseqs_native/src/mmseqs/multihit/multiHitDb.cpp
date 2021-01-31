@@ -22,8 +22,7 @@ int multihitdb(mmseqs_output *out, Parameters &par) {
     out->info("Tmp {} folder does not exist or is not a directory.\n", tmpDir
                       );
     if (FileUtil::makeDir(tmpDir.c_str()) == false) {
-      Debug(Debug::ERROR) << "Can not create tmp folder " << tmpDir << ".\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not create tmp folder {}.", tmpDir);
     } else {
       out->info("Created dir {}\n", tmpDir);
     }
@@ -36,9 +35,7 @@ int multihitdb(mmseqs_output *out, Parameters &par) {
   tmpDir = tmpDir + "/" + hash;
   if (FileUtil::directoryExists(tmpDir.c_str()) == false) {
     if (FileUtil::makeDir(tmpDir.c_str()) == false) {
-      Debug(Debug::ERROR) << "Can not create sub tmp folder " << tmpDir
-                          << ".\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not create sub tmp folder {}", tmpDir);
     }
   }
   FileUtil::symlinkAlias(tmpDir, "latest");

@@ -58,8 +58,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
   std::vector<std::string> filenames(par.filenames);
   for (size_t i = 0; i < filenames.size(); i++) {
     if (FileUtil::directoryExists(filenames[i].c_str()) == true) {
-      Debug(Debug::ERROR) << "File " << filenames[i] << " is a directory.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("File {} is a directory", filenames[i] );
     }
   }
 
@@ -88,9 +87,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
                           FileUtil::baseName(filenames[i]).c_str());
     int written = fwrite(buffer, sizeof(char), len, source);
     if (written != (int)len) {
-      Debug(Debug::ERROR) << "Cannot write to source file " << sourceFile
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot write to source file {}", sourceFile);
     }
 
     mtar_t tar;
@@ -98,18 +95,14 @@ int tar2db(mmseqs_output *out, Parameters &par) {
         Util::endsWith(".tgz", filenames[i])) {
 #ifdef HAVE_ZLIB
       if (mtar_gzopen(&tar, filenames[i].c_str()) != MTAR_ESUCCESS) {
-        Debug(Debug::ERROR) << "Cannot open file " << filenames[i] << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot open file {}\n", filenames[i] );
       }
 #else
-      Debug(Debug::ERROR) << "MMseqs2 was not compiled with zlib support. "
-                             "Cannot read compressed input.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("MMseqs2 was not compiled with zlib support. Cannot read compressed input");
 #endif
     } else {
       if (mtar_open(&tar, filenames[i].c_str()) != MTAR_ESUCCESS) {
-        Debug(Debug::ERROR) << "Cannot open file " << filenames[i] << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot open file {}\n", filenames[i] );
       }
     }
 
@@ -134,8 +127,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
       strm.avail_in = 0;
       int status = inflateInit2(&strm, 15 | 32);
       if (status < 0) {
-        Debug(Debug::ERROR) << "Cannot initialize zlib stream\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot initialize zlib stream");
       }
 #endif
       unsigned int thread_idx = 0;
@@ -162,9 +154,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
                 }
                 if (mtar_read_data(&tar, dataBuffer, header.size) !=
                     MTAR_ESUCCESS) {
-                  Debug(Debug::ERROR)
-                      << "Cannot read entry " << header.name << "\n";
-                  EXIT(EXIT_FAILURE);
+                  out->failure("Cannot read entry {}\n", header.name );
                 }
                 proceed = true;
                 currentKey = __sync_fetch_and_add(&(globalKey), 1);
@@ -174,9 +164,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
                     FileUtil::baseName(header.name).c_str(), i);
                 int written = fwrite(buffer, sizeof(char), len, lookup);
                 if (written != (int)len) {
-                  Debug(Debug::ERROR)
-                      << "Cannot write to lookup file " << lookupFile << "\n";
-                  EXIT(EXIT_FAILURE);
+                  out->failure("Cannot write to lookup file {}", lookupFile);
                 }
               }
             } else {
@@ -208,18 +196,14 @@ int tar2db(mmseqs_output *out, Parameters &par) {
                   break;
                 default:
                   inflateEnd(&strm);
-                  Debug(Debug::ERROR) << "Gzip error " << err << " entry "
-                                      << header.name << "\n";
-                  EXIT(EXIT_FAILURE);
+                  out->failure("Gzip error {} entry {}", err, header.name);
               }
               have = CHUNK - strm.avail_out;
               writer.writeAdd((const char *)out, have, thread_idx);
             } while (strm.avail_out == 0);
             writer.writeEnd(currentKey, thread_idx);
 #else
-            Debug(Debug::ERROR) << "MMseqs2 was not compiled with zlib "
-                                   "support. Cannot read compressed input.\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("MMseqs2 was not compiled with zlib support. Cannot read compressed input");
 #endif
           } else if (Util::endsWith(".bz2", header.name)) {
 #ifdef HAVE_BZLIB
@@ -232,15 +216,11 @@ int tar2db(mmseqs_output *out, Parameters &par) {
               inflateBuffer = (char *)realloc(inflateBuffer, inflateSize);
             }
             if (err != BZ_OK) {
-              Debug(Debug::ERROR)
-                  << "Could not decompress " << header.name << "\n";
-              EXIT(EXIT_FAILURE);
+              out->failure("Could not decompress {}\n", header.name );
             }
             writer.writeData(inflateBuffer, entrySize, currentKey, thread_idx);
 #else
-            Debug(Debug::ERROR) << "MMseqs2 was not compiled with bzlib "
-                                   "support. Cannot read compressed input.\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("MMseqs2 was not compiled with bzlib support. Cannot read compressed input");
 #endif
           } else {
             writer.writeData(dataBuffer, header.size, currentKey, thread_idx);
@@ -259,12 +239,10 @@ int tar2db(mmseqs_output *out, Parameters &par) {
   }  // filename for
   writer.close();
   if (fclose(lookup) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << lookupFile << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close file {}", lookupFile);
   }
   if (fclose(source) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << sourceFile << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close file {}", sourceFile);
   }
 
   return EXIT_SUCCESS;

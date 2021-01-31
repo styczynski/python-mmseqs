@@ -104,8 +104,7 @@ int result2flat(mmseqs_output *out, Parameters &par) {
   }
 
   if (fclose(fastaFP) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << par.db4 << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close file {}\n", par.db4 );
   }
   targetdb_header.close();
   querydb_header.close();

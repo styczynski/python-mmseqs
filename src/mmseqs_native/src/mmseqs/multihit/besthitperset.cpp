@@ -46,9 +46,7 @@ class BestHitBySetFilter : public Aggregation {
     // dataToAggregate = [nbrTargetGene][Field of result]
     size_t targetId = targetSizeReader->getId(targetSetKey);
     if (targetId == UINT_MAX) {
-      Debug(Debug::ERROR) << "Invalid target size database key " << targetSetKey
-                          << ".\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid target size database key {}", targetSetKey);
     }
     char *data = targetSizeReader->getData(targetId, thread_idx);
     unsigned int nbrGenes = Util::fast_atoi<unsigned int>(data);

@@ -11,8 +11,7 @@ int createbintaxonomy(mmseqs_output* out, Parameters& par) {
   std::pair<char*, size_t> serialized = NcbiTaxonomy::serialize(taxonomy);
   FILE* handle = fopen(par.db4.c_str(), "w");
   if (handle == NULL) {
-    Debug(Debug::ERROR) << "Could not open " << par.db4 << " for writing\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not open {} for writing\n", par.db4 );
   }
   fwrite(serialized.first, serialized.second, sizeof(char), handle);
   fclose(handle);

@@ -85,8 +85,7 @@ int aggregate(mmseqs_output *out, const bool useAln, Parameters &par) {
 
         size_t seqId = taxSeqReader.getId(seqKey);
         if (seqId == UINT_MAX) {
-          Debug(Debug::ERROR) << "Missing key " << seqKey << " in tax result\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Missing key {} in tax result", seqKey);
         }
         char *seqToTaxData = taxSeqReader.getData(seqId, thread_idx);
         TaxID taxon = Util::fast_atoi<int>(seqToTaxData);
@@ -94,25 +93,19 @@ int aggregate(mmseqs_output *out, const bool useAln, Parameters &par) {
         if (useAln == true && taxon != 0) {
           size_t alnId = alnSeqReader->getId(seqKey);
           if (alnId == UINT_MAX) {
-            Debug(Debug::ERROR)
-                << "Missing key " << alnId << " in alignment result\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("Missing key {} in alignment result", alnId);
           }
           char *seqToAlnData = alnSeqReader->getData(alnId, thread_idx);
           float weight = FLT_MAX;
           size_t columns = Util::getWordsOfLine(seqToAlnData, entry, 255);
           if (par.voteMode == Parameters::AGG_TAX_MINUS_LOG_EVAL) {
             if (columns <= 3) {
-              Debug(Debug::ERROR)
-                  << "No alignment evalue for taxon " << taxon << " found\n";
-              EXIT(EXIT_FAILURE);
+              out->failure("No alignment evalue for taxon {} found", taxon);
             }
             weight = strtod(entry[3], NULL);
           } else if (par.voteMode == Parameters::AGG_TAX_SCORE) {
             if (columns <= 1) {
-              Debug(Debug::ERROR)
-                  << "No alignment score for taxon " << taxon << " found\n";
-              EXIT(EXIT_FAILURE);
+              out->failure("No alignment score for taxon {} found", taxon);
             }
             weight = strtod(entry[1], NULL);
           }

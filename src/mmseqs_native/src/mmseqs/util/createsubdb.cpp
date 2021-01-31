@@ -19,8 +19,7 @@ int createsubdb(mmseqs_output *out, Parameters &par) {
     if (FileUtil::fileExists(par.db1.c_str())) {
       orderFile = fopen(par.db1.c_str(), "r");
     } else {
-      Debug(Debug::ERROR) << "File " << par.db1 << " does not exist.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("File {} does not exist", par.db1 );
     }
   }
 
@@ -93,7 +92,7 @@ int createsubdb(mmseqs_output *out, Parameters &par) {
   free(line);
   reader.close();
   if (fclose(orderFile) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << par.db1 << "\n";
+    out->error("Cannot close file {}", par.db1);
     return EXIT_FAILURE;
   }
 

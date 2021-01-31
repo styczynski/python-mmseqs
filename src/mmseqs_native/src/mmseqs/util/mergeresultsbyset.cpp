@@ -43,9 +43,7 @@ int mergeresultsbyset(mmseqs_output *out, Parameters &par) {
         unsigned int key = Util::fast_atoi<unsigned int>(dbKey);
         size_t id = resultReader.getId(key);
         if (id == UINT_MAX) {
-          Debug(Debug::ERROR)
-              << "Invalid key " << key << " in entry " << i << ".\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Invalid key {} in entry {}.", key ,  in entry );
         }
         buffer.append(resultReader.getData(id, thread_idx));
         data = Util::skipLine(data);

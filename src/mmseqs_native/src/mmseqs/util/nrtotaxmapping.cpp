@@ -77,17 +77,14 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
 #ifdef HAVE_ZLIB
       kbIn = new igzstream(par.filenames[i].c_str());
 #else
-      Debug(Debug::ERROR) << "MMseqs2 was not compiled with zlib support. "
-                             "Cannot read compressed input\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("MMseqs2 was not compiled with zlib support. Cannot read compressed input");
 #endif
     } else {
       kbIn = new std::ifstream(par.filenames[i]);
     }
 
     if (kbIn->fail()) {
-      Debug(Debug::ERROR) << "File " << par.filenames[i] << " not found\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("File {} not found\n", par.filenames[i] );
     }
 
     std::string line;
@@ -96,9 +93,7 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
       progress.updateProgress();
       const size_t columns = Util::getWordsOfLine(line.c_str(), entry, 255);
       if (columns < 4) {
-        Debug(Debug::ERROR)
-            << "Invalid accession2taxid file " << par.filenames[i] << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Invalid accession2taxid file {}\n", par.filenames[i] );
       }
       std::string accession(entry[0], entry[1] - entry[0] - 1);
       unsigned int taxid = Util::fast_atoi<unsigned int>(entry[2]);
@@ -255,9 +250,7 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
   MemoryMapped mappingUnsorted(resultDbData, MemoryMapped::WholeFile,
                                MemoryMapped::SequentialScan);
   if (!mappingUnsorted.isValid()) {
-    Debug(Debug::ERROR) << "Could not open mapping file " << resultDbData
-                        << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not open mapping file {}", resultDbData);
   }
   char* data = (char*)mappingUnsorted.getData();
   std::vector<std::pair<unsigned int, TaxID>> mapping;
@@ -269,8 +262,7 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
     const size_t columns = Util::getWordsOfLine(data, entry, 255);
     data = Util::skipLine(data);
     if (columns < 2) {
-      Debug(Debug::ERROR) << "Invalid mapping file " << resultDbData << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid mapping file {}", resultDbData);
     }
     unsigned int dbKey = Util::fast_atoi<unsigned int>(entry[0]);
     unsigned int taxId = Util::fast_atoi<unsigned int>(entry[1]);
@@ -280,9 +272,7 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
   SORT_PARALLEL(mapping.begin(), mapping.end(), sortMappingByDbKey);
   FILE* handle = FileUtil::openFileOrDie(resultDbData.c_str(), "w", true);
   if (handle == NULL) {
-    Debug(Debug::ERROR) << "Could not write to mapping file " << resultDbData
-                        << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not write to mapping file {}", resultDbData);
   }
 
   std::string result;
@@ -296,17 +286,13 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
     result.append(1, '\n');
     int written = fwrite(result.c_str(), sizeof(char), result.size(), handle);
     if (written != (int)result.size()) {
-      Debug(Debug::ERROR) << "Could not write to mapping file " << resultDbData
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Could not write to mapping file {}", resultDbData);
     }
     result.clear();
   }
 
   if (fclose(handle) != 0) {
-    Debug(Debug::ERROR) << "Could not close mapping file " << resultDbData
-                        << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not close mapping file {}", resultDbData);
   }
 
   return EXIT_SUCCESS;

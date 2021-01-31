@@ -85,10 +85,7 @@ Matcher::result_t Matcher::getSWResult(Sequence *dbSeq, const int diagonal,
   if (Parameters::isEqualDbtype(dbSeq->getSequenceType(),
                                 Parameters::DBTYPE_NUCLEOTIDES)) {
     if (diagonal == INT_MAX) {
-      Debug(Debug::ERROR) << "Query sequence " << currentQuery->getDbKey()
-                          << " has a result with no diagonal information. "
-                             "Please check your database.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Query sequence {} has a result with no diagonal information. Please check your database");
     }
     alignment = nuclaligner->align(dbSeq, diagonal, isReverse, backtrace, aaIds,
                                    evaluer, wrappedScoring);
@@ -271,8 +268,7 @@ Matcher::result_t Matcher::parseAlignmentRecord(const char *data,
   const char *entry[255];
   size_t columns = Util::getWordsOfLine(data, entry, 255);
   if (columns < ALN_RES_WITHOUT_BT_COL_CNT) {
-    Debug(Debug::ERROR) << "Invalid alignment result record.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid alignment result record");
   }
 
   char key[255];
@@ -342,8 +338,7 @@ Matcher::result_t Matcher::parseAlignmentRecord(const char *data,
             uncompressAlignment(std::string(entry[14], entry[15] - entry[14])));
       }
     default:
-      Debug(Debug::ERROR) << "Invalid column count in alignment.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid column count in alignment");
   }
 }
 

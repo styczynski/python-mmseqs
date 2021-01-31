@@ -55,9 +55,7 @@ int result2rbh(mmseqs_output *out, Parameters &par) {
         } else {
           // this is a B->A line - the bitscore can only decrease:
           if (bestAtoBbitScore < currAlnScore) {
-            Debug(Debug::ERROR) << "The merged results are assumed to be "
-                                   "sorted by decreasing bitscore.\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("The merged results are assumed to be sorted by decreasing bitscore");
           }
           if (currAlnScore < bestAtoBbitScore) {
             // worse bitscore - no need to check anymore...

@@ -111,10 +111,7 @@ int StatsComputer::run() {
     //    return sequenceWise(&statsComputer::composition);
     case STAT_UNKNOWN:
     default:
-      Debug(Debug::ERROR) << "Unrecognized statistic: " << stat << "\n";
-      Debug(Debug::ERROR) << "Please define --stat parameter\n";
-
-      EXIT(EXIT_FAILURE);
+      out->failure("Unrecognized statistic: {}, Please define --stat parameter", stat);
   }
 }
 

@@ -72,17 +72,11 @@ int createseqfiledb(mmseqs_output *out, Parameters &par) {
         const unsigned int memberKey = (unsigned int)strtoul(dbKey, NULL, 10);
         size_t headerId = headerDb.getId(memberKey);
         if (headerId == UINT_MAX) {
-          Debug(Debug::ERROR)
-              << "Entry " << key << " does not contain a sequence!"
-              << "\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Entry {} does not contain a sequence!", key );
         }
         size_t seqId = seqDb.getId(memberKey);
         if (seqId == UINT_MAX) {
-          Debug(Debug::ERROR)
-              << "Entry " << key << " does not contain a sequence!"
-              << "\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Entry {} does not contain a sequence!", key );
         }
         if (entries_num == 1 && par.hhFormat) {
           char *header = headerDb.getData(headerId, thread_idx);

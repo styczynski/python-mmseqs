@@ -1017,8 +1017,7 @@ Parameters::Parameters()
                       typeid(bool), (void *)&help, "",
                       MMseqsParameter::COMMAND_HIDDEN) {
   if (instance) {
-    // Debug(Debug::ERROR) << "Parameter instance already exists!\n";
-    // abort();
+    // Do nothing
   } else {
     instance = this;
   }
@@ -1998,8 +1997,7 @@ Parameters::Parameters()
 int compileRegex(regex_t *regex, const char *regexText) {
   int status = regcomp(regex, regexText, REG_EXTENDED | REG_NEWLINE);
   if (status != 0) {
-    Debug(Debug::ERROR) << "Error in regex " << regexText << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Error in regex {}", regexText);
   }
   return 0;
 }
@@ -2010,8 +2008,7 @@ bool parseBool(const std::string &p) {
   } else if (p == "false" || p == "FALSE" || p == "0") {
     return false;
   } else {
-    Debug(Debug::ERROR) << "Invalid boolean string " << p << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Invalid boolean string {}", p);
   }
 }
 
@@ -2035,10 +2032,9 @@ std::vector<std::string> Parameters::findMissingTaxDbFiles(
 
 void Parameters::printTaxDbError(const std::string &filename,
                                  const std::vector<std::string> &missingFiles) {
-  Debug(Debug::ERROR) << "Input taxonomy database \"" << filename
-                      << "\" is missing files:\n";
+  out->error("Input taxonomy database \"{}\" is missing files.", filename);
   for (size_t i = 0; i < missingFiles.size(); ++i) {
-    Debug(Debug::ERROR) << "- " << missingFiles[i] << "\n";
+    out->error("File is missing from input taxonomy database: {}", missingFiles[i]);
   }
 }
 
@@ -2514,9 +2510,7 @@ std::string Parameters::createParameterString(
       ss << MultiParam<float>::format(*((MultiParam<float> *)par[i]->value))
          << " ";
     } else {
-      Debug(Debug::ERROR)
-          << "Wrong parameter type. Please inform the developers!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Wrong parameter type. Please inform the developers");
     }
   }
 
@@ -2664,9 +2658,8 @@ std::vector<int> Parameters::getOutputFormat(
     } else if (outformatSplit[i].compare("empty") == 0) {
       code = Parameters::OUTFMT_EMPTY;
     } else {
-      Debug(Debug::ERROR) << "Format code " << outformatSplit[i]
-                          << " does not exist.";
-      EXIT(EXIT_FAILURE);
+      out->failure("Format code {} does not exist", outformatSplit[i]
+                          );
     }
     formatCodes.push_back(code);
   }

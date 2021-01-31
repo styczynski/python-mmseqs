@@ -186,9 +186,7 @@ DBConcat::DBConcat(const std::string &dataFileNameA,
 
       int written = fwrite(buffer, sizeof(char), length, mappingFilePtr);
       if (written != (int)length) {
-        Debug(Debug::ERROR)
-            << "Cannot write to data file " << dataFileNameC << "_mapping\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot write to data file {}_mapping", dataFileNameC);
       }
     }
 
@@ -207,15 +205,11 @@ DBConcat::DBConcat(const std::string &dataFileNameA,
 
       int written = fwrite(buffer, sizeof(char), length, mappingFilePtr);
       if (written != (int)length) {
-        Debug(Debug::ERROR)
-            << "Cannot write to data file " << dataFileNameC << "_mapping\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot write to data file {}_mapping", dataFileNameC);
       }
     }
     if (fclose(mappingFilePtr) != 0) {
-      Debug(Debug::ERROR) << "Cannot close data file " << dataFileNameC
-                          << "_mapping\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot close data file {}_mapping", dataFileNameC);
     }
   }
 
@@ -255,9 +249,7 @@ DBConcat::DBConcat(const std::string &dataFileNameA,
       int written =
           fwrite(line.c_str(), sizeof(char), line.size(), lookupFilePtr);
       if (written != (int)line.size()) {
-        Debug(Debug::ERROR)
-            << "Cannot write to data file " << dataFileNameC << ".lookup\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot write to data file {}.lookup", dataFileNameC);
       }
       line.clear();
     }
@@ -289,17 +281,13 @@ DBConcat::DBConcat(const std::string &dataFileNameA,
       int written =
           fwrite(line.c_str(), sizeof(char), line.size(), lookupFilePtr);
       if (written != (int)line.size()) {
-        Debug(Debug::ERROR)
-            << "Cannot write to data file " << dataFileNameC << ".lookup\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot write to data file {}.lookup", dataFileNameC);
       }
 
       line.clear();
     }
     if (fclose(lookupFilePtr) != 0) {
-      Debug(Debug::ERROR) << "Cannot close file " << dataFileNameC
-                          << ".lookup\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot close file {}.lookup", dataFileNameC);
     }
     lookupReaderB.close();
   }
@@ -331,9 +319,7 @@ DBConcat::DBConcat(const std::string &dataFileNameA,
       int written =
           fwrite(line.c_str(), sizeof(char), line.size(), sourceFilePtr);
       if (written != (int)line.size()) {
-        Debug(Debug::ERROR)
-            << "Cannot write to data file " << dataFileNameC << ".source\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot write to data file {}.source", dataFileNameC);
       }
       line.clear();
     }
@@ -341,11 +327,7 @@ DBConcat::DBConcat(const std::string &dataFileNameA,
     // if lookup was concatenated - make sure maxSetId there is consistent with
     // sourceMaxSetIdA
     if (shouldConcatLookup && (sourceMaxSetIdA != maxSetIdA)) {
-      Debug(Debug::ERROR) << "The maxSetId in " << dataFileNameA
-                          << ".lookup is " << maxSetIdA << " and in "
-                          << dataFileNameA << ".source is " << sourceMaxSetIdA
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("The maxSetId in {}. Lookup is {} and in {}. Source is {}.", dataFileNameA, maxSetIdA, dataFileNameA, sourceMaxSetIdA);
     }
 
     std::map<unsigned int, std::string> sourceMapB =
@@ -368,16 +350,12 @@ DBConcat::DBConcat(const std::string &dataFileNameA,
       int written =
           fwrite(line.c_str(), sizeof(char), line.size(), sourceFilePtr);
       if (written != (int)line.size()) {
-        Debug(Debug::ERROR)
-            << "Cannot write to data file " << dataFileNameC << ".source\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot write to data file {}.source", dataFileNameC);
       }
       line.clear();
     }
     if (fclose(sourceFilePtr) != 0) {
-      Debug(Debug::ERROR) << "Cannot close file " << dataFileNameC
-                          << ".source\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot close file {}.source", dataFileNameC);
     }
   }
 }

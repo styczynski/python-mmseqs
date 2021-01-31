@@ -62,9 +62,7 @@ int addid(const std::string &db1, const std::string &db1Index,
         } else if (doMapping) {
           size_t lookupId = lookupReader->getLookupIdByKey(key);
           if (lookupId == SIZE_MAX) {
-            Debug(Debug::ERROR)
-                << "Could not find key " << key << " in lookup\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("Could not find key {} in lookup", key);
           }
           strToAdd = lookupReader->getLookupEntryName(lookupId);
         } else {

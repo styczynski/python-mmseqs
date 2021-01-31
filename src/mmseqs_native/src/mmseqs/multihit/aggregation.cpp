@@ -46,9 +46,8 @@ void Aggregation::buildMap(
     unsigned int targetKey = Util::fast_atoi<unsigned int>(columns[0].c_str());
     size_t setId = targetSetReader->getId(targetKey);
     if (setId == UINT_MAX) {
-      Debug(Debug::ERROR) << "Invalid target database key " << columns[0]
-                          << ".\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid target database key {}", columns[0]
+                          );
     }
     char *data = targetSetReader->getData(setId, thread_idx);
     unsigned int setKey = Util::fast_atoi<unsigned int>(data);

@@ -21,8 +21,7 @@ int convertmsa(mmseqs_output *out, Parameters &par) {
 #ifdef HAVE_ZLIB
     in = new igzstream(par.db1.c_str());
 #else
-    Debug(Debug::ERROR) << "MMseqs2 was not compiled with zlib support. Can "
-                           "not read compressed input!\n";
+    out->error("MMseqs2 was not compiled with zlib support. Can not read compressed input");
     return EXIT_FAILURE;
 #endif
   } else {
@@ -30,7 +29,7 @@ int convertmsa(mmseqs_output *out, Parameters &par) {
   }
 
   if (in->fail()) {
-    Debug(Debug::ERROR) << "File " << par.db1 << " not found!\n";
+    out->error("File {} not found", par.db1);
     return EXIT_FAILURE;
   }
 
@@ -98,7 +97,7 @@ int convertmsa(mmseqs_output *out, Parameters &par) {
     if (line[0] == '#') {
       if (Util::startWith("#=GF", line)) {
         if (columns < 3) {
-          Debug(Debug::ERROR) << "Invalid annotation!\n";
+          out->error("Invalid annotation");
           inEntry = false;
           continue;
         }
@@ -116,7 +115,7 @@ int convertmsa(mmseqs_output *out, Parameters &par) {
       }
     } else {
       if (columns < 2) {
-        Debug(Debug::ERROR) << "Invalid sequence!\n";
+        out->error("Invalid sequence");
         inEntry = false;
         continue;
       }
