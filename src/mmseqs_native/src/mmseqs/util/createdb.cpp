@@ -50,26 +50,20 @@ int createdb(mmseqs_output* out, Parameters& par) {
   std::string indexFile = dataFile + ".index";
   if (par.createdbMode == Parameters::SEQUENCE_SPLIT_MODE_SOFT &&
       par.shuffleDatabase) {
-    Debug(Debug::WARNING)
-        << "Shuffle database cannot be combined with --createdb-mode 0\n";
-    out->warn("We recompute with --shuffle 0");
+    out->warn("Shuffle database cannot be combined with --createdb-mode 0. We recompute with --shuffle 0");
     par.shuffleDatabase = false;
   }
 
   if (par.createdbMode == Parameters::SEQUENCE_SPLIT_MODE_SOFT &&
       par.filenames[0] == "stdin") {
-    Debug(Debug::WARNING)
-        << "Stdin input cannot be combined with --createdb-mode 0\n";
-    out->warn("We recompute with --createdb-mode 1");
+    out->warn("Stdin input cannot be combined with --createdb-mode 0. We recompute with --createdb-mode 1");
     par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_HARD;
   }
 
   const unsigned int shuffleSplits = par.shuffleDatabase ? 32 : 1;
   if (par.createdbMode == Parameters::SEQUENCE_SPLIT_MODE_SOFT &&
       par.compressed) {
-    Debug(Debug::WARNING)
-        << "Compressed database cannot be combined with --createdb-mode 0\n";
-    out->warn("We recompute with --compressed 0");
+    out->warn("Compressed database cannot be combined with --createdb-mode 0. We recompute with --compressed 0");
     par.compressed = 0;
   }
 
@@ -96,8 +90,7 @@ int createdb(mmseqs_output* out, Parameters& par) {
 redoComputation:
   FILE* source = fopen(sourceFile.c_str(), "w");
   if (source == NULL) {
-    Debug(Debug::ERROR) << "Cannot open " << sourceFile << " for writing\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot open {} for writing", sourceFile);
   }
   DBWriter hdrWriter(hdrDataFile.c_str(), hdrIndexFile.c_str(), shuffleSplits,
                      par.compressed, Parameters::DBTYPE_GENERIC_DB);
@@ -138,9 +131,7 @@ redoComputation:
                           sourceName.c_str());
     int written = fwrite(buffer, sizeof(char), len, source);
     if (written != (int)len) {
-      Debug(Debug::ERROR) << "Cannot write to source file " << sourceFile
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot write to source file {}", sourceFile);
     }
 
     KSeqWrapper* kseq = NULL;
@@ -152,17 +143,14 @@ redoComputation:
     }
     if (par.createdbMode == Parameters::SEQUENCE_SPLIT_MODE_SOFT &&
         kseq->type != KSeqWrapper::KSEQ_FILE) {
-      Debug(Debug::WARNING) << "Only uncompressed fasta files can be used with "
-                               "--createdb-mode 0.\n";
-      out->warn("We recompute with --createdb-mode 1.");
+      out->warn("Only uncompressed fasta files can be used with --createdb-mode 0. We recompute with --createdb-mode 1.");
       par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_HARD;
       progress.reset(SIZE_MAX);
       hdrWriter.close();
       seqWriter.close();
       delete kseq;
       if (fclose(source) != 0) {
-        Debug(Debug::ERROR) << "Cannot close file " << sourceFile << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot close file {}", sourceFile);
       }
       for (size_t i = 0; i < shuffleSplits; ++i) {
         sourceLookup[i].clear();
@@ -173,8 +161,7 @@ redoComputation:
       progress.updateProgress();
       const KSeqWrapper::KSeqEntry& e = kseq->entry;
       if (e.name.l == 0) {
-        Debug(Debug::ERROR) << "Fasta entry " << entries_num << " is invalid\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Fasta entry {} is invalid", entries_num);
       }
 
       // header
@@ -189,8 +176,7 @@ redoComputation:
         if (headerId.empty()) {
           // An identifier is necessary for these two cases, so we should just
           // give up
-          Debug(Debug::WARNING)
-              << "Cannot extract identifier from entry " << entries_num << "\n";
+         out->warn("Cannot extract identifier from entry {}", entries_num);
         }
         header.push_back('\n');
       }
@@ -222,17 +208,14 @@ redoComputation:
         }
         if (par.createdbMode == Parameters::SEQUENCE_SPLIT_MODE_SOFT &&
             e.multiline == true) {
-          Debug(Debug::WARNING)
-              << "Multiline fasta can not be combined with --createdb-mode 0\n";
-          out->warn("We recompute with --createdb-mode 1");
+          out->warn("Multiline fasta can not be combined with --createdb-mode 0. We recompute with --createdb-mode 1");
           par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_HARD;
           progress.reset(SIZE_MAX);
           hdrWriter.close();
           seqWriter.close();
           delete kseq;
           if (fclose(source) != 0) {
-            Debug(Debug::ERROR) << "Cannot close file " << sourceFile << "\n";
-            EXIT(EXIT_FAILURE);
+            out->failure("Cannot close file {}", sourceFile);
           }
           for (size_t i = 0; i < shuffleSplits; ++i) {
             sourceLookup[i].clear();
@@ -272,8 +255,7 @@ redoComputation:
   }
   out->info("\n");
   if (fclose(source) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << sourceFile << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close file {}", sourceFile);
   }
   hdrWriter.close(true, false);
   seqWriter.close(true, false);
@@ -294,13 +276,7 @@ redoComputation:
   }
 
   if (entries_num == 0) {
-    Debug(Debug::ERROR) << "The input files have no entry: ";
-    for (size_t fileIdx = 0; fileIdx < filenames.size(); fileIdx++) {
-      Debug(Debug::ERROR) << " - " << filenames[fileIdx] << "\n";
-    }
-    Debug(Debug::ERROR) << "Please check your input files. Only files in "
-                           "fasta/fastq[.gz|bz2] are supported\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("The input files have no entry. Please check your input files. Only files in fasta/fastq[.gz|bz2] are supported");
   }
 
   // fix ids
@@ -347,23 +323,19 @@ redoComputation:
       entry.id = id;
       entry.entryName = Util::parseFastaHeader(header);
       if (entry.entryName.empty()) {
-        Debug(Debug::WARNING)
-            << "Cannot extract identifier from entry " << entries_num << "\n";
+        out->warn("Cannot extract identifier from entry {}", entries_num);
       }
       entry.fileNumber = sourceLookup[splitIdx][splitCounter];
       readerHeader.lookupEntryToBuffer(buffer, entry);
       int written = fwrite(buffer.c_str(), sizeof(char), buffer.size(), file);
       if (written != (int)buffer.size()) {
-        Debug(Debug::ERROR)
-            << "Cannot write to lookup file " << lookupFile << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot write to lookup file {}", lookupFile);
       }
       buffer.clear();
       splitCounter++;
     }
     if (fclose(file) != 0) {
-      Debug(Debug::ERROR) << "Cannot close file " << lookupFile << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot close file {}", lookupFile);
     }
     readerHeader.close();
   }

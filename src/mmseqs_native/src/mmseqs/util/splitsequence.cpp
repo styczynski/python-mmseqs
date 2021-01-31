@@ -48,9 +48,7 @@ int splitsequence(mmseqs_output* out, Parameters& par) {
 
   if (par.sequenceSplitMode == Parameters::SEQUENCE_SPLIT_MODE_SOFT &&
       par.compressed == true) {
-    Debug(Debug::WARNING)
-        << "Sequence split mode (--sequence-split-mode 0) and compressed "
-           "(--compressed 1) can not be combined.\nTurn compressed to 0";
+    out->warn("Sequence split mode (--sequence-split-mode 0) and compressed (--compressed 1) can not be combined. Turn compressed to 0");
     par.compressed = 0;
   }
 

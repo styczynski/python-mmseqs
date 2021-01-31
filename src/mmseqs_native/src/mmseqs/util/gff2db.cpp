@@ -13,8 +13,7 @@ int gff2db(mmseqs_output *out, Parameters &par) {
   MemoryMapped file(par.db1, MemoryMapped::WholeFile,
                     MemoryMapped::SequentialScan);
   if (!file.isValid()) {
-    Debug(Debug::ERROR) << "Could not open GFF file " << par.db1 << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Could not open GFF file {}", par.db1);
   }
   char *data = (char *)file.getData();
 
@@ -71,24 +70,21 @@ int gff2db(mmseqs_output *out, Parameters &par) {
     size_t start = Util::fast_atoi<size_t>(fields[3]);
     size_t end = Util::fast_atoi<size_t>(fields[4]);
     if (start == end) {
-      Debug(Debug::WARNING)
-          << "Invalid sequence length in line " << entries_num << "!\n";
+      out->warn("Invalid sequence length in line {}", entries_num);
       continue;
     }
 
     std::string name(fields[0], fields[1] - fields[0] - 1);
     size_t lookupId = reader.getLookupIdByAccession(name);
     if (lookupId == SIZE_MAX) {
-      Debug(Debug::ERROR) << "GFF entry not found in database lookup: " << name
-                          << "!\n";
+      out->error("GFF entry not found in database lookup: {}", name);
       return EXIT_FAILURE;
     }
     unsigned int key = reader.getLookupKey(lookupId);
 
     size_t headerId = headerReader.getId(key);
     if (headerId == UINT_MAX) {
-      Debug(Debug::ERROR) << "GFF entry not found in header database: " << name
-                          << "!\n";
+      out->error("GFF entry not found in header database: {}", name);
       return EXIT_FAILURE;
     }
     unsigned int id = par.identifierOffset + entries_num;
@@ -103,8 +99,7 @@ int gff2db(mmseqs_output *out, Parameters &par) {
 
     size_t seqId = reader.getId(key);
     if (seqId == UINT_MAX) {
-      Debug(Debug::ERROR) << "GFF entry not found in sequence database: "
-                          << name << "!\n";
+      out->error("GFF entry not found in sequence database: {}", name);
       return EXIT_FAILURE;
     }
 

@@ -228,8 +228,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
       par.db2.c_str(), par.threads, IndexReader::HEADERS,
       (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0);
   if (queryDbType == -1) {
-    Debug(Debug::ERROR) << "Please recreate your database or add a .dbtype "
-                           "file to your sequence/profile database.\n";
+    out->error("Please recreate your database or add a .dbtype file to your sequence/profile database.");
     return EXIT_FAILURE;
   }
   const bool queryNucl =
@@ -253,8 +252,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
   }
 
   if (targetDbType == -1) {
-    Debug(Debug::ERROR) << "Please recreate your database or add a .dbtype "
-                           "file to your sequence/profile database.\n";
+    out->error("Please recreate your database or add a .dbtype file to your sequence/profile database.");
     return EXIT_FAILURE;
   }
   const bool targetNucl =
@@ -289,11 +287,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
     } else {
       if (par.searchType == Parameters::SEARCH_TYPE_AUTO &&
           (targetNucl == true && queryNucl == true)) {
-        Debug(Debug::WARNING)
-            << "Assume that nucleotide search was performed\n";
-        Debug(Debug::WARNING)
-            << "If this is not correct than please provide the parameter "
-               "--search-type 2 (translated) or 3 (nucleotide)\n";
+        out->warn("Assume that nucleotide search was performed.\nIf this is not correct than please provide the parameter --search-type 2 (translated) or 3 (nucleotide)");
       } else if (par.searchType == Parameters::SEARCH_TYPE_TRANSLATED) {
         seqtargetNuc = false;
         isTransNucTransNucSearch = true;

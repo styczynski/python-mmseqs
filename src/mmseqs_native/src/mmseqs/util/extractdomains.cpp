@@ -297,8 +297,7 @@ int doExtract(Parameters &par, DBReader<unsigned int> &blastTabReader,
       const std::vector<Domain> result =
           getEntries(std::string(tabData, tabLength));
       if (result.empty()) {
-        Debug(Debug::WARNING)
-            << "Can not map any entries for entry " << id << "!\n";
+        out->warn("Can not map any entries for entry {}", id);
         continue;
       }
 
@@ -318,8 +317,7 @@ int doExtract(Parameters &par, DBReader<unsigned int> &blastTabReader,
           break;
         }
         default:
-          Debug(Debug::ERROR) << "Input type not implemented!\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Input type not implemented");
       }
 
       std::ostringstream oss;

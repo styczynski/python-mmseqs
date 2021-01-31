@@ -76,24 +76,18 @@ int translatenucs(mmseqs_output* out, Parameters& par) {
       size_t length = reader.getEntryLen(i) - 1;
       if ((data[length] != '\n' && length % 3 != 0) &&
           (data[length - 1] == '\n' && (length - 1) % 3 != 0)) {
-        Debug(Debug::WARNING)
-            << "Nucleotide sequence entry " << key << " length (" << length
-            << ") is not divisible by three. Adjust length to (length="
-            << length - (length % 3) << ").\n";
+        key, length,
+        out->warn("Nucleotide sequence entry {} length ({}) is not divisible by three. Adjust length to (length={})", key, length, length - (length % 3));
         length = length - (length % 3);
       }
 
       if (length < 3) {
-        Debug(Debug::WARNING)
-            << "Nucleotide sequence entry " << key << " length (" << length
-            << ") is too short. Skipping entry.\n";
+        out->warn("Nucleotide sequence entry {} length ({}) is too short. Skipping entry", key, length);
         continue;
       }
 
       if (length > (3 * par.maxSeqLen)) {
-        Debug(Debug::WARNING)
-            << "Nucleotide sequence entry " << key << " length (" << length
-            << ") is too long. Trimming entry.\n";
+        out->warn("Nucleotide sequence entry {} length ({}) is too long. Trimming entry", key, length);
         length = (3 * par.maxSeqLen);
       }
 

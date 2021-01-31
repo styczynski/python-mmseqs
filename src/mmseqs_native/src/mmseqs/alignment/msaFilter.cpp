@@ -308,8 +308,7 @@ size_t MsaFilter::filter(const int N_in, const int L, const int coverage,
                                         // the consensus sequence :-(
       ;
     } else {
-      Debug(Debug::WARNING)
-          << "The alingment %s does not contain any sequences.\n";
+      out->warn("The alingment %s does not contain any sequences");
     }
   }
 

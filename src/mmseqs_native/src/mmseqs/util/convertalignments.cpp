@@ -110,8 +110,7 @@ std::map<unsigned int, unsigned int> readKeyToSet(const std::string &file) {
   while (*data != '\0') {
     const size_t columns = Util::getWordsOfLine(data, entry, 255);
     if (columns < 3) {
-      Debug(Debug::WARNING)
-          << "Not enough columns in lookup file " << file << "\n";
+      out->warn("Not enough columns in lookup file {}", file);
       continue;
     }
     mapping.emplace(Util::fast_atoi<unsigned int>(entry[0]),
@@ -135,8 +134,7 @@ std::map<unsigned int, std::string> readSetToSource(const std::string &file) {
   while (*data != '\0') {
     const size_t columns = Util::getWordsOfLine(data, entry, 255);
     if (columns < 2) {
-      Debug(Debug::WARNING)
-          << "Not enough columns in lookup file " << file << "\n";
+      out->warn("Not enough columns in lookup file {}", file);
       continue;
     }
     data = Util::skipLine(data);
@@ -184,10 +182,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
         PrefilteringIndexReader::dbPathWithoutIndex(par.db2);
     if (FileUtil::fileExists(
             std::string(db2NoIndexName + "_mapping").c_str()) == false) {
-      Debug(Debug::ERROR)
-          << db2NoIndexName + "_mapping"
-          << " does not exist. Please create the taxonomy mapping!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("{}_mapping does not exist. Please create the taxonomy mapping", db2NoIndexName);
     }
     bool isSorted = Util::readMapping(db2NoIndexName + "_mapping", mapping);
     if (isSorted == false) {
@@ -258,11 +253,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
           tseqDbr.sequenceReader->getDbtype(), Parameters::DBTYPE_AMINO_ACIDS);
     } else if (targetNucs == true && queryNucs == true &&
                par.searchType == Parameters::SEARCH_TYPE_AUTO) {
-      Debug(Debug::WARNING) << "It is unclear from the input if a translated "
-                               "or nucleotide search was performed\n "
-                               "Please provide the parameter --search-type 2 "
-                               "(translated) or 3 (nucleotide)\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("It is unclear from the input if a translated or nucleotide search was performed. Please provide the parameter --search-type 2 (translated) or 3 (nucleotide)");
     } else if (par.searchType == Parameters::SEARCH_TYPE_TRANSLATED) {
       seqtargetAA = true;
     }
@@ -456,13 +447,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
         data = Util::skipLine(data);
 
         if (res.backtrace.empty() && needBacktrace == true) {
-          Debug(Debug::ERROR)
-              << "Backtrace cigar is missing in the alignment result. Please "
-                 "recompute the alignment with the -a flag.\n"
-                 "Command: mmseqs align "
-              << par.db1 << " " << par.db2 << " " << par.db3 << " "
-              << "alnNew -a\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Backtrace cigar is missing in the alignment result. Please recompute the alignment with the -a flag. Command: mmseqs align {} {} {} alnNew -a", par.db1, par/db2, par.db3);
         }
 
         size_t tHeaderId = tDbrHeader->sequenceReader->getId(res.dbKey);
@@ -524,8 +509,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
                   res.qEndPos + 1, res.dbStartPos + 1, res.dbEndPos + 1,
                   res.eval, res.score);
               if (count < 0 || static_cast<size_t>(count) >= sizeof(buffer)) {
-                Debug(Debug::WARNING)
-                    << "Truncated line in entry" << i << "!\n";
+                out->warn("Truncated line in entry {}", i);
                 continue;
               }
               // results_row.push_back(std::string(buffer, count));
@@ -864,34 +848,8 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
             result.append("\" },\n");
             break;
           }
-
-            //                    case Parameters::FORMAT_ALIGNMENT_GFF:{
-            //                        // for TBLASTX
-            //                        bool strand = res.qEndPos > res.qStartPos;
-            //                        int currStart = std::min(res.qStartPos,
-            //                        res.qEndPos); int currEnd =
-            //                        std::max(res.qStartPos, res.qEndPos); int
-            //                        currLen = currEnd - currStart;
-            //                        result.append(queryId);
-            //                        result.append("\tconserve\tprotein_match\t");
-            //                        result.append(SSTR(currStart+1));
-            //                        result.push_back('\t');
-            //                        result.append(SSTR(currEnd+1));
-            //                        result.push_back('\t');
-            //                        result.append(SSTR(currLen));
-            //                        result.push_back('\t');
-            //                        result.push_back((strand) ? '-' : '+');
-            //                        result.append("\t.\t");
-            //                        result.append("ID=");
-            //                        result.append(queryId);
-            //                        result.append(":hsp:");
-            //                        result.append(SSTR(counter));
-            //                        result.append(";");
-            //                        break;
-            //                    }
           default:
-            Debug(Debug::ERROR) << "Not implemented yet";
-            EXIT(EXIT_FAILURE);
+            out->failure("Not implemented yet");
         }
         results_row.push_back(record);
       }

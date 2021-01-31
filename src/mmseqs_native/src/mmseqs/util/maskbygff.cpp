@@ -35,8 +35,7 @@ int maskbygff(mmseqs_output* out, Parameters& par) {
 
     // gff has always 9 fields
     if (fields.size() != 9) {
-      Debug(Debug::WARNING)
-          << "Invalid GFF format in line " << entries_num << "!";
+      out->warn("Invalid GFF format in line {}", entries_num);
       continue;
     }
 
@@ -51,21 +50,18 @@ int maskbygff(mmseqs_output* out, Parameters& par) {
     char* rest;
     size_t start = strtoull(fields[3].c_str(), &rest, 10);
     if ((rest != fields[3].c_str() && *rest != '\0') || errno == ERANGE) {
-      Debug(Debug::WARNING)
-          << "Invalid start position format in line " << entries_num << "!\n";
+      out->warn("Invalid start position format in line {}", entries_num);
       continue;
     }
     size_t end = strtoull(fields[4].c_str(), &rest, 10);
     if ((rest != fields[4].c_str() && *rest != '\0') || errno == ERANGE) {
-      Debug(Debug::WARNING)
-          << "Invalid end position format in line " << entries_num << "!\n";
+      out->warn("Invalid end position format in line {}", entries_num);
       continue;
     }
 
     // gff start and end are supposed to be 1-indexed
     if (end <= start || end == 0 || start == 0) {
-      Debug(Debug::WARNING)
-          << "Invalid sequence length in line " << entries_num << "!\n";
+      out->warn("Invalid sequence length in line {}", entries_num);
       continue;
     }
 
@@ -75,8 +71,8 @@ int maskbygff(mmseqs_output* out, Parameters& par) {
 
     size_t id = reader.getId(name);
     if (id == UINT_MAX) {
-      Debug(Debug::ERROR) << "GFF entry not found in input database: " << name
-                          << "!\n";
+      out->error("GFF entry not found in input database: {}", name);
+
       return EXIT_FAILURE;
     }
 

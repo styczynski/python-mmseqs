@@ -7,8 +7,7 @@
 
 #if defined(__CYGWIN__) || defined(__EMSCRIPTEN__)
 int apply(mmseqs_output* out, Parameters& par) {
-  Debug(Debug::ERROR) << "apply is not supported on Windows/Cygwin\n";
-  EXIT(EXIT_FAILURE);
+  out->failure("Apply is not supported on Windows/Cygwin");
 }
 #else
 #include <fcntl.h>
@@ -317,8 +316,7 @@ int apply(mmseqs_output *out, Parameters &par) {
       default:
         break;
       case -1:
-        Debug(Debug::ERROR) << "Could not fork worker process!\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Could not fork worker process");
       case 0: {
         int mpiRank = 0;
         int mpiProcs = 1;
@@ -370,14 +368,11 @@ int apply(mmseqs_output *out, Parameters &par) {
                                       const_cast<char **>(par.restArgv),
                                       local_environ, 0);
           if (status == -1) {
-            Debug(Debug::WARNING)
-                << "Entry " << key << " system error number " << errno << "!\n";
+            out->warn("Entry {} system error number {}", key, errno);
             continue;
           }
           if (status > 0) {
-            Debug(Debug::WARNING)
-                << "Entry " << key << " exited with error code " << status
-                << "!\n";
+            out->warn("Entry {} exited with error code {}", key, status);
             continue;
           }
         }

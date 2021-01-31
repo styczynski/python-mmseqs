@@ -74,9 +74,7 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
   }
   const int queryDbType = FileUtil::parseDbType(par.db1.c_str());
   if (queryDbType == -1 || targetDbType == -1) {
-    Debug(Debug::ERROR) << "Please recreate your database or add a .dbtype "
-                           "file to your sequence/profile database.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Please recreate your database or add a .dbtype file to your sequence/profile database");
   }
 
   int searchMode = computeSearchMode(queryDbType, targetDbType, targetSrcDbType,
@@ -84,8 +82,7 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
   if ((searchMode & Parameters::SEARCH_MODE_FLAG_QUERY_NUCLEOTIDE) &&
       (searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_NUCLEOTIDE)) {
     if (par.taxonomySearchMode == Parameters::TAXONOMY_ACCEL_2BLCA) {
-      Debug(Debug::WARNING) << "Accel. 2bLCA cannot be used with nucl-nucl "
-                               "taxonomy, using top-hit instead\n";
+      out->warn("Accel. 2bLCA cannot be used with nucl-nucl taxonomy, using top-hit instead");
       par.taxonomySearchMode = Parameters::TAXONOMY_TOP_HIT;
     }
   }

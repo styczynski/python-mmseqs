@@ -246,15 +246,13 @@ int msa2result(mmseqs_output *out, Parameters &par) {
       unsigned int startKey = setSizes[id];
       while (kseq_read(seq) >= 0) {
         if (seq->name.l == 0 || seq->seq.l == 0) {
-          Debug(Debug::WARNING) << "Invalid fasta sequence " << setSize
-                                << " in entry " << queryKey << "\n";
+          out->warn("Invalid fasta sequence {} in entry {}", setSize, queryKey);
           fastaError = true;
           break;
         }
 
         if (seq->seq.l > maxSeqLength) {
-          Debug(Debug::WARNING) << "Member sequence " << setSize << " in entry "
-                                << queryKey << " too long\n";
+          out->warn("Member sequence {} in entry {} too long", setSize, queryKey);
           fastaError = true;
           break;
         }

@@ -287,8 +287,7 @@ int computeSearchMode(int queryDbType, int targetDbType, int targetSrcDbType,
   // reject unvalid search
   if (Parameters::isEqualDbtype(queryDbType, Parameters::DBTYPE_HMM_PROFILE) &&
       Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_HMM_PROFILE)) {
-    Debug(Debug::ERROR) << "Profile-Profile searches are not supported.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Profile-Profile searches are not supported");
   }
   // index was used
   if (targetSrcDbType == -1) {
@@ -298,12 +297,7 @@ int computeSearchMode(int queryDbType, int targetDbType, int targetSrcDbType,
                                   Parameters::DBTYPE_NUCLEOTIDES)) {
       if (searchType == Parameters::SEARCH_TYPE_AUTO) {
         // WARNING because its not really an error, just a req. parameter
-        Debug(Debug::WARNING)
-            << "It is unclear from the input if a translated or nucleotide "
-               "search should be performed\n"
-               "Please provide the parameter --search-type 2 (translated), 3 "
-               "(nucleotide) or 4 (translated nucleotide backtrace)\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("It is unclear from the input if a translated or nucleotide search should be performed. Please provide the parameter --search-type 2 (translated), 3 (nucleotide) or 4 (translated nucleotide backtrace)");
       }
       // nucl/nucl
       // nucl/nucl translated
@@ -315,12 +309,7 @@ int computeSearchMode(int queryDbType, int targetDbType, int targetSrcDbType,
         return Parameters::SEARCH_MODE_FLAG_QUERY_NUCLEOTIDE |
                Parameters::SEARCH_MODE_FLAG_TARGET_NUCLEOTIDE;
       } else {
-        Debug(Debug::ERROR)
-            << "--search-type 1 (amino acid) can not used in combination with "
-               "a nucleotide database\n "
-               "The only possible options --search-types 2 (translated), 3 "
-               "(nucleotide) or 4 (translated nucleotide backtrace)\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("--search-type 1 (amino acid) can not used in combination with a nucleotide database. The only possible options --search-types 2 (translated), 3 (nucleotide) or 4 (translated nucleotide backtrace)");
       }
     }
     // protein/protein
@@ -485,14 +474,8 @@ int computeSearchMode(int queryDbType, int targetDbType, int targetSrcDbType,
              Parameters::SEARCH_MODE_FLAG_TARGET_TRANSLATED;
     }
   }
-  Debug(Debug::ERROR)
-      << "Invalid input database and --search-type combination\n"
-      << "queryDbType: " << Parameters::getDbTypeName(queryDbType) << "\n"
-      << "targetDbType: " << Parameters::getDbTypeName(targetDbType) << "\n"
-      << "targetSrcDbType: " << Parameters::getDbTypeName(targetSrcDbType)
-      << "\n"
-      << "searchMode: " << searchType << "\n";
-  EXIT(EXIT_FAILURE);
+  Parameters::getDbTypeName(queryDbType),
+  out->failure("Invalid input database and --search-type combination. queryDbType: {}, targetSrcDbType:: {}, searchMode: {}", Parameters::getDbTypeName(targetDbType), Parameters::getDbTypeName(targetSrcDbType), searchType);
 }
 
 void setNuclSearchDefaults(Parameters *p) {
@@ -556,9 +539,7 @@ int search(mmseqs_output *out, Parameters &par) {
   }
   const int queryDbType = FileUtil::parseDbType(par.db1.c_str());
   if (queryDbType == -1 || targetDbType == -1) {
-    Debug(Debug::ERROR) << "Please recreate your database or add a .dbtype "
-                           "file to your sequence/profile database.\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Please recreate your database or add a .dbtype file to your sequence/profile database");
   }
 
   int searchMode = computeSearchMode(queryDbType, targetDbType, targetSrcDbType,
@@ -585,17 +566,13 @@ int search(mmseqs_output *out, Parameters &par) {
                      Parameters::SEARCH_MODE_FLAG_TARGET_PROFILE))) {
     // par.printUsageMessage(command, MMseqsParameter::COMMAND_ALIGN |
     // MMseqsParameter::COMMAND_PREFILTER);
-    Debug(Debug::ERROR)
-        << "Cannot use ungapped alignment mode with profile databases\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot use ungapped alignment mode with profile databases");
   }
 
   if (isUngappedMode && par.lcaSearch) {
     // par.printUsageMessage(command, MMseqsParameter::COMMAND_ALIGN |
     // MMseqsParameter::COMMAND_PREFILTER);
-    Debug(Debug::ERROR)
-        << "Cannot use ungapped alignment mode with lca search\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot use ungapped alignment mode with lca search");
   }
 
   // validate and set parameters for iterative search
@@ -603,9 +580,7 @@ int search(mmseqs_output *out, Parameters &par) {
     if (searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_PROFILE) {
       // par.printUsageMessage(command, MMseqsParameter::COMMAND_ALIGN |
       // MMseqsParameter::COMMAND_PREFILTER);
-      Debug(Debug::ERROR)
-          << "Iterative target-profile searches are not supported.\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Iterative target-profile searches are not supported");
     }
 
     par.addBacktrace = true;
@@ -616,8 +591,7 @@ int search(mmseqs_output *out, Parameters &par) {
           // par.printUsageMessage(command,
           //                      MMseqsParameter::COMMAND_ALIGN |
           //                      MMseqsParameter::COMMAND_PREFILTER);
-          Debug(Debug::ERROR) << "Cannot realign query profiles.\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Cannot realign query profiles");
         }
       }
 
@@ -768,8 +742,7 @@ int search(mmseqs_output *out, Parameters &par) {
   } else {
     if (par.sensSteps > 1) {
       if (par.startSens > par.sensitivity) {
-        Debug(Debug::ERROR) << "--start-sens should not be greater -s.\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("--start-sens should not be greater -s");
       }
       cmd.addVar("SENSE_0", SSTR(par.startSens));
       senses.push_back(par.startSens);

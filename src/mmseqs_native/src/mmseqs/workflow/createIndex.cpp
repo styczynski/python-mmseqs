@@ -29,10 +29,7 @@ int createindex(mmseqs_output *out, Parameters &par,
   int dbType = FileUtil::parseDbType(par.db1.c_str());
   if (Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_HMM_PROFILE) &&
       sensitivity == false) {
-    Debug(Debug::ERROR)
-        << "Please adjust the sensitivity of your target profile index with "
-           "-s.\n"
-           "Be aware that this searches can take huge amount of memory. \n";
+    par->error("Please adjust the sensitivity of your target profile index with -s. Be aware that this searches can take huge amount of memory.");
     return EXIT_FAILURE;
   }
 
@@ -177,10 +174,7 @@ int createlinindex(mmseqs_output *out, Parameters &par) {
   //// par.printParameters(command.cmd, argc, argv, *command.params);
 
   if (isNucl && par.searchType == Parameters::SEARCH_TYPE_AUTO) {
-    Debug(Debug::WARNING) << "Database " << par.db1
-                          << " is a nucleotide database. \n"
-                          << "Please provide the parameter --search-type 2 "
-                             "(translated) or 3 (nucleotide)\n";
+    out->warn("Database {} is a nucleotide database. Please provide the parameter --search-type 2 (translated) or 3 (nucleotide)", par.db1);
     return EXIT_FAILURE;
   }
   return createindex(
@@ -258,10 +252,7 @@ int createindex(mmseqs_output *out, Parameters &par) {
   }
   //// par.printParameters(command.cmd, argc, argv, *command.params);
   if (isNucl && par.searchType == Parameters::SEARCH_TYPE_AUTO) {
-    Debug(Debug::WARNING) << "Database " << par.db1
-                          << " is a nucleotide database. \n"
-                          << "Please provide the parameter --search-type 2 "
-                             "(translated) or 3 (nucleotide)\n";
+    out->warn("Database {} is a nucleotide database. Please provide the parameter --search-type 2 (translated) or 3 (nucleotide)", par.db1);
     return EXIT_FAILURE;
   }
   return createindex(

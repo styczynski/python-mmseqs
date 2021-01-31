@@ -74,8 +74,7 @@ int summarizeresult(mmseqs_output* out, Parameters& par) {
 
         if (domain.qStartPos > static_cast<int>(domain.qLen) ||
             domain.qEndPos > static_cast<int>(domain.qLen)) {
-          Debug(Debug::WARNING) << "Query alignment start or end is greater "
-                                   "than query length! Skipping line.\n";
+          out->warn("Query alignment start or end is greater than query length! Skipping line.");
           continue;
         }
         if (domain.dbcov <= par.covThr) {

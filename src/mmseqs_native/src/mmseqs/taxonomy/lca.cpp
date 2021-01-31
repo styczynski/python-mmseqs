@@ -26,10 +26,7 @@ int dolca(mmseqs_output* out, Parameters& par, bool majority) {
   std::vector<std::pair<unsigned int, unsigned int>> mapping;
   if (FileUtil::fileExists(std::string(par.db1 + "_mapping").c_str()) ==
       false) {
-    Debug(Debug::ERROR)
-        << par.db1 + "_mapping"
-        << " does not exist. Please create the taxonomy mapping!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("{}_mapping does not exist. Please create the taxonomy mapping", par.db1);
   }
   bool isSorted = Util::readMapping(par.db1 + "_mapping", mapping);
   if (isSorted == false) {
@@ -60,8 +57,7 @@ int dolca(mmseqs_output* out, Parameters& par, bool majority) {
       continue;
     }
     if (t->nodeExists(taxon) == false) {
-      Debug(Debug::WARNING)
-          << "Ignoring missing blocked taxon " << taxon << "\n";
+      out->warn("Ignoring missing blocked taxon {}", taxon);
       continue;
     }
 
@@ -70,15 +66,12 @@ int dolca(mmseqs_output* out, Parameters& par, bool majority) {
       const char* name = split + 1;
       const TaxonNode* node = t->taxonNode(taxon, false);
       if (node == NULL) {
-        Debug(Debug::WARNING)
-            << "Ignoring missing blocked taxon " << taxon << "\n";
+        out->warn("Ignoring missing blocked taxon {}", taxon);
         continue;
       }
       const char* nodeName = t->getString(node->nameIdx);
       if (strcmp(nodeName, name) != 0) {
-        Debug(Debug::WARNING)
-            << "Node name '" << name << "' does not match to be blocked name '"
-            << nodeName << "'\n";
+        out->warn("Node name '{}' does not match to be blocked name '{}'", name, nodeName);
         continue;
       }
     }
@@ -161,16 +154,12 @@ int dolca(mmseqs_output* out, Parameters& par, bool majority) {
             float weight = FLT_MAX;
             if (par.voteMode == Parameters::AGG_TAX_MINUS_LOG_EVAL) {
               if (columns <= 3) {
-                Debug(Debug::ERROR)
-                    << "No alignment result for taxon " << taxon << " found\n";
-                EXIT(EXIT_FAILURE);
+                out->failure("No alignment result for taxon {} found", taxon);
               }
               weight = strtod(entry[3], NULL);
             } else if (par.voteMode == Parameters::AGG_TAX_SCORE) {
               if (columns <= 1) {
-                Debug(Debug::ERROR)
-                    << "No alignment result for taxon " << taxon << " found\n";
-                EXIT(EXIT_FAILURE);
+                out->failure("No alignment result for taxon {} found", taxon);
               }
               weight = strtod(entry[1], NULL);
             }

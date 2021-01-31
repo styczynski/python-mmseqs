@@ -82,10 +82,7 @@ size_t MultipleAlignment::updateGapsInCenterSequence(char **msaSequence,
   size_t centerSeqPos = 0;
   for (int queryPos = 0; queryPos < centerSeq->L; queryPos++) {
     if (centerSeqPos >= maxMsaSeqLen) {
-      Debug(Debug::ERROR) << "queryMSASize (" << centerSeqPos
-                          << ") is >= maxMsaSeqLen (" << maxMsaSeqLen << ")"
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("queryMSASize ({}) is >= maxMsaSeqLen ({})", centerSeqPos, maxMsaSeqLen);
     }
     for (size_t gapIdx = 0; gapIdx < queryGaps[queryPos]; gapIdx++) {
       if (noDeletionMSA == false) {
@@ -115,8 +112,7 @@ void MultipleAlignment::updateGapsInSequenceSet(
     // HACK: score was 0 and sequence was rejected, so we fill in an empty gap
     // sequence
     if (targetPos == UINT_MAX) {
-      Debug(Debug::WARNING) << "Edge sequence " << i << " was not aligned."
-                            << "\n";
+      out->warn("Edge sequence {} was not aligned.", i);
       // fill up with gaps
       for (size_t pos = 0; pos < centerSeqSize; pos++) {
         edgeSeqMSA[pos] = '-';
@@ -131,10 +127,7 @@ void MultipleAlignment::updateGapsInSequenceSet(
     }
     for (size_t alnPos = 0; alnPos < bt.size(); alnPos++) {
       if (bufferPos >= maxMsaSeqLen) {
-        Debug(Debug::ERROR) << "BufferPos (" << bufferPos
-                            << ") is >= maxMsaSeqLen (" << maxMsaSeqLen << ")"
-                            << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("BufferPos ({}) is >= maxMsaSeqLen ({})", bufferPos, maxMsaSeqLen);
       }
       if (bt.at(alnPos) == 'I') {
         edgeSeqMSA[bufferPos] = '-';
@@ -199,11 +192,7 @@ MultipleAlignment::MSAResult MultipleAlignment::computeMSA(
   }
 
   if (edgeSeqs.size() != alignmentResults.size()) {
-    Debug(Debug::ERROR) << "edgeSeqs.size (" << edgeSeqs.size()
-                        << ") is != alignmentResults.size ("
-                        << alignmentResults.size() << ")"
-                        << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("edgeSeqs.size ({}) is != alignmentResults.size ({})", edgeSeqs.size(), alignmentResults.size());
   }
 
   char **msaSequence = new char *[edgeSeqs.size() + 1];
@@ -253,10 +242,7 @@ MultipleAlignment::MSAResult MultipleAlignment::singleSequenceMSA(
   msaSequence[0] = initX(centerSeq->L);
   for (int queryPos = 0; queryPos < centerSeq->L; queryPos++) {
     if (queryMSASize >= maxMsaSeqLen) {
-      Debug(Debug::ERROR) << "queryMSASize (" << queryMSASize
-                          << ") is >= maxMsaSeqLen (" << maxMsaSeqLen << ")"
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("queryMSASize ({}) is >= maxMsaSeqLen ({})", queryMSASize, maxMsaSeqLen);
     }
     msaSequence[0][queryMSASize] = (char)centerSeq->numSequence[queryPos];
     queryMSASize++;

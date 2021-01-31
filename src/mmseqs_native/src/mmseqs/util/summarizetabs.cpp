@@ -36,28 +36,20 @@ std::vector<Domain> mapDomains(const std::vector<Domain> &input, float overlap,
   for (size_t i = 0; i < input.size(); i++) {
     Domain domain = input[i];
     if (domain.qStart > domain.qLength || domain.qEnd > domain.qLength) {
-      Debug(Debug::WARNING)
-          << "Query alignment start or end is greater than query length in set "
-          << domain.query << "! Skipping line.\n";
+      out->warn("Query alignment start or end is greater than query length in set {}. Skipping line", domain.query);
       continue;
     }
     if (domain.qStart > domain.qEnd) {
-      Debug(Debug::WARNING)
-          << "Query alignment end is greater than start in set " << domain.query
-          << "! Skipping line.\n";
+      out->warn("Query alignment end is greater than start in set {}. Skipping line", domain.query);
       continue;
     }
     float percentageOverlap = getOverlap(covered, domain.qStart, domain.qEnd);
     if (domain.tStart > domain.tEnd) {
-      Debug(Debug::WARNING)
-          << "Target alignment end is greater than start in set "
-          << domain.query << "! Skipping line.\n";
+      out->warn("Target alignment end is greater than start in set {}. Skipping line", domain.query);
       continue;
     }
     if (domain.tStart > domain.tLength || domain.tEnd > domain.tLength) {
-      Debug(Debug::WARNING) << "Target alignment start or end is greater than "
-                               "target length in set "
-                            << domain.query << "! Skipping line.\n";
+      out->warn("Target alignment start or end is greater than target length in set {}. Skipping line", domain.query);
       continue;
     }
     float targetCov =
@@ -76,8 +68,7 @@ std::vector<Domain> mapDomains(const std::vector<Domain> &input, float overlap,
 std::map<std::string, unsigned int> readLength(const std::string &file) {
   std::ifstream mappingStream(file);
   if (mappingStream.fail()) {
-    Debug(Debug::ERROR) << "File " << file << " not found!\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("File {} not found", file);
   }
   std::map<std::string, unsigned int> mapping;
   std::string line;
@@ -169,16 +160,14 @@ int doAnnotate(Parameters &par, DBReader<unsigned int> &blastTabReader,
       const std::vector<Domain> entries =
           getEntries(id, tabData, tabLength, lengths);
       if (entries.empty()) {
-        Debug(Debug::WARNING)
-            << "Can not map any entries for entry " << id << "!\n";
+        out->warn("Can not map any entries for entry {}", id);
         continue;
       }
 
       std::vector<Domain> result =
           mapDomains(entries, par.overlap, par.covThr, par.evalThr);
       if (result.empty()) {
-        Debug(Debug::WARNING)
-            << "Can not map any domains for entry " << id << "!\n";
+        out->warn("Can not map any domains for entry {}", id);
         continue;
       }
 

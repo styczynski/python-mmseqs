@@ -107,8 +107,7 @@ int createtsv(mmseqs_output *out, Parameters &par) {
 
       char *headerData = queryDB->getData(queryIndex, thread_idx);
       if (headerData == NULL) {
-        Debug(Debug::WARNING)
-            << "Invalid header entry in query " << queryKey << "!\n";
+        out->warn("Invalid header entry in query {}", queryKey);
         continue;
       }
 
@@ -128,8 +127,7 @@ int createtsv(mmseqs_output *out, Parameters &par) {
         if (targetColumn != SIZE_T_MAX) {
           size_t foundElements = Util::getWordsOfLine(data, columnPointer, 255);
           if (foundElements < targetColumn) {
-            Debug(Debug::WARNING) << "Not enough columns!"
-                                  << "\n";
+            out->warn("Not enough columns!");
             continue;
           }
           Util::parseKey(columnPointer[targetColumn], dbKey);
@@ -142,9 +140,7 @@ int createtsv(mmseqs_output *out, Parameters &par) {
           size_t targetIndex = targetDB->getId(targetKey);
           char *targetData = targetDB->getData(targetIndex, thread_idx);
           if (targetData == NULL) {
-            Debug(Debug::WARNING)
-                << "Invalid header entry in query " << queryKey
-                << " and target " << targetKey << "!\n";
+            out->warn("Invalid header entry in query {} and target {}", queryKey, targetKey);
             continue;
           }
           if (par.fullHeader) {

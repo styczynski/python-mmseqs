@@ -67,10 +67,7 @@ size_t DBWriter::addToThreadBuffer(const void *data, size_t itmesize,
     threadBuffer[threadIdx] =
         (char *)realloc(threadBuffer[threadIdx], newBufferSize);
     if (compressedBuffers[threadIdx] == NULL) {
-      Debug(Debug::ERROR) << "Realloc of buffer for " << threadIdx
-                          << " failed. Buffer size = "
-                          << threadBufferSize[threadIdx] << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Realloc of buffer for {} failed. Buffer size = {}", threadIdx, threadBufferSize[threadIdx]);
     }
   }
   memcpy(threadBuffer[threadIdx] + threadBufferOffset[threadIdx], data,
@@ -147,9 +144,7 @@ void DBWriter::open(size_t bufferSize) {
     int flags;
     if ((flags = fcntl(fd, F_GETFL, 0)) < 0 ||
         fcntl(fd, F_SETFD, flags | FD_CLOEXEC) == -1) {
-      Debug(Debug::ERROR) << "Can not set mode for " << dataFileNames[i]
-                          << "!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not set mode for {}", dataFileNames[i]);
     }
 
     dataFilesBuffer[i] = new (std::nothrow) char[bufferSize];
@@ -160,24 +155,18 @@ void DBWriter::open(size_t bufferSize) {
 
     // set buffer to 64
     if (setvbuf(dataFiles[i], dataFilesBuffer[i], _IOFBF, bufferSize) != 0) {
-      Debug(Debug::WARNING)
-          << "Write buffer could not be allocated (bufferSize=" << bufferSize
-          << ")\n";
+     out->warn("Write buffer could not be allocated (bufferSize={})", bufferSize);
     }
 
     indexFiles[i] = FileUtil::openAndDelete(indexFileNames[i], "w");
     fd = fileno(indexFiles[i]);
     if ((flags = fcntl(fd, F_GETFL, 0)) < 0 ||
         fcntl(fd, F_SETFD, flags | FD_CLOEXEC) == -1) {
-      Debug(Debug::ERROR) << "Can not set mode for " << indexFileNames[i]
-                          << "!\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not set mode for {}", indexFileNames[i]);
     }
 
     if (setvbuf(indexFiles[i], NULL, _IOFBF, bufferSize) != 0) {
-      Debug(Debug::WARNING)
-          << "Write buffer could not be allocated (bufferSize=" << bufferSize
-          << ")\n";
+      out->warn("Write buffer could not be allocated (bufferSize={})", bufferSize);
     }
 
     if (dataFiles[i] == NULL) {
@@ -216,12 +205,10 @@ void DBWriter::writeDbtypeFile(const char *path, int dbtype,
   dbtype = isCompressed ? dbtype | (1 << 31) : dbtype & ~(1 << 31);
   size_t written = fwrite(&dbtype, sizeof(int), 1, file);
   if (written != 1) {
-    Debug(Debug::ERROR) << "Can not write to data file " << name << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Can not write to data file {}", name);
   }
   if (fclose(file) != 0) {
-    Debug(Debug::ERROR) << "Cannot close file " << name << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot close file {}", name);
   }
 }
 
@@ -229,14 +216,10 @@ void DBWriter::close(bool merge, bool needsSort) {
   // close all datafiles
   for (unsigned int i = 0; i < threads; i++) {
     if (fclose(dataFiles[i]) != 0) {
-      Debug(Debug::ERROR) << "Cannot close data file " << dataFileNames[i]
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot close data file {}", dataFileNames[i]);
     }
     if (fclose(indexFiles[i]) != 0) {
-      Debug(Debug::ERROR) << "Cannot close index file " << indexFileNames[i]
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Cannot close index file {}", indexFileNames[i]);
     }
   }
 
@@ -271,9 +254,7 @@ void DBWriter::close(bool merge, bool needsSort) {
 void DBWriter::writeStart(unsigned int thrIdx) {
   checkClosed();
   if (thrIdx >= threads) {
-    Debug(Debug::ERROR) << "Thread index " << thrIdx
-                        << " > maximum thread number " << threads << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Thread index {} > maximum thread number {}", thrIdx, threads);
   }
   starts[thrIdx] = offsets[thrIdx];
   if ((mode & Parameters::WRITER_COMPRESSED_MODE) != 0) {
@@ -282,10 +263,7 @@ void DBWriter::writeStart(unsigned int thrIdx) {
     int cLevel = 3;
     size_t const initResult = ZSTD_initCStream(cstream[thrIdx], cLevel);
     if (ZSTD_isError(initResult)) {
-      Debug(Debug::ERROR) << "ZSTD_initCStream() error in thread " << thrIdx
-                          << ". Error " << ZSTD_getErrorName(initResult)
-                          << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("ZSTD_initCStream() error in thread {}. Error {}", thrIdx, ZSTD_getErrorName(initResult));
     }
   }
 }
@@ -294,9 +272,7 @@ size_t DBWriter::writeAdd(const char *data, size_t dataSize,
                           unsigned int thrIdx) {
   checkClosed();
   if (thrIdx >= threads) {
-    Debug(Debug::ERROR) << "Thread index " << thrIdx
-                        << " > maximum thread number " << threads << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Thread index {} > maximum thread number", thrIdx, threads);
   }
   bool isCompressedDB = (mode & Parameters::WRITER_COMPRESSED_MODE) != 0;
   if (isCompressedDB && state[thrIdx] == INIT_STATE && dataSize < 60) {
@@ -315,17 +291,12 @@ size_t DBWriter::writeAdd(const char *data, size_t dataSize,
           cstream[thrIdx], &output,
           &input); /* toRead is guaranteed to be <= ZSTD_CStreamInSize() */
       if (ZSTD_isError(toRead)) {
-        Debug(Debug::ERROR)
-            << "ZSTD_compressStream() error in thread " << thrIdx << ". Error "
-            << ZSTD_getErrorName(toRead) << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("ZSTD_compressStream() error in thread {}. Error {}", thrIdx, ZSTD_getErrorName(toRead));
       }
       size_t written = addToThreadBuffer(compressedBuffers[thrIdx],
                                          sizeof(char), output.pos, thrIdx);
       if (written != output.pos) {
-        Debug(Debug::ERROR)
-            << "Can not write to data file " << dataFileNames[thrIdx] << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Can not write to data file {}", dataFileNames[thrIdx]);
       }
       offsets[thrIdx] += written;
       totalWriten += written;
@@ -338,9 +309,7 @@ size_t DBWriter::writeAdd(const char *data, size_t dataSize,
       written = fwrite(data, sizeof(char), dataSize, dataFiles[thrIdx]);
     }
     if (written != dataSize) {
-      Debug(Debug::ERROR) << "Can not write to data file "
-                          << dataFileNames[thrIdx] << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not write to data file {}", dataFileNames[thrIdx]);
     }
     offsets[thrIdx] += written;
   }
@@ -362,23 +331,17 @@ void DBWriter::writeEnd(unsigned int key, unsigned int thrIdx, bool addNullByte,
 
       //        std::cout << compressedLength << std::endl;
       if (ZSTD_isError(remainingToFlush)) {
-        Debug(Debug::ERROR)
-            << "ZSTD_endStream() error in thread " << thrIdx << ". Error "
-            << ZSTD_getErrorName(remainingToFlush) << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("ZSTD_endStream() error in thread {}. Error {}", thrIdx, ZSTD_getErrorName(remainingToFlush));
       }
       if (remainingToFlush) {
-        Debug(Debug::ERROR) << "Stream not flushed\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Stream not flushed");
       }
       size_t written = addToThreadBuffer(compressedBuffers[thrIdx],
                                          sizeof(char), output.pos, thrIdx);
       compressedLength = threadBufferOffset[thrIdx];
       offsets[thrIdx] += written;
       if (written != output.pos) {
-        Debug(Debug::ERROR)
-            << "Can not write to data file " << dataFileNames[thrIdx] << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Can not write to data file {}", dataFileNames[thrIdx]);
       }
     } else {
       compressedLength = offsets[thrIdx] - starts[thrIdx];
@@ -388,9 +351,7 @@ void DBWriter::writeEnd(unsigned int key, unsigned int thrIdx, bool addNullByte,
     size_t written2 = fwrite(&compressedLengthInt, sizeof(unsigned int), 1,
                              dataFiles[thrIdx]);
     if (written2 != 1) {
-      Debug(Debug::ERROR) << "Can not write entry length to data file "
-                          << dataFileNames[thrIdx] << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not write entry length to data file {}", dataFileNames[thrIdx]);
     }
     offsets[thrIdx] += sizeof(unsigned int);
     writeThreadBuffer(thrIdx, compressedLength);
@@ -406,9 +367,7 @@ void DBWriter::writeEnd(unsigned int key, unsigned int thrIdx, bool addNullByte,
     const size_t written =
         fwrite(&nullByte, sizeof(char), 1, dataFiles[thrIdx]);
     if (written != 1) {
-      Debug(Debug::ERROR) << "Can not write to data file "
-                          << dataFileNames[thrIdx] << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not write to data file {}", dataFileNames[thrIdx]);
     }
     totalWritten += written;
     offsets[thrIdx] += 1;
@@ -435,9 +394,7 @@ void DBWriter::writeIndexEntry(unsigned int key, size_t offset, size_t length,
   size_t len = indexToBuffer(buffer, key, offset, length);
   size_t written = fwrite(buffer, sizeof(char), len, indexFiles[thrIdx]);
   if (written != len) {
-    Debug(Debug::ERROR) << "Can not write to data file " << dataFileName[thrIdx]
-                        << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Can not write to data file {}", dataFileName[thrIdx]);
   }
 }
 
@@ -472,9 +429,7 @@ void DBWriter::alignToPageSize(int thrIdx) {
   for (size_t i = currentOffset; i < newOffset; ++i) {
     size_t written = fwrite(&nullByte, sizeof(char), 1, dataFiles[thrIdx]);
     if (written != 1) {
-      Debug(Debug::ERROR) << "Can not write to data file "
-                          << dataFileNames[thrIdx] << "\n";
-      EXIT(EXIT_FAILURE);
+      out->failure("Can not write to data file {}", dataFileNames[thrIdx]);
     }
   }
   offsets[thrIdx] = newOffset;
@@ -482,9 +437,7 @@ void DBWriter::alignToPageSize(int thrIdx) {
 
 void DBWriter::checkClosed() {
   if (closed == true) {
-    Debug(Debug::ERROR) << "Trying to read a closed database. Datafile="
-                        << dataFileName << "\n";
-    EXIT(EXIT_FAILURE);
+    out->failure("Trying to read a closed database. Datafile={}", dataFileName);
   }
 }
 
@@ -594,16 +547,12 @@ void DBWriter::mergeResults(const char *outFileName,
       for (size_t j = 0; j < filenames.size(); ++j) {
         FILE *fh = fopen(filenames[j].c_str(), "r");
         if (fh == NULL) {
-          Debug(Debug::ERROR)
-              << "Can not open result file " << filenames[j] << "!\n";
-          EXIT(EXIT_FAILURE);
+          out->failure("Can not open result file {}", filenames[j]);
         }
         struct stat sb;
         if (fstat(fileno(fh), &sb) < 0) {
           int errsv = errno;
-          Debug(Debug::ERROR) << "Failed to fstat file " << filenames[j]
-                              << ". Error " << errsv << ".\n";
-          EXIT(EXIT_FAILURE);
+         out->failure("Failed to fstat file {}. Error {}", filenames[j], errsv);
         }
         datafiles.emplace_back(fh);
         cumulativeSize += sb.st_size;
@@ -615,15 +564,13 @@ void DBWriter::mergeResults(const char *outFileName,
       FILE *outFh = FileUtil::openAndDelete(outFileName, "w");
       Concat::concatFiles(datafiles, outFh);
       if (fclose(outFh) != 0) {
-        Debug(Debug::ERROR) << "Cannot close data file " << outFileName << "\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot close data file {}", outFileName);
       }
     }
 
     for (unsigned int i = 0; i < datafiles.size(); ++i) {
       if (fclose(datafiles[i]) != 0) {
-        Debug(Debug::ERROR) << "Cannot close data file in merge\n";
-        EXIT(EXIT_FAILURE);
+        out->failure("Cannot close data file in merge");
       }
     }
 

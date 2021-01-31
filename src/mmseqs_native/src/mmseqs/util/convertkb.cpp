@@ -154,8 +154,7 @@ int convertkb(mmseqs_output *out, Parameters &par) {
           if (doMapping) {
             size_t lookupId = reader->getLookupIdByAccession(accession);
             if (lookupId == SIZE_MAX) {
-              Debug(Debug::WARNING)
-                  << "Could not find accession " << accession << " in lookup\n";
+              out->warn("Could not find accession {} in lookup", accession);
               continue;
             }
             key = reader->getLookupKey(lookupId);
