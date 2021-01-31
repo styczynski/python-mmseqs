@@ -1,16 +1,17 @@
 #include <mmseqs/clustering/clustering.h>
 #include <mmseqs/clustering/clusteringAlgorithms.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/timer.h>
 #include <mmseqs/commons/util.h>
 #include <mmseqs/commons/itoa.h>
 
-Clustering::Clustering(const std::string &seqDB, const std::string &seqDBIndex,
+Clustering::Clustering(mmseqs_output* output, const std::string &seqDB, const std::string &seqDBIndex,
                        const std::string &alnDB, const std::string &alnDBIndex,
                        const std::string &outDB, const std::string &outDBIndex,
                        unsigned int maxIteration, int similarityScoreType,
                        int threads, int compressed)
-    : maxIteration(maxIteration),
+    : out(output),
+      maxIteration(maxIteration),
       similarityScoreType(similarityScoreType),
       threads(threads),
       compressed(compressed),

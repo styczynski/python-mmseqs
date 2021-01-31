@@ -6,7 +6,7 @@
 #include <climits>
 #include <cmath>
 #include <new>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fastSort.h>
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/commons/util.h>
@@ -17,7 +17,7 @@
 
 #define LEN(x, y) (x[y + 1] - x[y])
 
-void AlignmentSymmetry::readInData(DBReader<unsigned int> *alnDbr,
+void AlignmentSymmetry::readInData(mmseqs_output* out, DBReader<unsigned int> *alnDbr,
                                    DBReader<unsigned int> *seqDbr,
                                    unsigned int **elementLookupTable,
                                    unsigned short **elementScoreTable,
@@ -119,7 +119,7 @@ void AlignmentSymmetry::readInData(DBReader<unsigned int> *alnDbr,
   }
 }
 
-size_t AlignmentSymmetry::findMissingLinks(unsigned int **elementLookupTable,
+size_t AlignmentSymmetry::findMissingLinks(mmseqs_output* out, unsigned int **elementLookupTable,
                                            size_t *offsetTable, size_t dbSize,
                                            int threads) {
   // init memory for parallel merge
@@ -170,7 +170,7 @@ size_t AlignmentSymmetry::findMissingLinks(unsigned int **elementLookupTable,
   return symmetricElementCount;
 }
 
-void AlignmentSymmetry::addMissingLinks(unsigned int **elementLookupTable,
+void AlignmentSymmetry::addMissingLinks(mmseqs_output* out, unsigned int **elementLookupTable,
                                         size_t *offsetTableWithOutNewLinks,
                                         size_t *offsetTableWithNewLinks,
                                         size_t dbSize,
@@ -221,7 +221,7 @@ void AlignmentSymmetry::addMissingLinks(unsigned int **elementLookupTable,
 }
 
 // sort each element vector for bsearch
-void AlignmentSymmetry::sortElements(unsigned int **elementLookupTable,
+void AlignmentSymmetry::sortElements(mmseqs_output* out, unsigned int **elementLookupTable,
                                      size_t *elementOffsets, size_t dbSize) {
 #pragma omp parallel for schedule(dynamic, 1000)
   for (size_t i = 0; i < dbSize; i++) {

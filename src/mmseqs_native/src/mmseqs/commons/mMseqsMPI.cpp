@@ -1,5 +1,5 @@
 #include <mmseqs/commons/mMseqsMPI.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/parameters.h>
 
 bool MMseqsMPI::active = false;

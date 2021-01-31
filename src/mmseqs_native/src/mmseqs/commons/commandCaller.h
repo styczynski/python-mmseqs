@@ -7,7 +7,7 @@
 
 class CommandCaller {
  public:
-  CommandCaller();
+  CommandCaller(mmseqs_output* output);
 
   void addVariable(const char* key, const char* value);
   void addVar(std::string key, std::string value);
@@ -19,6 +19,9 @@ class CommandCaller {
   // Does not return on success
   void execProgram(const char* program, const std::vector<std::string>& argv);
   int callProgram(const char* program, const std::vector<std::string>& argv);
+
+ private:
+  mmseqs_output* out;
 };
 
 #endif  // MMSEQS_COMMANDCALLER_H

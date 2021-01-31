@@ -1,6 +1,6 @@
 #include <mmseqs/commons/dBReader.h>
 #include <mmseqs/commons/dBWriter.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/commons/sequence.h>
 #include <mmseqs/commons/substitutionMatrix.h>

@@ -11,64 +11,64 @@
 
 class FileUtil {
  public:
-  static bool fileExists(const char *fileName);
+  static bool fileExists(mmseqs_output* out, const char *fileName);
 
-  static bool fileExistsAndIsNotEmpty(const char *fileName);
+  static bool fileExistsAndIsNotEmpty(mmseqs_output* out, const char *fileName);
 
-  static bool directoryExists(const char *directoryName);
+  static bool directoryExists(mmseqs_output* out, const char *directoryName);
 
-  static FILE *openFileOrDie(const char *fileName, const char *mode,
+  static FILE *openFileOrDie(mmseqs_output* out, const char *fileName, const char *mode,
                              bool shouldExist);
 
-  static size_t countLines(const char *name);
+  static size_t countLines(mmseqs_output* out, const char *name);
 
-  static bool makeDir(const char *dirName, const int mode = 0777);
+  static bool makeDir(mmseqs_output* out, const char *dirName, const int mode = 0777);
 
-  static void deleteTempFiles(const std::list<std::string> &tmpFiles);
+  static void deleteTempFiles(mmseqs_output* out, const std::list<std::string> &tmpFiles);
 
-  static std::string getRealPathFromSymLink(const std::string path);
+  static std::string getRealPathFromSymLink(mmseqs_output* out, const std::string path);
 
-  static std::string getHashFromSymLink(const std::string path);
+  static std::string getHashFromSymLink(mmseqs_output* out, const std::string path);
 
-  static void *mmapFile(FILE *file, size_t *dataSize);
+  static void *mmapFile(mmseqs_output* out, FILE *file, size_t *dataSize);
 
-  static void munmapData(void *ptr, size_t dataSize);
+  static void munmapData(mmseqs_output* out, void *ptr, size_t dataSize);
 
-  static void writeFile(const std::string &pathToFile, const unsigned char *sh,
+  static void writeFile(mmseqs_output* out, const std::string &pathToFile, const unsigned char *sh,
                         size_t len);
 
-  static std::string dirName(const std::string &file);
+  static std::string dirName(mmseqs_output* out, const std::string &file);
 
-  static std::string baseName(const std::string &file);
+  static std::string baseName(mmseqs_output* out, const std::string &file);
 
-  static size_t getFreeSpace(const char *dir);
+  static size_t getFreeSpace(mmseqs_output* out, const char *dir);
 
-  static std::string getCurrentWorkingDirectory();
+  static std::string getCurrentWorkingDirectory(mmseqs_output* out);
 
-  static void symlinkAlias(const std::string &file, const std::string &alias);
-  static void symlinkAbs(const std::string &target, const std::string &link);
+  static void symlinkAlias(mmseqs_output* out, const std::string &file, const std::string &alias);
+  static void symlinkAbs(mmseqs_output* out, const std::string &target, const std::string &link);
 
-  static size_t getFileSize(const std::string &fileName);
+  static size_t getFileSize(mmseqs_output* out, const std::string &fileName);
 
-  static bool symlinkExists(const std::string &path);
+  static bool symlinkExists(mmseqs_output* out, const std::string &path);
 
-  static void copyFile(const char *src, const char *dst);
+  static void copyFile(mmseqs_output* out, const char *src, const char *dst);
 
-  static FILE *openAndDelete(const char *fileName, const char *mode);
+  static FILE *openAndDelete(mmseqs_output* out, const char *fileName, const char *mode);
 
-  static std::vector<std::string> findDatafiles(const char *datafiles);
+  static std::vector<std::string> findDatafiles(mmseqs_output* out, const char *datafiles);
 
-  static void remove(const char *file);
+  static void remove(mmseqs_output* out, const char *file);
 
-  static void move(const char *src, const char *dst);
+  static void move(mmseqs_output* out, const char *src, const char *dst);
 
-  static int parseDbType(const char *name);
+  static int parseDbType(mmseqs_output* out, const char *name);
 
-  static std::string createTemporaryDirectory(std::string baseTmpPath,
+  static std::string createTemporaryDirectory(mmseqs_output* out, std::string baseTmpPath,
                                               const std::string &basePath,
                                               const std::string &subDirectory);
 
-  static void fixRlimitNoFile();
+  static void fixRlimitNoFile(mmseqs_output* out);
 };
 
 #endif  // MMSEQS_FILEUTIL_H

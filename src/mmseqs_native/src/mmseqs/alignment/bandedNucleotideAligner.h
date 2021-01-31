@@ -7,13 +7,13 @@
 #include <mmseqs/commons/nucleotideMatrix.h>
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/alignment/stripedSmithWaterman.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/substitutionMatrix.h>
 #include <mmseqs/commons/util.h>
 
 class BandedNucleotideAligner {
  public:
-  BandedNucleotideAligner(BaseMatrix *subMat, size_t maxSequenceLength,
+  BandedNucleotideAligner(mmseqs_output* output, BaseMatrix *subMat, size_t maxSequenceLength,
                           int gapo, int gape, int zdrop);
 
   ~BandedNucleotideAligner();
@@ -25,6 +25,7 @@ class BandedNucleotideAligner {
                 bool wrappedScoring = false);
 
  private:
+  mmseqs_output* out;
   SubstitutionMatrix::FastMatrix fastMatrix;
   uint8_t *targetSeqRev;
   int targetSeqRevDataLen;

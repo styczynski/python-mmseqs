@@ -7,7 +7,7 @@
 #include <cstring>
 
 #include <mmseqs/commons/dBReader.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/commons/util.h>

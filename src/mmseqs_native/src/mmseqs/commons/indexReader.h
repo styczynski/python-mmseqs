@@ -2,7 +2,7 @@
 #define MMSEQS_INDEXREADER_H
 
 #include <mmseqs/commons/dBReader.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/prefiltering/prefilteringIndexReader.h>
 
@@ -11,11 +11,11 @@ class IndexReader {
   const static int PRELOAD_NO = 0;
   const static int PRELOAD_DATA = 1;
   const static int PRELOAD_INDEX = 2;
-  IndexReader(const std::string &dataName, int threads,
+  IndexReader(mmseqs_output* output, const std::string &dataName, int threads,
               int databaseType = SEQUENCES | HEADERS, int preloadMode = false,
               int dataMode = (DBReader<unsigned int>::USE_INDEX |
                               DBReader<unsigned int>::USE_DATA))
-      : sequenceReader(NULL), index(NULL) {
+      : out(output), sequenceReader(NULL), index(NULL) {
     int targetDbtype = FileUtil::parseDbType(dataName.c_str());
     if (Parameters::isEqualDbtype(targetDbtype, Parameters::DBTYPE_INDEX_DB)) {
       index = new DBReader<unsigned int>(
@@ -105,6 +105,7 @@ class IndexReader {
   DBReader<unsigned int> *sequenceReader;
 
  private:
+  mmseqs_output* out;
   DBReader<unsigned int> *index;
   int seqType;
 };

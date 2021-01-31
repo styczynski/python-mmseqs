@@ -2,7 +2,7 @@
 #include "CovSeqidQscPercMinDiagTargetCov.lib.h"
 #include <mmseqs/commons/dBReader.h>
 #include <mmseqs/commons/dBWriter.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/alignment/distanceCalculator.h>
 #include <mmseqs/commons/fastSort.h>
 #include <mmseqs/commons/indexReader.h>
@@ -17,7 +17,7 @@
 #include <omp.h>
 #endif
 
-float parsePrecisionLib(const std::string &scoreFile, double targetSeqid,
+float parsePrecisionLib(mmseqs_output* out, const std::string &scoreFile, double targetSeqid,
                         double targetCov, double targetPrecision) {
   std::stringstream in(scoreFile);
   std::string line;
@@ -43,7 +43,7 @@ float parsePrecisionLib(const std::string &scoreFile, double targetSeqid,
   return 0;
 }
 
-int doRescorediagonal(Parameters &par, DBWriter &resultWriter,
+int doRescorediagonal(mmseqs_output* out, Parameters &par, DBWriter &resultWriter,
                       DBReader<unsigned int> &resultReader, const size_t dbFrom,
                       const size_t dbSize) {
   IndexReader *qDbrIdx = NULL;

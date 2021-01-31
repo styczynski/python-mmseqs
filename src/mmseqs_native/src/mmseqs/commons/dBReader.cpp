@@ -11,7 +11,7 @@
 
 #include <fcntl.h>
 
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/commons/memoryMapped.h>
 #include <mmseqs/commons/util.h>
@@ -22,9 +22,10 @@
 #endif
 
 template <typename T>
-DBReader<T>::DBReader(const char *dataFileName_, const char *indexFileName_,
+DBReader<T>::DBReader(mmseqs_output* output, const char *dataFileName_, const char *indexFileName_,
                       int threads, int dataMode)
-    : threads(threads),
+    : out(output),
+      threads(threads),
       dataMode(dataMode),
       dataFileName(strdup(dataFileName_)),
       indexFileName(strdup(indexFileName_)),
@@ -52,10 +53,11 @@ DBReader<T>::DBReader(const char *dataFileName_, const char *indexFileName_,
 }
 
 template <typename T>
-DBReader<T>::DBReader(DBReader<T>::Index *index, size_t size, size_t dataSize,
+DBReader<T>::DBReader(mmseqs_output* output, DBReader<T>::Index *index, size_t size, size_t dataSize,
                       T lastKey, int dbType, unsigned int maxSeqLen,
                       int threads)
-    : threads(threads),
+    : out(output),
+      threads(threads),
       dataMode(USE_INDEX),
       dataFileName(NULL),
       indexFileName(NULL),

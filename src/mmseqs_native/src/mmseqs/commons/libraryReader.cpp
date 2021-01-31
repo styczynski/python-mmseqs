@@ -3,7 +3,7 @@
 //
 #include <mmseqs/commons/libraryReader.h>
 #include <cstring>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 
 // Returns pointer to first non-white-space character in str OR to NULL if none
 // found
@@ -27,7 +27,7 @@ bool LibraryReader::StreamStartsWith(std::stringstream& in, const char* id) {
 
 // Parse serialization record and return integer value following label 'str' in
 // line read from file pointer 'fp'.
-int LibraryReader::ReadInt(const char* line, const char* label,
+int LibraryReader::ReadInt(mmseqs_output* out, const char* line, const char* label,
                            const char* errmsg = NULL) {
   int rv = 0;
   if (strstr(line, label)) {
@@ -41,7 +41,7 @@ int LibraryReader::ReadInt(const char* line, const char* label,
 
 // Parse serialization record and return double value following label 'label' in
 // line read from file pointer 'fp'.
-double LibraryReader::ReadDouble(const char* line, const char* label,
+double LibraryReader::ReadDouble(mmseqs_output* out, const char* line, const char* label,
                                  const char* errmsg = NULL) {
   double rv = 0;
   if (strstr(line, label)) {
@@ -54,7 +54,7 @@ double LibraryReader::ReadDouble(const char* line, const char* label,
 
 // Parse serialization record and return string following label 'label' in
 // line read from file pointer 'fp'.
-std::string LibraryReader::ReadString(const char* line, const char* label,
+std::string LibraryReader::ReadString(mmseqs_output* out, const char* line, const char* label,
                                       const char* errmsg = NULL) {
   std::string rv;
   if (strstr(line, label)) {
@@ -76,7 +76,7 @@ std::string LibraryReader::getline(std::stringstream& in) {
 
 // Parse serialization record and return bool value following label 'str' in
 // line read from file pointer 'fp'.
-bool LibraryReader::ReadBool(const char* line, const char* label,
+bool LibraryReader::ReadBool(mmseqs_output* out, const char* line, const char* label,
                              const char* errmsg = NULL) {
   bool rv = false;
   if (strstr(line, label)) {

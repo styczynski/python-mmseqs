@@ -12,7 +12,7 @@
 #include <stdlib.h>
 #include <algorithm>
 #include <mmseqs/commons/dBReader.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fastSort.h>
 #include <mmseqs/prefiltering/indexer.h>
 #include <mmseqs/prefiltering/kmerGenerator.h>

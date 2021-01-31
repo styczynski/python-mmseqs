@@ -2,11 +2,11 @@
 #define BYTE_PARSER_H
 
 #include <string>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 
 class ByteParser {
  public:
-  static size_t parse(const std::string& sizeAndUnit) {
+  static size_t parse(mmseqs_output* out, const std::string& sizeAndUnit) {
     // default unit is M
     size_t unitFactor = TWO_POW_10 * TWO_POW_10;
     size_t size = 0;
@@ -54,7 +54,7 @@ class ByteParser {
     }
   };
 
-  static std::string format(size_t numBytes, char unit = 'a',
+  static std::string format(mmseqs_output* out, size_t numBytes, char unit = 'a',
                             char accuracy = 'l') {
     size_t unitT = TWO_POW_10 * TWO_POW_10 * TWO_POW_10 * TWO_POW_10;
     size_t unitG = TWO_POW_10 * TWO_POW_10 * TWO_POW_10;

@@ -9,7 +9,7 @@
 #include <string>
 #include <utility>
 #include <vector>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/commons/memoryTracker.h>
 #include <mmseqs/commons/parameters.h>
@@ -112,10 +112,10 @@ class DBReader : public MemoryTracker {
   };
 
   // = USE_DATA|USE_INDEX
-  DBReader(const char* dataFileName, const char* indexFileName, int threads,
+  DBReader(mmseqs_output* output, const char* dataFileName, const char* indexFileName, int threads,
            int mode);
 
-  DBReader(Index* index, size_t size, size_t aaDbSize, T lastKey, int dbType,
+  DBReader(mmseqs_output* output, Index* index, size_t size, size_t aaDbSize, T lastKey, int dbType,
            unsigned int maxSeqLen, int threads);
 
   void setDataFile(const char* dataFileName);

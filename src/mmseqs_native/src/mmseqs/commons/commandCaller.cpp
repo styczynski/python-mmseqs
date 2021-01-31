@@ -1,5 +1,5 @@
 #include <mmseqs/commons/commandCaller.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/util.h>
 
 #include <strings.h>
@@ -11,7 +11,7 @@
 #include <omp.h>
 #endif
 
-CommandCaller::CommandCaller() {
+CommandCaller::CommandCaller(mmseqs_output* output): out(output) {
 #ifdef OPENMP
 #if _OPENMP >= 201307
   if (omp_get_proc_bind() != omp_proc_bind_false) {

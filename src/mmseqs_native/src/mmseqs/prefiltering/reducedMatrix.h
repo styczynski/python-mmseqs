@@ -1,7 +1,7 @@
 #ifndef ReducedMatrix_H
 #define ReducedMatrix_H
 #include <mmseqs/commons/baseMatrix.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 
 class ReducedMatrix : public BaseMatrix {
  public:

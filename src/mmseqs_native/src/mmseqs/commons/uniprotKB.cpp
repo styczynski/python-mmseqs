@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/uniprotKB.h>
 #include <mmseqs/commons/util.h>
 

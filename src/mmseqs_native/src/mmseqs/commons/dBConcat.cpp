@@ -1,7 +1,7 @@
 #include <mmseqs/commons/dBConcat.h>
 #include <mmseqs/commons/dBReader.h>
 #include <mmseqs/commons/dBWriter.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/commons/util.h>
@@ -14,14 +14,14 @@
 #include <omp.h>
 #endif
 
-DBConcat::DBConcat(const std::string &dataFileNameA,
+DBConcat::DBConcat(mmseqs_output* output, const std::string &dataFileNameA,
                    const std::string &indexFileNameA,
                    const std::string &dataFileNameB,
                    const std::string &indexFileNameB,
                    const std::string &dataFileNameC,
                    const std::string &indexFileNameC, unsigned int threads,
                    bool write, bool preserveKeysA, bool preserveKeysB,
-                   bool takeLargerEntry, size_t trimRight) {
+                   bool takeLargerEntry, size_t trimRight): out(output) {
   sameDatabase = dataFileNameA == dataFileNameB;
 
   bool shouldConcatMapping = false;

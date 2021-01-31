@@ -1,6 +1,6 @@
 #include <mmseqs/alignment/alignment.h>
 #include <mmseqs/commons/dBWriter.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fastSort.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/commons/indexReader.h>
@@ -17,12 +17,13 @@
 #include <omp.h>
 #endif
 
-Alignment::Alignment(const std::string &querySeqDB,
+Alignment::Alignment(mmseqs_output* output, const std::string &querySeqDB,
                      const std::string &targetSeqDB, const std::string &prefDB,
                      const std::string &prefDBIndex, const std::string &outDB,
                      const std::string &outDBIndex, const Parameters &par,
                      const bool lcaAlign)
-    : covThr(par.covThr),
+    : out(output),
+      covThr(par.covThr),
       canCovThr(par.covThr),
       covMode(par.covMode),
       seqIdMode(par.seqIdMode),

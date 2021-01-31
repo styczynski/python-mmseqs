@@ -2,7 +2,7 @@
 #include "../alignment/DistanceCalculator.h"
 #include <mmseqs/commons/byteParser.h>
 #include <mmseqs/commons/commandCaller.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/commons/util.h>
 

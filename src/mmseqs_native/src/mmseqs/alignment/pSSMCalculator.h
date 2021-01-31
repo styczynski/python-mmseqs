@@ -22,7 +22,7 @@ class PSSMCalculator {
                   std::string &result);
   };
 
-  PSSMCalculator(BaseMatrix *subMat, size_t maxSeqLength, size_t maxSetSize,
+  PSSMCalculator(mmseqs_output* output, BaseMatrix *subMat, size_t maxSeqLength, size_t maxSetSize,
                  float pca, float pcb);
 
   ~PSSMCalculator();
@@ -51,6 +51,8 @@ class PSSMCalculator {
                                      size_t setSize, const char **msaSeqs);
 
  private:
+
+  mmseqs_output* out;
   BaseMatrix *subMat;
 
   // contains sequence weights (global)

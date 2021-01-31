@@ -3,7 +3,7 @@
 // Originally licensed under GPLv2 or later
 
 #include <mmseqs/taxonomy/ncbiTaxonomy.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/commons/mathUtil.h>
 #include <mmseqs/commons/util.h>

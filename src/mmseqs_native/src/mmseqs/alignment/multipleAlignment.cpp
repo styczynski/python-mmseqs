@@ -1,12 +1,12 @@
 #include <mmseqs/alignment/multipleAlignment.h>
 
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/sequence.h>
 #include <mmseqs/commons/substitutionMatrix.h>
 #include <mmseqs/commons/util.h>
 
-MultipleAlignment::MultipleAlignment(size_t maxSeqLen,
-                                     SubstitutionMatrix *subMat) {
+MultipleAlignment::MultipleAlignment(mmseqs_output* output, size_t maxSeqLen,
+                                     SubstitutionMatrix *subMat): out(output) {
   this->maxSeqLen = maxSeqLen;
   this->maxMsaSeqLen = maxSeqLen * 2;
 

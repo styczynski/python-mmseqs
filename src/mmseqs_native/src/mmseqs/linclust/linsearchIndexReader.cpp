@@ -2,7 +2,7 @@
 // Created by Martin Steinegger on 2019-01-04.
 //
 #include <mmseqs/linclust/linsearchIndexReader.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/linclust/kmerIndex.h>
 #include <mmseqs/commons/nucleotideMatrix.h>

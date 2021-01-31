@@ -12,7 +12,7 @@
 #include <mmseqs/commons/dBWriter.h>
 #include <mmseqs/commons/baseMatrix.h>
 #include <mmseqs/commons/parameters.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 
 class KmerIndex {
  private:

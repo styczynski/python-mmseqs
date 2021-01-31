@@ -5,9 +5,11 @@
 
 class BaseMatrix {
  public:
-  BaseMatrix();
+  BaseMatrix(mmseqs_output* output);
 
   virtual ~BaseMatrix();
+
+  mmseqs_output* out;
 
   /*contains amino acid to int mapping*/
   unsigned char* aa2num;

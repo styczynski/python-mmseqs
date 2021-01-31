@@ -4,15 +4,15 @@
 #include <mmseqs/alignment/pSSMCalculator.h>
 #include <_simd/simd.h>
 #include <mmseqs/commons/baseMatrix.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/mathUtil.h>
 #include <mmseqs/alignment/multipleAlignment.h>
 #include <mmseqs/commons/sequence.h>
 #include <mmseqs/commons/util.h>
 
-PSSMCalculator::PSSMCalculator(BaseMatrix *subMat, size_t maxSeqLength,
+PSSMCalculator::PSSMCalculator(mmseqs_output* output, BaseMatrix *subMat, size_t maxSeqLength,
                                size_t maxSetSize, float pca, float pcb)
-    : subMat(subMat) {
+    : out(output), subMat(subMat) {
   this->maxSeqLength = maxSeqLength;
   this->maxSetSize = maxSetSize;
   this->profile = new float[(maxSeqLength + 1) * Sequence::PROFILE_AA_SIZE];

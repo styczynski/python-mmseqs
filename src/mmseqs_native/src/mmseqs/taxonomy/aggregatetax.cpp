@@ -1,7 +1,7 @@
 #include <algorithm>
 #include <map>
 #include <mmseqs/commons/dBWriter.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/alignment/matcher.h>
 #include <mmseqs/taxonomy/ncbiTaxonomy.h>

@@ -6,7 +6,7 @@
 
 class DBConcat {
  public:
-  DBConcat(const std::string &dataFileNameA, const std::string &indexFileNameA,
+  DBConcat(mmseqs_output* output, const std::string &dataFileNameA, const std::string &indexFileNameA,
            const std::string &dataFileNameB, const std::string &indexFileNameB,
            const std::string &dataFileNameC, const std::string &indexFileNameC,
            unsigned int threads, bool write = true, bool preserveKeysA = false,
@@ -19,6 +19,7 @@ class DBConcat {
   unsigned int dbBKeyMap(unsigned int);
 
  private:
+  mmseqs_output* out;
   size_t indexSizeA;
   size_t indexSizeB;
 

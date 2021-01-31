@@ -1,4 +1,4 @@
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/indexReader.h>
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/commons/util.h>

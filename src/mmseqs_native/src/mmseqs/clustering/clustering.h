@@ -8,7 +8,7 @@
 
 class Clustering {
  public:
-  Clustering(const std::string &seqDB, const std::string &seqDBIndex,
+  Clustering(mmseqs_output* output, const std::string &seqDB, const std::string &seqDBIndex,
              const std::string &alnResultsDB,
              const std::string &alnResultsDBIndex, const std::string &outDB,
              const std::string &outDBIndex, unsigned int maxIteration,
@@ -19,6 +19,9 @@ class Clustering {
   ~Clustering();
 
  private:
+
+  mmseqs_output* out;
+
   void writeData(DBWriter *dbw,
                  const std::pair<unsigned int, unsigned int> *ret,
                  size_t dbSize);

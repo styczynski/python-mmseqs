@@ -4,14 +4,15 @@
 
 #include <_simd/simd.h>
 #include <mmseqs/alignment/msaFilter.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/util.h>
 #include <mmseqs/commons/mathUtil.h>
 #include <mmseqs/alignment/multipleAlignment.h>
 
-MsaFilter::MsaFilter(int maxSeqLen, int maxSetSize, SubstitutionMatrix *m,
+MsaFilter::MsaFilter(mmseqs_output* output, int maxSeqLen, int maxSetSize, SubstitutionMatrix *m,
                      int gapOpen, int gapExtend)
     :  // TODO allow changing these?
+      out(output),
       PLTY_GAPOPEN(6.0f),
       PLTY_GAPEXTD(1.0f),
       gapOpen(gapOpen),

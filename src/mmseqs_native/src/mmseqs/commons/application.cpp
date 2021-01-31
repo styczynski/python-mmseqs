@@ -1,6 +1,6 @@
 #include <mmseqs/commons/application.h>
 #include <mmseqs/commons/command.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/commons/timer.h>
 #include <mmseqs/commons/util.h>

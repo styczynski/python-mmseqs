@@ -6,7 +6,7 @@
  */
 
 #include <mmseqs/commons/dBWriter.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/commons/kSeqWrapper.h>
 #include <mmseqs/commons/util.h>

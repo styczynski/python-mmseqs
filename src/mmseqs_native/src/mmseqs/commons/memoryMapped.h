@@ -46,9 +46,9 @@ class MemoryMapped {
   };
 
   /// do nothing, must use open()
-  MemoryMapped();
+  MemoryMapped(mmseqs_output* output);
   /// open file, mappedBytes = 0 maps the whole file
-  MemoryMapped(const std::string& filename, size_t mappedBytes = WholeFile,
+  MemoryMapped(mmseqs_output* output, const std::string& filename, size_t mappedBytes = WholeFile,
                CacheHint hint = Normal);
   /// close file (see close() )
   ~MemoryMapped();
@@ -83,6 +83,7 @@ class MemoryMapped {
   static int getpagesize();
 
  private:
+  mmseqs_output* out;
   /// don't copy object
   MemoryMapped(const MemoryMapped&);
   /// don't copy object

@@ -9,15 +9,15 @@
 #include <mmseqs/commons/parameters.h>
 #include "ksw2.h"
 
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/alignment/stripedSmithWaterman.h>
 #include <mmseqs/commons/substitutionMatrix.h>
 #include <mmseqs/commons/util.h>
 
-BandedNucleotideAligner::BandedNucleotideAligner(BaseMatrix *subMat,
+BandedNucleotideAligner::BandedNucleotideAligner(mmseqs_output* output, BaseMatrix *subMat,
                                                  size_t maxSequenceLength,
                                                  int gapo, int gape, int zdrop)
-    : fastMatrix(SubstitutionMatrix::createAsciiSubMat(*subMat)) {
+    : out(output), fastMatrix(SubstitutionMatrix::createAsciiSubMat(*subMat)) {
   targetSeqRevDataLen = maxSequenceLength;
   targetSeqRev = static_cast<uint8_t *>(malloc(targetSeqRevDataLen + 1));
   querySeqRevDataLen = maxSequenceLength;

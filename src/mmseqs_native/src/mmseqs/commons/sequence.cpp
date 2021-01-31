@@ -1,6 +1,6 @@
 #include <mmseqs/commons/sequence.h>
 #include <_simd/simd.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/mathUtil.h>
 #include <mmseqs/alignment/pSSMCalculator.h>
 #include <mmseqs/commons/parameters.h>

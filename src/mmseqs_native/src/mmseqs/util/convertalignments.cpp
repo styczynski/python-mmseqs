@@ -1,6 +1,6 @@
 #include <mmseqs/commons/dBReader.h>
 #include <mmseqs/commons/dBWriter.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/commons/indexReader.h>
 #include <mmseqs/alignment/matcher.h>

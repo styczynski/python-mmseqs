@@ -14,7 +14,7 @@ class DBReader;
 
 class DBWriter : public MemoryTracker {
  public:
-  DBWriter(const char* dataFileName, const char* indexFileName,
+  DBWriter(mmseqs_output* output, const char* dataFileName, const char* indexFileName,
            unsigned int threads, size_t mode, int dbtype);
 
   ~DBWriter();
@@ -71,6 +71,8 @@ class DBWriter : public MemoryTracker {
   bool isClosed() { return closed; }
 
  private:
+  mmseqs_output* out;
+
   size_t addToThreadBuffer(const void* data, size_t itmesize, size_t nitems,
                            int threadIdx);
   void writeThreadBuffer(unsigned int idx, size_t dataSize);

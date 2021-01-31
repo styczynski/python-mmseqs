@@ -1,5 +1,5 @@
 #include <mmseqs/commons/fileUtil.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/util.h>
 
 #include <dirent.h>
@@ -18,12 +18,12 @@
 #include <sys/statvfs.h>
 #include <sys/types.h>
 
-bool FileUtil::fileExists(const char *fileName) {
+bool FileUtil::fileExists(mmseqs_output* out. const char *fileName) {
   struct stat st;
   return stat(fileName, &st) == 0;
 }
 
-bool FileUtil::fileExistsAndIsNotEmpty(const char *fileName) {
+bool FileUtil::fileExistsAndIsNotEmpty(mmseqs_output* out, const char *fileName) {
   if (!fileExists(fileName)) {
     return false;
   }
@@ -34,16 +34,16 @@ bool FileUtil::fileExistsAndIsNotEmpty(const char *fileName) {
   return file.peek() != std::ifstream::traits_type::eof();
 }
 
-bool FileUtil::directoryExists(const char *directoryName) {
+bool FileUtil::directoryExists(mmseqs_output* out, const char *directoryName) {
   struct stat st;
   return stat(directoryName, &st) == 0 && S_ISDIR(st.st_mode);
 }
 
-bool FileUtil::makeDir(const char *directoryName, const int mode) {
+bool FileUtil::makeDir(mmseqs_output* out, const char *directoryName, const int mode) {
   return mkdir(directoryName, mode) == 0;
 }
 
-void *FileUtil::mmapFile(FILE *file, size_t *dataSize) {
+void *FileUtil::mmapFile(mmseqs_output* out, FILE *file, size_t *dataSize) {
   struct stat sb;
   if (fstat(fileno(file), &sb) < 0) {
     int errsv = errno;
@@ -61,13 +61,13 @@ void *FileUtil::mmapFile(FILE *file, size_t *dataSize) {
   return ret;
 }
 
-void FileUtil::munmapData(void *ptr, size_t dataSize) {
+void FileUtil::munmapData(mmseqs_output* out, void *ptr, size_t dataSize) {
   if (munmap(ptr, dataSize) < 0) {
     out->failure("Failed to munmap memory");
   }
 }
 
-FILE *FileUtil::openFileOrDie(const char *fileName, const char *mode,
+FILE *FileUtil::openFileOrDie(mmseqs_output* out, const char *fileName, const char *mode,
                               bool shouldExist) {
   bool exists = FileUtil::fileExists(fileName);
   if (exists && !shouldExist) {
@@ -89,7 +89,7 @@ FILE *FileUtil::openFileOrDie(const char *fileName, const char *mode,
   }
   return file;
 }
-size_t FileUtil::countLines(const char *name) {
+size_t FileUtil::countLines(mmseqs_output* out, const char *name) {
   FILE *fp = FileUtil::openFileOrDie(name, "r", true);
   size_t cnt = 0;
   while (!feof(fp)) {
@@ -102,7 +102,7 @@ size_t FileUtil::countLines(const char *name) {
   return cnt;
 }
 
-void FileUtil::deleteTempFiles(const std::list<std::string> &tmpFiles) {
+void FileUtil::deleteTempFiles(mmseqs_output* out, const std::list<std::string> &tmpFiles) {
   for (std::list<std::string>::const_iterator it = tmpFiles.begin();
        it != tmpFiles.end(); it++) {
     out->debug("Deleting {}", *it);
@@ -111,7 +111,7 @@ void FileUtil::deleteTempFiles(const std::list<std::string> &tmpFiles) {
   }
 }
 
-void FileUtil::writeFile(const std::string &pathToFile,
+void FileUtil::writeFile(mmseqs_output* out, const std::string &pathToFile,
                          const unsigned char *data, size_t len) {
   int fd = open(pathToFile.c_str(), O_WRONLY | O_CREAT | O_TRUNC,
                 S_IRUSR | S_IWUSR | S_IXUSR);
@@ -129,18 +129,18 @@ void FileUtil::writeFile(const std::string &pathToFile,
   }
 }
 
-std::string FileUtil::dirName(const std::string &file) {
+std::string FileUtil::dirName(mmseqs_output* out, const std::string &file) {
   size_t pos = file.find_last_of("\\/");
   return (std::string::npos == pos) ? "." : file.substr(0, pos);
 }
 
-std::string FileUtil::baseName(const std::string &file) {
+std::string FileUtil::baseName(mmseqs_output* out, const std::string &file) {
   size_t pos = file.find_last_of("\\/");
   return (std::string::npos == pos) ? file
                                     : file.substr(pos + 1, file.length());
 }
 
-size_t FileUtil::getFreeSpace(const char *path) {
+size_t FileUtil::getFreeSpace(mmseqs_output* out, const char *path) {
   struct statvfs stat;
   if (statvfs(path, &stat) != 0) {
     // error happens, just quits here
@@ -151,7 +151,7 @@ size_t FileUtil::getFreeSpace(const char *path) {
   return stat.f_bfree * stat.f_frsize;
 }
 
-std::string FileUtil::getRealPathFromSymLink(const std::string path) {
+std::string FileUtil::getRealPathFromSymLink(mmseqs_output* out, const std::string path) {
   char *p = realpath(path.c_str(), NULL);
   if (p == NULL) {
     out->failure("Could not get path of {}", path);
@@ -162,7 +162,7 @@ std::string FileUtil::getRealPathFromSymLink(const std::string path) {
   return name;
 }
 
-std::string FileUtil::getHashFromSymLink(const std::string path) {
+std::string FileUtil::getHashFromSymLink(mmseqs_output* out, const std::string path) {
   char *p = realpath(path.c_str(), NULL);
   if (p == NULL) {
     out->failure("Could not get path of {}", path);
@@ -174,7 +174,7 @@ std::string FileUtil::getHashFromSymLink(const std::string path) {
   return base;
 }
 
-void FileUtil::symlinkAlias(const std::string &file, const std::string &alias) {
+void FileUtil::symlinkAlias(mmseqs_output* out, const std::string &file, const std::string &alias) {
   char *p = realpath(file.c_str(), NULL);
   if (p == NULL) {
     out->failure("Could not get path of {}", file);
@@ -211,7 +211,7 @@ void FileUtil::symlinkAlias(const std::string &file, const std::string &alias) {
   }
 }
 
-std::string FileUtil::getCurrentWorkingDirectory() {
+std::string FileUtil::getCurrentWorkingDirectory(mmseqs_output* out) {
   // CWD can be larger than PATH_MAX and allocating enough memory is somewhat
   // tricky
   char *wd = NULL;
@@ -231,7 +231,7 @@ std::string FileUtil::getCurrentWorkingDirectory() {
   return cwd;
 }
 
-void FileUtil::symlinkAbs(const std::string &target, const std::string &link) {
+void FileUtil::symlinkAbs(mmseqs_output* out, const std::string &target, const std::string &link) {
   if (FileUtil::fileExists(link.c_str())) {
     FileUtil::remove(link.c_str());
   }
@@ -266,19 +266,19 @@ void FileUtil::symlinkAbs(const std::string &target, const std::string &link) {
   free(l);
 }
 
-size_t FileUtil::getFileSize(const std::string &fileName) {
+size_t FileUtil::getFileSize(mmseqs_output* out, const std::string &fileName) {
   struct stat stat_buf;
   int rc = stat(fileName.c_str(), &stat_buf);
   return rc == 0 ? stat_buf.st_size : -1;
 }
 
-bool FileUtil::symlinkExists(const std::string &path) {
+bool FileUtil::symlinkExists(mmseqs_output* out, const std::string &path) {
   struct stat buf;
   int result = lstat(path.c_str(), &buf);
   return (result == 0);
 }
 
-void FileUtil::copyFile(const char *src, const char *dst) {
+void FileUtil::copyFile(mmseqs_output* out, const char *src, const char *dst) {
   // https://stackoverflow.com/questions/10195343/copy-a-file-in-a-sane-safe-and-efficient-way
   char buf[BUFSIZ];
   size_t size;
@@ -301,7 +301,7 @@ void FileUtil::copyFile(const char *src, const char *dst) {
   close(dest);
 }
 
-FILE *FileUtil::openAndDelete(const char *fileName, const char *mode) {
+FILE *FileUtil::openAndDelete(mmseqs_output* out, const char *fileName, const char *mode) {
   if (FileUtil::fileExists(fileName) == true) {
     if (FileUtil::directoryExists(fileName)) {
       out->failure("Can not open {} for writing. It is a directory.", fileName);
@@ -316,7 +316,7 @@ FILE *FileUtil::openAndDelete(const char *fileName, const char *mode) {
   return file;
 }
 
-std::vector<std::string> FileUtil::findDatafiles(const char *datafiles) {
+std::vector<std::string> FileUtil::findDatafiles(mmseqs_output* out, const char *datafiles) {
   std::string baseName = std::string(datafiles);
   std::string checkName = baseName + ".0";
   std::vector<std::string> filenames;
@@ -334,13 +334,13 @@ std::vector<std::string> FileUtil::findDatafiles(const char *datafiles) {
   return filenames;
 }
 
-void FileUtil::remove(const char *file) {
+void FileUtil::remove(mmseqs_output* out, const char *file) {
   if (std::remove(file) != 0) {
     out->failure("Could not delete {}", file);
   }
 }
 
-void FileUtil::move(const char *src, const char *dst) {
+void FileUtil::move(mmseqs_output* out, const char *src, const char *dst) {
   struct stat srcFileInfo;
   FILE *srcFile = FileUtil::openFileOrDie(src, "rw", true);
   if (fstat(fileno(srcFile), &srcFileInfo) < 0) {
@@ -371,7 +371,7 @@ void FileUtil::move(const char *src, const char *dst) {
   }
 }
 
-int FileUtil::parseDbType(const char *name) {
+int FileUtil::parseDbType(mmseqs_output* out, const char *name) {
   std::string dbTypeFile = std::string(name) + ".dbtype";
   if (FileUtil::fileExists(dbTypeFile.c_str()) == false) {
     return Parameters::DBTYPE_GENERIC_DB;
@@ -397,7 +397,7 @@ int FileUtil::parseDbType(const char *name) {
 }
 
 std::string FileUtil::createTemporaryDirectory(
-    std::string baseTmpPath, const std::string &tmpPath,
+    mmseqs_output* out, std::string baseTmpPath, const std::string &tmpPath,
     const std::string &subDirectory) {
   std::string basePath = baseTmpPath + tmpPath;
   std::string tmpDir(basePath);
@@ -419,7 +419,7 @@ std::string FileUtil::createTemporaryDirectory(
   return tmpDir;
 }
 
-void FileUtil::fixRlimitNoFile() {
+void FileUtil::fixRlimitNoFile(mmseqs_output* out) {
   static bool increasedRlimitNoFile(false);
   if (increasedRlimitNoFile == false) {
     increasedRlimitNoFile = true;

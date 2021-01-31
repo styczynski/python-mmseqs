@@ -2,7 +2,7 @@
 #define KMERGENERATOR_H
 #include <string>
 #include <vector>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/prefiltering/indexer.h>
 #include <mmseqs/commons/scoreMatrix.h>
 

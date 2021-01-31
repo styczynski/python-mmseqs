@@ -4,7 +4,7 @@
 
 #include <mmseqs/linclust/kmersearch.h>
 #include <mmseqs/commons/command.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fastSort.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/linclust/kmerIndex.h>

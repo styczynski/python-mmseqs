@@ -1,5 +1,5 @@
 #include "Aggregation.h"
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fastSort.h>
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/output.h>

@@ -1,7 +1,7 @@
 #include <mmseqs/commons/util.h>
 #include <sys/resource.h>
 #include <mmseqs/commons/baseMatrix.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/commons/sequence.h>

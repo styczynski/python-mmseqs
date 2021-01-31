@@ -9,7 +9,7 @@
 
 class Alignment {
  public:
-  Alignment(const std::string &querySeqDB, const std::string &targetSeqDB,
+  Alignment(mmseqs_output* output, const std::string &querySeqDB, const std::string &targetSeqDB,
             const std::string &prefDB, const std::string &prefDBIndex,
             const std::string &outDB, const std::string &outDBIndex,
             const Parameters &par, const bool lcaAlign);
@@ -33,6 +33,9 @@ class Alignment {
                                  float seqIdThr);
 
  private:
+
+  mmseqs_output *out;
+
   // sequence coverage threshold
   double covThr;
 

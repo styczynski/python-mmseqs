@@ -19,7 +19,7 @@
 #include <mmseqs/commons/memoryMapped.h>
 
 #include <cstdio>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/util.h>
 
 // OS-specific
@@ -46,8 +46,9 @@
 #endif
 
 /// do nothing, must use open()
-MemoryMapped::MemoryMapped()
-    : _filename(),
+MemoryMapped::MemoryMapped(mmseqs_output* output)
+    : out(output),
+      _filename(),
       _filesize(0),
       _hint(Normal),
       _mappedBytes(0),
@@ -59,9 +60,10 @@ MemoryMapped::MemoryMapped()
 }
 
 /// open file, mappedBytes = 0 maps the whole file
-MemoryMapped::MemoryMapped(const std::string& filename, size_t mappedBytes,
+MemoryMapped::MemoryMapped(mmseqs_output* output, const std::string& filename, size_t mappedBytes,
                            CacheHint hint)
-    : _filename(filename),
+    : out(output),
+      _filename(filename),
       _filesize(0),
       _hint(hint),
       _mappedBytes(mappedBytes),

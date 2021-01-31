@@ -2,14 +2,14 @@
 #include <climits>
 
 #include <_simd/simd.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/mathUtil.h>
 #include <mmseqs/commons/sequence.h>
 #include <mmseqs/commons/util.h>
 
 const double BaseMatrix::ANY_BACK = 1E-5;
 
-BaseMatrix::BaseMatrix() {
+BaseMatrix::BaseMatrix(mmseqs_output* output): out(output) {
   // init [amino acid <-> int] mappings
 
   num2aa = new char[255];

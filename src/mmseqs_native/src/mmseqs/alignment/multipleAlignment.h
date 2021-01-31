@@ -34,7 +34,7 @@ class MultipleAlignment {
           msaSequence(msa) {}
   };
 
-  MultipleAlignment(size_t maxSeqLen, SubstitutionMatrix *subMat);
+  MultipleAlignment(mmseqs_output* output, size_t maxSeqLen, SubstitutionMatrix *subMat);
 
   ~MultipleAlignment();
 
@@ -52,6 +52,9 @@ class MultipleAlignment {
   static void deleteMSA(MultipleAlignment::MSAResult *res);
 
  private:
+
+  mmseqs_output* out;
+
   BaseMatrix *subMat;
 
   size_t maxSeqLen;

@@ -14,13 +14,15 @@
 
 class ClusteringAlgorithms {
  public:
-  ClusteringAlgorithms(DBReader<unsigned int> *seqDbr,
+  ClusteringAlgorithms(mmseqs_output* output, DBReader<unsigned int> *seqDbr,
                        DBReader<unsigned int> *alnDbr, int threads,
                        int scoretype, int maxiterations);
   ~ClusteringAlgorithms();
   std::pair<unsigned int, unsigned int> *execute(int mode);
 
  private:
+  mmseqs_output* out;
+
   DBReader<unsigned int> *seqDbr;
 
   DBReader<unsigned int> *alnDbr;

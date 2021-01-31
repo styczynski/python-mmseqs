@@ -3,7 +3,7 @@
 
 #include <cstdlib>
 
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/libraryReader.h>
 #include <mmseqs/commons/mathUtil.h>
 #include <mmseqs/commons/sequence.h>

@@ -1,5 +1,5 @@
 #include <mmseqs/commons/substitutionMatrix.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/util.h>
 #include "lambda_calculator.h"
 

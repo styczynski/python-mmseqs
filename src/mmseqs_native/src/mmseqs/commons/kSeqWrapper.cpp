@@ -1,6 +1,6 @@
 #include <mmseqs/commons/kSeqWrapper.h>
 #include <unistd.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/commons/util.h>
 #include "kseq.h"
@@ -9,7 +9,7 @@ namespace KSEQFILE {
 KSEQ_INIT(int, read)
 }
 
-KSeqFile::KSeqFile(const char* fileName) {
+KSeqFile::KSeqFile(mmseqs_output* output, const char* fileName): out(output) {
   file = FileUtil::openFileOrDie(fileName, "r", true);
   seq = (void*)KSEQFILE::kseq_init(fileno(file));
   type = KSEQ_FILE;

@@ -1,6 +1,6 @@
 #include <mmseqs/commons/dBReader.h>
 #include <mmseqs/commons/dBWriter.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/util.h>
 #include <mmseqs/commons/itoa.h>
 #include <mmseqs/output.h>

@@ -29,7 +29,7 @@
 #include <cmath>
 #include <set>
 #include <string>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/util.h>
 
 // standard genetic code

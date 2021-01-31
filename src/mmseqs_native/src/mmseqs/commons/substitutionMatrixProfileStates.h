@@ -1,7 +1,7 @@
 #ifndef SubstitutionMatrixProfileStates_H
 #define SubstitutionMatrixProfileStates_H
 #include <mmseqs/commons/baseMatrix.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/profileStates.h>
 
 class SubstitutionMatrixProfileStates : public BaseMatrix {

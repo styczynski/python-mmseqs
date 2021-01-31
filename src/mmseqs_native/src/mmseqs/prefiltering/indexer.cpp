@@ -1,5 +1,5 @@
 #include <mmseqs/prefiltering/indexer.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 
 Indexer::Indexer(const size_t alphabetSize, const int maxKmerSize) {
   this->maxKmerSize = maxKmerSize;

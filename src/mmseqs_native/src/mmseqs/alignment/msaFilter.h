@@ -10,7 +10,7 @@
 
 class MsaFilter {
  public:
-  MsaFilter(int maxSeqLen, int maxSetSize, SubstitutionMatrix *m, int gapOpen,
+  MsaFilter(mmseqs_output* output, int maxSeqLen, int maxSetSize, SubstitutionMatrix *m, int gapOpen,
             int gapExtend);
 
   ~MsaFilter();
@@ -55,6 +55,9 @@ class MsaFilter {
   void pruneAlignment(char **msaSequence, int N_in, int L);
 
  private:
+
+  mmseqs_output* out;
+
   // shuffles the filtered sequences to the back of the array, the unfiltered
   // ones remain in the front
   void shuffleSequences(const char **X, size_t setSize);

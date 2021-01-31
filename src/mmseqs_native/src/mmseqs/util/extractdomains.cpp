@@ -1,7 +1,7 @@
 #include <mmseqs/alignment/compressedA3M.h>
 #include <mmseqs/commons/dBReader.h>
 #include <mmseqs/commons/dBWriter.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/domain.h>
 #include <mmseqs/commons/mathUtil.h>
 #include <mmseqs/commons/parameters.h>

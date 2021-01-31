@@ -5,7 +5,7 @@
 #include <sys/mman.h>
 #include <cstring>
 #include <new>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/util.h>
 
 SequenceLookup::SequenceLookup(size_t sequenceCount, size_t dataSize)

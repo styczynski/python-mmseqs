@@ -30,11 +30,12 @@ class KSeqWrapper {
 
 class KSeqFile : public KSeqWrapper {
  public:
-  KSeqFile(const char* file);
+  KSeqFile(mmseqs_output* out, const char* file);
   bool ReadEntry();
   ~KSeqFile();
 
  private:
+  mmseqs_output* out;
   FILE* file;
 };
 

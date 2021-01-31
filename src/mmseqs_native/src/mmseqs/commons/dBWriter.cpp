@@ -1,7 +1,7 @@
 #include <mmseqs/commons/dBWriter.h>
 #include <mmseqs/commons/concat.h>
 #include <mmseqs/commons/dBReader.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/commons/timer.h>
@@ -17,9 +17,9 @@
 #include <omp.h>
 #endif
 
-DBWriter::DBWriter(const char *dataFileName_, const char *indexFileName_,
+DBWriter::DBWriter(mmseqs_output* output, const char *dataFileName_, const char *indexFileName_,
                    unsigned int threads, size_t mode, int dbtype)
-    : threads(threads), mode(mode), dbtype(dbtype) {
+    : out(output), threads(threads), mode(mode), dbtype(dbtype) {
   dataFileName = strdup(dataFileName_);
   indexFileName = strdup(indexFileName_);
 

@@ -1,6 +1,6 @@
 #include <mmseqs/clustering/clusteringAlgorithms.h>
 #include <mmseqs/clustering/alignmentSymmetry.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/timer.h>
 #include <mmseqs/commons/util.h>
 #include <mmseqs/commons/fastSort.h>
@@ -14,10 +14,10 @@
 #include <omp.h>
 #endif
 
-ClusteringAlgorithms::ClusteringAlgorithms(DBReader<unsigned int> *seqDbr,
+ClusteringAlgorithms::ClusteringAlgorithms(mmseqs_output* output, DBReader<unsigned int> *seqDbr,
                                            DBReader<unsigned int> *alnDbr,
                                            int threads, int scoretype,
-                                           int maxiterations) {
+                                           int maxiterations): out(output) {
   this->seqDbr = seqDbr;
   if (seqDbr->getSize() != alnDbr->getSize()) {
     out->failure("Sequence db size != result db size");

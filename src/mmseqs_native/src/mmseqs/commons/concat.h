@@ -15,7 +15,7 @@
 #include <unistd.h>
 #include <algorithm>
 
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/util.h>
 #define SAFE_READ_ERROR ((size_t)-1)
 
@@ -105,7 +105,7 @@ class Concat {
     return std::max(IO_BUFSIZE, static_cast<size_t>(sb.st_blksize));
   }
 
-  static void concatFiles(const std::vector<FILE *> &files, FILE *outFile) {
+  static void concatFiles(mmseqs_output* out, const std::vector<FILE *> &files, FILE *outFile) {
     int output_desc = fileno(outFile);
     struct stat stat_buf;
     if (fstat(output_desc, &stat_buf) < 0) {
@@ -134,7 +134,7 @@ class Concat {
     }
   }
 
-  static bool doConcat(int input_desc, int out_desc, const char *buf,
+  static bool doConcat(mmseqs_output* out, int input_desc, int out_desc, const char *buf,
                        size_t bufsize) {
     while (true) {
       /* Read a block of input.  */

@@ -1,7 +1,7 @@
 #ifndef MMSEQS_EVALUE_COMPUTATION_H
 #define MMSEQS_EVALUE_COMPUTATION_H
 
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/substitutionMatrix.h>
 #include <mmseqs/commons/util.h>
 
@@ -9,13 +9,13 @@
 
 class EvalueComputation {
  public:
-  EvalueComputation(size_t dbResCount, BaseMatrix *subMat)
-      : dbResCount(dbResCount) {
+  EvalueComputation(mmseqs_output* output, size_t dbResCount, BaseMatrix *subMat)
+      : out(output), dbResCount(dbResCount) {
     init(subMat, 0, 0, false);
   }
-  EvalueComputation(size_t dbResCount, BaseMatrix *subMat, int gapOpen,
+  EvalueComputation(mmseqs_output* output, size_t dbResCount, BaseMatrix *subMat, int gapOpen,
                     int gapExtend)
-      : dbResCount(dbResCount) {
+      : out(output), dbResCount(dbResCount) {
     init(subMat, gapOpen, gapExtend, true);
   }
 
@@ -52,6 +52,8 @@ class EvalueComputation {
   }
 
  private:
+  mmseqs_output* out;
+
   void init(BaseMatrix *subMat, int gapOpen, int gapExtend, bool isGapped) {
     const double lambdaTolerance = 0.01;
     const double kTolerance = 0.05;

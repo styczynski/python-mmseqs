@@ -1,4 +1,4 @@
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/fileUtil.h>
 #include <mmseqs/linclust/kmerIndex.h>
 #include <mmseqs/linclust/linsearchIndexReader.h>

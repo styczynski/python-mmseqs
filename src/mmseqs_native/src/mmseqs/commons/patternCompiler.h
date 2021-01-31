@@ -1,7 +1,7 @@
 #ifndef MMSEQS_PATTERNCOMPILER_H
 #define MMSEQS_PATTERNCOMPILER_H
 #include <regex.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/util.h>
 
 class PatternCompiler {

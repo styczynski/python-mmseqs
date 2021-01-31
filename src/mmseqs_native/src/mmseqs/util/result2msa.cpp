@@ -2,7 +2,7 @@
 #include <mmseqs/commons/dBConcat.h>
 #include <mmseqs/commons/dBReader.h>
 #include <mmseqs/commons/dBWriter.h>
-#include <mmseqs/commons/debug.h>
+#include <mmseqs/output.h>
 #include <mmseqs/commons/headerSummarizer.h>
 #include <mmseqs/alignment/msaFilter.h>
 #include <mmseqs/alignment/pSSMCalculator.h>
