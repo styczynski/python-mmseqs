@@ -42,7 +42,7 @@ int rbh(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   std::string tmpDir = par.db4;
-  std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames,
+  std::string hash = SSTR(par.hashParameter(out, par.databases_types, par.filenames,
                                             par.searchworkflow));
   if (par.reuseLatest) {
     hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
@@ -51,21 +51,21 @@ int rbh(mmseqs_output *out, Parameters &par) {
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   cmd.addVariable("SEARCH_A_B_PAR",
-                  par.createParameterString(par.searchworkflow).c_str());
+                  par.createParameterString(out, par.searchworkflow).c_str());
   int originalCovMode = par.covMode;
-  par.covMode = Util::swapCoverageMode(par.covMode);
+  par.covMode = Util::swapCoverageMode(out, par.covMode);
   cmd.addVariable("SEARCH_B_A_PAR",
-                  par.createParameterString(par.searchworkflow).c_str());
+                  par.createParameterString(out, par.searchworkflow).c_str());
   par.covMode = originalCovMode;
   cmd.addVariable("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : NULL);
   cmd.addVariable("VERB_COMP_PAR",
-                  par.createParameterString(par.verbandcompression).c_str());
+                  par.createParameterString(out, par.verbandcompression).c_str());
   cmd.addVariable("THREADS_COMP_PAR",
-                  par.createParameterString(par.threadsandcompression).c_str());
+                  par.createParameterString(out, par.threadsandcompression).c_str());
   cmd.addVariable("VERBOSITY",
-                  par.createParameterString(par.onlyverbosity).c_str());
+                  par.createParameterString(out, par.onlyverbosity).c_str());
   std::string program = tmpDir + "/rbh.sh";
   FileUtil::writeFile(out, program, rbh_sh, rbh_sh_len);
   cmd.execProgram(program.c_str(), par.filenames);

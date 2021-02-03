@@ -40,7 +40,7 @@ int summarizeresult(mmseqs_output* out, Parameters& par) {
 
   unsigned int localThreads =
       std::min((unsigned int)par.threads, (unsigned int)dbSize);
-  DBWriter writer(outData, outIndex, localThreads, par.compressed,
+  DBWriter writer(out, outData, outIndex, localThreads, par.compressed,
                   Parameters::DBTYPE_ALIGNMENT_RES);
   writer.open();
 
@@ -63,7 +63,7 @@ int summarizeresult(mmseqs_output* out, Parameters& par) {
       bool readFirst = false;
       writer.writeStart(thread_idx);
       while (*data != '\0') {
-        Matcher::result_t domain = Matcher::parseAlignmentRecord(data, true);
+        Matcher::result_t domain = Matcher::parseAlignmentRecord(out, data, true);
         data = Util::skipLine(data);
 
         if (readFirst == false) {

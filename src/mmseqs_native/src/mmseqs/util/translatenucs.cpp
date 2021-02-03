@@ -34,13 +34,13 @@ int translatenucs(mmseqs_output* out, Parameters& par) {
   unsigned int localThreads =
       std::max(std::min((unsigned int)par.threads, (unsigned int)entries), 1u);
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), localThreads,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), localThreads,
                   par.compressed, Parameters::DBTYPE_AMINO_ACIDS);
   writer.open();
 
   Log::Progress progress(entries);
   TranslateNucl translateNucl(
-      static_cast<TranslateNucl::GenCode>(par.translationTable));
+      out, static_cast<TranslateNucl::GenCode>(par.translationTable));
 #pragma omp parallel num_threads(localThreads)
   {
     int thread_idx = 0;

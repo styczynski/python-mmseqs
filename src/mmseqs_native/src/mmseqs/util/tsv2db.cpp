@@ -16,7 +16,7 @@ int tsv2db(mmseqs_output *out, Parameters &par) {
     out->info("Consider setting --output-dbtype.");
   }
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), 1, par.compressed,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), 1, par.compressed,
                   par.outputDbType);
   writer.open();
 

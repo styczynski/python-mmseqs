@@ -74,7 +74,7 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
     bool needSequenceDB = false;
     bool needFullHeaders = false;
     bool needSource = false;
-    Parameters::getOutputFormat(par.formatAlignmentMode, par.outfmt,
+    Parameters::getOutputFormat(out, par.formatAlignmentMode, par.outfmt,
                                 needSequenceDB, needBacktrace, needFullHeaders,
                                 needLookup, needSource, needTaxonomyMapping,
                                 needTaxonomy);
@@ -117,9 +117,9 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
 
   if (needTaxonomy || needTaxonomyMapping) {
     std::vector<std::string> missingFiles =
-        Parameters::findMissingTaxDbFiles(target);
+        Parameters::findMissingTaxDbFiles(out, target);
     if (missingFiles.empty() == false) {
-      Parameters::printTaxDbError(target, missingFiles);
+      Parameters::printTaxDbError(out, target, missingFiles);
       return 1;
     }
   }
@@ -129,42 +129,42 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
   if (linsearch) {
     search_module = "linsearch";
     const bool isIndex =
-        LinsearchIndexReader::searchForIndex(target).empty() == false;
+        LinsearchIndexReader::searchForIndex(out, target).empty() == false;
     out->output_string("INDEXEXT", isIndex ? ".linidx" : "");
     index_ext = isIndex ? ".linidx" : "";
     out->output_string("SEARCH_MODULE", "linsearch");
     out->output_string("LINSEARCH", "TRUE");
     out->output_string("CREATELININDEX_PAR",
-                       par.createParameterString(par.createlinindex));
+                       par.createParameterString(out, par.createlinindex));
     out->output_string("SEARCH_PAR",
-                       par.createParameterString(par.linsearchworkflow, true));
+                       par.createParameterString(out, par.linsearchworkflow, true));
   } else {
     search_module = "search";
     const bool isIndex =
-        PrefilteringIndexReader::searchForIndex(target).empty() == false;
+        PrefilteringIndexReader::searchForIndex(out, target).empty() == false;
     out->output_string("INDEXEXT", isIndex ? ".idx" : "");
     index_ext = isIndex ? ".idx" : "";
     out->output_string("SEARCH_MODULE", "search");
     out->output_string("LINSEARCH", "");
     out->output_string("CREATELININDEX_PAR", "");
     out->output_string("SEARCH_PAR",
-                       par.createParameterString(par.searchworkflow, true));
+                       par.createParameterString(out, par.searchworkflow, true));
   }
   out->output_string("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : "");
   out->output_string("GREEDY_BEST_HITS", par.greedyBestHits ? "TRUE" : "");
   out->output_string("LEAVE_INPUT", par.dbOut ? "TRUE" : "");
 
   out->output_string("RUNNER", par.runner);
-  out->output_string("VERBOSITY", par.createParameterString(par.onlyverbosity));
+  out->output_string("VERBOSITY", par.createParameterString(out, par.onlyverbosity));
 
   out->output_string("CREATEDB_QUERY_PAR",
-                     par.createParameterString(par.createdb));
+                     par.createParameterString(out, par.createdb));
   par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_HARD;
-  out->output_string("CREATEDB_PAR", par.createParameterString(par.createdb));
+  out->output_string("CREATEDB_PAR", par.createParameterString(out, par.createdb));
   out->output_string("CONVERT_PAR",
-                     par.createParameterString(par.convertalignments));
+                     par.createParameterString(out, par.convertalignments));
   out->output_string("SUMMARIZE_PAR",
-                     par.createParameterString(par.summarizeresult));
+                     par.createParameterString(out, par.summarizeresult));
 
   std::string query_file_path = par.filenames.back();
 

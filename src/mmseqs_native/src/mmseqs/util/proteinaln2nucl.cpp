@@ -37,13 +37,13 @@ int proteinaln2nucl(mmseqs_output *out, Parameters &par) {
     tdbr_aa = qdbr_aa;
   } else if (par.db1.compare(par.db2) != 0 && par.db3.compare(par.db4) != 0) {
     tdbr_nuc = new DBReader<unsigned int>(
-        par.db2.c_str(), par.db2Index.c_str(), par.threads,
+        out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     tdbr_nuc->open(DBReader<unsigned int>::NOSORT);
     tdbr_nuc->readMmapedDataInMemory();
 
     tdbr_aa = new DBReader<unsigned int>(
-        par.db4.c_str(), par.db4Index.c_str(), par.threads,
+        out, par.db4.c_str(), par.db4Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     tdbr_aa->open(DBReader<unsigned int>::NOSORT);
     tdbr_aa->readMmapedDataInMemory();
@@ -62,12 +62,12 @@ int proteinaln2nucl(mmseqs_output *out, Parameters &par) {
     out->failure("Wrong query and target database input");
   }
 
-  NucleotideMatrix subMat(par.scoringMatrixFile.nucleotides, 1.0, 0.0);
+  NucleotideMatrix subMat(out, par.scoringMatrixFile.nucleotides, 1.0, 0.0);
   SubstitutionMatrix::FastMatrix fastMatrix =
       SubstitutionMatrix::createAsciiSubMat(subMat);
   const int gapOpen = par.gapOpen.nucleotides;
   const int gapExtend = par.gapExtend.nucleotides;
-  EvalueComputation evaluer(tdbr_nuc->getAminoAcidDBSize(), &subMat, gapOpen,
+  EvalueComputation evaluer(out, tdbr_nuc->getAminoAcidDBSize(), &subMat, gapOpen,
                             gapExtend);
 
   DBReader<unsigned int> alnDbr(
@@ -75,7 +75,7 @@ int proteinaln2nucl(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   alnDbr.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter resultWriter(par.db6.c_str(), par.db6Index.c_str(), par.threads,
+  DBWriter resultWriter(out, par.db6.c_str(), par.db6Index.c_str(), par.threads,
                         par.compressed, Parameters::DBTYPE_ALIGNMENT_RES);
   resultWriter.open();
 
@@ -113,7 +113,7 @@ int proteinaln2nucl(mmseqs_output *out, Parameters &par) {
       }
 
       while (*data != '\0') {
-        Matcher::result_t res = Matcher::parseAlignmentRecord(data, true);
+        Matcher::result_t res = Matcher::parseAlignmentRecord(out, data, true);
         data = Util::skipLine(data);
 
         if (qStartCodon && res.qStartPos == 0) {

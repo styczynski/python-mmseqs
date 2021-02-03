@@ -53,33 +53,33 @@ int clusterupdate(mmseqs_output *out, Parameters &par) {
   setClusterUpdateMustPassAlong(&par);
   setClusterAutomagicParameters(par);
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   cmd.addVariable("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : NULL);
   cmd.addVariable("RECOVER_DELETED", par.recoverDeleted ? "TRUE" : NULL);
 
   cmd.addVariable("RUNNER", par.runner.c_str());
-  cmd.addVariable("DIFF_PAR", par.createParameterString(par.diff).c_str());
+  cmd.addVariable("DIFF_PAR", par.createParameterString(out, par.diff).c_str());
   cmd.addVariable("VERBOSITY",
-                  par.createParameterString(par.onlyverbosity).c_str());
+                  par.createParameterString(out, par.onlyverbosity).c_str());
   cmd.addVariable("THREADS_PAR",
-                  par.createParameterString(par.onlythreads).c_str());
+                  par.createParameterString(out, par.onlythreads).c_str());
   cmd.addVariable("RESULT2REPSEQ_PAR",
-                  par.createParameterString(par.result2repseq).c_str());
+                  par.createParameterString(out, par.result2repseq).c_str());
 
   cmd.addVariable("CLUST_PAR",
-                  par.createParameterString(par.clusterworkflow, true).c_str());
+                  par.createParameterString(out, par.clusterworkflow, true).c_str());
 
   int maxAccept = par.maxAccept;
   par.maxAccept = 1;
   par.PARAM_MAX_ACCEPT.wasSet = true;
   cmd.addVariable(
       "SEARCH_PAR",
-      par.createParameterString(par.clusterUpdateSearch, true).c_str());
+      par.createParameterString(out, par.clusterUpdateSearch, true).c_str());
   par.maxAccept = maxAccept;
 
   std::string tmpDir = par.db6;
   std::string hash = SSTR(
-      par.hashParameter(par.databases_types, par.filenames, par.clusterUpdate));
+      par.hashParameter(out, par.databases_types, par.filenames, par.clusterUpdate));
   if (par.reuseLatest) {
     hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }

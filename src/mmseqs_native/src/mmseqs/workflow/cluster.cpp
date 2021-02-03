@@ -61,7 +61,7 @@ void setNuclClusterDefaults(Parameters *p) {
   }
 }
 
-void setClusterAutomagicParameters(Parameters &par) {
+void setClusterAutomagicParameters(mmseqs_output* out, Parameters &par) {
   if (par.PARAM_NO_COMP_BIAS_CORR.wasSet == false && par.seqIdThr >= 0.7) {
     par.compBiasCorrection = 0;
     par.PARAM_NO_COMP_BIAS_CORR.wasSet = true;
@@ -133,10 +133,10 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
       Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_HMM_PROFILE)) {
     out->failure("Cannot use ungapped alignment mode with profile databases");
   }
-  setClusterAutomagicParameters(par);
+  setClusterAutomagicParameters(out, par);
 
   std::string tmpDir = par.db3;
-  std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames,
+  std::string hash = SSTR(par.hashParameter(out, par.databases_types, par.filenames,
                                             par.clusterworkflow));
   if (par.reuseLatest) {
     hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
@@ -145,7 +145,7 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   cmd.addVariable("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : NULL);
   const int originalRescoreMode = par.rescoreMode;
   par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
@@ -153,47 +153,47 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
   par.rescoreMode = originalRescoreMode;
   cmd.addVariable("RUNNER", par.runner.c_str());
   cmd.addVariable("MERGECLU_PAR",
-                  par.createParameterString(par.threadsandcompression).c_str());
+                  par.createParameterString(out, par.threadsandcompression).c_str());
   cmd.addVariable("VERBOSITY",
-                  par.createParameterString(par.onlyverbosity).c_str());
+                  par.createParameterString(out, par.onlyverbosity).c_str());
 
   if (isNucleotideDb) {
     par.forwardFrames = "1";
     par.reverseFrames = "1";
     par.searchType = 3;
     cmd.addVariable("EXTRACT_FRAMES_PAR",
-                    par.createParameterString(par.extractframes).c_str());
+                    par.createParameterString(out, par.extractframes).c_str());
     int oldKmer = par.kmerSize;
     par.kmerSize = 0;
     cmd.addVariable("LINCLUST_PAR",
-                    par.createParameterString(par.linclustworkflow).c_str());
+                    par.createParameterString(out, par.linclustworkflow).c_str());
     par.kmerSize = oldKmer;
     if (par.PARAM_MAX_SEQS.wasSet == false) {
       par.maxResListLen = 300;
     }
 
     cmd.addVariable("PREFILTER_PAR",
-                    par.createParameterString(par.prefilter).c_str());
+                    par.createParameterString(out, par.prefilter).c_str());
     if (isUngappedMode) {
       par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
       cmd.addVariable("ALIGNMENT_PAR",
-                      par.createParameterString(par.rescorediagonal).c_str());
+                      par.createParameterString(out, par.rescorediagonal).c_str());
       par.rescoreMode = originalRescoreMode;
     } else {
       cmd.addVariable("ALIGNMENT_MODE_NOT_SET", "TRUE");
       par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
       cmd.addVariable("RESCORE_ALN_PAR",
-                      par.createParameterString(par.rescorediagonal).c_str());
+                      par.createParameterString(out, par.rescorediagonal).c_str());
       cmd.addVariable(
           "THREADSANDCOMPRESS_PAR",
-          par.createParameterString(par.threadsandcompression).c_str());
+          par.createParameterString(out, par.threadsandcompression).c_str());
       cmd.addVariable("ALIGNMENT_PAR",
-                      par.createParameterString(par.align).c_str());
+                      par.createParameterString(out, par.align).c_str());
     }
     cmd.addVariable("CLUSTER_PAR",
-                    par.createParameterString(par.clust).c_str());
+                    par.createParameterString(out, par.clust).c_str());
     cmd.addVariable("OFFSETALIGNMENT_PAR",
-                    par.createParameterString(par.offsetalignment).c_str());
+                    par.createParameterString(out, par.offsetalignment).c_str());
     std::string program = tmpDir + "/nucleotide_clustering.sh";
     FileUtil::writeFile(out, program, nucleotide_clustering_sh,
                         nucleotide_clustering_sh_len);
@@ -209,7 +209,7 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
     int maskMode = par.maskMode;
     par.maskMode = 0;
     cmd.addVariable("LINCLUST_PAR",
-                    par.createParameterString(par.linclustworkflow).c_str());
+                    par.createParameterString(out, par.linclustworkflow).c_str());
     par.alphabetSize = alphabetSize;
     par.kmerSize = kmerSize;
     par.maskMode = maskMode;
@@ -220,18 +220,18 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
     par.diagonalScoring = 0;
     par.compBiasCorrection = 0;
     cmd.addVariable("PREFILTER0_PAR",
-                    par.createParameterString(par.prefilter).c_str());
+                    par.createParameterString(out, par.prefilter).c_str());
     if (isUngappedMode) {
       par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
       cmd.addVariable("ALIGNMENT0_PAR",
-                      par.createParameterString(par.rescorediagonal).c_str());
+                      par.createParameterString(out, par.rescorediagonal).c_str());
       par.rescoreMode = originalRescoreMode;
     } else {
       cmd.addVariable("ALIGNMENT0_PAR",
-                      par.createParameterString(par.align).c_str());
+                      par.createParameterString(out, par.align).c_str());
     }
     cmd.addVariable("CLUSTER0_PAR",
-                    par.createParameterString(par.clust).c_str());
+                    par.createParameterString(out, par.clust).c_str());
     par.diagonalScoring = 1;
     par.compBiasCorrection = 1;
     par.minDiagScoreThr = minDiagScoreThr;
@@ -241,18 +241,18 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
       par.sensitivity = 1.0 + sensStepSize * step;
 
       cmd.addVariable(std::string("PREFILTER" + SSTR(step) + "_PAR").c_str(),
-                      par.createParameterString(par.prefilter).c_str());
+                      par.createParameterString(out, par.prefilter).c_str());
       if (isUngappedMode) {
         par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
         cmd.addVariable(std::string("ALIGNMENT" + SSTR(step) + "_PAR").c_str(),
-                        par.createParameterString(par.rescorediagonal).c_str());
+                        par.createParameterString(out, par.rescorediagonal).c_str());
         par.rescoreMode = originalRescoreMode;
       } else {
         cmd.addVariable(std::string("ALIGNMENT" + SSTR(step) + "_PAR").c_str(),
-                        par.createParameterString(par.align).c_str());
+                        par.createParameterString(out, par.align).c_str());
       }
       cmd.addVariable(std::string("CLUSTER" + SSTR(step) + "_PAR").c_str(),
-                      par.createParameterString(par.clust).c_str());
+                      par.createParameterString(out, par.clust).c_str());
     }
     cmd.addVariable("STEPS", SSTR(par.clusterSteps).c_str());
     // correct for cascading clustering errors
@@ -261,19 +261,19 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
     }
     cmd.addVariable(
         "THREADSANDCOMPRESS",
-        par.createParameterString(par.threadsandcompression).c_str());
+        par.createParameterString(out, par.threadsandcompression).c_str());
     cmd.addVariable("VERBCOMPRESS",
-                    par.createParameterString(par.verbandcompression).c_str());
-    int swapedCovMode = Util::swapCoverageMode(par.covMode);
+                    par.createParameterString(out, par.verbandcompression).c_str());
+    int swapedCovMode = Util::swapCoverageMode(out, par.covMode);
     int tmpCovMode = par.covMode;
     par.covMode = swapedCovMode;
     cmd.addVariable("PREFILTER_REASSIGN_PAR",
-                    par.createParameterString(par.prefilter).c_str());
+                    par.createParameterString(out, par.prefilter).c_str());
     par.covMode = tmpCovMode;
     cmd.addVariable("ALIGNMENT_REASSIGN_PAR",
-                    par.createParameterString(par.align).c_str());
+                    par.createParameterString(out, par.align).c_str());
     cmd.addVariable("MERGEDBS_PAR",
-                    par.createParameterString(par.mergedbs).c_str());
+                    par.createParameterString(out, par.mergedbs).c_str());
 
     std::string program = tmpDir + "/cascaded_clustering.sh";
     FileUtil::writeFile(out, program, cascaded_clustering_sh,
@@ -287,20 +287,20 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
     float seqIdThr = par.seqIdThr;
     par.seqIdThr = (float)Parameters::CLUST_HASH_DEFAULT_MIN_SEQ_ID / 100.0f;
     cmd.addVariable("DETECTREDUNDANCY_PAR",
-                    par.createParameterString(par.clusthash).c_str());
+                    par.createParameterString(out, par.clusthash).c_str());
     par.alphabetSize = alphabetSize;
     par.seqIdThr = seqIdThr;
     cmd.addVariable("PREFILTER_PAR",
-                    par.createParameterString(par.prefilter).c_str());
+                    par.createParameterString(out, par.prefilter).c_str());
     if (isUngappedMode) {
       cmd.addVariable("ALIGNMENT_PAR",
-                      par.createParameterString(par.rescorediagonal).c_str());
+                      par.createParameterString(out, par.rescorediagonal).c_str());
     } else {
       cmd.addVariable("ALIGNMENT_PAR",
-                      par.createParameterString(par.align).c_str());
+                      par.createParameterString(out, par.align).c_str());
     }
     cmd.addVariable("CLUSTER_PAR",
-                    par.createParameterString(par.clust).c_str());
+                    par.createParameterString(out, par.clust).c_str());
     std::string program = tmpDir + "/clustering.sh";
     FileUtil::writeFile(out, program, clustering_sh, clustering_sh_len);
     cmd.execProgram(program.c_str(), par.filenames);

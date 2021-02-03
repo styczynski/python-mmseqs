@@ -331,7 +331,7 @@ int databases(mmseqs_output *out, Parameters &par) {
   //    par.printParameters(command.cmd, argc, argv, par.databases);
   std::string tmpDir = par.db3;
   std::string hash = SSTR(
-      par.hashParameter(par.databases_types, par.filenames, par.databases));
+      par.hashParameter(out, par.databases_types, par.filenames, par.databases));
   if (par.reuseLatest) {
     hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
@@ -339,7 +339,7 @@ int databases(mmseqs_output *out, Parameters &par) {
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   for (size_t i = 0; i < downloads[downloadIdx].environment.size(); ++i) {
     cmd.addVariable(downloads[downloadIdx].environment[i].key,
                     downloads[downloadIdx].environment[i].value);
@@ -348,15 +348,15 @@ int databases(mmseqs_output *out, Parameters &par) {
                   downloads[downloadIdx].hasTaxonomy ? "TRUE" : NULL);
   cmd.addVariable("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : NULL);
   cmd.addVariable("VERB_PAR",
-                  par.createParameterString(par.onlyverbosity).c_str());
+                  par.createParameterString(out, par.onlyverbosity).c_str());
   cmd.addVariable("COMP_PAR",
-                  par.createParameterString(par.verbandcompression).c_str());
+                  par.createParameterString(out, par.verbandcompression).c_str());
   // aria2c gives an (undocumented error with more than 16 connections)
   cmd.addVariable("ARIA_NUM_CONN", SSTR(std::min(16, par.threads)).c_str());
   cmd.addVariable("THREADS_PAR",
-                  par.createParameterString(par.onlythreads).c_str());
+                  par.createParameterString(out, par.onlythreads).c_str());
   cmd.addVariable("THREADS_COMP_PAR",
-                  par.createParameterString(par.threadsandcompression).c_str());
+                  par.createParameterString(out, par.threadsandcompression).c_str());
   std::string program = tmpDir + "/download.sh";
   FileUtil::writeFile(out, program, downloads[downloadIdx].script,
                       downloads[downloadIdx].scriptLength);

@@ -29,7 +29,7 @@ int createindex(mmseqs_output *out, Parameters &par,
   int dbType = FileUtil::parseDbType(out, par.db1.c_str());
   if (Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_HMM_PROFILE) &&
       sensitivity == false) {
-    par->error("Please adjust the sensitivity of your target profile index with -s. Be aware that this searches can take huge amount of memory.");
+    out->error("Please adjust the sensitivity of your target profile index with -s. Be aware that this searches can take huge amount of memory.");
     return EXIT_FAILURE;
   }
 
@@ -48,15 +48,15 @@ int createindex(mmseqs_output *out, Parameters &par,
   out->output_string("INDEXER", indexerModule);
   out->output_string("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : "");
   par.translate = 1;
-  out->output_string("ORF_PAR", par.createParameterString(par.extractorfs));
+  out->output_string("ORF_PAR", par.createParameterString(out, par.extractorfs));
   out->output_string("EXTRACT_FRAMES_PAR",
-                     par.createParameterString(par.extractframes));
+                     par.createParameterString(out, par.extractframes));
   out->output_string("SPLIT_SEQ_PAR",
-                     par.createParameterString(par.splitsequence));
+                     par.createParameterString(out, par.splitsequence));
   if (indexerModule == "kmerindexdb") {
-    out->output_string("INDEX_PAR", par.createParameterString(par.kmerindexdb));
+    out->output_string("INDEX_PAR", par.createParameterString(out, par.kmerindexdb));
   } else {
-    out->output_string("INDEX_PAR", par.createParameterString(par.indexdb));
+    out->output_string("INDEX_PAR", par.createParameterString(out, par.indexdb));
   }
   if (flag.size() > 0) {
     out->output_string(flag, "1");

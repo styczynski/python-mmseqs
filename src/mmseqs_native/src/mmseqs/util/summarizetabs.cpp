@@ -25,7 +25,7 @@ static inline float getOverlap(const std::vector<bool> &covered,
   return static_cast<float>(counter) / static_cast<float>(qEnd - qStart + 1);
 }
 
-std::vector<Domain> mapDomains(const std::vector<Domain> &input, float overlap,
+std::vector<Domain> mapDomains(mmseqs_output* out, const std::vector<Domain> &input, float overlap,
                                float minCoverage, double eValThreshold) {
   std::vector<Domain> result;
   if (input.empty()) {
@@ -65,7 +65,7 @@ std::vector<Domain> mapDomains(const std::vector<Domain> &input, float overlap,
   return result;
 }
 
-std::map<std::string, unsigned int> readLength(const std::string &file) {
+std::map<std::string, unsigned int> readLength(mmseqs_output* out, const std::string &file) {
   std::ifstream mappingStream(file);
   if (mappingStream.fail()) {
     out->failure("File {} not found", file);
@@ -82,6 +82,7 @@ std::map<std::string, unsigned int> readLength(const std::string &file) {
 }
 
 std::vector<Domain> getEntries(
+    mmseqs_output* out,
     unsigned int queryId, char *data, size_t length,
     const std::map<std::string, unsigned int> &lengths) {
   std::vector<Domain> result;
@@ -132,15 +133,15 @@ std::vector<Domain> getEntries(
   return result;
 }
 
-int doAnnotate(Parameters &par, DBReader<unsigned int> &blastTabReader,
+int doAnnotate(mmseqs_output* out, Parameters &par, DBReader<unsigned int> &blastTabReader,
                const std::pair<std::string, std::string> &resultdb,
                const size_t dbFrom, const size_t dbSize, bool merge) {
-  DBWriter writer(resultdb.first.c_str(), resultdb.second.c_str(),
+  DBWriter writer(out, resultdb.first.c_str(), resultdb.second.c_str(),
                   static_cast<unsigned int>(par.threads), par.compressed,
                   Parameters::DBTYPE_ALIGNMENT_RES);
   writer.open();
 
-  std::map<std::string, unsigned int> lengths = readLength(par.db2);
+  std::map<std::string, unsigned int> lengths = readLength(out, par.db2);
 
   Log::Progress progress(dbSize);
 
@@ -158,14 +159,14 @@ int doAnnotate(Parameters &par, DBReader<unsigned int> &blastTabReader,
       char *tabData = blastTabReader.getData(i, thread_idx);
       size_t tabLength = blastTabReader.getEntryLen(i) - 1;
       const std::vector<Domain> entries =
-          getEntries(id, tabData, tabLength, lengths);
+          getEntries(out, id, tabData, tabLength, lengths);
       if (entries.empty()) {
         out->warn("Can not map any entries for entry {}", id);
         continue;
       }
 
       std::vector<Domain> result =
-          mapDomains(entries, par.overlap, par.covThr, par.evalThr);
+          mapDomains(out, entries, par.overlap, par.covThr, par.evalThr);
       if (result.empty()) {
         out->warn("Can not map any domains for entry {}", id);
         continue;
@@ -190,7 +191,7 @@ int doAnnotate(Parameters &par, DBReader<unsigned int> &blastTabReader,
   return EXIT_SUCCESS;
 }
 
-int doAnnotate(Parameters &par, const unsigned int mpiRank,
+int doAnnotate(mmseqs_output* out, Parameters &par, const unsigned int mpiRank,
                const unsigned int mpiNumProc) {
   DBReader<unsigned int> reader(
       out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
@@ -203,7 +204,7 @@ int doAnnotate(Parameters &par, const unsigned int mpiRank,
   std::pair<std::string, std::string> tmpOutput =
       Util::createTmpFileNames(par.db3, par.db3Index, mpiRank);
 
-  int status = doAnnotate(par, reader, tmpOutput, dbFrom, dbSize, true);
+  int status = doAnnotate(out, par, reader, tmpOutput, dbFrom, dbSize, true);
 
   reader.close();
 
@@ -218,18 +219,18 @@ int doAnnotate(Parameters &par, const unsigned int mpiRank,
           Util::createTmpFileNames(par.db3, par.db3Index, proc);
       splitFiles.push_back(std::make_pair(tmpFile.first, tmpFile.second));
     }
-    DBWriter::mergeResults(par.db3, par.db3Index, splitFiles);
+    DBWriter::mergeResults(out, par.db3, par.db3Index, splitFiles);
   }
   return status;
 }
 
-int doAnnotate(Parameters &par) {
+int doAnnotate(mmseqs_output* out, Parameters &par) {
   DBReader<unsigned int> reader(
       out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
   size_t resultSize = reader.getSize();
-  int status = doAnnotate(par, reader, std::make_pair(par.db3, par.db3Index), 0,
+  int status = doAnnotate(out, par, reader, std::make_pair(par.db3, par.db3Index), 0,
                           resultSize, false);
   reader.close();
   return status;
@@ -242,9 +243,9 @@ int summarizetabs(mmseqs_output *out, Parameters &par) {
   // MMseqsMPI::init(argc, argv);
 
 #ifdef HAVE_MPI
-  int status = doAnnotate(par, MMseqsMPI::rank, MMseqsMPI::numProc);
+  int status = doAnnotate(out, par, MMseqsMPI::rank, MMseqsMPI::numProc);
 #else
-  int status = doAnnotate(par);
+  int status = doAnnotate(out, par);
 #endif
 
   return status;

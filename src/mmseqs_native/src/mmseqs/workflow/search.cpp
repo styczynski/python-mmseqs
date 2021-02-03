@@ -56,7 +56,7 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
       // Call prefilter module
       std::string step_str = std::to_string(current_step);
       if (!FileUtil::fileExists(
-              (blastp_tmp + "/pref_" + step_str + ".dbtype").c_str())) {
+              out, (blastp_tmp + "/pref_" + step_str + ".dbtype").c_str())) {
         std::cout << "step_search K_2: prefilter " << blastp_input
                   << blastp_target << (blastp_tmp + "/pref_" + step_str) << "\n"
                   << std::flush;
@@ -207,7 +207,7 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
       if (current_step < blastp_steps - 1) {
         std::cout << "step_search K_13\n" << std::flush;
         if (!FileUtil::fileExists(
-                (blastp_tmp + "/order_" + step_str + ".dbtype").c_str())) {
+                out, (blastp_tmp + "/order_" + step_str + ".dbtype").c_str())) {
           // awk '$3 < 2 { print $1 }' "$TMP_PATH/aln_$STEP.index" >
           // "$TMP_PATH/order_$STEP"
           std::cout << "SPIERDALAJ?\n";
@@ -217,7 +217,7 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
         std::cout << "step_search K_14\n" << std::flush;
 
         if (!FileUtil::fileExistsAndIsNotEmpty(
-                (blastp_tmp + "/order_" + step_str).c_str())) {
+                out, (blastp_tmp + "/order_" + step_str).c_str())) {
           // "$MMSEQS" mvdb "$ALN_RES_MERGE" "$3" ${VERBOSITY}
           Parameters mvdb_par(par);
           mvdb_par.setDBFields(1, aln_res_merge);
@@ -282,7 +282,7 @@ void setSearchDefaults(Parameters *p) {
   p->evalProfile = 0.1;
 }
 
-int computeSearchMode(int queryDbType, int targetDbType, int targetSrcDbType,
+int computeSearchMode(mmseqs_output* out, int queryDbType, int targetDbType, int targetSrcDbType,
                       int searchType) {
   // reject unvalid search
   if (Parameters::isEqualDbtype(queryDbType, Parameters::DBTYPE_HMM_PROFILE) &&
@@ -521,7 +521,7 @@ int search(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, false, 0,
   //    MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
 
-  std::string indexStr = PrefilteringIndexReader::searchForIndex(par.db2);
+  std::string indexStr = PrefilteringIndexReader::searchForIndex(out, par.db2);
 
   int targetDbType = FileUtil::parseDbType(out, par.db2.c_str());
   std::string targetDB = (indexStr == "") ? par.db2.c_str() : indexStr.c_str();
@@ -530,7 +530,7 @@ int search(mmseqs_output *out, Parameters &par) {
       Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_INDEX_DB)) {
     indexStr = par.db2;
     DBReader<unsigned int> dbr(
-        targetDB.c_str(), (targetDB + ".index").c_str(), par.threads,
+        out, targetDB.c_str(), (targetDB + ".index").c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     dbr.open(DBReader<unsigned int>::NOSORT);
     PrefilteringIndexData data = PrefilteringIndexReader::getMetadata(&dbr);
@@ -542,7 +542,7 @@ int search(mmseqs_output *out, Parameters &par) {
     out->failure("Please recreate your database or add a .dbtype file to your sequence/profile database");
   }
 
-  int searchMode = computeSearchMode(queryDbType, targetDbType, targetSrcDbType,
+  int searchMode = computeSearchMode(out, queryDbType, targetDbType, targetSrcDbType,
                                      par.searchType);
   if ((searchMode & Parameters::SEARCH_MODE_FLAG_QUERY_NUCLEOTIDE) &&
       (searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_NUCLEOTIDE)) {
@@ -601,7 +601,7 @@ int search(mmseqs_output *out, Parameters &par) {
   // par.printParameters(command.cmd, argc, argv, par.searchworkflow);
 
   std::string tmpDir = par.db4;
-  std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames,
+  std::string hash = SSTR(par.hashParameter(out, par.databases_types, par.filenames,
                                             par.searchworkflow));
   if (par.reuseLatest) {
     hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
@@ -620,12 +620,12 @@ int search(mmseqs_output *out, Parameters &par) {
   std::vector<float> senses;
   std::string search_prog = "";
 
-  CommandCaller cmd;
-  cmd.addVar("VERBOSITY", par.createParameterString(par.onlyverbosity));
+  CommandCaller cmd(out);
+  cmd.addVar("VERBOSITY", par.createParameterString(out, par.onlyverbosity));
   cmd.addVar("THREADS_COMP_PAR",
-             par.createParameterString(par.threadsandcompression));
+             par.createParameterString(out, par.threadsandcompression));
   cmd.addVar("VERB_COMP_PAR",
-             par.createParameterString(par.verbandcompression));
+             par.createParameterString(out, par.verbandcompression));
   if (isUngappedMode) {
     cmd.addVar("ALIGN_MODULE", "rescorediagonal");
     align_module = "rescorediagonal";
@@ -653,54 +653,54 @@ int search(mmseqs_output *out, Parameters &par) {
     par.evalThr *= ((float)queryDbSize) / targetDbSize;
 
     int originalCovMode = par.covMode;
-    par.covMode = Util::swapCoverageMode(par.covMode);
+    par.covMode = Util::swapCoverageMode(out, par.covMode);
     size_t maxResListLen = par.maxResListLen;
     par.maxResListLen = INT_MAX;
-    cmd.addVar("PREFILTER_PAR", par.createParameterString(par.prefilter));
+    cmd.addVar("PREFILTER_PAR", par.createParameterString(out, par.prefilter));
     par.maxResListLen = maxResListLen;
     double originalEvalThr = par.evalThr;
     par.evalThr = std::numeric_limits<double>::max();
-    cmd.addVar("SWAP_PAR", par.createParameterString(par.swapresult));
+    cmd.addVar("SWAP_PAR", par.createParameterString(out, par.swapresult));
     par.evalThr = originalEvalThr;
     if (isUngappedMode) {
       par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
       cmd.addVar("ALIGNMENT_PAR",
-                 par.createParameterString(par.rescorediagonal));
+                 par.createParameterString(out, par.rescorediagonal));
       par.rescoreMode = originalRescoreMode;
     } else {
-      cmd.addVar("ALIGNMENT_PAR", par.createParameterString(par.align));
+      cmd.addVar("ALIGNMENT_PAR", par.createParameterString(out, par.align));
     }
-    cmd.addVar("SORTRESULT_PAR", par.createParameterString(par.sortresult));
+    cmd.addVar("SORTRESULT_PAR", par.createParameterString(out, par.sortresult));
     par.covMode = originalCovMode;
 
     program = tmpDir + "/searchslicedtargetprofile.sh";
     FileUtil::writeFile(out, program, searchslicedtargetprofile_sh,
                         searchslicedtargetprofile_sh_len);
   } else if (searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_PROFILE) {
-    cmd.addVar("PREFILTER_PAR", par.createParameterString(par.prefilter));
+    cmd.addVar("PREFILTER_PAR", par.createParameterString(out, par.prefilter));
     // we need to align all hits in case of target Profile hits
     size_t maxResListLen = par.maxResListLen;
     par.maxResListLen = INT_MAX;
     int originalCovMode = par.covMode;
-    par.covMode = Util::swapCoverageMode(par.covMode);
+    par.covMode = Util::swapCoverageMode(out, par.covMode);
     if (isUngappedMode) {
       par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
       cmd.addVar("ALIGNMENT_PAR",
-                 par.createParameterString(par.rescorediagonal));
+                 par.createParameterString(out, par.rescorediagonal));
       par.rescoreMode = originalRescoreMode;
     } else {
-      cmd.addVar("ALIGNMENT_PAR", par.createParameterString(par.align));
+      cmd.addVar("ALIGNMENT_PAR", par.createParameterString(out, par.align));
     }
     par.covMode = originalCovMode;
     par.maxResListLen = maxResListLen;
-    cmd.addVar("SWAP_PAR", par.createParameterString(par.swapresult));
+    cmd.addVar("SWAP_PAR", par.createParameterString(out, par.swapresult));
     FileUtil::writeFile(out, tmpDir + "/searchtargetprofile.sh",
                         searchtargetprofile_sh, searchtargetprofile_sh_len);
     program = std::string(tmpDir + "/searchtargetprofile.sh");
   } else if (par.numIterations > 1) {
     cmd.addVar("NUM_IT", SSTR(par.numIterations));
-    cmd.addVar("SUBSTRACT_PAR", par.createParameterString(par.subtractdbs));
-    cmd.addVar("VERBOSITY_PAR", par.createParameterString(par.onlyverbosity));
+    cmd.addVar("SUBSTRACT_PAR", par.createParameterString(out, par.subtractdbs));
+    cmd.addVar("VERBOSITY_PAR", par.createParameterString(out, par.onlyverbosity));
 
     double originalEval = par.evalThr;
     par.evalThr =
@@ -721,19 +721,19 @@ int search(mmseqs_output *out, Parameters &par) {
       }
 
       cmd.addVar(std::string("PREFILTER_PAR_" + SSTR(i)),
-                 par.createParameterString(par.prefilter));
+                 par.createParameterString(out, par.prefilter));
       if (isUngappedMode) {
         par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
         cmd.addVar(std::string("ALIGNMENT_PAR_" + SSTR(i)),
-                   par.createParameterString(par.rescorediagonal));
+                   par.createParameterString(out, par.rescorediagonal));
         par.rescoreMode = originalRescoreMode;
       } else {
         cmd.addVar(std::string("ALIGNMENT_PAR_" + SSTR(i)),
-                   par.createParameterString(par.align));
+                   par.createParameterString(out, par.align));
       }
       par.pca = 0.0;
       cmd.addVar(std::string("PROFILE_PAR_" + SSTR(i)),
-                 par.createParameterString(par.result2profile));
+                 par.createParameterString(out, par.result2profile));
       par.pca = 1.0;
     }
 
@@ -775,14 +775,14 @@ int search(mmseqs_output *out, Parameters &par) {
         prefilterWithoutS.push_back(par.prefilter[i]);
       }
     }
-    cmd.addVar("PREFILTER_PAR", par.createParameterString(prefilterWithoutS));
+    cmd.addVar("PREFILTER_PAR", par.createParameterString(out, prefilterWithoutS));
     if (isUngappedMode) {
       par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
       cmd.addVar("ALIGNMENT_PAR",
-                 par.createParameterString(par.rescorediagonal));
+                 par.createParameterString(out, par.rescorediagonal));
       par.rescoreMode = originalRescoreMode;
     } else {
-      cmd.addVar("ALIGNMENT_PAR", par.createParameterString(par.align));
+      cmd.addVar("ALIGNMENT_PAR", par.createParameterString(out, par.align));
     }
     FileUtil::writeFile(out, tmpDir + "/blastp.sh", blastp_sh, blastp_sh_len);
     program = std::string(tmpDir + "/blastp.sh");
@@ -802,13 +802,13 @@ int search(mmseqs_output *out, Parameters &par) {
                    ? "TRUE"
                    : "");
     cmd.addVar("THREAD_COMP_PAR",
-               par.createParameterString(par.threadsandcompression).c_str());
+               par.createParameterString(out, par.threadsandcompression).c_str());
     par.subDbMode = 1;
-    cmd.addVar("CREATESUBDB_PAR", par.createParameterString(par.createsubdb));
+    cmd.addVar("CREATESUBDB_PAR", par.createParameterString(out, par.createsubdb));
     par.translate = 1;
-    cmd.addVar("ORF_PAR", par.createParameterString(par.extractorfs));
+    cmd.addVar("ORF_PAR", par.createParameterString(out, par.extractorfs));
     cmd.addVar("OFFSETALIGNMENT_PAR",
-               par.createParameterString(par.offsetalignment));
+               par.createParameterString(out, par.offsetalignment));
     cmd.addVar("SEARCH", program);
     search_prog = program;
     program = std::string(tmpDir + "/translated_search.sh");
@@ -835,7 +835,7 @@ int search(mmseqs_output *out, Parameters &par) {
         break;
     }
     cmd.addVar("SPLITSEQUENCE_PAR",
-               par.createParameterString(par.splitsequence));
+               par.createParameterString(out, par.splitsequence));
     if (indexStr == "") {
       cmd.addVar("NEEDTARGETSPLIT", "TRUE");
       needTargetSplit = true;
@@ -843,9 +843,9 @@ int search(mmseqs_output *out, Parameters &par) {
     cmd.addVar("NEEDQUERYSPLIT", "TRUE");
     need_query_split = true;
     cmd.addVar("EXTRACT_FRAMES_PAR",
-               par.createParameterString(par.extractframes));
+               par.createParameterString(out, par.extractframes));
     cmd.addVar("OFFSETALIGNMENT_PAR",
-               par.createParameterString(par.offsetalignment));
+               par.createParameterString(out, par.offsetalignment));
     cmd.addVar("SEARCH", program);
     search_prog = program;
     program = std::string(tmpDir + "/blastn.sh");

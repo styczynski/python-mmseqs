@@ -53,7 +53,7 @@ int easyrbh(mmseqs_output* out, Parameters& par) {
     bool needFullHeaders = false;
     bool needLookup = false;
     bool needSource = false;
-    Parameters::getOutputFormat(par.formatAlignmentMode, par.outfmt,
+    Parameters::getOutputFormat(out, par.formatAlignmentMode, par.outfmt,
                                 needSequenceDB, needBacktrace, needFullHeaders,
                                 needLookup, needSource, needTaxonomyMapping,
                                 needTaxonomy);
@@ -79,7 +79,7 @@ int easyrbh(mmseqs_output* out, Parameters& par) {
   tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   cmd.addVariable("TMP_PATH", tmpDir.c_str());
   cmd.addVariable("RESULTS", par.filenames.back().c_str());
   par.filenames.pop_back();
@@ -89,9 +89,9 @@ int easyrbh(mmseqs_output* out, Parameters& par) {
 
   if (needTaxonomy || needTaxonomyMapping) {
     std::vector<std::string> missingFiles =
-        Parameters::findMissingTaxDbFiles(target);
+        Parameters::findMissingTaxDbFiles(out, target);
     if (missingFiles.empty() == false) {
-      Parameters::printTaxDbError(target, missingFiles);
+      Parameters::printTaxDbError(out, target, missingFiles);
       EXIT(EXIT_FAILURE);
     }
   }
@@ -99,21 +99,21 @@ int easyrbh(mmseqs_output* out, Parameters& par) {
   cmd.addVariable("QUERY", par.filenames.back().c_str());
 
   cmd.addVariable("SEARCH_PAR",
-                  par.createParameterString(par.searchworkflow, true).c_str());
+                  par.createParameterString(out, par.searchworkflow, true).c_str());
   cmd.addVariable("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : NULL);
   cmd.addVariable("LEAVE_INPUT", par.dbOut ? "TRUE" : NULL);
 
   cmd.addVariable("RUNNER", par.runner.c_str());
   cmd.addVariable("VERBOSITY",
-                  par.createParameterString(par.onlyverbosity).c_str());
+                  par.createParameterString(out, par.onlyverbosity).c_str());
 
   cmd.addVariable("CREATEDB_QUERY_PAR",
-                  par.createParameterString(par.createdb).c_str());
+                  par.createParameterString(out, par.createdb).c_str());
   par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_HARD;
   cmd.addVariable("CREATEDB_PAR",
-                  par.createParameterString(par.createdb).c_str());
+                  par.createParameterString(out, par.createdb).c_str());
   cmd.addVariable("CONVERT_PAR",
-                  par.createParameterString(par.convertalignments).c_str());
+                  par.createParameterString(out, par.convertalignments).c_str());
 
   std::string program = tmpDir + "/easyrbh.sh";
   FileUtil::writeFile(out, program, easyrbh_sh, easyrbh_sh_len);

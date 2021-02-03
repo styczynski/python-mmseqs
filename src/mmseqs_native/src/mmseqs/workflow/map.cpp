@@ -44,7 +44,7 @@ int map(mmseqs_output *out, Parameters &par) {
 
   std::string tmpDir = par.db4;
   std::string hash = SSTR(
-      par.hashParameter(par.databases_types, par.filenames, par.mapworkflow));
+      par.hashParameter(out, par.databases_types, par.filenames, par.mapworkflow));
   if (par.reuseLatest) {
     hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
@@ -52,13 +52,13 @@ int map(mmseqs_output *out, Parameters &par) {
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   cmd.addVariable("RUNNER", par.runner.c_str());
 
   par.mapworkflow.push_back(&(par.PARAM_ALIGNMENT_MODE));
   par.alignmentMode = 4;
   cmd.addVariable("SEARCH_PAR",
-                  par.createParameterString(par.mapworkflow).c_str());
+                  par.createParameterString(out, par.mapworkflow).c_str());
 
   std::string program = tmpDir + "/map.sh";
   FileUtil::writeFile(out, program, map_sh, map_sh_len);

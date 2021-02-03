@@ -36,7 +36,7 @@ int linclust(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   std::string tmpDir = par.db3;
-  std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames,
+  std::string hash = SSTR(par.hashParameter(out, par.databases_types, par.filenames,
                                             par.linclustworkflow));
   if (par.reuseLatest) {
     hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
@@ -45,7 +45,7 @@ int linclust(mmseqs_output *out, Parameters &par) {
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   cmd.addVariable("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : NULL);
   cmd.addVariable("RUNNER", par.runner.c_str());
 
@@ -110,11 +110,11 @@ int linclust(mmseqs_output *out, Parameters &par) {
       Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_AMINO_ACIDS) ? "1"
                                                                         : NULL);
   cmd.addVariable("KMERMATCHER_PAR",
-                  par.createParameterString(par.kmermatcher).c_str());
+                  par.createParameterString(out, par.kmermatcher).c_str());
   cmd.addVariable("VERBOSITY",
-                  par.createParameterString(par.onlyverbosity).c_str());
+                  par.createParameterString(out, par.onlyverbosity).c_str());
   cmd.addVariable("VERBOSITYANDCOMPRESS",
-                  par.createParameterString(par.threadsandcompression).c_str());
+                  par.createParameterString(out, par.threadsandcompression).c_str());
 
   par.alphabetSize = alphabetSize;
   par.kmerSize = kmerSize;
@@ -130,7 +130,7 @@ int linclust(mmseqs_output *out, Parameters &par) {
   float prevCov = par.covThr;
   par.covThr = std::max(0.5f, par.covThr);
   cmd.addVariable("HAMMING_PAR",
-                  par.createParameterString(par.rescorediagonal).c_str());
+                  par.createParameterString(out, par.rescorediagonal).c_str());
   // set it back to old value
   par.covThr = prevCov;
   par.seqIdThr = prevSeqId;
@@ -139,23 +139,23 @@ int linclust(mmseqs_output *out, Parameters &par) {
   // # 3. Ungapped alignment filtering
   par.filterHits = true;
   cmd.addVariable("UNGAPPED_ALN_PAR",
-                  par.createParameterString(par.rescorediagonal).c_str());
+                  par.createParameterString(out, par.rescorediagonal).c_str());
 
   // # 4. Local gapped sequence alignment.
   if (isUngappedMode) {
     const int originalRescoreMode = par.rescoreMode;
     par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
     cmd.addVariable("ALIGNMENT_PAR",
-                    par.createParameterString(par.rescorediagonal).c_str());
+                    par.createParameterString(out, par.rescorediagonal).c_str());
     par.rescoreMode = originalRescoreMode;
   } else {
     cmd.addVariable("ALIGNMENT_PAR",
-                    par.createParameterString(par.align).c_str());
+                    par.createParameterString(out, par.align).c_str());
   }
   // # 5. Clustering using greedy set cover.
-  cmd.addVariable("CLUSTER_PAR", par.createParameterString(par.clust).c_str());
+  cmd.addVariable("CLUSTER_PAR", par.createParameterString(out, par.clust).c_str());
   cmd.addVariable("MERGECLU_PAR",
-                  par.createParameterString(par.threadsandcompression).c_str());
+                  par.createParameterString(out, par.threadsandcompression).c_str());
 
   std::string program = tmpDir + "/linclust.sh";
   FileUtil::writeFile(out, program, linclust_sh, linclust_sh_len);

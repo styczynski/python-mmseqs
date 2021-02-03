@@ -250,8 +250,7 @@ add_subdirectory(src/mmseqs_native/src)
 # endif ()
 
 
-file(GLOB BINDINGS_COMMON_SRCS "src/mmseqs_native/src/mmseqs/commons/*.cpp"
-                               "src/mmseqs_native/src/mmseqs/*.cpp")
+file(GLOB BINDINGS_COMMON_SRCS "src/mmseqs_native/src/mmseqs/*.cpp")
 
 # Generate python module
 

@@ -16,7 +16,7 @@
 #include <omp.h>
 #endif
 
-int doswap(Parameters &par, bool isGeneralMode) {
+int doswap(mmseqs_output* out, Parameters &par, bool isGeneralMode) {
   const char *parResultDb;
   const char *parResultDbIndex;
   const char *parOutDb;
@@ -75,11 +75,11 @@ int doswap(Parameters &par, bool isGeneralMode) {
     resultReader.close();
   } else {
     bool touch = (par.preloadMode != Parameters::PRELOAD_MODE_MMAP);
-    IndexReader query(par.db1, par.threads, IndexReader::SEQUENCES,
+    IndexReader query(out, par.db1, par.threads, IndexReader::SEQUENCES,
                       (touch) ? IndexReader::PRELOAD_INDEX : 0);
     aaResSize = query.sequenceReader->getAminoAcidDBSize();
 
-    IndexReader target(par.db2, par.threads, IndexReader::SEQUENCES,
+    IndexReader target(out, par.db2, par.threads, IndexReader::SEQUENCES,
                        (touch) ? IndexReader::PRELOAD_INDEX : 0);
     maxTargetId = target.sequenceReader->getLastKey();
 
@@ -94,17 +94,17 @@ int doswap(Parameters &par, bool isGeneralMode) {
     if (Parameters::isEqualDbtype(target.getDbtype(),
                                   Parameters::DBTYPE_NUCLEOTIDES)) {
       subMat =
-          new NucleotideMatrix(par.scoringMatrixFile.nucleotides, 1.0, 0.0);
+          new NucleotideMatrix(out, par.scoringMatrixFile.nucleotides, 1.0, 0.0);
       gapOpen = par.gapOpen.nucleotides;
       gapExtend = par.gapExtend.nucleotides;
     } else {
       // keep score bias at 0.0 (improved ROC)
       subMat =
-          new SubstitutionMatrix(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+          new SubstitutionMatrix(out, par.scoringMatrixFile.aminoacids, 2.0, 0.0);
       gapOpen = par.gapOpen.aminoacids;
       gapExtend = par.gapExtend.aminoacids;
     }
-    evaluer = new EvalueComputation(aaResSize, subMat, gapOpen, gapExtend);
+    evaluer = new EvalueComputation(out, aaResSize, subMat, gapOpen, gapExtend);
   }
 
   DBReader<unsigned int> resultDbr(
@@ -153,7 +153,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
   }
 
   // memoryLimit in bytes
-  size_t memoryLimit = Util::computeMemory(par.splitMemoryLimit);
+  size_t memoryLimit = Util::computeMemory(out, par.splitMemoryLimit);
 
   size_t bytesForTargetElements = sizeof(size_t) * (maxTargetId + 2);
   memoryLimit = (memoryLimit > bytesForTargetElements)
@@ -173,7 +173,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
     }
   }
   splits.push_back(std::make_pair(maxTargetId, bytesToWrite));
-  AlignmentSymmetry::computeOffsetFromCounts(targetElementSize,
+  AlignmentSymmetry::computeOffsetFromCounts(out, targetElementSize,
                                              maxTargetId + 1);
 
   const char empty = '\0';
@@ -184,8 +184,8 @@ int doswap(Parameters &par, bool isGeneralMode) {
     unsigned int dbKeyToWrite = splits[split].first;
     size_t bytesToWrite = splits[split].second;
     char *tmpData = new char[bytesToWrite];
-    Util::checkAllocation(tmpData, "Can not allocate tmpData memory in doswap");
-    out->info("\nReading results.");
+    Util::checkAllocation(out, tmpData, "Can not allocate tmpData memory in doswap");
+    out->info("Reading results.");
     Log::Progress progress(resultSize);
 #pragma omp parallel
     {
@@ -233,7 +233,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
     }
     targetElementSize[0] = 0;
 
-    out->info("\nOutput database: {}\n", parOutDbStr);
+    out->info("Output database: {}", parOutDbStr);
     bool isAlignmentResult = false;
     bool hasBacktrace = false;
     const char *entry[255];
@@ -255,7 +255,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
     splitFileNames.push_back(splitNamePair);
     Log::Progress progress2(dbKeyToWrite - prevDbKeyToWrite + 1);
 
-    DBWriter resultWriter(splitNamePair.first.c_str(),
+    DBWriter resultWriter(out, splitNamePair.first.c_str(),
                           splitNamePair.second.c_str(), par.threads,
                           par.compressed, resultDbr.getDbtype());
     resultWriter.open();
@@ -292,7 +292,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
         bool evalBreak = false;
         while (dataSize > 0) {
           if (isAlignmentResult) {
-            Matcher::result_t res = Matcher::parseAlignmentRecord(data, true);
+            Matcher::result_t res = Matcher::parseAlignmentRecord(out, data, true);
             Matcher::result_t::swapResult(res, *evaluer, hasBacktrace);
             if (res.eval > par.evalThr) {
               evalBreak = true;
@@ -300,7 +300,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
               curRes.emplace_back(res);
             }
           } else {
-            hit_t hit = QueryMatcher::parsePrefilterHit(data);
+            hit_t hit = QueryMatcher::parsePrefilterHit(out, data);
             hit.diagonal = static_cast<unsigned short>(
                 static_cast<short>(hit.diagonal) * -1);
             curRes.emplace_back(hit.seqId, hit.prefScore, 0, 0, 0,
@@ -343,7 +343,6 @@ int doswap(Parameters &par, bool isGeneralMode) {
         }
       }
     };
-    out->info("\n");
     if (splits.size() > 1) {
       resultWriter.close(true);
     } else {
@@ -355,7 +354,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
     delete[] tmpData;
   }
   if (splits.size() > 1) {
-    DBWriter::mergeResults(parOutDbStr, parOutDbIndexStr, splitFileNames);
+    DBWriter::mergeResults(out, parOutDbStr, parOutDbIndexStr, splitFileNames);
   }
 
   if (evaluer != NULL) {
@@ -377,9 +376,9 @@ int doswap(Parameters &par, bool isGeneralMode) {
 int swapdb(mmseqs_output *out, Parameters &par) {
   //    Parameters &par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true, 0, 0);
-  return doswap(par, true);
+  return doswap(out, par, true);
 }
 
 int swapresults(mmseqs_output *out, Parameters &par) {
-  return doswap(par, false);
+  return doswap(out, par, false);
 }

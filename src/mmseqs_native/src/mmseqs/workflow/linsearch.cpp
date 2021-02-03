@@ -34,14 +34,14 @@ void setLinsearchDefaults(Parameters *p) {
 
 int linsearch(mmseqs_output *out, Parameters &par) {
   const int queryDbType = FileUtil::parseDbType(out, par.db1.c_str());
-  std::string indexStr = LinsearchIndexReader::searchForIndex(par.db2);
+  std::string indexStr = LinsearchIndexReader::searchForIndex(out, par.db2);
   if (indexStr.empty()) {
     out->failure("Database {} needs to be index: createlinindex {}", par.db2, par.db2);
   }
   int targetDbType = 0;
   if (indexStr != "") {
     DBReader<unsigned int> dbr(
-        indexStr.c_str(), (indexStr + ".index").c_str(), par.threads,
+        out, indexStr.c_str(), (indexStr + ".index").c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     dbr.open(DBReader<unsigned int>::NOSORT);
     PrefilteringIndexData data = PrefilteringIndexReader::getMetadata(&dbr);
@@ -90,7 +90,7 @@ int linsearch(mmseqs_output *out, Parameters &par) {
   // par.printParameters(command.cmd, argc, argv, par.searchworkflow);
 
   std::string tmpDir = par.db4;
-  std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames,
+  std::string hash = SSTR(par.hashParameter(out, par.databases_types, par.filenames,
                                             par.linsearchworkflow));
   if (par.reuseLatest) {
     hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
@@ -99,7 +99,7 @@ int linsearch(mmseqs_output *out, Parameters &par) {
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   cmd.addVariable("FILTER", "1");
   int oldCovMode = par.covMode;
   par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
@@ -109,20 +109,20 @@ int linsearch(mmseqs_output *out, Parameters &par) {
   float oldCov = par.covThr;
   par.covThr = std::max(par.covThr, 0.9f);
   cmd.addVariable("RESCORE_FILTER_PAR",
-                  par.createParameterString(par.rescorediagonal).c_str());
+                  par.createParameterString(out, par.rescorediagonal).c_str());
   par.covMode = oldCovMode;
   par.covThr = oldCov;
 
   cmd.addVariable("ALIGN_MODULE", isUngappedMode ? "rescorediagonal" : "align");
   cmd.addVariable("KMERSEARCH_PAR",
-                  par.createParameterString(par.kmersearch).c_str());
+                  par.createParameterString(out, par.kmersearch).c_str());
   double oldEval = par.evalThr;
   par.evalThr = 100000;
   cmd.addVariable("ALIGNMENT_PAR",
-                  par.createParameterString(par.align).c_str());
+                  par.createParameterString(out, par.align).c_str());
   par.evalThr = oldEval;
   cmd.addVariable("SWAPRESULT_PAR",
-                  par.createParameterString(par.swapresult).c_str());
+                  par.createParameterString(out, par.swapresult).c_str());
   cmd.addVariable("NUCL", isNuclSearch ? "1" : NULL);
 
   std::string program = tmpDir + "/linsearch.sh";
@@ -142,11 +142,11 @@ int linsearch(mmseqs_output *out, Parameters &par) {
             : NULL);
     par.translate = 1;
     cmd.addVariable("ORF_PAR",
-                    par.createParameterString(par.extractorfs).c_str());
+                    par.createParameterString(out, par.extractorfs).c_str());
     cmd.addVariable("OFFSETALIGNMENT_PAR",
-                    par.createParameterString(par.offsetalignment).c_str());
+                    par.createParameterString(out, par.offsetalignment).c_str());
     cmd.addVariable("TRANSLATE_PAR",
-                    par.createParameterString(par.translatenucs).c_str());
+                    par.createParameterString(out, par.translatenucs).c_str());
     cmd.addVariable("SEARCH", program.c_str());
     program = std::string(tmpDir + "/translated_search.sh");
     FileUtil::writeFile(out, program, Linsearch::translated_search_sh,

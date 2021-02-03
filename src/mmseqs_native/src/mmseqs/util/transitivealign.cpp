@@ -33,10 +33,10 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
 
   BaseMatrix *subMat;
   if (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_NUCLEOTIDES)) {
-    subMat = new NucleotideMatrix(par.scoringMatrixFile.nucleotides, 1.0, 0.0);
+    subMat = new NucleotideMatrix(out, par.scoringMatrixFile.nucleotides, 1.0, 0.0);
   } else {
     // keep score bias at 0.0 (improved ROC)
-    subMat = new SubstitutionMatrix(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+    subMat = new SubstitutionMatrix(out, par.scoringMatrixFile.aminoacids, 2.0, 0.0);
   }
 
   DBReader<unsigned int> alnReader(
@@ -49,11 +49,11 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
 
   std::string tmpRes = par.db3 + ".tmp";
   std::string tmpResIndex = par.db3 + ".tmp.index";
-  DBWriter resultWriter(tmpRes.c_str(), tmpResIndex.c_str(), par.threads,
+  DBWriter resultWriter(out, tmpRes.c_str(), tmpResIndex.c_str(), par.threads,
                         par.compressed, Parameters::DBTYPE_ALIGNMENT_RES);
   resultWriter.open();
 
-  EvalueComputation evaluer(sequenceDbr.getAminoAcidDBSize(), subMat,
+  EvalueComputation evaluer(out, sequenceDbr.getAminoAcidDBSize(), subMat,
                             par.gapOpen.aminoacids, par.gapExtend.aminoacids);
   const size_t flushSize = 100000000;
   size_t iterations =
@@ -71,17 +71,12 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
       thread_idx = (unsigned int)omp_get_thread_num();
 #endif
 
-      Matcher matcher(querySeqType, par.maxSeqLen, subMat, &evaluer,
+      Matcher matcher(out, querySeqType, par.maxSeqLen, subMat, &evaluer,
                       par.compBiasCorrection, par.gapOpen.aminoacids,
                       par.gapExtend.aminoacids, par.zdrop);
 
-      //            Sequence query(par.maxSeqLen, targetSeqType, subMat,
-      //            par.kmerSize, par.spacedKmer, par.compBiasCorrection);
-      //            Sequence target(par.maxSeqLen, targetSeqType, subMat,
-      //            par.kmerSize, par.spacedKmer, par.compBiasCorrection);
-
       char *buffer = new char[1024 + 32768 * 4];
-      BacktraceTranslator btTranslate;
+      BacktraceTranslator btTranslate(out);
       std::vector<Matcher::result_t> results;
       results.reserve(300);
       std::vector<Matcher::result_t> outputResults;
@@ -95,7 +90,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
         char *data = alnReader.getData(id, thread_idx);
 
         results.clear();
-        Matcher::readAlignmentResults(results, data, false);
+        Matcher::readAlignmentResults(out, results, data, false);
         resultWriter.writeStart(thread_idx);
         for (size_t entryIdx_i = 0; entryIdx_i < results.size(); entryIdx_i++) {
           const unsigned int queryId =
@@ -240,7 +235,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
   }
 
   // memoryLimit in bytes
-  size_t memoryLimit = Util::computeMemory(par.splitMemoryLimit);
+  size_t memoryLimit = Util::computeMemory(out, par.splitMemoryLimit);
 
   // compute splits
   std::vector<std::pair<unsigned int, size_t> > splits;
@@ -255,7 +250,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
     }
   }
   splits.push_back(std::make_pair(maxTargetId, bytesToWrite));
-  AlignmentSymmetry::computeOffsetFromCounts(targetElementSize,
+  AlignmentSymmetry::computeOffsetFromCounts(out, targetElementSize,
                                              maxTargetId + 1);
 
   std::string parOutDbStr(par.db3);
@@ -267,9 +262,9 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
     unsigned int dbKeyToWrite = splits[split].first;
     size_t bytesToWrite = splits[split].second;
     char *tmpData = new char[bytesToWrite];
-    Util::checkAllocation(tmpData,
+    Util::checkAllocation(out, tmpData,
                           "Could not allocate tmpData memory in doswap");
-    out->info("\nReading results.");
+    out->info("Reading results");
 #pragma omp parallel
     {
       int thread_idx = 0;
@@ -322,7 +317,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
                             : std::make_pair(par.db3, par.db3Index);
     splitFileNames.push_back(splitNamePair);
 
-    DBWriter resultWriter(splitNamePair.first.c_str(),
+    DBWriter resultWriter(out, splitNamePair.first.c_str(),
                           splitNamePair.second.c_str(), par.threads,
                           par.compressed, resultDbr.getDbtype());
     resultWriter.open();
@@ -365,7 +360,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
   DBReader<unsigned int>::removeDb(out, tmpRes);
 
   if (splits.size() > 1) {
-    DBWriter::mergeResults(parOutDbStr, parOutDbIndexStr, splitFileNames);
+    DBWriter::mergeResults(out, parOutDbStr, parOutDbIndexStr, splitFileNames);
   }
 
   sequenceDbr.close();

@@ -62,7 +62,7 @@ int easycluster(mmseqs_output *out, Parameters &par) {
   tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   cmd.addVariable("TMP_PATH", tmpDir.c_str());
   cmd.addVariable("RESULTS", par.filenames.back().c_str());
   par.filenames.pop_back();
@@ -70,16 +70,16 @@ int easycluster(mmseqs_output *out, Parameters &par) {
 
   cmd.addVariable("RUNNER", par.runner.c_str());
   cmd.addVariable("CREATEDB_PAR",
-                  par.createParameterString(par.createdb).c_str());
+                  par.createParameterString(out, par.createdb).c_str());
   cmd.addVariable("CLUSTER_PAR",
-                  par.createParameterString(par.clusterworkflow, true).c_str());
+                  par.createParameterString(out, par.clusterworkflow, true).c_str());
   cmd.addVariable("CLUSTER_MODULE", "cluster");
   cmd.addVariable("RESULT2REPSEQ_PAR",
-                  par.createParameterString(par.result2repseq).c_str());
+                  par.createParameterString(out, par.result2repseq).c_str());
   cmd.addVariable("THREADS_PAR",
-                  par.createParameterString(par.onlythreads).c_str());
+                  par.createParameterString(out, par.onlythreads).c_str());
   cmd.addVariable("VERBOSITY_PAR",
-                  par.createParameterString(par.onlyverbosity).c_str());
+                  par.createParameterString(out, par.onlyverbosity).c_str());
 
   std::string program = tmpDir + "/easycluster.sh";
   FileUtil::writeFile(out, program, easycluster_sh, easycluster_sh_len);

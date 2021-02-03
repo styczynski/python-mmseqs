@@ -62,8 +62,8 @@ int tar2db(mmseqs_output *out, Parameters &par) {
     }
   }
 
-  PatternCompiler include(par.tarInclude.c_str());
-  PatternCompiler exclude(par.tarExclude.c_str());
+  PatternCompiler include(out, par.tarInclude.c_str());
+  PatternCompiler exclude(out, par.tarExclude.c_str());
 
   std::string dataFile = filenames.back();
   filenames.pop_back();
@@ -75,7 +75,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
   std::string lookupFile = dataFile + ".lookup";
   FILE *lookup = FileUtil::openAndDelete(out, lookupFile.c_str(), "w");
 
-  DBWriter writer(dataFile.c_str(), indexFile.c_str(), par.threads,
+  DBWriter writer(out, dataFile.c_str(), indexFile.c_str(), par.threads,
                   par.compressed, par.outputDbType);
   writer.open();
   Log::Progress progress;
@@ -117,7 +117,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
 #ifdef HAVE_ZLIB
       const unsigned int CHUNK = 128 * 1024;
       unsigned char in[CHUNK];
-      unsigned char out[CHUNK];
+      unsigned char out_chunk[CHUNK];
       z_stream strm;
       memset(&strm, 0, sizeof(z_stream));
       strm.zalloc = Z_NULL;
@@ -187,7 +187,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
             do {
               unsigned have;
               strm.avail_out = CHUNK;
-              strm.next_out = out;
+              strm.next_out = out_chunk;
               int err = inflate(&strm, Z_NO_FLUSH);
               switch (err) {
                 case Z_OK:
@@ -199,7 +199,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
                   out->failure("Gzip error {} entry {}", err, header.name);
               }
               have = CHUNK - strm.avail_out;
-              writer.writeAdd((const char *)out, have, thread_idx);
+              writer.writeAdd((const char *)out_chunk, have, thread_idx);
             } while (strm.avail_out == 0);
             writer.writeEnd(currentKey, thread_idx);
 #else
@@ -216,7 +216,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
               inflateBuffer = (char *)realloc(inflateBuffer, inflateSize);
             }
             if (err != BZ_OK) {
-              out->failure("Could not decompress {}\n", header.name );
+              out->failure("Could not decompress {}", header.name);
             }
             writer.writeData(inflateBuffer, entrySize, currentKey, thread_idx);
 #else

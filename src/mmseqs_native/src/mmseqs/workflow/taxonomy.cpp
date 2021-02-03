@@ -57,7 +57,7 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
     par.taxonomySearchMode = Parameters::TAXONOMY_ACCEL_2BLCA;
   }
 
-  std::string indexStr = PrefilteringIndexReader::searchForIndex(par.db2);
+  std::string indexStr = PrefilteringIndexReader::searchForIndex(out, par.db2);
   int targetDbType = FileUtil::parseDbType(out, par.db2.c_str());
   std::string targetDB = (indexStr == "") ? par.db2.c_str() : indexStr.c_str();
   int targetSrcDbType = -1;
@@ -65,7 +65,7 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
       Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_INDEX_DB)) {
     indexStr = par.db2;
     DBReader<unsigned int> dbr(
-        targetDB.c_str(), (targetDB + ".index").c_str(), par.threads,
+        out, targetDB.c_str(), (targetDB + ".index").c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     dbr.open(DBReader<unsigned int>::NOSORT);
     PrefilteringIndexData data = PrefilteringIndexReader::getMetadata(&dbr);
@@ -89,7 +89,7 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
 
   std::string tmpDir = par.db4;
   std::string hash =
-      SSTR(par.hashParameter(par.databases_types, par.filenames, par.taxonomy));
+      SSTR(par.hashParameter(out, par.databases_types, par.filenames, par.taxonomy));
   if (par.reuseLatest) {
     hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
@@ -97,21 +97,21 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   std::string program;
   cmd.addVariable("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : NULL);
   cmd.addVariable("RUNNER", par.runner.c_str());
   cmd.addVariable("THREADS_COMP_PAR",
-                  par.createParameterString(par.threadsandcompression).c_str());
+                  par.createParameterString(out, par.threadsandcompression).c_str());
   cmd.addVariable("VERBOSITY",
-                  par.createParameterString(par.onlyverbosity).c_str());
+                  par.createParameterString(out, par.onlyverbosity).c_str());
 
   if (searchMode & Parameters::SEARCH_MODE_FLAG_QUERY_TRANSLATED &&
       !(searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_TRANSLATED)) {
     cmd.addVariable("TARGETDB_IDX", targetDB.c_str());
     par.translate = 1;
     cmd.addVariable("EXTRACT_ORFS_PAR",
-                    par.createParameterString(par.extractorfs).c_str());
+                    par.createParameterString(out, par.extractorfs).c_str());
     int showTaxLineageOrig = par.showTaxLineage;
     // never show lineage for the orfs
     par.showTaxLineage = 0;
@@ -120,13 +120,13 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
     par.taxonomyOutputMode = Parameters::TAXONOMY_OUTPUT_BOTH;
     par.PARAM_TAX_OUTPUT_MODE.wasSet = true;
     cmd.addVariable("TAXONOMY_PAR",
-                    par.createParameterString(par.taxonomy, true).c_str());
+                    par.createParameterString(out, par.taxonomy, true).c_str());
     par.showTaxLineage = showTaxLineageOrig;
     par.taxonomyOutputMode = taxonomyOutputMode;
     cmd.addVariable("AGGREGATETAX_PAR",
-                    par.createParameterString(par.aggregatetax).c_str());
+                    par.createParameterString(out, par.aggregatetax).c_str());
     cmd.addVariable("SWAPDB_PAR",
-                    par.createParameterString(par.swapdb).c_str());
+                    par.createParameterString(out, par.swapdb).c_str());
 
     cmd.addVariable(
         "ORF_FILTER",
@@ -136,16 +136,16 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
     par.diagonalScoring = false;
     par.maxResListLen = 1;
     cmd.addVariable("ORF_FILTER_PREFILTER",
-                    par.createParameterString(par.prefilter).c_str());
+                    par.createParameterString(out, par.prefilter).c_str());
 
     par.evalThr = par.orfFilterEval;
     par.rescoreMode = Parameters::RESCORE_MODE_ALIGNMENT;
     cmd.addVariable("ORF_FILTER_RESCOREDIAGONAL",
-                    par.createParameterString(par.rescorediagonal).c_str());
+                    par.createParameterString(out, par.rescorediagonal).c_str());
 
     par.subDbMode = Parameters::SUBDB_MODE_SOFT;
     cmd.addVariable("CREATESUBDB_PAR",
-                    par.createParameterString(par.createsubdb).c_str());
+                    par.createParameterString(out, par.createsubdb).c_str());
 
     program = tmpDir + "/taxpercontig.sh";
     FileUtil::writeFile(out, program, taxpercontig_sh, taxpercontig_sh_len);
@@ -159,17 +159,17 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
     }
     cmd.addVariable(
         "SEARCH_PAR",
-        par.createParameterString(par.searchworkflow, true).c_str());
+        par.createParameterString(out, par.searchworkflow, true).c_str());
 
     program = tmpDir + "/taxonomy.sh";
     FileUtil::writeFile(out, program.c_str(), taxonomy_sh, taxonomy_sh_len);
   }
   if (par.taxonomyOutputMode == Parameters::TAXONOMY_OUTPUT_LCA) {
     cmd.addVariable("TAX_OUTPUT", "0");
-    cmd.addVariable("LCA_PAR", par.createParameterString(par.lca).c_str());
+    cmd.addVariable("LCA_PAR", par.createParameterString(out, par.lca).c_str());
   } else if (par.taxonomyOutputMode == Parameters::TAXONOMY_OUTPUT_BOTH) {
     cmd.addVariable("TAX_OUTPUT", "2");
-    cmd.addVariable("LCA_PAR", par.createParameterString(par.lca).c_str());
+    cmd.addVariable("LCA_PAR", par.createParameterString(out, par.lca).c_str());
   } else {
     cmd.addVariable("TAX_OUTPUT", "1");
   }

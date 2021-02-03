@@ -53,7 +53,7 @@ int easytaxonomy(mmseqs_output *out, Parameters &par) {
   tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   cmd.addVariable("RESULTS", par.filenames.back().c_str());
   par.filenames.pop_back();
   cmd.addVariable("TARGET", par.filenames.back().c_str());
@@ -62,29 +62,29 @@ int easytaxonomy(mmseqs_output *out, Parameters &par) {
   cmd.addVariable("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : NULL);
   cmd.addVariable("RUNNER", par.runner.c_str());
   cmd.addVariable("VERBOSITY",
-                  par.createParameterString(par.onlyverbosity).c_str());
+                  par.createParameterString(out, par.onlyverbosity).c_str());
 
   par.taxonomyOutputMode = Parameters::TAXONOMY_OUTPUT_BOTH;
   par.PARAM_TAX_OUTPUT_MODE.wasSet = true;
   cmd.addVariable("TAXONOMY_PAR",
-                  par.createParameterString(par.taxonomy, true).c_str());
+                  par.createParameterString(out, par.taxonomy, true).c_str());
   cmd.addVariable("CREATEDB_QUERY_PAR",
-                  par.createParameterString(par.createdb).c_str());
-  cmd.addVariable("LCA_PAR", par.createParameterString(par.lca).c_str());
+                  par.createParameterString(out, par.createdb).c_str());
+  cmd.addVariable("LCA_PAR", par.createParameterString(out, par.lca).c_str());
   cmd.addVariable("CONVERT_PAR",
-                  par.createParameterString(par.convertalignments).c_str());
+                  par.createParameterString(out, par.convertalignments).c_str());
   cmd.addVariable("TAXONOMYREPORT_PAR",
-                  par.createParameterString(par.taxonomyreport).c_str());
+                  par.createParameterString(out, par.taxonomyreport).c_str());
   cmd.addVariable("CREATETSV_PAR",
-                  par.createParameterString(par.createtsv).c_str());
+                  par.createParameterString(out, par.createtsv).c_str());
   par.evalThr = FLT_MAX;
   cmd.addVariable("SWAPRESULT_PAR",
-                  par.createParameterString(par.swapresult).c_str());
+                  par.createParameterString(out, par.swapresult).c_str());
   par.pickIdFrom = 1;
   cmd.addVariable("ADDTAXONOMY_PAR",
-                  par.createParameterString(par.addtaxonomy).c_str());
+                  par.createParameterString(out, par.addtaxonomy).c_str());
   cmd.addVariable("THREADS_COMP_PAR",
-                  par.createParameterString(par.threadsandcompression).c_str());
+                  par.createParameterString(out, par.threadsandcompression).c_str());
   FileUtil::writeFile(out, tmpDir + "/easy-taxonomy.sh", easytaxonomy_sh,
                       easytaxonomy_sh_len);
   std::string program(tmpDir + "/easy-taxonomy.sh");

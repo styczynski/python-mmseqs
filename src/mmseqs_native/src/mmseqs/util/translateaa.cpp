@@ -21,13 +21,13 @@ int translateaa(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                   par.compressed, Parameters::DBTYPE_NUCLEOTIDES);
   writer.open();
 
   TranslateNucl translateNucl(
-      static_cast<TranslateNucl::GenCode>(par.translationTable));
-  SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, -0.0f);
+      out, static_cast<TranslateNucl::GenCode>(par.translationTable));
+  SubstitutionMatrix subMat(out, par.scoringMatrixFile.aminoacids, 2.0f, -0.0f);
 
   char lookupAA[21][3];
   const char nucLookup[4] = {'A', 'C', 'G', 'T'};
@@ -68,7 +68,7 @@ int translateaa(mmseqs_output *out, Parameters &par) {
     char *aa = new char[(par.maxSeqLen + 1) / 3 + 3 + 1];
     std::string nucSeq;
     nucSeq.reserve(10000);
-    Sequence aaSequence(par.maxSeqLen + 1, Parameters::DBTYPE_AMINO_ACIDS,
+    Sequence aaSequence(out, par.maxSeqLen + 1, Parameters::DBTYPE_AMINO_ACIDS,
                         &subMat, 0, false, par.compBiasCorrection);
 
 #pragma omp for schedule(dynamic, 5)
