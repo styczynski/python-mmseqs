@@ -17,7 +17,7 @@ int translatenucs(mmseqs_output* out, Parameters& par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   DBReader<unsigned int> reader(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
@@ -25,7 +25,7 @@ int translatenucs(mmseqs_output* out, Parameters& par) {
   DBReader<unsigned int>* header = NULL;
   if (addOrfStop == true) {
     header = new DBReader<unsigned int>(
-        par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
+        out, par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     header->open(DBReader<unsigned int>::NOSORT);
   }
@@ -114,7 +114,7 @@ int translatenucs(mmseqs_output* out, Parameters& par) {
     delete[] aa;
   }
   writer.close(true);
-  DBReader<unsigned int>::softlinkDb(par.db1, par.db2,
+  DBReader<unsigned int>::softlinkDb(out, par.db1, par.db2,
                                      DBFiles::SEQUENCE_ANCILLARY);
 
   if (addOrfStop == true) {

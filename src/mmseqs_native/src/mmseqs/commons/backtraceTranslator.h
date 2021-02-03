@@ -1,11 +1,12 @@
 #ifndef BACKTRACE_TRANSLATOR_H
 #define BACKTRACE_TRANSLATOR_H
 
+#include <mmseqs/output.h>
 #include <mmseqs/alignment/matcher.h>
 
 class BacktraceTranslator {
  public:
-  BacktraceTranslator() {
+  BacktraceTranslator(mmseqs_output* output): out(output) {
     //  AB state, BC state -> AC state, increment in AB cigar, increment in BC
     //  cigar
 
@@ -161,6 +162,7 @@ class BacktraceTranslator {
   }
 
  private:
+  mmseqs_output* out;
   char transitions[3][3];
 
   enum State { M = 0, I, D };

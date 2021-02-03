@@ -34,11 +34,11 @@ int extractorfs(mmseqs_output* out, Parameters& par) {
   if (par.translate) {
     outputDbtype = Parameters::DBTYPE_AMINO_ACIDS;
   }
-  DBWriter sequenceWriter(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter sequenceWriter(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                           par.compressed, outputDbtype);
   sequenceWriter.open();
 
-  DBWriter headerWriter(par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
+  DBWriter headerWriter(out, par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
                         false, Parameters::DBTYPE_GENERIC_DB);
   headerWriter.open();
 
@@ -51,11 +51,11 @@ int extractorfs(mmseqs_output* out, Parameters& par) {
   const char newline = '\n';
   Log::Progress progress(reader.getSize());
   TranslateNucl translateNucl(
-      static_cast<TranslateNucl::GenCode>(par.translationTable));
+      out, static_cast<TranslateNucl::GenCode>(par.translationTable));
 
 #pragma omp parallel
   {
-    Orf orf(par.translationTable, par.useAllTableStarts);
+    Orf orf(out, par.translationTable, par.useAllTableStarts);
     int thread_idx = 0;
 #ifdef OPENMP
     thread_idx = omp_get_thread_num();
@@ -155,17 +155,17 @@ int extractorfs(mmseqs_output* out, Parameters& par) {
 #pragma omp single
     {
 #pragma omp task
-      { DBWriter::createRenumberedDB(par.hdr2, par.hdr2Index, "", ""); }
+      { DBWriter::createRenumberedDB(out, par.hdr2, par.hdr2Index, "", ""); }
 
 #pragma omp task
       {
-        DBWriter::createRenumberedDB(par.db2, par.db2Index,
+        DBWriter::createRenumberedDB(out, par.db2, par.db2Index,
                                      par.createLookup ? par.db1 : "",
                                      par.createLookup ? par.db1Index : "");
       }
     }
   }
-  DBReader<unsigned int>::softlinkDb(par.db1, par.db2, DBFiles::SOURCE);
+  DBReader<unsigned int>::softlinkDb(out, par.db1, par.db2, DBFiles::SOURCE);
 
   return EXIT_SUCCESS;
 }

@@ -34,7 +34,7 @@ int createseqfiledb(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   resultDb.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter writer(par.db3.c_str(), par.db3Index.c_str(),
+  DBWriter writer(out, par.db3.c_str(), par.db3Index.c_str(),
                   static_cast<unsigned int>(par.threads), par.compressed,
                   Parameters::DBTYPE_GENERIC_DB);
   writer.open();

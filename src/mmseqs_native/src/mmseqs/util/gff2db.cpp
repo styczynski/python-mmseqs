@@ -10,14 +10,14 @@ int gff2db(mmseqs_output *out, Parameters &par) {
   //    Parameters &par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
-  MemoryMapped file(par.db1, MemoryMapped::WholeFile,
+  MemoryMapped file(out, par.db1, MemoryMapped::WholeFile,
                     MemoryMapped::SequentialScan);
   if (!file.isValid()) {
     out->failure("Could not open GFF file {}", par.db1);
   }
   char *data = (char *)file.getData();
 
-  DBReader<unsigned int> reader(par.db2.c_str(), par.db2Index.c_str(), 1,
+  DBReader<unsigned int> reader(out, par.db2.c_str(), par.db2Index.c_str(), 1,
                                 DBReader<unsigned int>::USE_INDEX |
                                     DBReader<unsigned int>::USE_DATA |
                                     DBReader<unsigned int>::USE_LOOKUP_REV);
@@ -27,10 +27,10 @@ int gff2db(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   headerReader.open(DBReader<unsigned int>::NOSORT);
 
-  DBWriter writer(par.db3.c_str(), par.db3Index.c_str(), 1, par.compressed,
+  DBWriter writer(out, par.db3.c_str(), par.db3Index.c_str(), 1, par.compressed,
                   Parameters::DBTYPE_NUCLEOTIDES);
   writer.open();
-  DBWriter headerWriter(par.hdr3.c_str(), par.hdr3Index.c_str(), 1,
+  DBWriter headerWriter(out, par.hdr3.c_str(), par.hdr3Index.c_str(), 1,
                         par.compressed, Parameters::DBTYPE_GENERIC_DB);
   headerWriter.open();
 

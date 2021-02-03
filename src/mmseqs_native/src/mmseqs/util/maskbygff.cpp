@@ -83,16 +83,16 @@ int maskbygff(mmseqs_output* out, Parameters& par) {
   }
   gffFile.close();
 
-  DBWriter writer(par.db3.c_str(), par.db3Index.c_str(), 1, par.compressed,
+  DBWriter writer(out, par.db3.c_str(), par.db3Index.c_str(), 1, par.compressed,
                   reader.getDbtype());
   writer.open();
 
   DBReader<std::string> headerReader(
-      par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
+      out, par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   headerReader.open(DBReader<std::string>::NOSORT);
 
-  DBWriter headerWriter(par.hdr3.c_str(), par.hdr3Index.c_str(), 1,
+  DBWriter headerWriter(out, par.hdr3.c_str(), par.hdr3Index.c_str(), 1,
                         par.compressed, Parameters::DBTYPE_GENERIC_DB);
   headerWriter.open();
 

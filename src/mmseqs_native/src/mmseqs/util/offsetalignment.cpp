@@ -105,12 +105,12 @@ void chainAlignmentHits(std::vector<Matcher::result_t> &results,
 //   Prot/Nucl
 // query update
 //   Nucl/Prot
-void updateOffset(char *data, std::vector<Matcher::result_t> &results,
+void updateOffset(mmseqs_output* out, char *data, std::vector<Matcher::result_t> &results,
                   const Orf::SequenceLocation *qloc, IndexReader &tOrfDBr,
                   bool targetNeedsUpdate, bool isNucleotideSearch,
                   int thread_idx) {
   size_t startPos = results.size();
-  Matcher::readAlignmentResults(results, data, true);
+  Matcher::readAlignmentResults(out, results, data, true);
   size_t endPos = results.size();
   for (size_t i = startPos; i < endPos; i++) {
     Matcher::result_t &res = results[i];
@@ -225,7 +225,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
   }
 
   IndexReader qOrfDbr(
-      par.db2.c_str(), par.threads, IndexReader::HEADERS,
+      out, par.db2.c_str(), par.threads, IndexReader::HEADERS,
       (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0);
   if (queryDbType == -1) {
     out->error("Please recreate your database or add a .dbtype file to your sequence/profile database.");
@@ -235,7 +235,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
       Parameters::isEqualDbtype(queryDbType, Parameters::DBTYPE_NUCLEOTIDES);
   IndexReader *qSourceDbr = NULL;
   if (queryNucl) {
-    qSourceDbr = new IndexReader(par.db1.c_str(), par.threads,
+    qSourceDbr = new IndexReader(out, par.db1.c_str(), par.threads,
                                  IndexReader::SRC_SEQUENCES,
                                  (touch) ? (IndexReader::PRELOAD_INDEX) : 0,
                                  DBReader<unsigned int>::USE_INDEX);
@@ -247,7 +247,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
     tOrfDbr = &qOrfDbr;
   } else {
     tOrfDbr = new IndexReader(
-        par.db4.c_str(), par.threads, IndexReader::HEADERS,
+        out, par.db4.c_str(), par.threads, IndexReader::HEADERS,
         (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0);
   }
 
@@ -267,7 +267,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
     if (isSameSrcDB) {
       tSourceDbr = qSourceDbr;
     } else {
-      tSourceDbr = new IndexReader(par.db3.c_str(), par.threads,
+      tSourceDbr = new IndexReader(out, par.db3.c_str(), par.threads,
                                    IndexReader::SRC_SEQUENCES,
                                    (touch) ? IndexReader::PRELOAD_INDEX : 0,
                                    DBReader<unsigned int>::USE_INDEX);
@@ -275,7 +275,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
 
     if (Parameters::isEqualDbtype(tSourceDbr->getDbtype(),
                                   Parameters::DBTYPE_INDEX_DB)) {
-      IndexReader tseqDbr(par.db3, par.threads, IndexReader::SEQUENCES, 0,
+      IndexReader tseqDbr(out, par.db3, par.threads, IndexReader::SEQUENCES, 0,
                           IndexReader::PRELOAD_INDEX);
       seqtargetNuc = Parameters::isEqualDbtype(
           tseqDbr.sequenceReader->getDbtype(), Parameters::DBTYPE_NUCLEOTIDES);
@@ -305,7 +305,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
   }
 
   DBReader<unsigned int> alnDbr(
-      par.db5.c_str(), par.db5Index.c_str(), par.threads,
+      out, par.db5.c_str(), par.db5Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   alnDbr.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
@@ -362,7 +362,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
     }
     contigOffsets = contigSizes;
 
-    AlignmentSymmetry::computeOffsetFromCounts(contigOffsets, maxContigKey + 1);
+    AlignmentSymmetry::computeOffsetFromCounts(out, contigOffsets, maxContigKey + 1);
 
     contigExists = new char[maxContigKey + 1]();
 #pragma omp parallel for schedule(static) num_threads(localThreads)
@@ -390,7 +390,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
   }
 
   out->info("Writing results to: {}\n", par.db6);
-  DBWriter resultWriter(par.db6.c_str(), par.db6Index.c_str(), localThreads,
+  DBWriter resultWriter(out, par.db6.c_str(), par.db6Index.c_str(), localThreads,
                         par.compressed, Parameters::DBTYPE_ALIGNMENT_RES);
   resultWriter.open();
 
@@ -450,11 +450,11 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
           char *header = qOrfDbr.sequenceReader->getData(queryId, thread_idx);
           Orf::SequenceLocation qloc = Orf::parseOrfHeader(header);
           if (qloc.id == UINT_MAX) {
-            updateOffset(data, results, NULL, *tOrfDbr,
+            updateOffset(out, data, results, NULL, *tOrfDbr,
                          (isNuclNuclSearch || isTransNucTransNucSearch),
                          isNuclNuclSearch, thread_idx);
           } else {
-            updateOffset(data, results, &qloc, *tOrfDbr,
+            updateOffset(out, data, results, &qloc, *tOrfDbr,
                          (isNuclNuclSearch || isTransNucTransNucSearch),
                          isNuclNuclSearch, thread_idx);
           }
@@ -489,7 +489,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
           qLen = qSourceDbr->sequenceReader->getSeqLen(queryId);
         }
         char *data = alnDbr.getData(i, thread_idx);
-        updateOffset(data, results, NULL, *tOrfDbr, true, isNuclNuclSearch,
+        updateOffset(out, data, results, NULL, *tOrfDbr, true, isNuclNuclSearch,
                      thread_idx);
       }
       if (par.mergeQuery == true) {

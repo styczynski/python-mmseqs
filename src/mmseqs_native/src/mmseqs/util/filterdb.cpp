@@ -104,7 +104,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                   par.compressed, reader.getDbtype());
   writer.open();
 
@@ -202,7 +202,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
     mode = JOIN_DB;
     std::string joinIndex = par.joinDB + ".index";
     helper = new DBReader<unsigned int>(
-        par.joinDB.c_str(), joinIndex.c_str(), par.threads,
+        out, par.joinDB.c_str(), joinIndex.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     helper->open(DBReader<unsigned int>::NOSORT);
     out->info("Joining databases by column value");

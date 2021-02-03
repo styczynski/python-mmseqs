@@ -13,7 +13,7 @@
 #include "omp.h"
 #endif
 
-void parseHMM(char *data, std::string *sequence, std::string *header,
+void parseHMM(mmseqs_output* out, char *data, std::string *sequence, std::string *header,
               char *profileBuffer, size_t *size, unsigned int id,
               BaseMatrix *subMat) {
   // find name tag
@@ -136,15 +136,15 @@ int convertprofiledb(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<std::string>::NOSORT);
 
-  DBWriter profileWriter(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter profileWriter(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                          par.compressed, Parameters::DBTYPE_HMM_PROFILE);
   profileWriter.open();
 
-  DBWriter headerWriter(par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
+  DBWriter headerWriter(out, par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
                         par.compressed, Parameters::DBTYPE_GENERIC_DB);
   headerWriter.open();
 
-  SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+  SubstitutionMatrix subMat(out, par.scoringMatrixFile.aminoacids, 2.0, 0.0);
 
   size_t maxElementSize = 0;
   for (size_t i = 0; i < reader.getSize(); i++) {
@@ -171,7 +171,7 @@ int convertprofiledb(mmseqs_output *out, Parameters &par) {
     for (size_t i = 0; i < reader.getSize(); i++) {
       char *data = reader.getData(i, thread_idx);
       size_t elementSize = 0;
-      parseHMM(data, &sequence, &header, profileBuffer, &elementSize, i,
+      parseHMM(out, data, &sequence, &header, profileBuffer, &elementSize, i,
                &subMat);
 
       profileWriter.writeData(profileBuffer, elementSize, i, thread_idx);

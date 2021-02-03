@@ -57,7 +57,7 @@ int msa2profile(mmseqs_output *out, Parameters &par) {
   if (FileUtil::fileExists(out, lookupFile.c_str())) {
     mode |= DBReader<unsigned int>::USE_LOOKUP;
   }
-  DBReader<unsigned int> qDbr(msaData.c_str(), msaIndex.c_str(), par.threads,
+  DBReader<unsigned int> qDbr(out, msaData.c_str(), msaIndex.c_str(), par.threads,
                               mode);
   qDbr.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
@@ -121,7 +121,7 @@ int msa2profile(mmseqs_output *out, Parameters &par) {
   maxSeqLength *= (VECSIZE_INT * 4);
 
   unsigned int threads = (unsigned int)par.threads;
-  DBWriter resultWriter(par.db2.c_str(), par.db2Index.c_str(), threads,
+  DBWriter resultWriter(out, par.db2.c_str(), par.db2Index.c_str(), threads,
                         par.compressed, Parameters::DBTYPE_HMM_PROFILE);
   resultWriter.open();
 
@@ -129,7 +129,7 @@ int msa2profile(mmseqs_output *out, Parameters &par) {
                         par.compressed, Parameters::DBTYPE_GENERIC_DB);
   headerWriter.open();
 
-  SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, -0.2f);
+  SubstitutionMatrix subMat(out, par.scoringMatrixFile.aminoacids, 2.0f, -0.2f);
 
   Log::Progress progress(qDbr.getSize());
 #pragma omp parallel
@@ -221,7 +221,7 @@ int msa2profile(mmseqs_output *out, Parameters &par) {
         }
 
         if (seq->seq.l > maxSeqLength) {
-          out->warn("Member sequence {} in entry {} too long", getSize, queryKey);
+          out->warn("Member sequence {} in entry {} too long", setSize, queryKey);
           fastaError = true;
           break;
         }
@@ -382,7 +382,7 @@ int msa2profile(mmseqs_output *out, Parameters &par) {
   qDbr.close();
 
   DBReader<unsigned int>::softlinkDb(
-      par.db1, par.db2, (DBFiles::Files)(DBFiles::LOOKUP | DBFiles::SOURCE));
+      out, par.db1, par.db2, (DBFiles::Files)(DBFiles::LOOKUP | DBFiles::SOURCE));
 
   if (sequenceReader != NULL) {
     sequenceReader->close();

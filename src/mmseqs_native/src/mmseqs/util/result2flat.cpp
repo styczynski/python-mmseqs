@@ -11,19 +11,19 @@ int result2flat(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   DBReader<unsigned int> querydb_header(
-      par.hdr1.c_str(), par.hdr1Index.c_str(), 1,
+      out, par.hdr1.c_str(), par.hdr1Index.c_str(), 1,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   querydb_header.open(DBReader<unsigned int>::NOSORT);
   querydb_header.readMmapedDataInMemory();
 
   DBReader<unsigned int> targetdb_header(
-      par.hdr2.c_str(), par.hdr2Index.c_str(), 1,
+      out, par.hdr2.c_str(), par.hdr2Index.c_str(), 1,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   targetdb_header.open(DBReader<unsigned int>::NOSORT);
   targetdb_header.readMmapedDataInMemory();
 
   DBReader<unsigned int> dbr_data(
-      par.db3.c_str(), par.db3Index.c_str(), 1,
+      out, par.db3.c_str(), par.db3Index.c_str(), 1,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   dbr_data.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 

@@ -23,7 +23,7 @@ int view(mmseqs_output* out, Parameters& par) {
       indexSrcType = IndexReader::SRC_HEADERS;
       break;
   }
-  IndexReader reader(par.db1, par.threads, indexSrcType, 0);
+  IndexReader reader(out, par.db1, par.threads, indexSrcType, 0);
   for (size_t i = 0; i < ids.size(); ++i) {
     const unsigned int key = Util::fast_atoi<unsigned int>(ids[i].c_str());
     const size_t id = reader.sequenceReader->getId(key);

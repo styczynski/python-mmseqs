@@ -28,7 +28,7 @@ int orftocontig(mmseqs_output* out, Parameters& par) {
   orfHeadersReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
   // writing in alignment format:
-  DBWriter alignmentFormatWriter(par.db3.c_str(), par.db3Index.c_str(),
+  DBWriter alignmentFormatWriter(out, par.db3.c_str(), par.db3Index.c_str(),
                                  par.threads, par.compressed,
                                  Parameters::DBTYPE_ALIGNMENT_RES);
   alignmentFormatWriter.open();
@@ -47,7 +47,7 @@ int orftocontig(mmseqs_output* out, Parameters& par) {
       progress.updateProgress();
       unsigned int orfKey = orfHeadersReader.getDbKey(id);
       Matcher::result_t orfToContigResult =
-          Orf::getFromDatabase(id, contigsReader, orfHeadersReader, thread_idx);
+          Orf::getFromDatabase(out, id, contigsReader, orfHeadersReader, thread_idx);
       size_t len =
           Matcher::resultToBuffer(orfToContigBuffer, orfToContigResult, true);
       alignmentFormatWriter.writeData(orfToContigBuffer, len, orfKey,

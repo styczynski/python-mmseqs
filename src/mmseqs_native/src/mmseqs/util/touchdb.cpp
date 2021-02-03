@@ -10,14 +10,14 @@ int touchdb(mmseqs_output* out, Parameters& par) {
 
   std::string db = par.db1;
 
-  std::string indexDB = PrefilteringIndexReader::searchForIndex(db);
+  std::string indexDB = PrefilteringIndexReader::searchForIndex(out, db);
   if (indexDB.empty() == false) {
     db = indexDB;
   }
 
-  MemoryMapped map(db, MemoryMapped::WholeFile,
+  MemoryMapped map(out, db, MemoryMapped::WholeFile,
                    MemoryMapped::CacheHint::SequentialScan);
-  Util::touchMemory(reinterpret_cast<const char*>(map.getData()),
+  Util::touchMemory(out, reinterpret_cast<const char*>(map.getData()),
                     map.mappedSize());
 
   return EXIT_SUCCESS;

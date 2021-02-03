@@ -154,12 +154,12 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
   if (returnAlnRes == false) {
     dbType = Parameters::DBTYPE_HMM_PROFILE;
   }
-  DBWriter writer(par.db5.c_str(), par.db5Index.c_str(), par.threads,
+  DBWriter writer(out, par.db5.c_str(), par.db5Index.c_str(), par.threads,
                   par.compressed, dbType);
   writer.open();
 
-  BacktraceTranslator translator;
-  SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0,
+  BacktraceTranslator translator(out);
+  SubstitutionMatrix subMat(out, par.scoringMatrixFile.aminoacids, 2.0,
                             par.scoreBias);
 
   EvalueComputation *evaluer = NULL;
@@ -168,7 +168,7 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
     probMatrix = new ProbabilityMatrix(subMat);
   } else {
     evaluer =
-        new EvalueComputation(cReader->getAminoAcidDBSize(), &subMat,
+        new EvalueComputation(out, cReader->getAminoAcidDBSize(), &subMat,
                               par.gapOpen.aminoacids, par.gapExtend.aminoacids);
   }
   Log::Progress progress(resultAbReader->getSize());
@@ -179,9 +179,9 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
     thread_idx = static_cast<unsigned int>(omp_get_thread_num());
 #endif
 
-    Sequence aSeq(par.maxSeqLen, aSeqDbType, &subMat, 0, false,
+    Sequence aSeq(out, par.maxSeqLen, aSeqDbType, &subMat, 0, false,
                   par.compBiasCorrection);
-    Sequence cSeq(par.maxSeqLen, cSeqDbType, &subMat, 0, false, false);
+    Sequence cSeq(out, par.maxSeqLen, cSeqDbType, &subMat, 0, false, false);
 
     MultipleAlignment *aligner = NULL;
     MsaFilter *filter = NULL;
@@ -191,14 +191,14 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
     std::string result;
 
     if (returnAlnRes == false) {
-      aligner = new MultipleAlignment(par.maxSeqLen, &subMat);
+      aligner = new MultipleAlignment(out, par.maxSeqLen, &subMat);
       if (par.filterMsa) {
         filter =
-            new MsaFilter(par.maxSeqLen, 300, &subMat, par.gapOpen.aminoacids,
+            new MsaFilter(out, par.maxSeqLen, 300, &subMat, par.gapOpen.aminoacids,
                           par.gapExtend.aminoacids);
       }
       calculator =
-          new PSSMCalculator(&subMat, par.maxSeqLen, 300, par.pca, par.pcb);
+          new PSSMCalculator(out, &subMat, par.maxSeqLen, 300, par.pca, par.pcb);
       masker = new PSSMMasker(par.maxSeqLen, *probMatrix, subMat);
       seqSet.reserve(300);
       result.reserve(par.maxSeqLen * Sequence::PROFILE_READIN_SIZE);
@@ -244,7 +244,7 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
 
       char *data = resultAbReader->getData(i, thread_idx);
       while (*data != '\0') {
-        Matcher::result_t resultAb = Matcher::parseAlignmentRecord(data, false);
+        Matcher::result_t resultAb = Matcher::parseAlignmentRecord(out, data, false);
         data = Util::skipLine(data);
         if (returnAlnRes == false && resultAb.eval > par.evalProfile) {
           continue;
@@ -262,7 +262,7 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
               resultBcReader.getEntryLen(bResId), *cReader, false);
         } else {
           Matcher::readAlignmentResults(
-              resultsBc, resultBcReader.getData(bResId, thread_idx), false);
+              out, resultsBc, resultBcReader.getData(bResId, thread_idx), false);
         }
 
         std::stable_sort(resultsBc.begin(), resultsBc.end(),

@@ -97,13 +97,13 @@ sequence covered by alignment tcov        Fraction of target sequence covered by
 alignment qset        Query set tset        Target set
  */
 
-std::map<unsigned int, unsigned int> readKeyToSet(const std::string &file) {
+std::map<unsigned int, unsigned int> readKeyToSet(mmseqs_output* out, const std::string &file) {
   std::map<unsigned int, unsigned int> mapping;
   if (file.length() == 0) {
     return mapping;
   }
 
-  MemoryMapped lookup(file, MemoryMapped::WholeFile,
+  MemoryMapped lookup(out, file, MemoryMapped::WholeFile,
                       MemoryMapped::SequentialScan);
   char *data = (char *)lookup.getData();
   const char *entry[255];
@@ -121,13 +121,13 @@ std::map<unsigned int, unsigned int> readKeyToSet(const std::string &file) {
   return mapping;
 }
 
-std::map<unsigned int, std::string> readSetToSource(const std::string &file) {
+std::map<unsigned int, std::string> readSetToSource(mmseqs_output* out, const std::string &file) {
   std::map<unsigned int, std::string> mapping;
   if (file.length() == 0) {
     return mapping;
   }
 
-  MemoryMapped source(file, MemoryMapped::WholeFile,
+  MemoryMapped source(out, file, MemoryMapped::WholeFile,
                       MemoryMapped::SequentialScan);
   char *data = (char *)source.getData();
   const char *entry[255];
@@ -167,7 +167,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
   bool needTaxonomy = false;
   bool needTaxonomyMapping = false;
   const std::vector<int> outcodes = Parameters::getOutputFormat(
-      format, par.outfmt, needSequenceDB, needBacktrace, needFullHeaders,
+      out, format, par.outfmt, needSequenceDB, needBacktrace, needFullHeaders,
       needLookup, needSource, needTaxonomyMapping, needTaxonomy);
 
   NcbiTaxonomy *t = NULL;
@@ -175,16 +175,16 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
   if (needTaxonomy) {
     std::string db2NoIndexName =
         PrefilteringIndexReader::dbPathWithoutIndex(par.db2);
-    t = NcbiTaxonomy::openTaxonomy(db2NoIndexName);
+    t = NcbiTaxonomy::openTaxonomy(out, db2NoIndexName);
   }
   if (needTaxonomy || needTaxonomyMapping) {
     std::string db2NoIndexName =
         PrefilteringIndexReader::dbPathWithoutIndex(par.db2);
-    if (FileUtil::fileExists(
+    if (FileUtil::fileExists(out,
             std::string(db2NoIndexName + "_mapping").c_str()) == false) {
       out->failure("{}_mapping does not exist. Please create the taxonomy mapping", db2NoIndexName);
     }
-    bool isSorted = Util::readMapping(db2NoIndexName + "_mapping", mapping);
+    bool isSorted = Util::readMapping(out, db2NoIndexName + "_mapping", mapping);
     if (isSorted == false) {
       std::stable_sort(mapping.begin(), mapping.end(), compareToFirstInt);
     }
@@ -201,8 +201,8 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
   if (needLookup) {
     std::string file1 = par.db1 + ".lookup";
     std::string file2 = par.db2 + ".lookup";
-    qKeyToSet = readKeyToSet(file1);
-    tKeyToSet = readKeyToSet(file2);
+    qKeyToSet = readKeyToSet(out, file1);
+    tKeyToSet = readKeyToSet(out, file2);
   }
 
   std::map<unsigned int, std::string> qSetToSource;
@@ -210,16 +210,16 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
   if (needSource) {
     std::string file1 = par.db1 + ".source";
     std::string file2 = par.db2 + ".source";
-    qSetToSource = readSetToSource(file1);
-    tSetToSource = readSetToSource(file2);
+    qSetToSource = readSetToSource(out, file1);
+    tSetToSource = readSetToSource(out, file2);
   }
 
   IndexReader qDbr(
-      par.db1, par.threads, IndexReader::SRC_SEQUENCES,
+      out, par.db1, par.threads, IndexReader::SRC_SEQUENCES,
       (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0,
       dbaccessMode);
   IndexReader qDbrHeader(
-      par.db1, par.threads, IndexReader::SRC_HEADERS,
+      out, par.db1, par.threads, IndexReader::SRC_HEADERS,
       (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0);
 
   IndexReader *tDbr;
@@ -229,11 +229,11 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
     tDbrHeader = &qDbrHeader;
   } else {
     tDbr = new IndexReader(
-        par.db2, par.threads, IndexReader::SRC_SEQUENCES,
+        out, par.db2, par.threads, IndexReader::SRC_SEQUENCES,
         (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0,
         dbaccessMode);
     tDbrHeader = new IndexReader(
-        par.db2, par.threads, IndexReader::SRC_HEADERS,
+        out, par.db2, par.threads, IndexReader::SRC_HEADERS,
         (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0);
   }
 
@@ -247,7 +247,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
     bool seqtargetAA = false;
     if (Parameters::isEqualDbtype(tDbr->getDbtype(),
                                   Parameters::DBTYPE_INDEX_DB)) {
-      IndexReader tseqDbr(par.db2, par.threads, IndexReader::SEQUENCES, 0,
+      IndexReader tseqDbr(out, par.db2, par.threads, IndexReader::SEQUENCES, 0,
                           IndexReader::PRELOAD_INDEX);
       seqtargetAA = Parameters::isEqualDbtype(
           tseqDbr.sequenceReader->getDbtype(), Parameters::DBTYPE_AMINO_ACIDS);
@@ -268,11 +268,11 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
   int gapOpen, gapExtend;
   SubstitutionMatrix *subMat = NULL;
   if (targetNucs == true && queryNucs == true && isTranslatedSearch == false) {
-    subMat = new NucleotideMatrix(par.scoringMatrixFile.nucleotides, 1.0, 0.0);
+    subMat = new NucleotideMatrix(out, par.scoringMatrixFile.nucleotides, 1.0, 0.0);
     gapOpen = par.gapOpen.nucleotides;
     gapExtend = par.gapExtend.nucleotides;
   } else {
-    subMat = new SubstitutionMatrix(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+    subMat = new SubstitutionMatrix(out, par.scoringMatrixFile.aminoacids, 2.0, 0.0);
     gapOpen = par.gapOpen.aminoacids;
     gapExtend = par.gapExtend.aminoacids;
   }
@@ -284,7 +284,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
                                              Parameters::DBTYPE_HMM_PROFILE);
     targetProfile = Parameters::isEqualDbtype(tDbr->sequenceReader->getDbtype(),
                                               Parameters::DBTYPE_HMM_PROFILE);
-    evaluer = new EvalueComputation(tDbr->sequenceReader->getAminoAcidDBSize(),
+    evaluer = new EvalueComputation(out, tDbr->sequenceReader->getAminoAcidDBSize(),
                                     subMat, gapOpen, gapExtend);
   }
 
@@ -302,13 +302,13 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
   const bool shouldCompress = par.dbOut == true && par.compressed == true;
   const int dbType = par.dbOut == true ? Parameters::DBTYPE_GENERIC_DB
                                        : Parameters::DBTYPE_OMIT_FILE;
-  DBWriter resultWriter(par.db4.c_str(), par.db4Index.c_str(), localThreads,
+  DBWriter resultWriter(out, par.db4.c_str(), par.db4Index.c_str(), localThreads,
                         shouldCompress, dbType);
   resultWriter.open();
 
   const bool isDb = par.dbOut;
   TranslateNucl translateNucl(
-      static_cast<TranslateNucl::GenCode>(par.translationTable));
+      out, static_cast<TranslateNucl::GenCode>(par.translationTable));
 
   if (format == Parameters::FORMAT_ALIGNMENT_SAM) {
     char buffer[1024];
@@ -443,11 +443,11 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
       char *data = alnDbr.getData(i, thread_idx);
       while (*data != '\0') {
         mmseqs_blast_tab_record record;
-        Matcher::result_t res = Matcher::parseAlignmentRecord(data, true);
+        Matcher::result_t res = Matcher::parseAlignmentRecord(out, data, true);
         data = Util::skipLine(data);
 
         if (res.backtrace.empty() && needBacktrace == true) {
-          out->failure("Backtrace cigar is missing in the alignment result. Please recompute the alignment with the -a flag. Command: mmseqs align {} {} {} alnNew -a", par.db1, par/db2, par.db3);
+          out->failure("Backtrace cigar is missing in the alignment result. Please recompute the alignment with the -a flag. Command: mmseqs align {} {} {} alnNew -a", par.db1, par.db2, par.db3);
         }
 
         size_t tHeaderId = tDbrHeader->sequenceReader->getId(res.dbKey);

@@ -89,10 +89,10 @@ redoComputation:
   if (source == NULL) {
     out->failure("Cannot open {} for writing", sourceFile);
   }
-  DBWriter hdrWriter(hdrDataFile.c_str(), hdrIndexFile.c_str(), shuffleSplits,
+  DBWriter hdrWriter(out, hdrDataFile.c_str(), hdrIndexFile.c_str(), shuffleSplits,
                      par.compressed, Parameters::DBTYPE_GENERIC_DB);
   hdrWriter.open();
-  DBWriter seqWriter(dataFile.c_str(), indexFile.c_str(), shuffleSplits,
+  DBWriter seqWriter(out, dataFile.c_str(), indexFile.c_str(), shuffleSplits,
                      par.compressed,
                      (dbType == -1) ? Parameters::DBTYPE_OMIT_FILE : dbType);
   seqWriter.open();
@@ -133,7 +133,7 @@ redoComputation:
 
     KSeqWrapper* kseq = NULL;
     if (dbInput == true) {
-      kseq = new KSeqBuffer(reader->getData(fileIdx, 0),
+      kseq = new KSeqBuffer(out, reader->getData(fileIdx, 0),
                             reader->getEntryLen(fileIdx) - 1);
     } else {
       kseq = KSeqFactory(filenames[fileIdx].c_str());
@@ -262,7 +262,7 @@ redoComputation:
     } else {
       dbType = Parameters::DBTYPE_AMINO_ACIDS;
     }
-    seqWriter.writeDbtypeFile(seqWriter.getDataFileName(), dbType,
+    seqWriter.writeDbtypeFile(out, seqWriter.getDataFileName(), dbType,
                               par.compressed);
   }
   out->info("Database type: {}\n", Parameters::getDbTypeName(dbType)
@@ -278,9 +278,9 @@ redoComputation:
 
   // fix ids
   if (par.shuffleDatabase == true) {
-    DBWriter::createRenumberedDB(dataFile, indexFile, "", "",
+    DBWriter::createRenumberedDB(out, dataFile, indexFile, "", "",
                                  DBReader<unsigned int>::LINEAR_ACCCESS);
-    DBWriter::createRenumberedDB(hdrDataFile, hdrIndexFile, "", "",
+    DBWriter::createRenumberedDB(out, hdrDataFile, hdrIndexFile, "", "",
                                  DBReader<unsigned int>::LINEAR_ACCCESS);
   }
   if (par.createdbMode == Parameters::SEQUENCE_SPLIT_MODE_SOFT) {
@@ -299,7 +299,7 @@ redoComputation:
 
   if (par.writeLookup == true) {
     DBReader<unsigned int> readerHeader(
-        hdrDataFile.c_str(), hdrIndexFile.c_str(), 1,
+        out, hdrDataFile.c_str(), hdrIndexFile.c_str(), 1,
         DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
     readerHeader.open(DBReader<unsigned int>::NOSORT);
     // create lookup file

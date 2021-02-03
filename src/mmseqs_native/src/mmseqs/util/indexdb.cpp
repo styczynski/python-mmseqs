@@ -65,16 +65,16 @@ int indexdb(mmseqs_output *out, Parameters &par) {
       dbr2 != NULL && Parameters::isEqualDbtype(dbr2->getDbtype(),
                                                 Parameters::DBTYPE_NUCLEOTIDES);
   BaseMatrix *seedSubMat = Prefiltering::getSubstitutionMatrix(
-      par.seedScoringMatrixFile, par.alphabetSize, 8.0f, false,
+      out, par.seedScoringMatrixFile, par.alphabetSize, 8.0f, false,
       (db1IsNucl && db2IsNucl));
 
   // memoryLimit in bytes
-  size_t memoryLimit = Util::computeMemory(par.splitMemoryLimit);
+  size_t memoryLimit = Util::computeMemory(out, par.splitMemoryLimit);
 
   int splitMode = Parameters::TARGET_DB_SPLIT;
   par.maxResListLen = std::min(dbr.getSize(), par.maxResListLen);
   Prefiltering::setupSplit(
-      dbr, seedSubMat->alphabetSize - 1, dbr.getDbtype(), par.threads, false,
+      out, dbr, seedSubMat->alphabetSize - 1, dbr.getDbtype(), par.threads, false,
       memoryLimit, 1, par.maxResListLen, par.kmerSize, par.split, splitMode);
 
   bool kScoreSet = false;
@@ -99,7 +99,7 @@ int indexdb(mmseqs_output *out, Parameters &par) {
   // query seq type is actually unknown here, but if we pass DBTYPE_HMM_PROFILE
   // then its +20 k-score
   par.kmerScore = Prefiltering::getKmerThreshold(
-      par.sensitivity, isProfileSearch, par.kmerScore, par.kmerSize);
+      out, par.sensitivity, isProfileSearch, par.kmerScore, par.kmerSize);
 
   std::string indexDB = PrefilteringIndexReader::indexName(par.db2);
 
@@ -109,7 +109,7 @@ int indexdb(mmseqs_output *out, Parameters &par) {
   if (par.checkCompatible > 0 && FileUtil::fileExists(out, indexDbType.c_str())) {
     out->info("Check index {}\n", indexDB);
     DBReader<unsigned int> index(
-        indexDB.c_str(), (indexDB + ".index").c_str(), par.threads,
+        out, indexDB.c_str(), (indexDB + ".index").c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     index.open(DBReader<unsigned int>::NOSORT);
 
@@ -142,19 +142,19 @@ int indexdb(mmseqs_output *out, Parameters &par) {
 
   if (recreate) {
     DBReader<unsigned int> hdbr1(
-        par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
+        out, par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     hdbr1.open(DBReader<unsigned int>::NOSORT);
 
     DBReader<unsigned int> *hdbr2 = NULL;
     if (sameDB == false) {
       hdbr2 = new DBReader<unsigned int>(
-          par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
+          out, par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
           DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
       hdbr2->open(DBReader<unsigned int>::NOSORT);
     }
 
-    DBReader<unsigned int>::removeDb(indexDB);
+    DBReader<unsigned int>::removeDb(out, indexDB);
     PrefilteringIndexReader::createIndexFile(
         out, indexDB, &dbr, dbr2, &hdbr1, hdbr2, seedSubMat, par.maxSeqLen,
         par.spacedKmer, par.spacedKmerPattern, par.compBiasCorrection,

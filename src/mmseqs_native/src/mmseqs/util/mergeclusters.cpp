@@ -21,7 +21,7 @@ int mergeclusters(mmseqs_output *out, Parameters &par) {
   }
 
   // the sequence database will serve as the reference for sequence indexes
-  DBReader<unsigned int> dbr(par.db1.c_str(), par.db1Index.c_str(), par.threads,
+  DBReader<unsigned int> dbr(out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
                              DBReader<unsigned int>::USE_INDEX);
   dbr.open(DBReader<unsigned int>::NOSORT);
 
@@ -79,7 +79,7 @@ int mergeclusters(mmseqs_output *out, Parameters &par) {
     clusterings.pop_front();
 
     DBReader<unsigned int> cluDb(
-        cluStep.c_str(), cluStepIndex.c_str(), par.threads,
+        out, cluStep.c_str(), cluStepIndex.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     cluDb.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
@@ -118,7 +118,7 @@ int mergeclusters(mmseqs_output *out, Parameters &par) {
   }
 
   out->info("Write merged clustering");
-  DBWriter dbw(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter dbw(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                par.compressed, Parameters::DBTYPE_CLUSTER_RES);
   dbw.open();
   progress.reset(dbr.getSize());

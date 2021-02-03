@@ -23,7 +23,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   DBReader<unsigned int> sequenceDbr(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   sequenceDbr.open(DBReader<unsigned int>::NOSORT);
   if (par.preloadMode != Parameters::PRELOAD_MODE_MMAP) {
@@ -40,7 +40,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
   }
 
   DBReader<unsigned int> alnReader(
-      par.db2.c_str(), par.db2Index.c_str(), par.threads,
+      out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   alnReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
@@ -200,7 +200,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
   }
 
   DBReader<unsigned int> resultDbr(
-      tmpRes.c_str(), tmpResIndex.c_str(), par.threads,
+      out, tmpRes.c_str(), tmpResIndex.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   resultDbr.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
@@ -362,7 +362,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
     delete[] tmpData;
   }
 
-  DBReader<unsigned int>::removeDb(tmpRes);
+  DBReader<unsigned int>::removeDb(out, tmpRes);
 
   if (splits.size() > 1) {
     DBWriter::mergeResults(parOutDbStr, parOutDbIndexStr, splitFileNames);

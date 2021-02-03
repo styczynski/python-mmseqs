@@ -13,15 +13,15 @@
 #include <fstream>
 #include <set>
 
-std::string getPrimaryAccession(const std::string &accession) {
+std::string getPrimaryAccession(mmseqs_output* out, const std::string &accession) {
   size_t end = accession.find_first_of(';');
   if (UNLIKELY(end == std::string::npos)) {
-    out->failure("Could not extract primary accession!");
+    out->failure("Could not extract primary accession");
   }
   return accession.substr(0, end);
 }
 
-std::vector<unsigned int> getEnabledColumns(const std::string &columns,
+std::vector<unsigned int> getEnabledColumns(mmseqs_output* out, const std::string &columns,
                                             const std::string *columnNames,
                                             size_t columnCount) {
   std::vector<std::string> kbColumns = Util::split(columns, ",");
@@ -33,11 +33,11 @@ std::vector<unsigned int> getEnabledColumns(const std::string &columns,
       unsigned int col =
           static_cast<unsigned int>(strtoul((*it).c_str(), &rest, 10));
       if ((rest != (*it).c_str() && *rest != '\0') || errno == ERANGE) {
-        out->failure("Invalid selected column: {}!\n", (*it) );
+        out->failure("Invalid selected column: {}", *it);
       }
 
       if (col >= columnCount) {
-        out->failure("Invalid selected column: {}!", col);
+        out->failure("Invalid selected column: {}", (int)col);
       }
       enabledColumns.insert(col);
     } else {
@@ -65,7 +65,7 @@ void setConvertKbDefaults(Parameters *par, unsigned int maxColumns) {
 }
 
 int convertkb(mmseqs_output *out, Parameters &par) {
-  UniprotKB kb;
+  UniprotKB kb(out);
   size_t columns = static_cast<unsigned int>(kb.getColumnCount());
 
   //    Parameters &par = Parameters::getInstance();
@@ -77,14 +77,14 @@ int convertkb(mmseqs_output *out, Parameters &par) {
   par.filenames.pop_back();
 
   std::vector<unsigned int> enabledColumns =
-      getEnabledColumns(par.kbColumns, kb.columnNames, kb.getColumnCount());
+      getEnabledColumns(out, par.kbColumns, kb.columnNames, kb.getColumnCount());
 
   DBWriter **writers = new DBWriter *[columns];
   for (std::vector<unsigned int>::const_iterator it = enabledColumns.begin();
        it != enabledColumns.end(); ++it) {
     std::string dataFile = outputBase + "_" + kb.columnNames[*it];
     std::string indexFile = outputBase + "_" + kb.columnNames[*it] + ".index";
-    writers[*it] = new DBWriter(dataFile.c_str(), indexFile.c_str(), 1,
+    writers[*it] = new DBWriter(out, dataFile.c_str(), indexFile.c_str(), 1,
                                 par.compressed, Parameters::DBTYPE_GENERIC_DB);
     writers[*it]->open();
   }
@@ -136,7 +136,7 @@ int convertkb(mmseqs_output *out, Parameters &par) {
       if (kb.readLine(line.c_str())) {
         progress.updateProgress();
         std::string accession =
-            getPrimaryAccession(kb.getColumn(UniprotKB::COL_KB_AC));
+            getPrimaryAccession(out, kb.getColumn(UniprotKB::COL_KB_AC));
 
         for (std::vector<unsigned int>::const_iterator it =
                  enabledColumns.begin();

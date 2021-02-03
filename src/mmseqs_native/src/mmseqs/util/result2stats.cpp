@@ -58,7 +58,7 @@ StatsComputer::StatsComputer(const Parameters &par)
       targetDbIndex(par.db2Index),
       tsvOut(par.tsvOut) {
   resultReader = new DBReader<unsigned int>(
-      par.db3.c_str(), par.db3Index.c_str(), par.threads,
+      out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   resultReader->open(DBReader<unsigned int>::LINEAR_ACCCESS);
   this->threads = par.threads;
@@ -279,7 +279,7 @@ int StatsComputer::sequenceWise(typename PerSequence<T>::type call,
   DBReader<unsigned int> *targetReader = NULL;
   if (!onlyResultDb) {
     targetReader = new DBReader<unsigned int>(
-        targetDb.c_str(), targetDbIndex.c_str(), threads,
+        out, targetDb.c_str(), targetDbIndex.c_str(), threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     targetReader->open(DBReader<unsigned int>::NOSORT);
   }

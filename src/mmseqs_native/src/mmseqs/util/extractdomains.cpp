@@ -57,7 +57,7 @@ double computeEvalue(unsigned int queryLength, int score) {
   return K * 1 * queryLength * std::exp(-lambdaLin * score);
 }
 
-int scoreSubAlignment(std::string query, std::string target,
+int scoreSubAlignment(mmseqs_output* out, std::string query, std::string target,
                       unsigned int qStart, unsigned int qEnd,
                       unsigned int tStart, unsigned int tEnd,
                       const SubstitutionMatrix &matrix) {
@@ -69,11 +69,11 @@ int scoreSubAlignment(std::string query, std::string target,
   unsigned int tPos = tStart;
   unsigned int qPos = qStart;
 
-  Sequence qSeq(query.length() + 1, Parameters::DBTYPE_AMINO_ACIDS, &matrix, 0,
+  Sequence qSeq(out, query.length() + 1, Parameters::DBTYPE_AMINO_ACIDS, &matrix, 0,
                 false, false);
   qSeq.mapSequence(0, 0, query.c_str(), query.size());
 
-  Sequence tSeq(target.length() + 1, Parameters::DBTYPE_AMINO_ACIDS, &matrix, 0,
+  Sequence tSeq(out, target.length() + 1, Parameters::DBTYPE_AMINO_ACIDS, &matrix, 0,
                 false, false);
 
   tSeq.mapSequence(0, 0, target.c_str(), target.size());
@@ -129,7 +129,7 @@ int scoreSubAlignment(std::string query, std::string target,
   return maxScore;
 }
 
-std::vector<Domain> mapMsa(const std::string &msa,
+std::vector<Domain> mapMsa(mmseqs_output* out, const std::string &msa,
                            const std::vector<Domain> &domains,
                            float minCoverage, double eValThreshold,
                            const SubstitutionMatrix &matrix) {
@@ -210,12 +210,9 @@ std::vector<Domain> mapMsa(const std::string &msa,
           float domainCov =
               MathUtil::getCoverage(domainStart, domainEnd, domain.tLength);
           int score = scoreSubAlignment(
-              querySequence, sequence, domain.qStart + queryDomainOffset,
+              out, querySequence, sequence, domain.qStart + queryDomainOffset,
               domain.qEnd, domainStart, domainEnd, matrix);
           double domainEvalue = domain.eValue + computeEvalue(length, score);
-          //                std::cout << name <<  "\t" << domainStart <<  "\t"
-          //                << domainEnd << "\t" << domainEvalue << "\t" <<
-          //                score << std::endl;
           if (domainCov > minCoverage && domainEvalue < eValThreshold) {
             result.emplace_back(name, domainStart, domainEnd, length,
                                 domain.target, domain.tStart, domain.tEnd,
@@ -231,10 +228,10 @@ std::vector<Domain> mapMsa(const std::string &msa,
   return result;
 }
 
-int doExtract(Parameters &par, DBReader<unsigned int> &blastTabReader,
+int doExtract(mmseqs_output* out, Parameters &par, DBReader<unsigned int> &blastTabReader,
               const std::pair<std::string, std::string> &resultdb,
               const size_t dbFrom, const size_t dbSize) {
-  SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0, 0);
+  SubstitutionMatrix subMat(out, par.scoringMatrixFile.aminoacids, 2.0, 0);
 
   std::string msaDataName = par.db2;
   std::string msaIndexName = par.db2Index;
@@ -258,7 +255,7 @@ int doExtract(Parameters &par, DBReader<unsigned int> &blastTabReader,
     headerReader->open(DBReader<unsigned int>::SORT_BY_LINE);
 
     sequenceReader = new DBReader<unsigned int>(
-        msaSequenceDataName.c_str(), msaSequenceIndexName.c_str(), par.threads,
+        out, msaSequenceDataName.c_str(), msaSequenceIndexName.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     sequenceReader->open(DBReader<unsigned int>::SORT_BY_LINE);
   }
@@ -268,7 +265,7 @@ int doExtract(Parameters &par, DBReader<unsigned int> &blastTabReader,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   msaReader.open(DBReader<unsigned int>::NOSORT);
 
-  DBWriter writer(resultdb.first.c_str(), resultdb.second.c_str(),
+  DBWriter writer(out, resultdb.first.c_str(), resultdb.second.c_str(),
                   static_cast<unsigned int>(par.threads), par.compressed,
                   Parameters::DBTYPE_ALIGNMENT_RES);
   writer.open();
@@ -324,7 +321,7 @@ int doExtract(Parameters &par, DBReader<unsigned int> &blastTabReader,
       oss << std::setprecision(std::numeric_limits<float>::digits10);
 
       std::vector<Domain> mapping =
-          mapMsa(msa, result, par.covThr, par.evalThr, subMat);
+          mapMsa(out, msa, result, par.covThr, par.evalThr, subMat);
 
       for (std::vector<Domain>::const_iterator k = mapping.begin();
            k != mapping.end(); ++k) {
@@ -353,7 +350,7 @@ int doExtract(Parameters &par, DBReader<unsigned int> &blastTabReader,
   return EXIT_SUCCESS;
 }
 
-int doExtract(Parameters &par, const unsigned int mpiRank,
+int doExtract(mmseqs_output* out, Parameters &par, const unsigned int mpiRank,
               const unsigned int mpiNumProc) {
   DBReader<unsigned int> reader(
       out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
@@ -366,7 +363,7 @@ int doExtract(Parameters &par, const unsigned int mpiRank,
   std::pair<std::string, std::string> tmpOutput =
       Util::createTmpFileNames(par.db3, par.db3Index, mpiRank);
 
-  int status = doExtract(par, reader, tmpOutput, dbFrom, dbSize);
+  int status = doExtract(out, par, reader, tmpOutput, dbFrom, dbSize);
 
   reader.close();
 
@@ -381,13 +378,13 @@ int doExtract(Parameters &par, const unsigned int mpiRank,
           Util::createTmpFileNames(par.db3, par.db3Index, proc);
       splitFiles.push_back(std::make_pair(tmpFile.first, tmpFile.second));
     }
-    DBWriter::mergeResults(par.db3, par.db3Index, splitFiles);
+    DBWriter::mergeResults(out, par.db3, par.db3Index, splitFiles);
   }
 
   return status;
 }
 
-int doExtract(Parameters &par) {
+int doExtract(mmseqs_output* out, Parameters &par) {
   size_t resultSize;
 
   DBReader<unsigned int> reader(
@@ -396,7 +393,7 @@ int doExtract(Parameters &par) {
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
   resultSize = reader.getSize();
 
-  int status = doExtract(par, reader, std::make_pair(par.db3, par.db3Index), 0,
+  int status = doExtract(out, par, reader, std::make_pair(par.db3, par.db3Index), 0,
                          resultSize);
 
   reader.close();
@@ -413,7 +410,7 @@ int extractdomains(mmseqs_output *out, Parameters &par) {
 #ifdef HAVE_MPI
   int status = doExtract(par, MMseqsMPI::rank, MMseqsMPI::numProc);
 #else
-  int status = doExtract(par);
+  int status = doExtract(out, par);
 #endif
 
   return status;

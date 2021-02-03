@@ -14,7 +14,7 @@ static bool compareToFirst(const std::pair<unsigned int, unsigned int>& lhs,
   return (lhs.first <= rhs.first);
 }
 
-void copyEntry(unsigned int oldKey, unsigned int newKey,
+void copyEntry(mmseqs_output* out, unsigned int oldKey, unsigned int newKey,
                DBReader<unsigned int>& reader, DBWriter& writer,
                bool isCompressed, int subDbMode) {
   const size_t id = reader.getId(oldKey);
@@ -61,7 +61,7 @@ int renamedbkeys(mmseqs_output* out, Parameters& par) {
     mode |= DBReader<unsigned int>::USE_LOOKUP;
     newLookupFile = FileUtil::openAndDelete(out, (par.db3 + ".lookup").c_str(), "w");
   }
-  DBReader<unsigned int> reader(par.db2.c_str(), par.db2Index.c_str(), 1, mode);
+  DBReader<unsigned int> reader(out, par.db2.c_str(), par.db2Index.c_str(), 1, mode);
   reader.open(DBReader<unsigned int>::NOSORT);
   const bool isCompressed = reader.isCompressed();
 
@@ -71,7 +71,7 @@ int renamedbkeys(mmseqs_output* out, Parameters& par) {
   if (FileUtil::fileExists(out, (par.db2 + "_mapping").c_str())) {
     mapping.reserve(reader.getSize());
     newMapping.reserve(reader.getSize());
-    bool isSorted = Util::readMapping(par.db2 + "_mapping", mapping);
+    bool isSorted = Util::readMapping(out, par.db2 + "_mapping", mapping);
     if (isSorted == false) {
       std::stable_sort(mapping.begin(), mapping.end(), compareToFirst);
     }
@@ -83,19 +83,19 @@ int renamedbkeys(mmseqs_output* out, Parameters& par) {
   DBReader<unsigned int>* headerReader = NULL;
   if (FileUtil::fileExists(out, par.hdr2dbtype.c_str())) {
     headerReader = new DBReader<unsigned int>(
-        par.hdr2.c_str(), par.hdr2Index.c_str(), 1,
+        out, par.hdr2.c_str(), par.hdr2Index.c_str(), 1,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     headerReader->open(DBReader<unsigned int>::NOSORT);
     isHeaderCompressed = headerReader->isCompressed();
   }
 
-  DBWriter writer(par.db3.c_str(), par.db3Index.c_str(), 1, 0,
+  DBWriter writer(out, par.db3.c_str(), par.db3Index.c_str(), 1, 0,
                   Parameters::DBTYPE_OMIT_FILE);
   writer.open();
 
   DBWriter* headerWriter = NULL;
   if (headerReader != NULL) {
-    headerWriter = new DBWriter(par.hdr3.c_str(), par.hdr3Index.c_str(), 1, 0,
+    headerWriter = new DBWriter(out, par.hdr3.c_str(), par.hdr3Index.c_str(), 1, 0,
                                 Parameters::DBTYPE_OMIT_FILE);
     headerWriter->open();
   }
@@ -120,7 +120,7 @@ int renamedbkeys(mmseqs_output* out, Parameters& par) {
     const unsigned int oldKey = Util::fast_atoi<unsigned int>(fields[0]);
     const unsigned int newKey = Util::fast_atoi<unsigned int>(fields[1]);
 
-    copyEntry(oldKey, newKey, reader, writer, isCompressed, par.subDbMode);
+    copyEntry(out, oldKey, newKey, reader, writer, isCompressed, par.subDbMode);
     if (lookup != NULL) {
       unsigned int lookupId = reader.getLookupIdByKey(oldKey);
       DBReader<unsigned int>::LookupEntry entry = lookup[lookupId];
@@ -141,15 +141,15 @@ int renamedbkeys(mmseqs_output* out, Parameters& par) {
     }
 
     if (headerReader != NULL && headerWriter != NULL) {
-      copyEntry(oldKey, newKey, *headerReader, *headerWriter,
+      copyEntry(out, oldKey, newKey, *headerReader, *headerWriter,
                 isHeaderCompressed, par.subDbMode);
     }
   }
   // merge any kind of sequence database
   writer.close(headerWriter != NULL);
-  DBWriter::writeDbtypeFile(par.db3.c_str(), reader.getDbtype(), isCompressed);
+  DBWriter::writeDbtypeFile(out, par.db3.c_str(), reader.getDbtype(), isCompressed);
   if (par.subDbMode == Parameters::SUBDB_MODE_SOFT) {
-    DBReader<unsigned int>::softlinkDb(par.db2, par.db3, DBFiles::DATA);
+    DBReader<unsigned int>::softlinkDb(out, par.db2, par.db3, DBFiles::DATA);
   }
   if (newMappingFile != NULL) {
     SORT_PARALLEL(newMapping.begin(), newMapping.end(), compareToFirst);
@@ -182,20 +182,20 @@ int renamedbkeys(mmseqs_output* out, Parameters& par) {
   if (headerWriter != NULL) {
     headerWriter->close(true);
     delete headerWriter;
-    DBWriter::writeDbtypeFile(par.hdr3.c_str(), headerReader->getDbtype(),
+    DBWriter::writeDbtypeFile(out, par.hdr3.c_str(), headerReader->getDbtype(),
                               isHeaderCompressed);
     if (par.subDbMode == Parameters::SUBDB_MODE_SOFT) {
-      DBReader<unsigned int>::softlinkDb(par.db2, par.db3, DBFiles::HEADER);
+      DBReader<unsigned int>::softlinkDb(out, par.db2, par.db3, DBFiles::HEADER);
     }
   }
   if (par.subDbMode == Parameters::SUBDB_MODE_SOFT) {
     DBReader<unsigned int>::softlinkDb(
-        par.db2, par.db3,
+        out, par.db2, par.db3,
         (DBFiles::Files)(DBFiles::SOURCE | DBFiles::TAX_MERGED |
                          DBFiles::TAX_NAMES | DBFiles::TAX_NODES));
   } else {
     DBReader<unsigned int>::copyDb(
-        par.db2, par.db3,
+        out, par.db2, par.db3,
         (DBFiles::Files)(DBFiles::SOURCE | DBFiles::TAX_MERGED |
                          DBFiles::TAX_NAMES | DBFiles::TAX_NODES));
   }

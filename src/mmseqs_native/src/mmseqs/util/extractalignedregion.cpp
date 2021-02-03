@@ -45,7 +45,7 @@ int extractalignedregion(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   alndbr.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter dbw(par.db4.c_str(), par.db4Index.c_str(),
+  DBWriter dbw(out, par.db4.c_str(), par.db4Index.c_str(),
                static_cast<unsigned int>(par.threads), par.compressed,
                tdbr->getDbtype());
   dbw.open();
@@ -71,7 +71,7 @@ int extractalignedregion(mmseqs_output *out, Parameters &par) {
       }
 
       char *data = alndbr.getData(i, thread_idx);
-      Matcher::readAlignmentResults(results, data);
+      Matcher::readAlignmentResults(out, results, data);
       for (size_t j = 0; j < results.size(); j++) {
         Matcher::result_t &res = results[j];
         size_t length = 0;

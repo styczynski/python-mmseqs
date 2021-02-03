@@ -33,7 +33,7 @@ int convertmsa(mmseqs_output *out, Parameters &par) {
     return EXIT_FAILURE;
   }
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), 1, par.compressed,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), 1, par.compressed,
                   Parameters::DBTYPE_MSA_DB);
   writer.open();
 

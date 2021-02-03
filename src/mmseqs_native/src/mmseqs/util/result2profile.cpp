@@ -36,7 +36,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
   // par.printParameters(command.cmd, argc, argv, *command.params);
 
   DBReader<unsigned int> resultReader(
-      par.db3.c_str(), par.db3Index.c_str(), par.threads,
+      out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   resultReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
   size_t dbFrom = 0;
@@ -77,7 +77,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
 
   if (templateDBIsIndex == false) {
     tDbr = new DBReader<unsigned int>(
-        par.db2.c_str(), par.db2Index.c_str(), par.threads,
+        out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     tDbr->open(DBReader<unsigned int>::NOSORT);
     targetSeqType = tDbr->getDbtype();
@@ -87,7 +87,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
   const bool sameDatabase = (par.db1.compare(par.db2) == 0) ? true : false;
   if (!sameDatabase) {
     qDbr = new DBReader<unsigned int>(
-        par.db1.c_str(), par.db1Index.c_str(), par.threads,
+        out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     qDbr->open(DBReader<unsigned int>::NOSORT);
     if (par.preloadMode != Parameters::PRELOAD_MODE_MMAP) {

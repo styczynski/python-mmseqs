@@ -22,7 +22,7 @@ int mergeresultsbyset(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   resultReader.open(DBReader<unsigned int>::NOSORT);
 
-  DBWriter dbw(par.db3.c_str(), par.db3Index.c_str(), par.threads,
+  DBWriter dbw(out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
                par.compressed, resultReader.getDbtype());
   dbw.open();
 #pragma omp parallel
@@ -43,7 +43,7 @@ int mergeresultsbyset(mmseqs_output *out, Parameters &par) {
         unsigned int key = Util::fast_atoi<unsigned int>(dbKey);
         size_t id = resultReader.getId(key);
         if (id == UINT_MAX) {
-          out->failure("Invalid key {} in entry {}.", key ,  in entry );
+          out->failure("Invalid key {} in entry {}", key, data);
         }
         buffer.append(resultReader.getData(id, thread_idx));
         data = Util::skipLine(data);

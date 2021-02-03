@@ -22,12 +22,12 @@ int subtractdbs(mmseqs_output *out, Parameters &par) {
 
   out->info("Remove {}\n", par.db2 << " ids from " << par.db1);
   DBReader<unsigned int> leftDbr(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   leftDbr.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
   DBReader<unsigned int> rightDbr(
-      par.db2.c_str(), par.db2Index.c_str(), par.threads,
+      out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   rightDbr.open(DBReader<unsigned int>::NOSORT);
 

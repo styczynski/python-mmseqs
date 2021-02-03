@@ -33,7 +33,7 @@ int createtsv(mmseqs_output *out, Parameters &par) {
                         : (par.idxSeqSrc == 1) ? IndexReader::HEADERS
                                                : IndexReader::SRC_HEADERS;
   IndexReader qDbrHeader(
-      par.db1, par.threads, queryHeaderType,
+      out, par.db1, par.threads, queryHeaderType,
       (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0);
   IndexReader *tDbrHeader = NULL;
   DBReader<unsigned int> *queryDB = qDbrHeader.sequenceReader;
@@ -58,7 +58,7 @@ int createtsv(mmseqs_output *out, Parameters &par) {
                                                     : IndexReader::SRC_HEADERS;
 
       tDbrHeader =
-          new IndexReader(par.db2, par.threads, targetHeaderType, touch);
+          new IndexReader(out, par.db2, par.threads, targetHeaderType, touch);
       tHeaderIndex = tDbrHeader->sequenceReader->getIndex();
       targetDB = tDbrHeader->sequenceReader;
     }
@@ -81,7 +81,7 @@ int createtsv(mmseqs_output *out, Parameters &par) {
   const bool shouldCompress = par.dbOut == true && par.compressed == true;
   const int dbType = par.dbOut == true ? Parameters::DBTYPE_GENERIC_DB
                                        : Parameters::DBTYPE_OMIT_FILE;
-  DBWriter writer(dataFile.c_str(), indexFile.c_str(), par.threads,
+  DBWriter writer(out, dataFile.c_str(), indexFile.c_str(), par.threads,
                   shouldCompress, dbType);
   writer.open();
 

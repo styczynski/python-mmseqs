@@ -47,7 +47,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
   char *targetElementExists = NULL;
   if (isGeneralMode) {
     DBReader<unsigned int> resultReader(
-        parResultDb, parResultDbIndex, par.threads,
+        out, parResultDb, parResultDbIndex, par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     resultReader.open(DBReader<unsigned int>::SORT_BY_OFFSET);
     // search for the maxTargetId (value of first column) in parallel
@@ -108,7 +108,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
   }
 
   DBReader<unsigned int> resultDbr(
-      parResultDb, parResultDbIndex, par.threads,
+      out, parResultDb, parResultDbIndex, par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   resultDbr.open(DBReader<unsigned int>::SORT_BY_OFFSET);
 

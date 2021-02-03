@@ -20,7 +20,7 @@ int mergedbs(mmseqs_output *out, Parameters &par) {
   const int preloadMode = (par.preloadMode != Parameters::PRELOAD_MODE_MMAP)
                               ? IndexReader::PRELOAD_INDEX
                               : 0;
-  IndexReader qDbr(par.db1, 1, IndexReader::SEQUENCES, preloadMode,
+  IndexReader qDbr(out, par.db1, 1, IndexReader::SEQUENCES, preloadMode,
                    DBReader<unsigned int>::USE_INDEX);
 
   // skip par.db{1,2}
@@ -35,7 +35,7 @@ int mergedbs(mmseqs_output *out, Parameters &par) {
     filesToMerge[i]->open(DBReader<unsigned int>::NOSORT);
   }
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), 1, par.compressed,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), 1, par.compressed,
                   filesToMerge[0]->getDbtype());
   writer.open();
 

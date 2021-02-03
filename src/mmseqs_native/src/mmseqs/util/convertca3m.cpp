@@ -27,7 +27,7 @@ int convertca3m(mmseqs_output* out, Parameters& par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   sequences.open(DBReader<unsigned int>::SORT_BY_LINE);
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                   par.compressed, Parameters::DBTYPE_CA3M_DB);
   writer.open();
 

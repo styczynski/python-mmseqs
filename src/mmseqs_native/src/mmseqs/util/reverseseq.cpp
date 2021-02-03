@@ -15,7 +15,7 @@ int reverseseq(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argn, argv, command, true, true, 0);
 
   DBReader<unsigned int> seqReader(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   seqReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
@@ -65,7 +65,7 @@ int reverseseq(mmseqs_output *out, Parameters &par) {
   }
   revSeqWriter.close(true);
   seqReader.close();
-  DBReader<unsigned int>::softlinkDb(par.db1, par.db2,
+  DBReader<unsigned int>::softlinkDb(out, par.db1, par.db2,
                                      DBFiles::SEQUENCE_ANCILLARY);
 
   return EXIT_SUCCESS;

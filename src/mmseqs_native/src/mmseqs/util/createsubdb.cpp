@@ -29,7 +29,7 @@ int createsubdb(mmseqs_output *out, Parameters &par) {
   reader.open(DBReader<unsigned int>::NOSORT);
   const bool isCompressed = reader.isCompressed();
 
-  DBWriter writer(par.db3.c_str(), par.db3Index.c_str(), 1, 0,
+  DBWriter writer(out, par.db3.c_str(), par.db3Index.c_str(), 1, 0,
                   Parameters::DBTYPE_OMIT_FILE);
   writer.open();
   // getline reallocs automatic
@@ -83,10 +83,10 @@ int createsubdb(mmseqs_output *out, Parameters &par) {
                                 Parameters::DBTYPE_PROFILE_STATE_SEQ);
   writer.close(shouldMerge, !isOrdered);
   if (par.subDbMode == Parameters::SUBDB_MODE_SOFT) {
-    DBReader<unsigned int>::softlinkDb(par.db2, par.db3, DBFiles::DATA);
+    DBReader<unsigned int>::softlinkDb(out, par.db2, par.db3, DBFiles::DATA);
   }
-  DBWriter::writeDbtypeFile(par.db3.c_str(), reader.getDbtype(), isCompressed);
-  DBReader<unsigned int>::softlinkDb(par.db2, par.db3,
+  DBWriter::writeDbtypeFile(out, par.db3.c_str(), reader.getDbtype(), isCompressed);
+  DBReader<unsigned int>::softlinkDb(out, par.db2, par.db3,
                                      DBFiles::SEQUENCE_ANCILLARY);
 
   free(line);

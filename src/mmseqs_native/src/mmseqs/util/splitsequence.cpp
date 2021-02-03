@@ -26,7 +26,7 @@ int splitsequence(mmseqs_output* out, Parameters& par) {
   if (par.sequenceSplitMode == Parameters::SEQUENCE_SPLIT_MODE_HARD) {
     mode |= DBReader<unsigned int>::USE_DATA;
   }
-  DBReader<unsigned int> reader(par.db1.c_str(), par.db1Index.c_str(),
+  DBReader<unsigned int> reader(out, par.db1.c_str(), par.db1Index.c_str(),
                                 par.threads, mode);
   reader.open(DBReader<unsigned int>::NOSORT);
   bool sizeLarger = false;
@@ -36,13 +36,13 @@ int splitsequence(mmseqs_output* out, Parameters& par) {
 
   // if no sequence needs to be splitted
   if (sizeLarger == false) {
-    DBReader<unsigned int>::softlinkDb(par.db1, par.db2, DBFiles::SEQUENCE_DB);
+    DBReader<unsigned int>::softlinkDb(out, par.db1, par.db2, DBFiles::SEQUENCE_DB);
     reader.close();
     return EXIT_SUCCESS;
   }
 
   DBReader<unsigned int> headerReader(
-      par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
+      out, par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   headerReader.open(DBReader<unsigned int>::NOSORT);
 
@@ -143,7 +143,7 @@ int splitsequence(mmseqs_output* out, Parameters& par) {
   headerReader.close();
   reader.close();
   if (par.sequenceSplitMode == Parameters::SEQUENCE_SPLIT_MODE_SOFT) {
-    DBReader<unsigned int>::softlinkDb(par.db1, par.db2, DBFiles::DATA);
+    DBReader<unsigned int>::softlinkDb(out, par.db1, par.db2, DBFiles::DATA);
   }
   // make identifiers stable
 #pragma omp parallel
@@ -161,7 +161,7 @@ int splitsequence(mmseqs_output* out, Parameters& par) {
       }
     }
   }
-  DBReader<unsigned int>::softlinkDb(par.db1, par.db2, DBFiles::SOURCE);
+  DBReader<unsigned int>::softlinkDb(out, par.db1, par.db2, DBFiles::SOURCE);
 
   return EXIT_SUCCESS;
 }

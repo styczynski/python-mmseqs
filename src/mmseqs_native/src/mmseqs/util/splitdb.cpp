@@ -14,7 +14,7 @@ int splitdb(mmseqs_output *out, Parameters &par) {
   }
 
   DBReader<unsigned int> dbr(
-      par.db1.c_str(), par.db1Index.c_str(), 1,
+      out, par.db1.c_str(), par.db1Index.c_str(), 1,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   dbr.open(DBReader<unsigned int>::NOSORT);
 
@@ -44,7 +44,7 @@ int splitdb(mmseqs_output *out, Parameters &par) {
       writer.writeData(data, dbr.getEntryLen(i) - 1, outerKey);
     }
     writer.close();
-    DBReader<unsigned int>::softlinkDb(par.db1, outDb,
+    DBReader<unsigned int>::softlinkDb(out, par.db1, outDb,
                                        DBFiles::SEQUENCE_ANCILLARY);
   }
 

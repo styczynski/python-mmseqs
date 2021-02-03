@@ -193,7 +193,7 @@ int doAnnotate(Parameters &par, DBReader<unsigned int> &blastTabReader,
 int doAnnotate(Parameters &par, const unsigned int mpiRank,
                const unsigned int mpiNumProc) {
   DBReader<unsigned int> reader(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
@@ -225,7 +225,7 @@ int doAnnotate(Parameters &par, const unsigned int mpiRank,
 
 int doAnnotate(Parameters &par) {
   DBReader<unsigned int> reader(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
   size_t resultSize = reader.getSize();

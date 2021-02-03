@@ -30,11 +30,11 @@ int result2msa(mmseqs_output *out, Parameters &par) {
       par.msaFormatMode != Parameters::FORMAT_MSA_STOCKHOLM_FLAT;
 
   DBReader<unsigned int> qDbr(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   qDbr.open(DBReader<unsigned int>::NOSORT);
   DBReader<unsigned int> queryHeaderReader(
-      par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
+      out, par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   queryHeaderReader.open(DBReader<unsigned int>::NOSORT);
   if (par.preloadMode != Parameters::PRELOAD_MODE_MMAP) {
@@ -49,7 +49,7 @@ int result2msa(mmseqs_output *out, Parameters &par) {
   const bool sameDatabase = (par.db1.compare(par.db2) == 0) ? true : false;
   if (!sameDatabase) {
     tDbr = new DBReader<unsigned int>(
-        par.db2.c_str(), par.db2Index.c_str(), par.threads,
+        out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     tDbr->open(DBReader<unsigned int>::NOSORT);
     maxSequenceLength = std::max(qDbr.getMaxSeqLen(), tDbr->getMaxSeqLen());
@@ -59,7 +59,7 @@ int result2msa(mmseqs_output *out, Parameters &par) {
 
     if (isCA3M == false) {
       targetHeaderReader = new DBReader<unsigned int>(
-          par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
+          out, par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
           DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
       targetHeaderReader->open(DBReader<unsigned int>::NOSORT);
 

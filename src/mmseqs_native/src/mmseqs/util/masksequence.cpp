@@ -24,10 +24,10 @@ int masksequence(mmseqs_output *out, Parameters &par) {
   BaseMatrix *subMat;
   if (Parameters::isEqualDbtype(reader.getDbtype(),
                                 Parameters::DBTYPE_NUCLEOTIDES)) {
-    subMat = new NucleotideMatrix(par.scoringMatrixFile.nucleotides, 1.0, 0.0);
+    subMat = new NucleotideMatrix(out, par.scoringMatrixFile.nucleotides, 1.0, 0.0);
   } else {
     // keep score bias at 0.0 (improved ROC)
-    subMat = new SubstitutionMatrix(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+    subMat = new SubstitutionMatrix(out, par.scoringMatrixFile.aminoacids, 2.0, 0.0);
   }
   size_t maxSeqLen = 0;
 
@@ -37,7 +37,7 @@ int masksequence(mmseqs_output *out, Parameters &par) {
   // need to prune low scoring k-mers through masking
   ProbabilityMatrix probMatrix(*subMat);
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                   par.compressed, reader.getDbtype());
   writer.open();
 #pragma omp parallel
@@ -74,7 +74,7 @@ int masksequence(mmseqs_output *out, Parameters &par) {
     delete[] charSequence;
   }
   writer.close(true);
-  DBReader<unsigned int>::softlinkDb(par.db1, par.db2,
+  DBReader<unsigned int>::softlinkDb(out, par.db1, par.db2,
                                      DBFiles::SEQUENCE_ANCILLARY);
   reader.close();
 
