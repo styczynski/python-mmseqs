@@ -79,7 +79,7 @@ int proteinaln2nucl(mmseqs_output *out, Parameters &par) {
                         par.compressed, Parameters::DBTYPE_ALIGNMENT_RES);
   resultWriter.open();
 
-  Debug::Progress progress(alnDbr.getSize());
+  Log::Progress progress(alnDbr.getSize());
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

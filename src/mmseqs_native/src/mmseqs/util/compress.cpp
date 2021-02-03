@@ -30,7 +30,7 @@ int doCompression(mmseqs_output* out, Parameters& par, bool shouldCompress) {
   DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads,
                   shouldCompress, dbtype);
   writer.open();
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
 
 #pragma omp parallel
   {

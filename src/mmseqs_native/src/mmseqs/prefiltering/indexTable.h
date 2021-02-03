@@ -59,9 +59,13 @@ struct __attribute__((__packed__)) IndexEntryLocalTmp {
 };
 
 class IndexTable {
+ private:
+  mmseqs_output* out;
+
  public:
-  IndexTable(int alphabetSize, int kmerSize, bool externalData)
-      : tableSize(MathUtil::ipow<size_t>(alphabetSize, kmerSize)),
+  IndexTable(mmseqs_output* output, int alphabetSize, int kmerSize, bool externalData)
+      : out(output),
+        tableSize(MathUtil::ipow<size_t>(alphabetSize, kmerSize)),
         alphabetSize(alphabetSize),
         kmerSize(kmerSize),
         externalData(externalData),
@@ -442,11 +446,11 @@ class IndexTable {
 
   int getAlphabetSize() { return alphabetSize; }
 
-  static int computeKmerSize(size_t aaSize) {
-    return aaSize < getUpperBoundAACountForKmerSize(6) ? 6 : 7;
+  static int computeKmerSize(mmseqs_output* out, size_t aaSize) {
+    return aaSize < getUpperBoundAACountForKmerSize(out, 6) ? 6 : 7;
   }
 
-  static size_t getUpperBoundAACountForKmerSize(int kmerSize) {
+  static size_t getUpperBoundAACountForKmerSize(mmseqs_output* out, int kmerSize) {
     switch (kmerSize) {
       case 6:
         return 3350000000;
@@ -457,7 +461,7 @@ class IndexTable {
     }
   }
 
-  static size_t getUpperBoundNucCountForKmerSize(int kmerSize) {
+  static size_t getUpperBoundNucCountForKmerSize(mmseqs_output* out, int kmerSize) {
     switch (kmerSize) {
       case 14:
         return 3350000000;

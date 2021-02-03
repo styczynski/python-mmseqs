@@ -24,7 +24,7 @@ int sortresult(mmseqs_output *out, Parameters &par) {
   DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads,
                   par.compressed, reader.getDbtype());
   writer.open();
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
 
 #pragma omp parallel
   {

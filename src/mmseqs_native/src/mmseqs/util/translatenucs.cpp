@@ -38,7 +38,7 @@ int translatenucs(mmseqs_output* out, Parameters& par) {
                   par.compressed, Parameters::DBTYPE_AMINO_ACIDS);
   writer.open();
 
-  Debug::Progress progress(entries);
+  Log::Progress progress(entries);
   TranslateNucl translateNucl(
       static_cast<TranslateNucl::GenCode>(par.translationTable));
 #pragma omp parallel num_threads(localThreads)

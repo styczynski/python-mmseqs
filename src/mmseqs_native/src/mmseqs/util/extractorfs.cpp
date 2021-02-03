@@ -49,7 +49,7 @@ int extractorfs(mmseqs_output* out, Parameters& par) {
   unsigned int forwardFrames = Orf::getFrames(par.forwardFrames);
   unsigned int reverseFrames = Orf::getFrames(par.reverseFrames);
   const char newline = '\n';
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
   TranslateNucl translateNucl(
       static_cast<TranslateNucl::GenCode>(par.translationTable));
 

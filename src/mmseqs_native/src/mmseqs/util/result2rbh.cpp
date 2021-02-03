@@ -20,7 +20,7 @@ int result2rbh(mmseqs_output *out, Parameters &par) {
   DBWriter dbw(par.db2.c_str(), par.db2Index.c_str(), par.threads,
                par.compressed, resultReader.getDbtype());
   dbw.open();
-  Debug::Progress progress(resultReader.getSize());
+  Log::Progress progress(resultReader.getSize());
 
 #pragma omp parallel
   {

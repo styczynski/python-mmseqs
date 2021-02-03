@@ -30,7 +30,7 @@ int result2repseq(mmseqs_output *out, Parameters &par) {
                         par.compressed, seqReader.getDbtype());
   resultWriter.open();
 
-  Debug::Progress progress(resultReader.getSize());
+  Log::Progress progress(resultReader.getSize());
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

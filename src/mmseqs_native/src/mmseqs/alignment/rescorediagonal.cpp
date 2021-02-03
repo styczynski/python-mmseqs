@@ -121,7 +121,7 @@ int doRescorediagonal(mmseqs_output* out, Parameters &par, DBWriter &resultWrite
   for (size_t i = 0; i < iterations; i++) {
     size_t start = dbFrom + (i * flushSize);
     size_t bucketSize = std::min(dbSize - (i * flushSize), flushSize);
-    Debug::Progress progress(bucketSize);
+    Log::Progress progress(bucketSize);
 
 #pragma omp parallel
     {
@@ -187,15 +187,8 @@ int doRescorediagonal(mmseqs_output* out, Parameters &par, DBWriter &resultWrite
             querySeq = (char *)queryBuffer.c_str();
           }
         }
-        //                if(par.rescoreMode !=
-        //                Parameters::RESCORE_MODE_HAMMING){
-        //                    query.mapSequence(id, queryId, querySeq);
-        //                    queryLen = query.L;
-        //                }else{
-        // -2 because of \n\0 in sequenceDB
-        //                }
 
-        std::vector<hit_t> results = QueryMatcher::parsePrefilterHits(data);
+        std::vector<hit_t> results = QueryMatcher::parsePrefilterHits(out, data);
         for (size_t entryIdx = 0; entryIdx < results.size(); entryIdx++) {
           char *querySeqToAlign = querySeq;
           bool isReverse = false;
@@ -452,7 +445,7 @@ int rescorediagonal(mmseqs_output *out, Parameters &par) {
   std::pair<std::string, std::string> tmpOutput =
       Util::createTmpFileNames(outfile, outfileIndex, MMseqsMPI::rank);
 
-  DBWriter resultWriter(tmpOutput.first.c_str(), tmpOutput.second.c_str(),
+  DBWriter resultWriter(out, tmpOutput.first.c_str(), tmpOutput.second.c_str(),
                         par.threads, par.compressed, dbtype);
   resultWriter.open();
   int status =
@@ -470,7 +463,7 @@ int rescorediagonal(mmseqs_output *out, Parameters &par) {
     DBWriter::mergeResults(par.db4, par.db4Index, splitFiles);
   }
 #else
-  DBWriter resultWriter(par.db4.c_str(), par.db4Index.c_str(), par.threads,
+  DBWriter resultWriter(out, par.db4.c_str(), par.db4Index.c_str(), par.threads,
                         par.compressed, dbtype);
   resultWriter.open();
   int status = doRescorediagonal(par, resultWriter, resultReader, 0,

@@ -41,7 +41,7 @@ int profile2cs(mmseqs_output* out, Parameters& par) {
     size_t entries = profileReader.getSize();
 
     SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, 0.0);
-    Debug::Progress progress(entries);
+    Log::Progress progress(entries);
 
     out->info("Start converting profiles.");
 #pragma omp parallel

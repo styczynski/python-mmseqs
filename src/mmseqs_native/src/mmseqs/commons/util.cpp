@@ -668,7 +668,7 @@ char Util::touchMemory(const char *memory, size_t size) {
     return 0;
   }
   size_t pageSize = getPageSize();
-  //    Debug::Progress progress(size/pageSize);
+  //    Log::Progress progress(size/pageSize);
   size_t fourTimesPageSize = 4 * pageSize;
   char buffer1 = 0;
   char buffer2 = 0;

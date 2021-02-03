@@ -225,7 +225,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
   }
 
   const size_t LINE_BUFFER_SIZE = 1000000;
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
 #pragma omp parallel
   {
     int thread_idx = 0;

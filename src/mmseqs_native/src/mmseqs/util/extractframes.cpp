@@ -36,7 +36,7 @@ int extractframes(mmseqs_output* out, Parameters& par) {
 
   unsigned int forwardFrames = Orf::getFrames(par.forwardFrames);
   unsigned int reverseFrames = Orf::getFrames(par.reverseFrames);
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
 
 #pragma omp parallel
   {

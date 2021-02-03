@@ -106,7 +106,7 @@ int convertkb(mmseqs_output *out, Parameters &par) {
     reader->open(DBReader<unsigned int>::NOSORT);
   }
 
-  Debug::Progress progress;
+  Log::Progress progress;
   for (std::vector<std::string>::const_iterator it = par.filenames.begin();
        it != par.filenames.end(); ++it) {
     std::istream *kbIn;

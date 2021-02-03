@@ -1,6 +1,7 @@
 #ifndef MMSEQS_PSSM_H
 #define MMSEQS_PSSM_H
 
+#include <mmseqs/output.h>
 #include <cstddef>
 #include <string>
 

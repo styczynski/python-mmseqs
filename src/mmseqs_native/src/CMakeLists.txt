@@ -47,6 +47,7 @@ add_library(mmseqs-framework
 target_include_directories(mmseqs-framework PUBLIC ${CMAKE_BINARY_DIR}/generated)
 target_include_directories(mmseqs-framework PUBLIC ${PROJECT_BINARY_DIR}/generated)
 target_include_directories(mmseqs-framework PUBLIC .)
+target_include_directories(mmseqs-framework PUBLIC ../../../lib/spdlog/include)
 
 add_dependencies(mmseqs-framework generated)
 

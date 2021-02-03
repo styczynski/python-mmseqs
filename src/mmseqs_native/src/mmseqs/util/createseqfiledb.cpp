@@ -39,7 +39,7 @@ int createseqfiledb(mmseqs_output *out, Parameters &par) {
                   Parameters::DBTYPE_GENERIC_DB);
   writer.open();
 
-  Debug::Progress progress(resultDb.getSize());
+  Log::Progress progress(resultDb.getSize());
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

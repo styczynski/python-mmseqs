@@ -359,7 +359,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
     free(dst);
   }
 
-  Debug::Progress progress(alnDbr.getSize());
+  Log::Progress progress(alnDbr.getSize());
 #pragma omp parallel num_threads(localThreads)
   {
     unsigned int thread_idx = 0;

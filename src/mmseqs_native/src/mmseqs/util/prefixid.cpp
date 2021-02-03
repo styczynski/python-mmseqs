@@ -29,7 +29,7 @@ int addid(const std::string &db1, const std::string &db1Index,
   const bool shouldWriteNullByte = !tsvOut;
 
   size_t entries = reader.getSize();
-  Debug::Progress progress(entries);
+  Log::Progress progress(entries);
   bool doMapping = false;
   DBReader<unsigned int> *lookupReader = NULL;
   if (mappingFile.size() > 0) {

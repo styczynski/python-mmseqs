@@ -1,6 +1,7 @@
 #ifndef BASE_MATRIX_H
 #define BASE_MATRIX_H
 
+#include <mmseqs/output.h>
 #include <string>
 
 class BaseMatrix {

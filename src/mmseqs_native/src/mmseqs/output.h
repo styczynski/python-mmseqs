@@ -55,8 +55,13 @@ struct mmseqs_output {
   }
 
   template<typename FormatString, typename... Args>
+  void warn(const FormatString &fmt, Args&&...args) {
+      logger.warn(fmt, std::forward<Args>(args)...);
+  }
+
+  template<typename FormatString, typename... Args>
   void info(const FormatString &fmt, Args&&...args) {
-      loggger.info(fmt, std::forward<Args>(args)...);
+      logger.info(fmt, std::forward<Args>(args)...);
   }
 
   template<typename FormatString, typename... Args>

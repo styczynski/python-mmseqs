@@ -16,10 +16,10 @@ class IndexReader {
               int dataMode = (DBReader<unsigned int>::USE_INDEX |
                               DBReader<unsigned int>::USE_DATA))
       : out(output), sequenceReader(NULL), index(NULL) {
-    int targetDbtype = FileUtil::parseDbType(dataName.c_str());
+    int targetDbtype = FileUtil::parseDbType(out, dataName.c_str());
     if (Parameters::isEqualDbtype(targetDbtype, Parameters::DBTYPE_INDEX_DB)) {
       index = new DBReader<unsigned int>(
-          dataName.c_str(), (dataName + ".index").c_str(), 1,
+          out, dataName.c_str(), (dataName + ".index").c_str(), 1,
           DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
       index->open(DBReader<unsigned int>::NOSORT);
       if (PrefilteringIndexReader::checkIfIndexFile(index)) {
@@ -68,11 +68,11 @@ class IndexReader {
     if (sequenceReader == NULL) {
       if (databaseType & (HEADERS | SRC_HEADERS)) {
         sequenceReader = new DBReader<unsigned int>(
-            (dataName + "_h").c_str(), ((dataName + "_h") + ".index").c_str(),
+            out, (dataName + "_h").c_str(), ((dataName + "_h") + ".index").c_str(),
             threads, dataMode);
       } else {
         sequenceReader = new DBReader<unsigned int>(
-            dataName.c_str(), (dataName + ".index").c_str(), threads, dataMode);
+            out, dataName.c_str(), (dataName + ".index").c_str(), threads, dataMode);
       }
       sequenceReader->open(DBReader<unsigned int>::NOSORT);
       bool touchData = preloadMode & PRELOAD_DATA;

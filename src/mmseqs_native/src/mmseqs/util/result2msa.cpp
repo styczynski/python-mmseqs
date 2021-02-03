@@ -159,7 +159,7 @@ int result2msa(mmseqs_output *out, Parameters &par) {
                      << " type: " << tDbr->getDbTypeName());
 
   const bool isFiltering = par.filterMsa != 0;
-  Debug::Progress progress(dbSize - dbFrom);
+  Log::Progress progress(dbSize - dbFrom);
 #pragma omp parallel num_threads(localThreads)
   {
     unsigned int thread_idx = 0;

@@ -6,10 +6,10 @@
 
 class SubstitutionMatrixProfileStates : public BaseMatrix {
  public:
-  SubstitutionMatrixProfileStates(std::string matrixName, double **probMatrix,
+  SubstitutionMatrixProfileStates(mmseqs_output* output, std::string matrixName, double **probMatrix,
                                   double *pBack, float **rMatrix,
                                   float bitFactor, float scoreBias,
-                                  int libAlphabetSize) {
+                                  int libAlphabetSize): BaseMatrix(output) {
     //        alphabetSize = 32;
     num2aa[0] = 'A';
     num2aa[1] = 'C';

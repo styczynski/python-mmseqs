@@ -62,7 +62,7 @@ int result2dnamsa(mmseqs_output *out, Parameters &par) {
   out->info("Target database size: {}\n", tDbr->getSize()
                      << " type: " << tDbr->getDbTypeName());
 
-  Debug::Progress progress(resultReader.getSize());
+  Log::Progress progress(resultReader.getSize());
 
 #pragma omp parallel
   {

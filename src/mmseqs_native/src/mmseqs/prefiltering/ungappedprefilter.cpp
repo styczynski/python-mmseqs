@@ -81,7 +81,7 @@ int doRescorealldiagonal(Parameters &par, DBReader<unsigned int> &qdbr,
     }
   }
 
-  Debug::Progress progress(dbSize);
+  Log::Progress progress(dbSize);
 
 #pragma omp parallel
   {

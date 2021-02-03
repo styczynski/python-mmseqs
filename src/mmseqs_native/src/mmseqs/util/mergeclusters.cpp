@@ -41,7 +41,7 @@ int mergeclusters(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   cluDb.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  Debug::Progress progress(cluDb.getSize());
+  Log::Progress progress(cluDb.getSize());
 #pragma omp parallel
   {
     int thread_idx = 0;

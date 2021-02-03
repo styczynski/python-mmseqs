@@ -74,7 +74,7 @@ int alignall(mmseqs_output *out, Parameters &par) {
     size_t start = (i * flushSize);
     size_t bucketSize =
         std::min(dbr_res.getSize() - (i * flushSize), flushSize);
-    Debug::Progress progress(bucketSize);
+    Log::Progress progress(bucketSize);
 #pragma omp parallel
     {
       unsigned int thread_idx = 0;

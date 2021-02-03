@@ -70,7 +70,7 @@ DBConcat::DBConcat(mmseqs_output* output, const std::string &dataFileNameA,
     concatWriter->open();
   }
 
-  Debug::Progress progress(indexSizeA);
+  Log::Progress progress(indexSizeA);
   // where the new key numbering of B should start
   unsigned int maxKeyA = 0;
 #pragma omp parallel num_threads(threads)

@@ -47,7 +47,7 @@ int convertmsa(mmseqs_output *out, Parameters &par) {
   std::string result;
   result.reserve(10 * 1024 * 1024);
 
-  Debug::Progress progress;
+  Log::Progress progress;
   while (std::getline(*in, line)) {
     size_t lineLength = line.length();
     if (lineLength < 1) {

@@ -18,7 +18,7 @@ int align(mmseqs_output* out, Parameters& par) {
   //    start_pos and cov\n3: also seq.id", NULL, 0); par.parseParameters(argc,
   //    argv, command, true, 0, MMseqsParameter::COMMAND_ALIGN);
 
-  Alignment aln(par.db1, par.db2, par.db3, par.db3Index, par.db4, par.db4Index,
+  Alignment aln(out, par.db1, par.db2, par.db3, par.db3Index, par.db4, par.db4Index,
                 par, false);
 
   out->info("Calculation of alignments");
@@ -41,7 +41,7 @@ int lcaalign(mmseqs_output* out, Parameters& par) {
   //    start_pos and cov\n3: also seq.id", NULL, 0); par.parseParameters(argc,
   //    argv, command, true, 0, MMseqsParameter::COMMAND_ALIGN);
 
-  Alignment aln(par.db1, par.db2, par.db3, par.db3Index, par.db4, par.db4Index,
+  Alignment aln(out, par.db1, par.db2, par.db3, par.db3Index, par.db4, par.db4Index,
                 par, true);
 
 #ifdef HAVE_MPI

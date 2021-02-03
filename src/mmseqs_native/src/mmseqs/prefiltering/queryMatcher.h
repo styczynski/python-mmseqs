@@ -56,7 +56,7 @@ struct hit_t {
 
 class QueryMatcher {
  public:
-  QueryMatcher(IndexTable *indexTable, SequenceLookup *sequenceLookup,
+  QueryMatcher(mmseqs_output* output, IndexTable *indexTable, SequenceLookup *sequenceLookup,
                BaseMatrix *kmerSubMat, BaseMatrix *ungappedAlignmentSubMat,
                short kmerThr, int kmerSize, size_t dbSize,
                unsigned int maxSeqLen, size_t maxHitsPerQuery,
@@ -83,7 +83,7 @@ class QueryMatcher {
   // get statistics
   const statistics_t *getStatistics() { return stats; }
 
-  static hit_t parsePrefilterHit(char *data) {
+  static hit_t parsePrefilterHit(mmseqs_output* out, char *data) {
     hit_t result;
     const char *wordCnt[255];
     size_t cols = Util::getWordsOfLine(data, wordCnt, 254);
@@ -93,26 +93,24 @@ class QueryMatcher {
       result.diagonal =
           static_cast<unsigned short>(Util::fast_atoi<short>(wordCnt[2]));
     } else {
-      out->info("Invalid prefilter input: cols = {}\n", cols
-                         << " wordCnt[0]: " << wordCnt[0]);
-      EXIT(EXIT_FAILURE);
+      out->failure("Invalid prefilter input: cols = {} wordCnt[0]: {}", cols, wordCnt[0]);
     }
     return result;
   }
 
-  static std::vector<hit_t> parsePrefilterHits(char *data) {
+  static std::vector<hit_t> parsePrefilterHits(mmseqs_output* out, char *data) {
     std::vector<hit_t> ret;
     while (*data != '\0') {
-      hit_t result = parsePrefilterHit(data);
+      hit_t result = parsePrefilterHit(out, data);
       ret.push_back(result);
       data = Util::skipLine(data);
     }
     return ret;
   }
 
-  static void parsePrefilterHits(char *data, std::vector<hit_t> &entries) {
+  static void parsePrefilterHits(mmseqs_output* out, char *data, std::vector<hit_t> &entries) {
     while (*data != '\0') {
-      hit_t result = parsePrefilterHit(data);
+      hit_t result = parsePrefilterHit(out, data);
       entries.push_back(result);
       data = Util::skipLine(data);
     }
@@ -135,6 +133,8 @@ class QueryMatcher {
  protected:
   const static int KMER_SCORE = 0;
   const static int UNGAPPED_DIAGONAL_SCORE = 1;
+
+  mmseqs_output* out;
 
   // keeps stats for run
   statistics_t *stats;

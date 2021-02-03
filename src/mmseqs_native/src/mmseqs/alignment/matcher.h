@@ -152,7 +152,7 @@ class Matcher {
     }
   };
 
-  Matcher(int querySeqType, int maxSeqLen, BaseMatrix *m,
+  Matcher(mmseqs_output* output, int querySeqType, int maxSeqLen, BaseMatrix *m,
           EvalueComputation *evaluer, bool aaBiasCorrection, int gapOpen,
           int gapExtend, int zdrop = 40);
 
@@ -214,10 +214,10 @@ class Matcher {
   // map new query into memory (create queryProfile, ...)
   void initQuery(Sequence *query);
 
-  static result_t parseAlignmentRecord(const char *data,
+  static result_t parseAlignmentRecord(mmseqs_output* out, const char *data,
                                        bool readCompressed = false);
 
-  static void readAlignmentResults(std::vector<result_t> &result, char *data,
+  static void readAlignmentResults(mmseqs_output* out, std::vector<result_t> &result, char *data,
                                    bool readCompressed = false);
 
   static float estimateSeqIdByScorePerCol(uint16_t score, unsigned int qLen,
@@ -238,6 +238,9 @@ class Matcher {
       EvalueComputation &evaluer, int gapOpen, int gapExtend, result_t &result);
 
  private:
+
+  mmseqs_output* out;
+
   // costs to open a gap
   int gapOpen;
   // costs to extend a gap

@@ -32,7 +32,7 @@ int orftocontig(mmseqs_output* out, Parameters& par) {
                                  par.threads, par.compressed,
                                  Parameters::DBTYPE_ALIGNMENT_RES);
   alignmentFormatWriter.open();
-  Debug::Progress progress(orfHeadersReader.getSize());
+  Log::Progress progress(orfHeadersReader.getSize());
 
 #pragma omp parallel
   {

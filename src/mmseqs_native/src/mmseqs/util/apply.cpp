@@ -295,7 +295,7 @@ int apply(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   reader.open(DBReader<unsigned int>::SORT_BY_LENGTH);
 
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
 
 #ifdef HAVE_MPI
   struct worker_s {

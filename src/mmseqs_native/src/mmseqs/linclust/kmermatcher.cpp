@@ -91,7 +91,7 @@ std::pair<size_t, size_t> fillKmerPositionArray(
     three = ExtendedSubstitutionMatrix::calcScoreMatrix(*subMat, 3);
   }
 
-  Debug::Progress progress(seqDbr.getSize());
+  Log::Progress progress(seqDbr.getSize());
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

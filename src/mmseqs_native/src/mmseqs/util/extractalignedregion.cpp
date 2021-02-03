@@ -49,7 +49,7 @@ int extractalignedregion(mmseqs_output *out, Parameters &par) {
                static_cast<unsigned int>(par.threads), par.compressed,
                tdbr->getDbtype());
   dbw.open();
-  Debug::Progress progress(alndbr.getSize());
+  Log::Progress progress(alndbr.getSize());
 
   const char newline = '\n';
 #pragma omp parallel

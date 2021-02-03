@@ -26,7 +26,7 @@ int filtertaxdb(mmseqs_output* out, Parameters& par) {
                   par.compressed, reader.getDbtype());
   writer.open();
 
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

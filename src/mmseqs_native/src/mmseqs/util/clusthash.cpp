@@ -47,7 +47,7 @@ int clusthash(mmseqs_output *out, Parameters &par) {
       new std::pair<size_t, unsigned int>[reader.getSize() + 1];
   // needed later to check if one of array
   hashSeqPair[reader.getSize()] = std::make_pair(UINT_MAX, 0);
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

@@ -33,7 +33,7 @@ int profile2pssm(mmseqs_output* out, Parameters& par) {
   SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, 0.0);
 
   size_t entries = reader.getSize();
-  Debug::Progress progress(entries);
+  Log::Progress progress(entries);
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

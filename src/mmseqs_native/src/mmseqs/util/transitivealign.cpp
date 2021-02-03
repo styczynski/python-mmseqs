@@ -63,7 +63,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
     size_t start = (i * flushSize);
     size_t bucketSize =
         std::min(alnReader.getSize() - (i * flushSize), flushSize);
-    Debug::Progress progress(bucketSize);
+    Log::Progress progress(bucketSize);
 #pragma omp parallel
     {
       unsigned int thread_idx = 0;
@@ -209,7 +209,7 @@ int transitivealign(mmseqs_output *out, Parameters &par) {
   size_t *targetElementSize =
       new size_t[maxTargetId + 2];  // extra element for offset + 1 index id
   memset(targetElementSize, 0, sizeof(size_t) * (maxTargetId + 2));
-  Debug::Progress progress(resultSize);
+  Log::Progress progress(resultSize);
 
 #pragma omp parallel
   {

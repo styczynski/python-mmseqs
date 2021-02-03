@@ -155,7 +155,7 @@ int msa2result(mmseqs_output *out, Parameters &par) {
   EvalueComputation evaluer(msaReader.getSize(), &subMat,
                             par.gapOpen.aminoacids, par.gapExtend.aminoacids);
 
-  Debug::Progress progress(msaReader.getSize());
+  Log::Progress progress(msaReader.getSize());
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

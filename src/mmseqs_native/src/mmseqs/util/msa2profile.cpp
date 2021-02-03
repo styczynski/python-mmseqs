@@ -131,7 +131,7 @@ int msa2profile(mmseqs_output *out, Parameters &par) {
 
   SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, -0.2f);
 
-  Debug::Progress progress(qDbr.getSize());
+  Log::Progress progress(qDbr.getSize());
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

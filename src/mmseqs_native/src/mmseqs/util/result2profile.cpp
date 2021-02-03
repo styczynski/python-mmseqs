@@ -145,7 +145,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
                     );
 
   const bool isFiltering = par.filterMsa != 0 || returnAlnRes;
-  Debug::Progress progress(dbSize - dbFrom);
+  Log::Progress progress(dbSize - dbFrom);
 #pragma omp parallel num_threads(localThreads)
   {
     unsigned int thread_idx = 0;

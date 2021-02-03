@@ -6,10 +6,11 @@
 #include <mmseqs/alignment/stripedSmithWaterman.h>
 #include <mmseqs/commons/util.h>
 
-Matcher::Matcher(int querySeqType, int maxSeqLen, BaseMatrix *m,
+Matcher::Matcher(mmseqs_output* output, int querySeqType, int maxSeqLen, BaseMatrix *m,
                  EvalueComputation *evaluer, bool aaBiasCorrection, int gapOpen,
                  int gapExtend, int zdrop)
-    : gapOpen(gapOpen),
+    : out(output),
+      gapOpen(gapOpen),
       gapExtend(gapExtend),
       m(m),
       evaluer(evaluer),
@@ -21,7 +22,7 @@ Matcher::Matcher(int querySeqType, int maxSeqLen, BaseMatrix *m,
 
   if (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_NUCLEOTIDES)) {
     nuclaligner =
-        new BandedNucleotideAligner(m, maxSeqLen, gapOpen, gapExtend, zdrop);
+        new BandedNucleotideAligner(out, m, maxSeqLen, gapOpen, gapExtend, zdrop);
     aligner = NULL;
   } else {
     nuclaligner = NULL;
@@ -203,14 +204,13 @@ Matcher::result_t Matcher::getSWResult(Sequence *dbSeq, const int diagonal,
   return result;
 }
 
-void Matcher::readAlignmentResults(std::vector<result_t> &result, char *data,
-                                   bool readCompressed) {
+void Matcher::readAlignmentResults(mmseqs_output* out, std::vector<result_t> &result, char *data, bool readCompressed) {
   if (data == NULL) {
     return;
   }
 
   while (*data != '\0') {
-    result.emplace_back(parseAlignmentRecord(data, readCompressed));
+    result.emplace_back(parseAlignmentRecord(out, data, readCompressed));
     data = Util::skipLine(data);
   }
 }
@@ -263,7 +263,7 @@ std::string Matcher::uncompressAlignment(const std::string &cbt) {
   return bt;
 }
 
-Matcher::result_t Matcher::parseAlignmentRecord(const char *data,
+Matcher::result_t Matcher::parseAlignmentRecord(mmseqs_output* out, const char *data,
                                                 bool readCompressed) {
   const char *entry[255];
   size_t columns = Util::getWordsOfLine(data, entry, 255);

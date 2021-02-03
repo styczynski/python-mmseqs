@@ -171,7 +171,7 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
         new EvalueComputation(cReader->getAminoAcidDBSize(), &subMat,
                               par.gapOpen.aminoacids, par.gapExtend.aminoacids);
   }
-  Debug::Progress progress(resultAbReader->getSize());
+  Log::Progress progress(resultAbReader->getSize());
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

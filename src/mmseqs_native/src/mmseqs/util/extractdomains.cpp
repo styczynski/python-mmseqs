@@ -273,7 +273,7 @@ int doExtract(Parameters &par, DBReader<unsigned int> &blastTabReader,
                   Parameters::DBTYPE_ALIGNMENT_RES);
   writer.open();
 
-  Debug::Progress progress(dbSize);
+  Log::Progress progress(dbSize);
 
 #pragma omp parallel
   {

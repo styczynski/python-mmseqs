@@ -22,7 +22,7 @@ int reverseseq(mmseqs_output *out, Parameters &par) {
   DBWriter revSeqWriter(par.db2.c_str(), par.db2Index.c_str(), par.threads,
                         par.compressed, seqReader.getDbtype());
   revSeqWriter.open();
-  Debug::Progress progress(seqReader.getSize());
+  Log::Progress progress(seqReader.getSize());
 
   bool isProfileInput = Parameters::isEqualDbtype(
       seqReader.getDbtype(), Parameters::DBTYPE_HMM_PROFILE);

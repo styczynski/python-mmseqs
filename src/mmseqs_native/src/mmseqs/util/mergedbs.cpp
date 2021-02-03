@@ -40,7 +40,7 @@ int mergedbs(mmseqs_output *out, Parameters &par) {
   writer.open();
 
   out->info("Merging the results to {}\n", par.db2.c_str());
-  Debug::Progress progress(qDbr.sequenceReader->getSize());
+  Log::Progress progress(qDbr.sequenceReader->getSize());
   for (size_t id = 0; id < qDbr.sequenceReader->getSize(); id++) {
     progress.updateProgress();
     unsigned int key = qDbr.sequenceReader->getDbKey(id);

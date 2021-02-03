@@ -72,7 +72,7 @@ int result2pp(mmseqs_output *out, Parameters &par) {
 
   SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, 0.0f);
 
-  Debug::Progress progress(dbSize - dbFrom);
+  Log::Progress progress(dbSize - dbFrom);
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

@@ -86,7 +86,7 @@ Alignment::Alignment(mmseqs_output* output, const std::string &querySeqDB,
 
   bool touch = (par.preloadMode != Parameters::PRELOAD_MODE_MMAP);
   tDbrIdx = new IndexReader(
-      targetSeqDB, par.threads, IndexReader::SEQUENCES,
+      out, targetSeqDB, par.threads, IndexReader::SEQUENCES,
       (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0);
   tdbr = tDbrIdx->sequenceReader;
   targetSeqType = tdbr->getDbtype();
@@ -97,7 +97,7 @@ Alignment::Alignment(mmseqs_output* output, const std::string &querySeqDB,
     querySeqType = targetSeqType;
   } else {
     // open the sequence, prefiltering and output databases
-    qDbrIdx = new IndexReader(par.db1, par.threads, IndexReader::SEQUENCES,
+    qDbrIdx = new IndexReader(out, par.db1, par.threads, IndexReader::SEQUENCES,
                               (touch) ? IndexReader::PRELOAD_INDEX : 0);
     qdbr = qDbrIdx->sequenceReader;
     querySeqType = qdbr->getDbtype();
@@ -154,7 +154,7 @@ Alignment::Alignment(mmseqs_output* output, const std::string &querySeqDB,
   }
 
   if (querySeqType == -1 || targetSeqType == -1) {
-    out->failure("Please recreate your database or add a .dbtype file to your sequence/profile database.")
+    out->failure("Please recreate your database or add a .dbtype file to your sequence/profile database.");
   }
   if (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_HMM_PROFILE) &&
       Parameters::isEqualDbtype(targetSeqType,
@@ -172,15 +172,10 @@ Alignment::Alignment(mmseqs_output* output, const std::string &querySeqDB,
                                        Parameters::DBTYPE_PROFILE_STATE_SEQ)) {
     querySeqType = Parameters::DBTYPE_PROFILE_STATE_PROFILE;
   }
-  out->info("Query database size: {}\n", qdbr->getSize()
-                     << " type: " << Parameters::getDbTypeName(querySeqType)
-                    );
-  out->info("Target database size: {}\n", tdbr->getSize()
-                     << " type: " << Parameters::getDbTypeName(targetSeqType)
-                    );
+  out->info("Query database size: {} type: {}\n. Target database size: {} type: {}", qdbr->getSize(), Parameters::getDbTypeName(querySeqType), tdbr->getSize(), Parameters::getDbTypeName(targetSeqType));
 
   prefdbr = new DBReader<unsigned int>(
-      prefDB.c_str(), prefDBIndex.c_str(), threads,
+      out, prefDB.c_str(), prefDBIndex.c_str(), threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   prefdbr->open(DBReader<unsigned int>::LINEAR_ACCCESS);
   reversePrefilterResult = Parameters::isEqualDbtype(
@@ -194,7 +189,7 @@ Alignment::Alignment(mmseqs_output* output, const std::string &querySeqDB,
   } else if (Parameters::isEqualDbtype(
                  querySeqType, Parameters::DBTYPE_PROFILE_STATE_PROFILE)) {
     SubstitutionMatrix s(par.scoringMatrixFile.aminoacids, 2.0, scoreBias);
-    m = new SubstitutionMatrixProfileStates(s.matrixName, s.probMatrix, s.pBack,
+    m = new SubstitutionMatrixProfileStates(out, s.matrixName, s.probMatrix, s.pBack,
                                             s.subMatrixPseudoCounts, 2.0,
                                             scoreBias, 219);
     gapOpen = par.gapOpen.aminoacids;
@@ -278,8 +273,7 @@ void Alignment::run(const unsigned int mpiRank, const unsigned int mpiNumProc) {
   size_t dbSize = 0;
   prefdbr->decomposeDomainByAminoAcid(mpiRank, mpiNumProc, &dbFrom, &dbSize);
 
-  out->info("Compute split from {}\n", dbFrom << " to "
-                     << (dbFrom + dbSize));
+  out->info("Compute split from {} to {}", dbFrom, dbFrom + dbSize);
   std::pair<std::string, std::string> tmpOutput =
       Util::createTmpFileNames(outDB, outDBIndex, mpiRank);
   run(tmpOutput.first, tmpOutput.second, dbFrom, dbSize, true);
@@ -303,7 +297,7 @@ void Alignment::run() { run(outDB, outDBIndex, 0, prefdbr->getSize(), false); }
 
 void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
                     const size_t dbFrom, const size_t dbSize, bool merge) {
-  DBWriter dbw(outDB.c_str(), outDBIndex.c_str(), threads, compressed,
+  DBWriter dbw(out, outDB.c_str(), outDBIndex.c_str(), threads, compressed,
                Parameters::DBTYPE_ALIGNMENT_RES);
   dbw.open();
 
@@ -313,7 +307,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
     return;
   }
 
-  EvalueComputation evaluer(tdbr->getAminoAcidDBSize(), this->m, gapOpen,
+  EvalueComputation evaluer(out, tdbr->getAminoAcidDBSize(), this->m, gapOpen,
                             gapExtend);
 
   size_t totalMemory = Util::getTotalSystemMemory();
@@ -329,7 +323,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
   for (size_t i = 0; i < iterations; i++) {
     size_t start = dbFrom + (i * flushSize);
     size_t bucketSize = std::min(dbSize - (i * flushSize), flushSize);
-    Debug::Progress progress(bucketSize);
+    Log::Progress progress(bucketSize);
 
 #pragma omp parallel num_threads(threads)
     {
@@ -351,7 +345,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
 
       std::vector<Matcher::result_t> swResults;
       swResults.reserve(300);
-      Matcher matcher(querySeqType, maxMatcherSeqLen, m, &evaluer,
+      Matcher matcher(out, querySeqType, maxMatcherSeqLen, m, &evaluer,
                       compBiasCorrection, gapOpen, gapExtend, zdrop);
 
       std::vector<Matcher::result_t> swRealignResults;
@@ -361,7 +355,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
         realigner = &matcher;
         if (realign_m != NULL) {
           realigner =
-              new Matcher(querySeqType, maxMatcherSeqLen, realign_m, &evaluer,
+              new Matcher(out, querySeqType, maxMatcherSeqLen, realign_m, &evaluer,
                           compBiasCorrection, gapOpen, gapExtend, zdrop);
         }
       }
@@ -413,7 +407,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
           bool isReverse = false;
           // Prefilter result (need to make this better)
           if (elements == 3) {
-            hit_t hit = QueryMatcher::parsePrefilterHit(data);
+            hit_t hit = QueryMatcher::parsePrefilterHit(out, data);
             isReverse = reversePrefilterResult && (hit.prefScore < 0);
             diagonal = static_cast<short>(hit.diagonal);
           }

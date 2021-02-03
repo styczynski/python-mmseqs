@@ -90,7 +90,7 @@ void IndexBuilder::fillDatabase(IndexTable *indexTable,
           seq->getSeqType(), Parameters::DBTYPE_PROFILE_STATE_SEQ) == false) {
     idScoreLookup = getScoreLookup(subMat);
   }
-  Debug::Progress progress(dbTo - dbFrom);
+  Log::Progress progress(dbTo - dbFrom);
 
   size_t maskedResidues = 0;
   size_t totalKmerCount = 0;
@@ -204,7 +204,7 @@ void IndexBuilder::fillDatabase(IndexTable *indexTable,
   indexTable->init();
 
   delete info;
-  Debug::Progress progress2(dbTo - dbFrom);
+  Log::Progress progress2(dbTo - dbFrom);
 
   out->info("Index table: fill");
 #pragma omp parallel

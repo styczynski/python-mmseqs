@@ -55,7 +55,7 @@ int aggregate(mmseqs_output *out, const bool useAln, Parameters &par) {
 
   std::vector<std::string> ranks = NcbiTaxonomy::parseRanks(par.lcaRanks);
 
-  Debug::Progress progress(setToSeqReader.getSize());
+  Log::Progress progress(setToSeqReader.getSize());
 
 #pragma omp parallel
   {

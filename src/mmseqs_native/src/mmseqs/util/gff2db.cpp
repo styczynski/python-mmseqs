@@ -36,7 +36,7 @@ int gff2db(mmseqs_output *out, Parameters &par) {
 
   bool shouldCompareType = par.gffType.length() > 0;
 
-  Debug::Progress progress;
+  Log::Progress progress;
   unsigned int entries_num = 0;
   char buffer[1024];
   const char *fields[255];

@@ -68,7 +68,7 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
   std::string seqHdrIndex = seqHdrData + ".index";
   par.filenames.pop_back();
 
-  Debug::Progress progress;
+  Log::Progress progress;
 
   std::vector<std::pair<std::string, TaxID>> accessionMapping;
   for (size_t i = 0; i < par.filenames.size(); i++) {

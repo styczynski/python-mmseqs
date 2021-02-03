@@ -78,7 +78,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
   DBWriter writer(dataFile.c_str(), indexFile.c_str(), par.threads,
                   par.compressed, par.outputDbType);
   writer.open();
-  Debug::Progress progress;
+  Log::Progress progress;
   char buffer[4096];
 
   size_t globalKey = 0;

@@ -35,7 +35,7 @@ int subtractdbs(mmseqs_output *out, Parameters &par) {
                   par.compressed, leftDbr.getDbtype());
   writer.open();
 
-  Debug::Progress progress(leftDbr.getSize());
+  Log::Progress progress(leftDbr.getSize());
 #pragma omp parallel
   {
     int thread_idx = 0;

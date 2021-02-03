@@ -471,7 +471,7 @@ void Prefiltering::mergeTargetSplits(
                   Parameters::DBTYPE_PREFILTER_RES);
   writer.open();
 
-  Debug::Progress progress(reader1.getSize());
+  Log::Progress progress(reader1.getSize());
 #pragma omp parallel num_threads(threads)
   {
     unsigned int thread_idx = 0;
@@ -863,7 +863,7 @@ bool Prefiltering::runSplit(mmseqs_output *out, const std::string &resultDB,
   out->info("Query db start {} to {}", queryFrom + 1, queryFrom + querySize);
   out->info("Target db start {} to {}", dbFrom + 1, dbFrom + dbSize);
 
-  Debug::Progress progress(querySize);
+  Log::Progress progress(querySize);
 
 #pragma omp parallel num_threads(localThreads)
   {

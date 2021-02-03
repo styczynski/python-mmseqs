@@ -365,6 +365,9 @@ class DBReader : public MemoryTracker {
                                   size_t* startEntry, size_t* numEntries);
 
  private:
+
+  mmseqs_output* out;
+
   void checkClosed() const;
 
   int threads;

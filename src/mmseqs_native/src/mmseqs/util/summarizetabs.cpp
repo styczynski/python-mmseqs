@@ -142,7 +142,7 @@ int doAnnotate(Parameters &par, DBReader<unsigned int> &blastTabReader,
 
   std::map<std::string, unsigned int> lengths = readLength(par.db2);
 
-  Debug::Progress progress(dbSize);
+  Log::Progress progress(dbSize);
 
 #pragma omp parallel
   {

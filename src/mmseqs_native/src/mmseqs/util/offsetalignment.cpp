@@ -398,7 +398,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
   if (Parameters::isEqualDbtype(queryDbType, Parameters::DBTYPE_NUCLEOTIDES)) {
     entryCount = maxContigKey + 1;
   }
-  Debug::Progress progress(entryCount);
+  Log::Progress progress(entryCount);
 
 #pragma omp parallel num_threads(localThreads)
   {

@@ -74,7 +74,7 @@ int createdb(mmseqs_output* out, Parameters& par) {
 
   const size_t testForNucSequence = 100;
   size_t isNuclCnt = 0;
-  Debug::Progress progress;
+  Log::Progress progress;
   std::vector<unsigned short>* sourceLookup =
       new std::vector<unsigned short>[shuffleSplits]();
   for (size_t i = 0; i < shuffleSplits; ++i) {

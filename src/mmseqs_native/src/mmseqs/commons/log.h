@@ -3,6 +3,7 @@
 
 
 #include <spdlog/spdlog.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
 
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -21,12 +22,12 @@ class Log {
   static const int INFO = 3;
 
   static int debugLevel;
-  std::shared_ptr<logger> logger_instance;
+  std::shared_ptr<spdlog::logger> logger_instance;
 
   explicit Log() {
      logger_instance = spdlog::stdout_color_mt("console");
      logger_instance->set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
-     level = Debug::INFO;
+     level = Log::INFO;
      setLogLevel(level);
   };
 
@@ -36,22 +37,27 @@ class Log {
 
   template<typename FormatString, typename... Args>
   void error(const FormatString &fmt, Args&&...args) {
-      spdlog::get("console")->spdlog::error(fmt, std::forward<Args>(args)...);
+      spdlog::get("console")->error(fmt, std::forward<Args>(args)...);
   }
 
   template<typename FormatString, typename... Args>
   void info(const FormatString &fmt, Args&&...args) {
-      spdlog::get("console")->spdlog::info(fmt, std::forward<Args>(args)...);
+      spdlog::get("console")->info(fmt, std::forward<Args>(args)...);
+  }
+
+  template<typename FormatString, typename... Args>
+  void warn(const FormatString &fmt, Args&&...args) {
+      spdlog::get("console")->warn(fmt, std::forward<Args>(args)...);
   }
 
   template<typename FormatString, typename... Args>
   void debug(const FormatString &fmt, Args&&...args) {
-      spdlog::get("console")->spdlog::debug(fmt, std::forward<Args>(args)...);
+      spdlog::get("console")->debug(fmt, std::forward<Args>(args)...);
   }
 
   template<typename FormatString, typename... Args>
   void failure(const FormatString &fmt, Args&&...args) {
-      spdlog::get("console")->spdlog::error(fmt, std::forward<Args>(args)...);
+      spdlog::get("console")->error(fmt, std::forward<Args>(args)...);
       EXIT(EXIT_FAILURE);
   }
 
@@ -95,7 +101,7 @@ class Log {
   };
 
  private:
-  const int level;
+  int level;
   std::string buffer;
   bool interactive;
 };

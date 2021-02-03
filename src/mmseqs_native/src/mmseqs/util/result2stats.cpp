@@ -126,7 +126,7 @@ StatsComputer::~StatsComputer() {
 }
 
 int StatsComputer::countNumberOfLines() {
-  Debug::Progress progress(resultReader->getSize());
+  Log::Progress progress(resultReader->getSize());
 
 #pragma omp parallel
   {
@@ -159,7 +159,7 @@ int StatsComputer::countNumberOfLines() {
 }
 
 int StatsComputer::meanValue() {
-  Debug::Progress progress(resultReader->getSize());
+  Log::Progress progress(resultReader->getSize());
 
 #pragma omp parallel
   {
@@ -199,7 +199,7 @@ int StatsComputer::meanValue() {
 }
 
 int StatsComputer::sumValue() {
-  Debug::Progress progress(resultReader->getSize());
+  Log::Progress progress(resultReader->getSize());
 
 #pragma omp parallel
   {
@@ -283,7 +283,7 @@ int StatsComputer::sequenceWise(typename PerSequence<T>::type call,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     targetReader->open(DBReader<unsigned int>::NOSORT);
   }
-  Debug::Progress progress(resultReader->getSize());
+  Log::Progress progress(resultReader->getSize());
 
 #pragma omp parallel
   {

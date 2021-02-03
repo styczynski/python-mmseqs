@@ -25,7 +25,7 @@ void AlignmentSymmetry::readInData(mmseqs_output* out, DBReader<unsigned int> *a
   const int alnType = alnDbr->getDbtype();
   const size_t dbSize = seqDbr->getSize();
   const size_t flushSize = 1000000;
-  Debug::Progress progress(dbSize);
+  Log::Progress progress(dbSize);
   size_t iterations = static_cast<int>(
       ceil(static_cast<double>(dbSize) / static_cast<double>(flushSize)));
   for (size_t it = 0; it < iterations; it++) {
@@ -177,7 +177,7 @@ void AlignmentSymmetry::addMissingLinks(mmseqs_output* out, unsigned int **eleme
                                         unsigned short **elementScoreTable) {
   // iterate over all connections and check if it exists in the corresponding
   // set if not add it
-  Debug::Progress progress(dbSize);
+  Log::Progress progress(dbSize);
 
   for (size_t setId = 0; setId < dbSize; setId++) {
     progress.updateProgress();

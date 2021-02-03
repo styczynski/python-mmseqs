@@ -42,7 +42,7 @@ int summarizeheaders(mmseqs_output *out, Parameters &par) {
     out->error("Header type is not supported");
     return EXIT_FAILURE;
   }
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
 
 #pragma omp parallel
   {

@@ -66,7 +66,7 @@ int Aggregation::run() {
   DBWriter writer(outputDbName.c_str(), outputDBIndex.c_str(), threads,
                   compressed, Parameters::DBTYPE_ALIGNMENT_RES);
   writer.open();
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
 
 #pragma omp parallel
   {

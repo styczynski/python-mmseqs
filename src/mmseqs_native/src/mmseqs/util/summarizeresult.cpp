@@ -44,7 +44,7 @@ int summarizeresult(mmseqs_output* out, Parameters& par) {
                   Parameters::DBTYPE_ALIGNMENT_RES);
   writer.open();
 
-  Debug::Progress progress(dbSize);
+  Log::Progress progress(dbSize);
 #pragma omp parallel num_threads(localThreads)
   {
     unsigned int thread_idx = 0;

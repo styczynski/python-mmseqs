@@ -24,7 +24,7 @@ int summarizealis(mmseqs_output* out, Parameters& par) {
                   par.compressed, Parameters::DBTYPE_GENERIC_DB);
   writer.open();
 
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

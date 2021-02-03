@@ -46,7 +46,7 @@ int addtaxonomy(mmseqs_output *out, Parameters &par) {
 
   size_t taxonNotFound = 0;
   size_t deletedNodes = 0;
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
 #pragma omp parallel
   {
     unsigned int thread_idx = 0;

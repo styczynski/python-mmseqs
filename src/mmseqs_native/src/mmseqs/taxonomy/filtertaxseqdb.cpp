@@ -52,7 +52,7 @@ int filtertaxseqdb(mmseqs_output* out, Parameters& par) {
   // not remove those, a lot of sequences would be classified as Root, even
   // though they have a sensible LCA
 
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
 
   out->info("Computing LCA");
 #pragma omp parallel

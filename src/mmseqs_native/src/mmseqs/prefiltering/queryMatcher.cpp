@@ -21,7 +21,7 @@
             FE_3, FE_2, FE_1)                                              \
   (action, __VA_ARGS__)
 
-QueryMatcher::QueryMatcher(IndexTable *indexTable,
+QueryMatcher::QueryMatcher(mmseqs_output* output, IndexTable *indexTable,
                            SequenceLookup *sequenceLookup,
                            BaseMatrix *kmerSubMat,
                            BaseMatrix *ungappedAlignmentSubMat, short kmerThr,
@@ -29,7 +29,7 @@ QueryMatcher::QueryMatcher(IndexTable *indexTable,
                            size_t maxHitsPerQuery, bool aaBiasCorrection,
                            bool diagonalScoring, unsigned int minDiagScoreThr,
                            bool takeOnlyBestKmer)
-    : idx(indexTable->getAlphabetSize(), kmerSize) {
+    : out(output), idx(indexTable->getAlphabetSize(), kmerSize) {
   this->kmerSubMat = kmerSubMat;
   this->ungappedAlignmentSubMat = ungappedAlignmentSubMat;
   this->indexTable = indexTable;

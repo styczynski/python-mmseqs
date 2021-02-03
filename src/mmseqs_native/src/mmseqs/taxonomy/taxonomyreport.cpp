@@ -176,7 +176,7 @@ int taxonomyreport(mmseqs_output* out, Parameters& par) {
   FILE* resultFP = fopen(par.db3.c_str(), "w");
 
   // 2. Read LCA file
-  Debug::Progress progress(reader.getSize());
+  Log::Progress progress(reader.getSize());
   out->info("Reading LCA results");
 
   std::unordered_map<TaxID, unsigned int> taxCounts;

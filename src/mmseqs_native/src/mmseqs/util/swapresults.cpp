@@ -51,7 +51,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     resultReader.open(DBReader<unsigned int>::SORT_BY_OFFSET);
     // search for the maxTargetId (value of first column) in parallel
-    Debug::Progress progress(resultReader.getSize());
+    Log::Progress progress(resultReader.getSize());
 
 #pragma omp parallel
     {
@@ -118,7 +118,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
       new size_t[maxTargetId + 2];  // extra element for offset + 1 index id
   memset(targetElementSize, 0, sizeof(size_t) * (maxTargetId + 2));
   {
-    Debug::Progress progress(resultSize);
+    Log::Progress progress(resultSize);
 
 #pragma omp parallel
     {
@@ -186,7 +186,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
     char *tmpData = new char[bytesToWrite];
     Util::checkAllocation(tmpData, "Can not allocate tmpData memory in doswap");
     out->info("\nReading results.");
-    Debug::Progress progress(resultSize);
+    Log::Progress progress(resultSize);
 #pragma omp parallel
     {
       int thread_idx = 0;
@@ -253,7 +253,7 @@ int doswap(Parameters &par, bool isGeneralMode) {
         (splits.size() > 1) ? std::make_pair(splitDbw, splitDbw + ".index")
                             : std::make_pair(parOutDb, parOutDbIndex);
     splitFileNames.push_back(splitNamePair);
-    Debug::Progress progress2(dbKeyToWrite - prevDbKeyToWrite + 1);
+    Log::Progress progress2(dbKeyToWrite - prevDbKeyToWrite + 1);
 
     DBWriter resultWriter(splitNamePair.first.c_str(),
                           splitNamePair.second.c_str(), par.threads,
