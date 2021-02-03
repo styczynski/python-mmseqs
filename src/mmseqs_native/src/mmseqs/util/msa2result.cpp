@@ -61,7 +61,7 @@ int msa2result(mmseqs_output *out, Parameters &par) {
   if (FileUtil::fileExists(out, lookupFile.c_str())) {
     mode |= DBReader<unsigned int>::USE_LOOKUP;
   }
-  DBReader<unsigned int> msaReader(msaData.c_str(), msaIndex.c_str(),
+  DBReader<unsigned int> msaReader(out, msaData.c_str(), msaIndex.c_str(),
                                    par.threads, mode);
   msaReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
@@ -125,26 +125,26 @@ int msa2result(mmseqs_output *out, Parameters &par) {
       }
     }
   }
-  AlignmentSymmetry::computeOffsetFromCounts(setSizes, msaReader.getSize());
+  AlignmentSymmetry::computeOffsetFromCounts(out, setSizes, msaReader.getSize());
 
   // for SIMD memory alignment
   maxSeqLength = (maxSeqLength) / (VECSIZE_INT * 4) + 2;
   maxSeqLength *= (VECSIZE_INT * 4);
 
   unsigned int threads = (unsigned int)par.threads;
-  DBWriter sequenceWriter(par.db2.c_str(), par.db2Index.c_str(), threads,
+  DBWriter sequenceWriter(out, par.db2.c_str(), par.db2Index.c_str(), threads,
                           par.compressed, Parameters::DBTYPE_AMINO_ACIDS);
   sequenceWriter.open();
 
-  DBWriter headerWriter(par.hdr2.c_str(), par.hdr2Index.c_str(), threads,
+  DBWriter headerWriter(out, par.hdr2.c_str(), par.hdr2Index.c_str(), threads,
                         par.compressed, Parameters::DBTYPE_GENERIC_DB);
   headerWriter.open();
 
-  DBWriter resultWriter(par.db3.c_str(), par.db3Index.c_str(), threads,
+  DBWriter resultWriter(out, par.db3.c_str(), par.db3Index.c_str(), threads,
                         par.compressed, Parameters::DBTYPE_ALIGNMENT_RES);
   resultWriter.open();
 
-  SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, -0.2f);
+  SubstitutionMatrix subMat(out, par.scoringMatrixFile.aminoacids, 2.0f, -0.2f);
   SubstitutionMatrix::FastMatrix fastMatrix =
       SubstitutionMatrix::createAsciiSubMat(subMat);
   // we need an evaluer to compute a normalized bitScore.
@@ -152,7 +152,7 @@ int msa2result(mmseqs_output *out, Parameters &par) {
   // entries in the MSA db and not the total number of residues also, since not
   // all against all comparisons were carried out, it is not straight-forward to
   // decide what to correct for.
-  EvalueComputation evaluer(msaReader.getSize(), &subMat,
+  EvalueComputation evaluer(out, msaReader.getSize(), &subMat,
                             par.gapOpen.aminoacids, par.gapExtend.aminoacids);
 
   Log::Progress progress(msaReader.getSize());
@@ -163,9 +163,9 @@ int msa2result(mmseqs_output *out, Parameters &par) {
     thread_idx = (unsigned int)omp_get_thread_num();
 #endif
 
-    PSSMCalculator calculator(&subMat, maxSeqLength + 1, maxSetSize, par.pca,
+    PSSMCalculator calculator(out, &subMat, maxSeqLength + 1, maxSetSize, par.pca,
                               par.pcb);
-    Sequence sequence(maxSeqLength + 1, Parameters::DBTYPE_AMINO_ACIDS, &subMat,
+    Sequence sequence(out, maxSeqLength + 1, Parameters::DBTYPE_AMINO_ACIDS, &subMat,
                       0, false, par.compBiasCorrection != 0);
 
     char *msaContent = (char *)mem_align(
@@ -187,7 +187,7 @@ int msa2result(mmseqs_output *out, Parameters &par) {
 
     const bool maskByFirst = par.matchMode == 0;
     const float matchRatio = par.matchRatio;
-    MsaFilter filter(maxSeqLength + 1, maxSetSize, &subMat,
+    MsaFilter filter(out, maxSeqLength + 1, maxSetSize, &subMat,
                      par.gapOpen.aminoacids, par.gapExtend.aminoacids);
 
     char buffer[2048];
@@ -508,7 +508,7 @@ int msa2result(mmseqs_output *out, Parameters &par) {
   msaReader.close();
 
   DBReader<unsigned int>::softlinkDb(
-      par.db1, par.db2, (DBFiles::Files)(DBFiles::LOOKUP | DBFiles::SOURCE));
+      out, par.db1, par.db2, (DBFiles::Files)(DBFiles::LOOKUP | DBFiles::SOURCE));
 
   if (sequenceReader != NULL) {
     sequenceReader->close();

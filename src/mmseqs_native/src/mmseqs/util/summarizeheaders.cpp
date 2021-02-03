@@ -29,7 +29,7 @@ int summarizeheaders(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::NOSORT);
 
-  DBWriter writer(par.db4.c_str(), par.db4Index.c_str(), par.threads,
+  DBWriter writer(out, par.db4.c_str(), par.db4Index.c_str(), par.threads,
                   par.compressed, Parameters::DBTYPE_GENERIC_DB);
   writer.open();
 
@@ -80,7 +80,7 @@ int summarizeheaders(mmseqs_output *out, Parameters &par) {
 
       std::ostringstream oss;
       oss << par.summaryPrefix << "-" << representative << "|"
-          << summarizer->summarize(headers);
+          << summarizer->summarize(out, headers);
 
       std::string summary = oss.str();
       writer.writeData(summary.c_str(), summary.length(), id, thread_idx);

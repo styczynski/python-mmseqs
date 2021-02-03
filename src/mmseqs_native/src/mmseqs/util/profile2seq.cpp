@@ -21,11 +21,11 @@ int profile2seq(mmseqs_output* out, Parameters& par, bool consensus) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                   par.compressed, Parameters::DBTYPE_AMINO_ACIDS);
   writer.open();
 
-  SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, 0.0);
+  SubstitutionMatrix subMat(out, par.scoringMatrixFile.aminoacids, 2.0f, 0.0);
 
   size_t entries = reader.getSize();
   Log::Progress progress(entries);
@@ -35,7 +35,7 @@ int profile2seq(mmseqs_output* out, Parameters& par, bool consensus) {
 #ifdef OPENMP
     thread_idx = static_cast<unsigned int>(omp_get_thread_num());
 #endif
-    Sequence seq(par.maxSeqLen, Parameters::DBTYPE_HMM_PROFILE, &subMat, 0,
+    Sequence seq(out, par.maxSeqLen, Parameters::DBTYPE_HMM_PROFILE, &subMat, 0,
                  false, false, false);
     std::string result;
     result.reserve(par.maxSeqLen);
@@ -56,7 +56,7 @@ int profile2seq(mmseqs_output* out, Parameters& par, bool consensus) {
   }
   writer.close(true);
   reader.close();
-  DBReader<unsigned int>::softlinkDb(par.db1, par.db2,
+  DBReader<unsigned int>::softlinkDb(out, par.db1, par.db2,
                                      DBFiles::SEQUENCE_ANCILLARY);
 
   return EXIT_SUCCESS;

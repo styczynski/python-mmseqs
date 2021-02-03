@@ -23,15 +23,15 @@ int countkmer(mmseqs_output *out, Parameters &par) {
   std::vector<std::string> ids = Util::split(par.idList, ",");
   int indexSrcType = IndexReader::SEQUENCES;
 
-  IndexReader reader(par.db1, par.threads, indexSrcType, 0);
+  IndexReader reader(out, par.db1, par.threads, indexSrcType, 0);
   int seqType = reader.sequenceReader->getDbtype();
   BaseMatrix *subMat;
   size_t isNucl =
       Parameters::isEqualDbtype(seqType, Parameters::DBTYPE_NUCLEOTIDES);
   if (Parameters::isEqualDbtype(seqType, Parameters::DBTYPE_NUCLEOTIDES)) {
-    subMat = new NucleotideMatrix(par.scoringMatrixFile.nucleotides, 1.0, 0.0);
+    subMat = new NucleotideMatrix(out, par.scoringMatrixFile.nucleotides, 1.0, 0.0);
   } else {
-    subMat = new SubstitutionMatrix(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+    subMat = new SubstitutionMatrix(out, par.scoringMatrixFile.aminoacids, 2.0, 0.0);
   }
   size_t maxLen = 0;
   for (size_t i = 0; i < reader.sequenceReader->getSize(); i++) {
@@ -43,8 +43,8 @@ int countkmer(mmseqs_output *out, Parameters &par) {
   memset(kmerCountTable, 0, sizeof(unsigned int) * idxSize);
 #pragma omp parallel
   {
-    Indexer idx(subMat->alphabetSize - 1, par.kmerSize);
-    Sequence s(maxLen, seqType, subMat, par.kmerSize, par.spacedKmer, false);
+    Indexer idx(out, subMat->alphabetSize - 1, par.kmerSize);
+    Sequence s(out, maxLen, seqType, subMat, par.kmerSize, par.spacedKmer, false);
 
 #pragma omp for schedule(dynamic, 1)
     for (size_t i = 0; i < reader.sequenceReader->getSize(); i++) {
@@ -62,7 +62,7 @@ int countkmer(mmseqs_output *out, Parameters &par) {
       }
     }
   }
-  Indexer idx(subMat->alphabetSize - 1, par.kmerSize);
+  Indexer idx(out, subMat->alphabetSize - 1, par.kmerSize);
   for (size_t i = 0; i < idxSize; i++) {
     std::cout << i << "\t";
     if (isNucl) {

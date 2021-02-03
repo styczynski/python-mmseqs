@@ -39,7 +39,7 @@ int result2pp(mmseqs_output *out, Parameters &par) {
   if (par.db1.compare(par.db2) != 0) {
     sameDatabase = false;
     tDbr = new DBReader<unsigned int>(
-        par.db2.c_str(), par.db2Index.c_str(), par.threads,
+        out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     tDbr->open(DBReader<unsigned int>::NOSORT);
     if (par.preloadMode != Parameters::PRELOAD_MODE_MMAP) {
@@ -66,11 +66,11 @@ int result2pp(mmseqs_output *out, Parameters &par) {
   outIndex = tmpOutput.second;
 #endif
 
-  DBWriter resultWriter(outDb.c_str(), outIndex.c_str(), par.threads,
+  DBWriter resultWriter(out, outDb.c_str(), outIndex.c_str(), par.threads,
                         par.compressed, Parameters::DBTYPE_HMM_PROFILE);
   resultWriter.open();
 
-  SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, 0.0f);
+  SubstitutionMatrix subMat(out, par.scoringMatrixFile.aminoacids, 2.0f, 0.0f);
 
   Log::Progress progress(dbSize - dbFrom);
 #pragma omp parallel
@@ -80,9 +80,9 @@ int result2pp(mmseqs_output *out, Parameters &par) {
     thread_idx = (unsigned int)omp_get_thread_num();
 #endif
 
-    Sequence queryProfile(par.maxSeqLen, qDbr.getDbtype(), &subMat, 0, false,
+    Sequence queryProfile(out, par.maxSeqLen, qDbr.getDbtype(), &subMat, 0, false,
                           false, false);
-    Sequence targetProfile(par.maxSeqLen, tDbr->getDbtype(), &subMat, 0, false,
+    Sequence targetProfile(out, par.maxSeqLen, tDbr->getDbtype(), &subMat, 0, false,
                            false, false);
     float *outProfile =
         new float[(par.maxSeqLen + 1) * Sequence::PROFILE_AA_SIZE];
@@ -147,7 +147,7 @@ int result2pp(mmseqs_output *out, Parameters &par) {
         if (evalue <= par.evalProfile &&
             (key != queryKey || sameDatabase == false)) {
           didMerge = true;
-          const Matcher::result_t res = Matcher::parseAlignmentRecord(results);
+          const Matcher::result_t res = Matcher::parseAlignmentRecord(out, results);
           const size_t edgeId = tDbr->getId(key);
           targetProfile.mapSequence(edgeId, key,
                                     tDbr->getData(edgeId, thread_idx),

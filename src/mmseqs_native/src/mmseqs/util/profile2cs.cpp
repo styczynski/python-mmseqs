@@ -34,19 +34,19 @@ int profile2cs(mmseqs_output* out, Parameters& par) {
       dbIndex += "." + SSTR(alphabetSize[i]);
     }
     dbIndex += ".index";
-    DBWriter writer(dbName.c_str(), dbIndex.c_str(), par.threads,
+    DBWriter writer(out, dbName.c_str(), dbIndex.c_str(), par.threads,
                     par.compressed, Parameters::DBTYPE_PROFILE_STATE_SEQ);
     writer.open();
     size_t alphSize = alphabetSize[i];
     size_t entries = profileReader.getSize();
 
-    SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, 0.0);
+    SubstitutionMatrix subMat(out, par.scoringMatrixFile.aminoacids, 2.0f, 0.0);
     Log::Progress progress(entries);
 
     out->info("Start converting profiles.");
 #pragma omp parallel
     {
-      Sequence seq(par.maxSeqLen, Parameters::DBTYPE_HMM_PROFILE, &subMat, 0,
+      Sequence seq(out, par.maxSeqLen, Parameters::DBTYPE_HMM_PROFILE, &subMat, 0,
                    false, false, true);
       unsigned int thread_idx = 0;
 #ifdef OPENMP
@@ -54,7 +54,7 @@ int profile2cs(mmseqs_output* out, Parameters& par) {
 #endif
       std::string result;
       result.reserve(par.maxSeqLen + 1);
-      ProfileStates ps(alphabetSize[i], subMat.pBack);
+      ProfileStates ps(out, alphabetSize[i], subMat.pBack);
 
 #pragma omp for schedule(dynamic, 1000)
       for (size_t i = 0; i < entries; ++i) {

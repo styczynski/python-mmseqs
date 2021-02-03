@@ -17,7 +17,7 @@ int result2rbh(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   resultReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter dbw(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter dbw(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                par.compressed, resultReader.getDbtype());
   dbw.open();
   Log::Progress progress(resultReader.getSize());

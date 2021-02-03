@@ -24,7 +24,7 @@ int splitdb(mmseqs_output *out, Parameters &par) {
 
   for (int split = 0; split < par.split; split++) {
     std::string outDb = par.db2 + "_" + SSTR(split) + "_" + SSTR(par.split);
-    DBWriter writer(outDb.c_str(), std::string(outDb + ".index").c_str(), 1,
+    DBWriter writer(out, outDb.c_str(), std::string(outDb + ".index").c_str(), 1,
                     par.compressed, dbr.getDbtype());
     writer.open();
 
@@ -34,7 +34,7 @@ int splitdb(mmseqs_output *out, Parameters &par) {
       dbr.decomposeDomainByAminoAcid(split, par.split, &startIndex,
                                      &domainSize);
     } else {
-      Util::decomposeDomain(dbr.getSize(), split, par.split, &startIndex,
+      Util::decomposeDomain(out, dbr.getSize(), split, par.split, &startIndex,
                             &domainSize);
     }
 

@@ -52,11 +52,11 @@ int splitsequence(mmseqs_output* out, Parameters& par) {
     par.compressed = 0;
   }
 
-  DBWriter sequenceWriter(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter sequenceWriter(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                           par.compressed, reader.getDbtype());
   sequenceWriter.open();
 
-  DBWriter headerWriter(par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
+  DBWriter headerWriter(out, par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
                         false, Parameters::DBTYPE_GENERIC_DB);
   headerWriter.open();
 
@@ -151,11 +151,11 @@ int splitsequence(mmseqs_output* out, Parameters& par) {
 #pragma omp single
     {
 #pragma omp task
-      { DBWriter::createRenumberedDB(par.hdr2, par.hdr2Index, "", ""); }
+      { DBWriter::createRenumberedDB(out, par.hdr2, par.hdr2Index, "", ""); }
 
 #pragma omp task
       {
-        DBWriter::createRenumberedDB(par.db2, par.db2Index,
+        DBWriter::createRenumberedDB(out, par.db2, par.db2Index,
                                      par.createLookup ? par.db1 : "",
                                      par.createLookup ? par.db1Index : "");
       }

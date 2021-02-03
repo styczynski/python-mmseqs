@@ -125,7 +125,7 @@ int msa2profile(mmseqs_output *out, Parameters &par) {
                         par.compressed, Parameters::DBTYPE_HMM_PROFILE);
   resultWriter.open();
 
-  DBWriter headerWriter(par.hdr2.c_str(), par.hdr2Index.c_str(), threads,
+  DBWriter headerWriter(out, par.hdr2.c_str(), par.hdr2Index.c_str(), threads,
                         par.compressed, Parameters::DBTYPE_GENERIC_DB);
   headerWriter.open();
 
@@ -139,9 +139,9 @@ int msa2profile(mmseqs_output *out, Parameters &par) {
     thread_idx = (unsigned int)omp_get_thread_num();
 #endif
 
-    PSSMCalculator calculator(&subMat, maxSeqLength + 1, maxSetSize, par.pca,
+    PSSMCalculator calculator(out, &subMat, maxSeqLength + 1, maxSetSize, par.pca,
                               par.pcb);
-    Sequence sequence(maxSeqLength + 1, Parameters::DBTYPE_AMINO_ACIDS, &subMat,
+    Sequence sequence(out, maxSeqLength + 1, Parameters::DBTYPE_AMINO_ACIDS, &subMat,
                       0, false, par.compBiasCorrection != 0);
 
     char *msaContent = (char *)mem_align(
@@ -161,7 +161,7 @@ int msa2profile(mmseqs_output *out, Parameters &par) {
 
     const bool maskByFirst = par.matchMode == 0;
     const float matchRatio = par.matchRatio;
-    MsaFilter filter(maxSeqLength + 1, maxSetSize, &subMat,
+    MsaFilter filter(out, maxSeqLength + 1, maxSetSize, &subMat,
                      par.gapOpen.aminoacids, par.gapExtend.aminoacids);
 
 #pragma omp for schedule(dynamic, 1)

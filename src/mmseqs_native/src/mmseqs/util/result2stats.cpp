@@ -50,8 +50,9 @@ int MapStatString(const std::string &str) {
   return stat;
 }
 
-StatsComputer::StatsComputer(const Parameters &par)
-    : stat(MapStatString(par.stat)),
+StatsComputer::StatsComputer(mmseqs_output* output, const Parameters &par)
+    : out(output),
+      stat(MapStatString(par.stat)),
       queryDb(par.db1),
       queryDbIndex(par.db1Index),
       targetDb(par.db2),
@@ -66,7 +67,7 @@ StatsComputer::StatsComputer(const Parameters &par)
   const bool shouldCompress = tsvOut == false && par.compressed == true;
   const int dbType = tsvOut == true ? Parameters::DBTYPE_OMIT_FILE
                                     : Parameters::DBTYPE_GENERIC_DB;
-  statWriter = new DBWriter(par.db4.c_str(), par.db4Index.c_str(),
+  statWriter = new DBWriter(out, par.db4.c_str(), par.db4Index.c_str(),
                             (unsigned int)par.threads, shouldCompress, dbType);
   statWriter->open();
 }
@@ -98,15 +99,15 @@ int StatsComputer::run() {
     case STAT_SUM:
       return sumValue();
     case STAT_DOOLITTLE:
-      return sequenceWise<float>(&doolittle);
+      return sequenceWise<float>(out, &doolittle);
     case STAT_CHARGES:
-      return sequenceWise<float>(&charges);
+      return sequenceWise<float>(out, &charges);
     case STAT_SEQLEN:
-      return sequenceWise<size_t>(&seqlen);
+      return sequenceWise<size_t>(out, &seqlen);
     case STAT_STRLEN:
-      return sequenceWise<size_t>(&std::strlen);
+      return sequenceWise<size_t>(out, &std::strlen);
     case STAT_FIRSTLINE:
-      return sequenceWise<std::string>(&firstline, true);
+      return sequenceWise<std::string>(out, &firstline, true);
     // case STAT_COMPOSITION:
     //    return sequenceWise(&statsComputer::composition);
     case STAT_UNKNOWN:
@@ -274,7 +275,7 @@ std::string firstline(const char *seq) {
 }
 
 template <typename T>
-int StatsComputer::sequenceWise(typename PerSequence<T>::type call,
+int StatsComputer::sequenceWise(mmseqs_output* out, typename PerSequence<T>::type call,
                                 bool onlyResultDb) {
   DBReader<unsigned int> *targetReader = NULL;
   if (!onlyResultDb) {
@@ -345,6 +346,6 @@ int result2stats(mmseqs_output *out, Parameters &par) {
   //    Parameters &par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
-  StatsComputer computeStats(par);
+  StatsComputer computeStats(out, par);
   return computeStats.run();
 }

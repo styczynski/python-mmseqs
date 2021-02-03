@@ -19,7 +19,7 @@ int reverseseq(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   seqReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter revSeqWriter(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter revSeqWriter(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                         par.compressed, seqReader.getDbtype());
   revSeqWriter.open();
   Log::Progress progress(seqReader.getSize());

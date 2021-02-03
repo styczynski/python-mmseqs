@@ -103,7 +103,7 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
   SORT_PARALLEL(accessionMapping.begin(), accessionMapping.end(),
                 sortByFirstString);
 
-  NcbiTaxonomy* taxonomy = NcbiTaxonomy::openTaxonomy(seqDbData);
+  NcbiTaxonomy* taxonomy = NcbiTaxonomy::openTaxonomy(out, seqDbData);
 
   // make sure to create a copy since taxonNodes is still used later
   std::vector<TaxonNode> nodesCopy(taxonomy->taxonNodes,
@@ -247,7 +247,7 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
   delete taxonomy;
 
   // rewrite mapping to be sorted to avoid future on-the-fly sorting
-  MemoryMapped mappingUnsorted(resultDbData, MemoryMapped::WholeFile,
+  MemoryMapped mappingUnsorted(out, resultDbData, MemoryMapped::WholeFile,
                                MemoryMapped::SequentialScan);
   if (!mappingUnsorted.isValid()) {
     out->failure("Could not open mapping file {}", resultDbData);

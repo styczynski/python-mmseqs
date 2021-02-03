@@ -10,12 +10,13 @@
 
 class StatsComputer {
  public:
-  StatsComputer(const Parameters &par);
+  StatsComputer(mmseqs_output* output, const Parameters &par);
   ~StatsComputer();
 
   int run();
 
  private:
+  mmseqs_output* out;
   int stat;
 
   std::string queryDb;
@@ -37,7 +38,7 @@ class StatsComputer {
   };
 
   template <typename T>
-  int sequenceWise(typename PerSequence<T>::type call,
+  int sequenceWise(mmseqs_output* out, typename PerSequence<T>::type call,
                    bool onlyResultDb = false);
 
   int countNumberOfLines();

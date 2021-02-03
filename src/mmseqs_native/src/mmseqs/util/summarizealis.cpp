@@ -20,7 +20,7 @@ int summarizealis(mmseqs_output* out, Parameters& par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                   par.compressed, Parameters::DBTYPE_GENERIC_DB);
   writer.open();
 
@@ -43,7 +43,7 @@ int summarizealis(mmseqs_output* out, Parameters& par) {
       progress.updateProgress();
 
       char* data = reader.getData(i, thread_idx);
-      Matcher::readAlignmentResults(alnResults, data);
+      Matcher::readAlignmentResults(out, alnResults, data);
       if (alnResults.empty()) {
         writer.writeData("", 0, reader.getDbKey(i), thread_idx);
         continue;

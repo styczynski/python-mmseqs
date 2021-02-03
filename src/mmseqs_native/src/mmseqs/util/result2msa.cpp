@@ -77,9 +77,9 @@ int result2msa(mmseqs_output *out, Parameters &par) {
     std::string refData = outDb + "_sequence.ffdata";
     std::string refIndex = outDb + "_sequence.ffindex";
     // Use only 1 thread for concat to ensure the same order
-    seqConcat = new DBConcat(par.db1, par.db1Index, par.db2, par.db2Index,
+    seqConcat = new DBConcat(out, par.db1, par.db1Index, par.db2, par.db2Index,
                              refData, refIndex, 1, MMseqsMPI::isMaster());
-    DBConcat hdrConcat(par.hdr1, par.hdr1Index, par.hdr2, par.hdr2Index,
+    DBConcat hdrConcat(out, par.hdr1, par.hdr1Index, par.hdr2, par.hdr2Index,
                        outDb + "_header.ffdata", outDb + "_header.ffindex", 1,
                        MMseqsMPI::isMaster(), false, false, false, 2);
 
@@ -89,7 +89,7 @@ int result2msa(mmseqs_output *out, Parameters &par) {
     // When exporting in ca3m, we need to access with SORT_BY_LINE
     // mode in order to keep track of the original line number in the index
     // file.
-    refReader = new DBReader<unsigned int>(refData.c_str(), refIndex.c_str(),
+    refReader = new DBReader<unsigned int>(out, refData.c_str(), refIndex.c_str(),
                                            par.threads,
                                            DBReader<unsigned int>::USE_INDEX);
     refReader->open(DBReader<unsigned int>::SORT_BY_LINE);
@@ -99,7 +99,7 @@ int result2msa(mmseqs_output *out, Parameters &par) {
   }
 
   DBReader<unsigned int> resultReader(
-      par.db3.c_str(), par.db3Index.c_str(), par.threads,
+      out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   resultReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
   size_t dbFrom = 0;
@@ -130,7 +130,7 @@ int result2msa(mmseqs_output *out, Parameters &par) {
   } else if (par.msaFormatMode == Parameters::FORMAT_MSA_STOCKHOLM_FLAT) {
     type = Parameters::DBTYPE_OMIT_FILE;
   }
-  DBWriter resultWriter(tmpOutput.first.c_str(), tmpOutput.second.c_str(),
+  DBWriter resultWriter(out, tmpOutput.first.c_str(), tmpOutput.second.c_str(),
                         localThreads, mode, type);
   resultWriter.open();
 
@@ -138,8 +138,8 @@ int result2msa(mmseqs_output *out, Parameters &par) {
   size_t maxSetSize = resultReader.maxCount('\n') + 1;
 
   // adjust score of each match state by -0.2 to trim alignment
-  SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, -0.2f);
-  EvalueComputation evalueComputation(tDbr->getAminoAcidDBSize(), &subMat,
+  SubstitutionMatrix subMat(out, par.scoringMatrixFile.aminoacids, 2.0f, -0.2f);
+  EvalueComputation evalueComputation(out, tDbr->getAminoAcidDBSize(), &subMat,
                                       par.gapOpen.aminoacids,
                                       par.gapExtend.aminoacids);
   if (qDbr.getDbtype() == -1 || tDbr->getDbtype() == -1) {
@@ -153,10 +153,7 @@ int result2msa(mmseqs_output *out, Parameters &par) {
     out->failure("Only the query OR the target database can be a profile database");
     return EXIT_FAILURE;
   }
-  out->info("Query database size: {}\n", qDbr.getSize()
-                     << " type: " << qDbr.getDbTypeName());
-  out->info("Target database size: {}\n", tDbr->getSize()
-                     << " type: " << tDbr->getDbTypeName());
+  out->info("Query database size: {} type: {}\nTarget database size: {} type: {}", qDbr.getSize(), qDbr.getDbTypeName(), tDbr->getSize(), tDbr->getDbTypeName());
 
   const bool isFiltering = par.filterMsa != 0;
   Log::Progress progress(dbSize - dbFrom);
@@ -167,18 +164,18 @@ int result2msa(mmseqs_output *out, Parameters &par) {
     thread_idx = (unsigned int)omp_get_thread_num();
 #endif
 
-    Matcher matcher(qDbr.getDbtype(), maxSequenceLength, &subMat,
+    Matcher matcher(out, qDbr.getDbtype(), maxSequenceLength, &subMat,
                     &evalueComputation, par.compBiasCorrection,
                     par.gapOpen.aminoacids, par.gapExtend.aminoacids);
-    MultipleAlignment aligner(maxSequenceLength, &subMat);
-    PSSMCalculator calculator(&subMat, maxSequenceLength, maxSetSize, par.pca,
+    MultipleAlignment aligner(out, maxSequenceLength, &subMat);
+    PSSMCalculator calculator(out, &subMat, maxSequenceLength, maxSetSize, par.pca,
                               par.pcb);
-    MsaFilter filter(maxSequenceLength, maxSetSize, &subMat,
+    MsaFilter filter(out, maxSequenceLength, maxSetSize, &subMat,
                      par.gapOpen.aminoacids, par.gapExtend.aminoacids);
     UniprotHeaderSummarizer summarizer;
-    Sequence centerSequence(maxSequenceLength, qDbr.getDbtype(), &subMat, 0,
+    Sequence centerSequence(out, maxSequenceLength, qDbr.getDbtype(), &subMat, 0,
                             false, par.compBiasCorrection);
-    Sequence edgeSequence(maxSequenceLength, tDbr->getDbtype(), &subMat, 0,
+    Sequence edgeSequence(out, maxSequenceLength, tDbr->getDbtype(), &subMat, 0,
                           false, false);
 
     // which sequences where kept after filtering
@@ -258,7 +255,7 @@ int result2msa(mmseqs_output *out, Parameters &par) {
 
         const size_t columns = Util::getWordsOfLine(data, entry, 255);
         if (columns > Matcher::ALN_RES_WITHOUT_BT_COL_CNT) {
-          alnResults.emplace_back(Matcher::parseAlignmentRecord(data));
+          alnResults.emplace_back(Matcher::parseAlignmentRecord(out, data));
         } else {
           // Recompute if not all the backtraces are present
           if (isQueryInit == false) {
@@ -303,7 +300,7 @@ int result2msa(mmseqs_output *out, Parameters &par) {
           result.append(1, '-');
           result.append(SSTR(queryKey));
           result.append(1, '|');
-          result.append(summarizer.summarize(headers));
+          result.append(summarizer.summarize(out, headers));
           result.append(1, '\n');
           headers.clear();
         }

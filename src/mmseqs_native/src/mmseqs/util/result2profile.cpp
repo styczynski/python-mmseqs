@@ -68,7 +68,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
   if (Parameters::isEqualDbtype(targetDbtype, Parameters::DBTYPE_INDEX_DB)) {
     bool touch = (par.preloadMode != Parameters::PRELOAD_MODE_MMAP);
     tDbrIdx = new IndexReader(
-        par.db2, par.threads, IndexReader::SEQUENCES,
+        out, par.db2, par.threads, IndexReader::SEQUENCES,
         (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0);
     tDbr = tDbrIdx->sequenceReader;
     templateDBIsIndex = true;
@@ -112,7 +112,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
   if (returnAlnRes) {
     type = Parameters::DBTYPE_ALIGNMENT_RES;
   }
-  DBWriter resultWriter(tmpOutput.first.c_str(), tmpOutput.second.c_str(),
+  DBWriter resultWriter(out, tmpOutput.first.c_str(), tmpOutput.second.c_str(),
                         localThreads, par.compressed, type);
   resultWriter.open();
 
@@ -120,9 +120,9 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
   size_t maxSetSize = resultReader.maxCount('\n') + 1;
 
   // adjust score of each match state by -0.2 to trim alignment
-  SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, -0.2f);
+  SubstitutionMatrix subMat(out, par.scoringMatrixFile.aminoacids, 2.0f, -0.2f);
   ProbabilityMatrix probMatrix(subMat);
-  EvalueComputation evalueComputation(tDbr->getAminoAcidDBSize(), &subMat,
+  EvalueComputation evalueComputation(out, tDbr->getAminoAcidDBSize(), &subMat,
                                       par.gapOpen.aminoacids,
                                       par.gapExtend.aminoacids);
 
@@ -138,11 +138,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
     return EXIT_FAILURE;
   }
 
-  out->info("Query database size: {}\n", qDbr->getSize()
-                     << " type: " << qDbr->getDbTypeName());
-  out->info("Target database size: {}\n", tDbr->getSize()
-                     << " type: " << Parameters::getDbTypeName(targetSeqType)
-                    );
+  out->info("Query database size: {} type: {}\nTarget database size: {} type: {}", qDbr->getSize(), qDbr->getDbTypeName(), tDbr->getSize(), Parameters::getDbTypeName(targetSeqType));
 
   const bool isFiltering = par.filterMsa != 0 || returnAlnRes;
   Log::Progress progress(dbSize - dbFrom);
@@ -153,18 +149,18 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
     thread_idx = (unsigned int)omp_get_thread_num();
 #endif
 
-    Matcher matcher(qDbr->getDbtype(), maxSequenceLength, &subMat,
+    Matcher matcher(out, qDbr->getDbtype(), maxSequenceLength, &subMat,
                     &evalueComputation, par.compBiasCorrection,
                     par.gapOpen.aminoacids, par.gapExtend.aminoacids);
-    MultipleAlignment aligner(maxSequenceLength, &subMat);
-    PSSMCalculator calculator(&subMat, maxSequenceLength, maxSetSize, par.pca,
+    MultipleAlignment aligner(out, maxSequenceLength, &subMat);
+    PSSMCalculator calculator(out, &subMat, maxSequenceLength, maxSetSize, par.pca,
                               par.pcb);
     PSSMMasker masker(maxSequenceLength, probMatrix, subMat);
-    MsaFilter filter(maxSequenceLength, maxSetSize, &subMat,
+    MsaFilter filter(out, maxSequenceLength, maxSetSize, &subMat,
                      par.gapOpen.aminoacids, par.gapExtend.aminoacids);
-    Sequence centerSequence(maxSequenceLength, qDbr->getDbtype(), &subMat, 0,
+    Sequence centerSequence(out, maxSequenceLength, qDbr->getDbtype(), &subMat, 0,
                             false, par.compBiasCorrection);
-    Sequence edgeSequence(maxSequenceLength, targetSeqType, &subMat, 0, false,
+    Sequence edgeSequence(out, maxSequenceLength, targetSeqType, &subMat, 0, false,
                           false);
 
     char dbKey[255];
@@ -224,7 +220,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
               edgeSequence.numSequence + edgeSequence.L));
 
           if (columns > Matcher::ALN_RES_WITHOUT_BT_COL_CNT) {
-            alnResults.emplace_back(Matcher::parseAlignmentRecord(data));
+            alnResults.emplace_back(Matcher::parseAlignmentRecord(out, data));
           } else {
             // Recompute if not all the backtraces are present
             if (isQueryInit == false) {
@@ -312,7 +308,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
 #endif
 
   if (MMseqsMPI::isMaster() && returnAlnRes == false) {
-    DBReader<unsigned int>::softlinkDb(par.db1, par.db4,
+    DBReader<unsigned int>::softlinkDb(out, par.db1, par.db4,
                                        DBFiles::SEQUENCE_ANCILLARY);
   }
 

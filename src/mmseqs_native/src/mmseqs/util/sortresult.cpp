@@ -21,7 +21,7 @@ int sortresult(mmseqs_output *out, Parameters &par) {
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                   par.compressed, reader.getDbtype());
   writer.open();
   Log::Progress progress(reader.getSize());
@@ -52,10 +52,10 @@ int sortresult(mmseqs_output *out, Parameters &par) {
       while (*data != '\0') {
         const size_t columns = Util::getWordsOfLine(data, entry, 255);
         if (columns >= Matcher::ALN_RES_WITHOUT_BT_COL_CNT) {
-          alnResults.emplace_back(Matcher::parseAlignmentRecord(data, true));
+          alnResults.emplace_back(Matcher::parseAlignmentRecord(out, data, true));
           format = columns >= Matcher::ALN_RES_WITH_BT_COL_CNT ? 1 : 0;
         } else if (columns == 3) {
-          prefResults.emplace_back(QueryMatcher::parsePrefilterHit(data));
+          prefResults.emplace_back(QueryMatcher::parsePrefilterHit(out, data));
           format = 2;
         } else {
           out->failure("Invalid input result format ({} columns)", columns);

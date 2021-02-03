@@ -26,11 +26,11 @@ int profile2pssm(mmseqs_output* out, Parameters& par) {
   const bool shouldCompress = isDbOutput == true && par.compressed == true;
   const int dbType = isDbOutput == true ? Parameters::DBTYPE_GENERIC_DB
                                         : Parameters::DBTYPE_OMIT_FILE;
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                   shouldCompress, dbType);
   writer.open();
 
-  SubstitutionMatrix subMat(par.scoringMatrixFile.aminoacids, 2.0f, 0.0);
+  SubstitutionMatrix subMat(out, par.scoringMatrixFile.aminoacids, 2.0f, 0.0);
 
   size_t entries = reader.getSize();
   Log::Progress progress(entries);
@@ -41,7 +41,7 @@ int profile2pssm(mmseqs_output* out, Parameters& par) {
     thread_idx = static_cast<unsigned int>(omp_get_thread_num());
 #endif
 
-    Sequence seq(par.maxSeqLen, Parameters::DBTYPE_HMM_PROFILE, &subMat, 0,
+    Sequence seq(out, par.maxSeqLen, Parameters::DBTYPE_HMM_PROFILE, &subMat, 0,
                  false, par.compBiasCorrection, false);
 
     char buffer[256];
