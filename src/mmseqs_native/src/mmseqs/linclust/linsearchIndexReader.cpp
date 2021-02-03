@@ -276,7 +276,7 @@ void LinsearchIndexReader::writeKmerIndexToDisk(mmseqs_output* out, std::string 
   FILE *filePtr = fopen(fileName.c_str(), "wb");
   if (filePtr == NULL) {
     perror(fileName.c_str());
-    EXIT(EXIT_FAILURE);
+    out->failure("File cannot be opened: {}", fileName);
   }
   fwrite(kmers, sizeof(KmerPosition<unsigned short>), kmerCnt, filePtr);
   if (fclose(filePtr) != 0) {

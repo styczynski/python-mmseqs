@@ -3,6 +3,7 @@
 
 #include <mmseqs/commons/application.h>
 #include <mmseqs/commons/parameters.h>
+#include <mmseqs/commons/log.h>
 #include <mmseqs/output.h>
 
 namespace py = pybind11;
@@ -14,6 +15,16 @@ mmseqs_output call_mmseqs_proxy(std::string command_name, Parameters args) {
 
 PYBIND11_MODULE(mmseqs_native, m) {
   m.doc() = "documentation string";  // optional
+
+    // make a new custom exception and use it as a translation target
+    static py::exception<FatalException> ex(m, "MMSEQException");
+    py::register_exception_translator([](std::exception_ptr p) {
+        try {
+            if (p) std::rethrow_exception(p);
+        } catch (const FatalException &e) {
+            ex(e.what());
+        }
+    });
 
   pybind11::class_<mmseqs_call_args>(m, "MMSeqsCallArgs")
       .def(pybind11::init<>())

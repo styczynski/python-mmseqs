@@ -63,7 +63,7 @@ int CommandCaller::callProgram(const char* program, size_t argc,
 
   std::string argString = argStream.str();
   if (std::system(argString.c_str()) != EXIT_SUCCESS) {
-    EXIT(EXIT_FAILURE);
+    out->failure("callProgram: Internal program failed");
   }
 
   return 0;
@@ -90,7 +90,7 @@ void CommandCaller::execProgram(const char* program,
 
   // should not be reached in the normal case
   delete[] pArgv;
-  EXIT(EXIT_FAILURE);
+  out->failure("execProgram: Reached unreachable condition");
 }
 
 int CommandCaller::callProgram(const char* program,
@@ -103,7 +103,7 @@ int CommandCaller::callProgram(const char* program,
 
   std::string argString = argStream.str();
   if (std::system(argString.c_str()) != EXIT_SUCCESS) {
-    EXIT(EXIT_FAILURE);
+    out->failure("callProgram: Internal program failed");
   }
 
   return 0;

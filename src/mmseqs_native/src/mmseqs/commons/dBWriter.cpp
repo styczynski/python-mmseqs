@@ -171,12 +171,12 @@ void DBWriter::open(size_t bufferSize) {
 
     if (dataFiles[i] == NULL) {
       perror(dataFileNames[i]);
-      EXIT(EXIT_FAILURE);
+      out->failure("Database write failed: {}", dataFileNames[i]);
     }
 
     if (indexFiles[i] == NULL) {
       perror(indexFileNames[i]);
-      EXIT(EXIT_FAILURE);
+      out->failure("Database write failed: {}", indexFileNames[i]);
     }
 
     if ((mode & Parameters::WRITER_COMPRESSED_MODE) != 0) {
@@ -611,7 +611,7 @@ void DBWriter::mergeIndex(mmseqs_output* out, const char **indexFilenames, unsig
   FILE *index_file = fopen(indexFilenames[0], "a");
   if (index_file == NULL) {
     perror(indexFilenames[0]);
-    EXIT(EXIT_FAILURE);
+    out->failure("Database write failed: {}", indexFilenames[0]);
   }
   size_t globalOffset = dataSizes[0];
   for (unsigned int fileIdx = 1; fileIdx < fileCount; fileIdx++) {

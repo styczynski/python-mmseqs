@@ -76,6 +76,5 @@ int countkmer(mmseqs_output *out, Parameters &par) {
     std::cout << "\t" << kmerCountTable[i] << std::endl;
   }
   delete[] kmerCountTable;
-  EXIT(EXIT_SUCCESS);
   return EXIT_SUCCESS;
 }

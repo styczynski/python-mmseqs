@@ -33,7 +33,7 @@ int convert2fasta(mmseqs_output* out, Parameters& par) {
   FILE* fastaFP = fopen(par.db2.c_str(), "w");
   if (fastaFP == NULL) {
     perror(par.db2.c_str());
-    EXIT(EXIT_FAILURE);
+    out->failure("Cannot convert database to FASTA - file cannot be written: {}", par.db2);
   }
 
   DBReader<unsigned int>* from = &db;

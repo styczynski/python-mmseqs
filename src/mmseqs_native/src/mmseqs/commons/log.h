@@ -4,6 +4,7 @@
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/ostream_sink.h>
 
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -14,15 +15,12 @@
 #include <mmseqs/commons/timer.h>
 #include <mmseqs/commons/util.h>
 
-#ifndef EXIT
-#define EXIT(exitCode)         \
-  do {                         \
-    int __status = (exitCode); \
-    std::cerr.flush();         \
-    std::cout.flush();         \
-    exit(__status);            \
-  } while (0)
-#endif
+struct FatalException : public std::exception {
+   std::string message_body;
+   FatalException(std::string message) : message_body(message) {}
+   ~FatalException() throw () {}
+   const char* what() const throw() { return message_body.c_str(); }
+};
 
 class Log {
  public:
@@ -63,10 +61,30 @@ class Log {
       spdlog::get("console")->debug(fmt, std::forward<Args>(args)...);
   }
 
+  // log to str and return it
+  template<typename FormatString, typename... Args>
+  static std::string log_to_str(const FormatString &msg, Args&&... args) {
+    std::ostringstream oss;
+    auto oss_sink = std::make_shared<spdlog::sinks::ostream_sink_mt>(oss);
+    spdlog::logger oss_logger("pattern_tester", oss_sink);
+    oss_logger.set_level(spdlog::level::info);
+    oss_logger.info(msg, std::forward<Args>(args)...);
+    return oss.str();
+  }
+
   template<typename FormatString, typename... Args>
   void failure(const FormatString &fmt, Args&&...args) {
       spdlog::get("console")->error(fmt, std::forward<Args>(args)...);
-      EXIT(EXIT_FAILURE);
+      // TODO: Implement MPI cleanup
+//      int __status = (exitCode);                \
+//    if (MMseqsMPI::active && __status == 0) { \
+//      MPI_Finalize();                         \
+//      MMseqsMPI::active = false;              \
+//    }                                         \
+//    std::cerr.flush();                        \
+//    std::cout.flush();                        \
+//    exit(__status);
+      throw FatalException(Log::log_to_str(fmt, std::forward<Args>(args)...));
   }
 
   static void setLogLevel(int i) {

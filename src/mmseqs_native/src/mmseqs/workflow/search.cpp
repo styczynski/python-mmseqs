@@ -210,9 +210,8 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
                 out, (blastp_tmp + "/order_" + step_str + ".dbtype").c_str())) {
           // awk '$3 < 2 { print $1 }' "$TMP_PATH/aln_$STEP.index" >
           // "$TMP_PATH/order_$STEP"
-          std::cout << "SPIERDALAJ?\n";
-          std::cout << "ELO\n";
-          EXIT(EXIT_FAILURE);
+          // TODO: Implement this blastp code
+          out->failure("Reached code branch that is yet uninmplemented (TODO: Implement this blastp code)");
         }
         std::cout << "step_search K_14\n" << std::flush;
 
@@ -917,7 +916,6 @@ int search(mmseqs_output *out, Parameters &par) {
                 << (tmpDir + "/query_seqs") << "}\n"
                 << std::flush;
       out->print();
-      // EXIT(EXIT_FAILURE);
     }
     query = tmpDir + "/query_seqs";
     std::cout << "step_search F\n" << std::flush;
@@ -940,9 +938,6 @@ int search(mmseqs_output *out, Parameters &par) {
       splitsequence_par.threads = 1;
       splitsequence_par.compressed = 0;
       subcall_mmseqs(out, "splitsequence", splitsequence_par);
-
-      //            out->print();
-      //            EXIT(EXIT_FAILURE);
     }
     query = tmpDir + "/query_seqs_split";
     std::cout << "step_search I\n" << std::flush;

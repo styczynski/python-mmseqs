@@ -92,7 +92,7 @@ int easyrbh(mmseqs_output* out, Parameters& par) {
         Parameters::findMissingTaxDbFiles(out, target);
     if (missingFiles.empty() == false) {
       Parameters::printTaxDbError(out, target, missingFiles);
-      EXIT(EXIT_FAILURE);
+      out->failure("Missing taxonomy files for {}", target);
     }
   }
 

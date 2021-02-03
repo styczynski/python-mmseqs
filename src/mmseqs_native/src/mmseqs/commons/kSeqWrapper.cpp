@@ -70,13 +70,13 @@ KSeqGzip::KSeqGzip(mmseqs_output* out, const char* fileName) {
   if (FileUtil::fileExists(out, fileName) == false) {
     errno = ENOENT;
     perror(fileName);
-    EXIT(EXIT_FAILURE);
+    out->failure("KSeqGzip: File cannot be loaded: {}", fileName);
   }
 
   file = gzopen(fileName, "r");
   if (file == NULL) {
     perror(fileName);
-    EXIT(EXIT_FAILURE);
+    out->failure("KSeqGzip: File cannot be loaded: {}", fileName);
   }
 
   seq = (void*)KSEQGZIP::kseq_init(file);
@@ -114,14 +114,14 @@ KSeqBzip::KSeqBzip(mmseqs_output* out, const char* fileName) {
   if (FileUtil::fileExists(out, fileName) == false) {
     errno = ENOENT;
     perror(fileName);
-    EXIT(EXIT_FAILURE);
+    out->failure("KSeqBzip: Cannot open file {}", fileName);
   }
   FILE* fp = FileUtil::openFileOrDie(out, fileName, "r+b", true);
   int bzError;
   file = BZ2_bzReadOpen(&bzError, fp, 0, 0, NULL, 0);
   if (bzError != 0) {
     perror(fileName);
-    EXIT(EXIT_FAILURE);
+    out->failure("KSeqBzip: Cannot open file {}", fileName);
   }
   seq = (void*)KSEQBZIP::kseq_init(file);
   type = KSEQ_BZIP;

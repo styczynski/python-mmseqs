@@ -98,7 +98,7 @@ int doRescorealldiagonal(mmseqs_output* out, Parameters &par, DBReader<unsigned 
                   par.compBiasCorrection);
     Sequence tSeq(out, par.maxSeqLen, targetSeqType, subMat, 0, false,
                   par.compBiasCorrection);
-    SmithWaterman aligner(par.maxSeqLen, subMat->alphabetSize,
+    SmithWaterman aligner(out, par.maxSeqLen, subMat->alphabetSize,
                           par.compBiasCorrection);
 
     std::string resultBuffer;

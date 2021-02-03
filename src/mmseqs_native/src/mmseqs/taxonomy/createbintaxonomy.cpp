@@ -16,5 +16,4 @@ int createbintaxonomy(mmseqs_output* out, Parameters& par) {
   fwrite(serialized.first, serialized.second, sizeof(char), handle);
   fclose(handle);
   free(serialized.first);
-  EXIT(EXIT_SUCCESS);
 }

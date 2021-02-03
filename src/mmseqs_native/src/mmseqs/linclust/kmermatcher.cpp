@@ -1225,7 +1225,7 @@ void writeKmersToDisk(mmseqs_output* out, std::string tmpFile,
   FILE *filePtr = fopen(tmpFile.c_str(), "wb");
   if (filePtr == NULL) {
     perror(tmpFile.c_str());
-    EXIT(EXIT_FAILURE);
+    out->failure("Temporary file cannot be opened: {}", tmpFile);
   }
   unsigned int writeSets = 0;
   const size_t BUFFER_SIZE = 2048;

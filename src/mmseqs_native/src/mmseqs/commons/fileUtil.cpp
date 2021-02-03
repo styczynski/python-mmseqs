@@ -73,19 +73,19 @@ FILE *FileUtil::openFileOrDie(mmseqs_output* out, const char *fileName, const ch
   if (exists && !shouldExist) {
     errno = EEXIST;
     perror(fileName);
-    EXIT(EXIT_FAILURE);
+    out->failure("File exist but it shouldn't: {}", fileName);
   }
   if (!exists && shouldExist) {
     errno = ENOENT;
     perror(fileName);
-    EXIT(EXIT_FAILURE);
+    out->failure("File do not exist and it should: {}", fileName);
   }
 
   FILE *file;
   file = fopen(fileName, mode);
   if (file == NULL) {
     perror(fileName);
-    EXIT(EXIT_FAILURE);
+    out->failure("Couldn't open a file: {}", fileName);
   }
   return file;
 }

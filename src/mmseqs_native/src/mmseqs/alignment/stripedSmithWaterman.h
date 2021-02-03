@@ -31,6 +31,7 @@
 #ifndef SMITH_WATERMAN_SSE2_H
 #define SMITH_WATERMAN_SSE2_H
 
+#include <mmseqs/output.h>
 #include <climits>
 
 #include <cstdio>
@@ -69,16 +70,16 @@ typedef struct {
 
 class SmithWaterman {
  public:
-  SmithWaterman(size_t maxSequenceLength, int aaSize, bool aaBiasCorrection);
+  SmithWaterman(mmseqs_output* output, size_t maxSequenceLength, int aaSize, bool aaBiasCorrection);
   ~SmithWaterman();
 
   // prints a __m128 vector containing 8 signed shorts
-  static void printVector(__m128i v);
+  static void printVector(mmseqs_output* out, __m128i v);
 
   // prints a __m128 vector containing 8 unsigned shorts, added 32768
-  static void printVectorUS(__m128i v);
+  static void printVectorUS(mmseqs_output* out, __m128i v);
 
-  static unsigned short sse2_extract_epi16(__m128i v, int pos);
+  static unsigned short sse2_extract_epi16(mmseqs_output* out, __m128i v, int pos);
 
   // The dynamic programming matrix entries for the query and database sequences
   // are stored sequentially (the order see the Farrar paper). This function
@@ -218,6 +219,7 @@ class SmithWaterman {
   }
 
  private:
+  mmseqs_output* out;
   struct s_profile {
     simd_int* profile_byte;      // 0: none
     simd_int* profile_word;      // 0: none

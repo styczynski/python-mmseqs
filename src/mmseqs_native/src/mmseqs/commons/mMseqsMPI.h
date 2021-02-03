@@ -23,20 +23,4 @@ class MMseqsMPI {
   };
 };
 
-// if we are in an error case, do not call MPI_Finalize, it might still be in a
-// Barrier
-#ifdef HAVE_MPI
-#define EXIT(exitCode)                        \
-  do {                                        \
-    int __status = (exitCode);                \
-    if (MMseqsMPI::active && __status == 0) { \
-      MPI_Finalize();                         \
-      MMseqsMPI::active = false;              \
-    }                                         \
-    std::cerr.flush();                        \
-    std::cout.flush();                        \
-    exit(__status);                           \
-  } while (0)
-#endif
-
 #endif

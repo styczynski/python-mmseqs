@@ -35,5 +35,4 @@ int view(mmseqs_output* out, Parameters& par) {
     size_t size = reader.sequenceReader->getEntryLen(id) - 1;
     fwrite(data, sizeof(char), size, stdout);
   }
-  EXIT(EXIT_SUCCESS);
 }

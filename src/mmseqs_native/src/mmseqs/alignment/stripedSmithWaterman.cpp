@@ -34,8 +34,8 @@
 
 #include <iostream>
 
-SmithWaterman::SmithWaterman(size_t maxSequenceLength, int aaSize,
-                             bool aaBiasCorrection) {
+SmithWaterman::SmithWaterman(mmseqs_output* output, size_t maxSequenceLength, int aaSize,
+                             bool aaBiasCorrection): out(output) {
   maxSequenceLength += 1;
   this->aaBiasCorrection = aaBiasCorrection;
   const int segSize = (maxSequenceLength + 7) / 8;
@@ -184,18 +184,14 @@ s_align SmithWaterman::ssw_align(
                        gap_extend, profile->profile_word, USHRT_MAX, maskLen);
       word = 1;
     } else if (bests.first.score == 255) {
-      fprintf(stderr,
-              "Please set 2 to the score_size parameter of the function "
-              "ssw_init, otherwise the alignment results will be incorrect.\n");
-      EXIT(EXIT_FAILURE);
+      out->failure("Please set 2 to the score_size parameter of the function ssw_init, otherwise the alignment results will be incorrect");
     }
   } else if (profile->profile_word) {
     bests = sw_sse2_word(db_sequence, 0, db_length, query_length, gap_open,
                          gap_extend, profile->profile_word, USHRT_MAX, maskLen);
     word = 1;
   } else {
-    fprintf(stderr, "Please call the function ssw_init before ssw_align.\n");
-    EXIT(EXIT_FAILURE);
+    out->failure("Please call the function ssw_init before ssw_align");
   }
   r.score1 = bests.first.score;
   r.dbEndPos1 = bests.first.ref;
@@ -264,17 +260,14 @@ s_align SmithWaterman::ssw_align(
                      gap_extend, profile->profile_rev_word, r.score1, maskLen);
   }
   if (bests_reverse.first.score != r.score1) {
-    fprintf(stderr,
-            "Score of forward/backward SW differ. This should not happen.\n");
-    EXIT(EXIT_FAILURE);
+    out->failure("Score of forward/backward SW differ. This should not happen");
   }
 
   r.dbStartPos1 = bests_reverse.first.ref;
   r.qStartPos1 = r.qEndPos1 - bests_reverse.first.read;
 
   if (r.dbStartPos1 == -1) {
-    fprintf(stderr, "Target start position is -1. This should not happen.\n");
-    EXIT(EXIT_FAILURE);
+    out->failure("Target start position is -1. This should not happen");
   }
 
   r.qCov = computeCov(r.qStartPos1, r.qEndPos1, query_length);
@@ -913,8 +906,7 @@ SmithWaterman::cigar *SmithWaterman::banded_sw(
       ++s2;
       kroundup32(s2);
       if (s2 < 0) {
-        fprintf(stderr, "Alignment score and position are not consensus.\n");
-        EXIT(1);
+        out->failure("Alignment score and position are not consensus");
       }
       direction = (int8_t *)realloc(direction, s2 * sizeof(int8_t));
     }
@@ -1122,19 +1114,19 @@ uint32_t SmithWaterman::to_cigar_int(uint32_t length, char op_letter) {
   return res;
 }
 
-void SmithWaterman::printVector(__m128i v) {
+void SmithWaterman::printVector(mmseqs_output* out, __m128i v) {
   for (int i = 0; i < 8; i++)
-    printf("%d ", ((short)(sse2_extract_epi16(v, i)) + 32768));
+    printf("%d ", ((short)(sse2_extract_epi16(out, v, i)) + 32768));
   std::cout << "\n";
 }
 
-void SmithWaterman::printVectorUS(__m128i v) {
+void SmithWaterman::printVectorUS(mmseqs_output* out, __m128i v) {
   for (int i = 0; i < 8; i++)
-    printf("%d ", (unsigned short)sse2_extract_epi16(v, i));
+    printf("%d ", (unsigned short)sse2_extract_epi16(out, v, i));
   std::cout << "\n";
 }
 
-unsigned short SmithWaterman::sse2_extract_epi16(__m128i v, int pos) {
+unsigned short SmithWaterman::sse2_extract_epi16(mmseqs_output* out, __m128i v, int pos) {
   switch (pos) {
     case 0:
       return _mm_extract_epi16(v, 0);
@@ -1153,10 +1145,7 @@ unsigned short SmithWaterman::sse2_extract_epi16(__m128i v, int pos) {
     case 7:
       return _mm_extract_epi16(v, 7);
   }
-  std::cerr << "Fatal error in QueryScore: position in the vector is not in "
-               "the legal range (pos = "
-            << pos << ")\n";
-  EXIT(1);
+  out->failure("Fatal error in QueryScore: position in the vector is not in the legal range (pos = {})", pos);
   // never executed
   return 0;
 }
@@ -1172,9 +1161,7 @@ s_align SmithWaterman::scoreIdentical(unsigned char *dbSeq, int L,
                                       EvalueComputation *evaluer,
                                       int alignmentMode) {
   if (profile->query_length != L) {
-    std::cerr << "scoreIdentical has different length L: " << L
-              << " query_length: " << profile->query_length << "\n";
-    EXIT(1);
+    out->failure("scoreIdentical has different length L: {}, query_length: {}", L, profile->query_length);
   }
 
   s_align r;

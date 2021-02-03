@@ -26,7 +26,7 @@ Matcher::Matcher(mmseqs_output* output, int querySeqType, int maxSeqLen, BaseMat
     aligner = NULL;
   } else {
     nuclaligner = NULL;
-    aligner = new SmithWaterman(maxSeqLen, m->alphabetSize, aaBiasCorrection);
+    aligner = new SmithWaterman(out, maxSeqLen, m->alphabetSize, aaBiasCorrection);
   }
 }
 

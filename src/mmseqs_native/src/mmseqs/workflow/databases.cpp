@@ -313,7 +313,7 @@ int databases(mmseqs_output *out, Parameters &par) {
   if (par.filenames.size() == 0 || par.help) {
     // par.printUsageMessage(par, par.help ? MMseqsParameter::COMMAND_EXPERT :
     // 0, description.c_str());
-    EXIT(EXIT_SUCCESS);
+    out->failure("Nothing to do");
   }
 
   ssize_t downloadIdx = -1;
@@ -364,5 +364,5 @@ int databases(mmseqs_output *out, Parameters &par) {
 
   // Should never get here
   assert(false);
-  EXIT(EXIT_FAILURE);
+  out->failure("Databases: Reached inmpossible assertion");
 }
