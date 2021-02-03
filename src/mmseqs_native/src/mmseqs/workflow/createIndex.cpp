@@ -26,7 +26,7 @@ int createindex(mmseqs_output *out, Parameters &par,
     }
   }
 
-  int dbType = FileUtil::parseDbType(par.db1.c_str());
+  int dbType = FileUtil::parseDbType(out, par.db1.c_str());
   if (Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_HMM_PROFILE) &&
       sensitivity == false) {
     par->error("Please adjust the sensitivity of your target profile index with -s. Be aware that this searches can take huge amount of memory.");
@@ -39,9 +39,9 @@ int createindex(mmseqs_output *out, Parameters &par,
       "some_hash__1";  // SSTR(par.hashParameter(par.databases_types,
                        // par.filenames, par.createindex));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
@@ -65,7 +65,7 @@ int createindex(mmseqs_output *out, Parameters &par,
   std::string tmp_db_path = "";
   if (flag == "TRANSLATED") {
     tmp_db_path = tmpDir + "/orfs_aa";
-    if (!FileUtil::fileExists((tmp_db_path + ".dbtype").c_str())) {
+    if (!FileUtil::fileExists(out, (tmp_db_path + ".dbtype").c_str())) {
       Parameters extractorfs_par;
       extractorfs_par.setDBFields(1, par.db1);
       extractorfs_par.setDBFields(2, tmp_db_path + ".dbtype");
@@ -88,7 +88,7 @@ int createindex(mmseqs_output *out, Parameters &par,
     }
   } else if (flag == "LIN_NUCL") {
     tmp_db_path = tmpDir + "/nucl_split_seq";
-    if (!FileUtil::fileExists((tmp_db_path + ".dbtype").c_str())) {
+    if (!FileUtil::fileExists(out, (tmp_db_path + ".dbtype").c_str())) {
       Parameters extractorfs_par;
       extractorfs_par.maxSeqLen = 65535;
       extractorfs_par.sequenceOverlap = 0;
@@ -162,7 +162,7 @@ int createlinindex(mmseqs_output *out, Parameters &par) {
   //    par.PARAM_V.removeCategory(MMseqsParameter::COMMAND_EXPERT);
   //
   //    par.parseParameters(argc, argv, command, true, 0, 0);
-  int dbType = FileUtil::parseDbType(par.db1.c_str());
+  int dbType = FileUtil::parseDbType(out, par.db1.c_str());
   bool isNucl =
       Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_NUCLEOTIDES);
   if (isNucl && par.searchType == Parameters::SEARCH_TYPE_NUCLEOTIDES &&
@@ -219,7 +219,7 @@ int createindex(mmseqs_output *out, Parameters &par) {
   //
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
-  int dbType = FileUtil::parseDbType(par.db1.c_str());
+  int dbType = FileUtil::parseDbType(out, par.db1.c_str());
   bool isNucl =
       Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_NUCLEOTIDES);
 

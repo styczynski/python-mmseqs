@@ -13,10 +13,10 @@ int createsubdb(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   FILE *orderFile = NULL;
-  if (FileUtil::fileExists(par.db1Index.c_str())) {
+  if (FileUtil::fileExists(out, par.db1Index.c_str())) {
     orderFile = fopen(par.db1Index.c_str(), "r");
   } else {
-    if (FileUtil::fileExists(par.db1.c_str())) {
+    if (FileUtil::fileExists(out, par.db1.c_str())) {
       orderFile = fopen(par.db1.c_str(), "r");
     } else {
       out->failure("File {} does not exist", par.db1 );

@@ -171,6 +171,7 @@ class Parameters {
   static const int OUTFMT_FIDENT = 39;
 
   static std::vector<int> getOutputFormat(
+      mmseqs_output* out,
       int formatMode, const std::string &outformat, bool &needSequences,
       bool &needBacktrace, bool &needFullHeaders, bool &needLookup,
       bool &needSource, bool &needTaxonomyMapping, bool &needTaxonomy);
@@ -1080,11 +1081,12 @@ class Parameters {
       const std::vector<MMseqsParameter *> &par1,
       const std::vector<MMseqsParameter *> &par2);
 
-  size_t hashParameter(const std::vector<DbType> &dbtypes,
+  size_t hashParameter(mmseqs_output* out, const std::vector<DbType> &dbtypes,
                        const std::vector<std::string> &filenames,
                        const std::vector<MMseqsParameter *> &par);
 
   std::string createParameterString(
+      mmseqs_output* out,
       const std::vector<MMseqsParameter *> &vector, bool wasSet = false);
 
   void overrideParameterDescription(MMseqsParameter &par,
@@ -1092,8 +1094,9 @@ class Parameters {
                                     const char *regex = NULL, int category = 0);
 
   static std::vector<std::string> findMissingTaxDbFiles(
+      mmseqs_output* out,
       const std::string &filename);
-  static void printTaxDbError(const std::string &filename,
+  static void printTaxDbError(mmseqs_output* out, const std::string &filename,
                               const std::vector<std::string> &missingFiles);
 
   static bool isEqualDbtype(const int type1, const int type2) {

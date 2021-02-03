@@ -1,6 +1,7 @@
 #ifndef DBCONCAT_H
 #define DBCONCAT_H
 
+#include <mmseqs/output.h>
 #include <string>
 #include <utility>
 

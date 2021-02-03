@@ -19,8 +19,8 @@ int prefilter(mmseqs_output* out, Parameters& par) {
   //    MMseqsParameter::COMMAND_PREFILTER);
 
   Timer timer;
-  int queryDbType = FileUtil::parseDbType(par.db1.c_str());
-  int targetDbType = FileUtil::parseDbType(par.db2.c_str());
+  int queryDbType = FileUtil::parseDbType(out, par.db1.c_str());
+  int targetDbType = FileUtil::parseDbType(out, par.db2.c_str());
   if (Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_INDEX_DB) ==
       true) {
     DBReader<unsigned int> dbr(

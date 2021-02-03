@@ -3,7 +3,8 @@
 
 #include <string>
 #include <vector>
-#include "../alignment/Matcher.h"
+#include <mmseqs/output.h>
+#include <mmseqs/alignment/Matcher.h>
 #include <mmseqs/commons/dBReader.h>
 
 class Orf {
@@ -51,7 +52,7 @@ class Orf {
     SequenceLocation() {}
   };
 
-  Orf(const unsigned int requestedGenCode, bool useAllTableStarts);
+  Orf(mmseqs_output* output, const unsigned int requestedGenCode, bool useAllTableStarts);
   ~Orf();
 
   bool setSequence(const char* sequence, size_t sequenceLength);
@@ -76,6 +77,7 @@ class Orf {
   std::pair<const char*, size_t> getSequence(const SequenceLocation& location);
 
   static Matcher::result_t getFromDatabase(
+      mmseqs_output* out,
       const size_t id, DBReader<unsigned int>& contigsReader,
       DBReader<unsigned int>& orfHeadersReader, int thread_idx);
 
@@ -93,6 +95,7 @@ class Orf {
                                bool hasIncompleteEnd);
 
  private:
+  mmseqs_output* out;
   size_t sequenceLength;
   char* sequence;
   char* reverseComplement;

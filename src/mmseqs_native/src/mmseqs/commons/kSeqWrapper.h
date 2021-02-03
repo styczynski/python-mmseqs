@@ -1,6 +1,7 @@
 #ifndef MMSEQS_KSEQWRAPPER_H
 #define MMSEQS_KSEQWRAPPER_H
 
+#include <mmseqs/output.h>
 #include <mmseqs/commons/kSeqBufferReader.h>
 #include "kseq.h"
 
@@ -41,7 +42,7 @@ class KSeqFile : public KSeqWrapper {
 
 class KSeqStream : public KSeqWrapper {
  public:
-  KSeqStream();
+  KSeqStream(mmseqs_output* out);
   bool ReadEntry();
   ~KSeqStream();
 };
@@ -51,7 +52,7 @@ class KSeqStream : public KSeqWrapper {
 
 class KSeqGzip : public KSeqWrapper {
  public:
-  KSeqGzip(const char* file);
+  KSeqGzip(mmseqs_output* out, const char* file);
   bool ReadEntry();
   ~KSeqGzip();
 
@@ -65,7 +66,7 @@ class KSeqGzip : public KSeqWrapper {
 
 class KSeqBzip : public KSeqWrapper {
  public:
-  KSeqBzip(const char* file);
+  KSeqBzip(mmseqs_output* out, const char* file);
   bool ReadEntry();
   ~KSeqBzip();
 
@@ -76,7 +77,7 @@ class KSeqBzip : public KSeqWrapper {
 
 class KSeqBuffer : public KSeqWrapper {
  public:
-  KSeqBuffer(const char* buffer, size_t length);
+  KSeqBuffer(mmseqs_output* out, const char* buffer, size_t length);
   bool ReadEntry();
   ~KSeqBuffer();
 

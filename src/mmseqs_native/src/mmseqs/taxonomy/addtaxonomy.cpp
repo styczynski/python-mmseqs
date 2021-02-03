@@ -22,7 +22,7 @@ int addtaxonomy(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   std::vector<std::pair<unsigned int, unsigned int>> mapping;
-  if (FileUtil::fileExists((par.db1 + "_mapping").c_str()) == false) {
+  if (FileUtil::fileExists(out, (par.db1 + "_mapping").c_str()) == false) {
     out->failure("{}_mapping does not exist. Run createtaxdb to create taxonomy mapping", par.db1);
   }
   const bool isSorted = Util::readMapping(par.db1 + "_mapping", mapping);

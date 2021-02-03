@@ -38,7 +38,7 @@ std::pair<unsigned int, unsigned int> *ClusteringAlgorithms::execute(int mode) {
   // init data
 
   unsigned int *assignedcluster = new (std::nothrow) unsigned int[dbSize];
-  Util::checkAllocation(assignedcluster,
+  Util::checkAllocation(out, assignedcluster,
                         "Can not allocate assignedcluster memory in "
                         "ClusteringAlgorithms::execute");
   std::fill_n(assignedcluster, dbSize, UINT_MAX);
@@ -63,26 +63,28 @@ std::pair<unsigned int, unsigned int> *ClusteringAlgorithms::execute(int mode) {
     }
     unsigned int *elements = new (std::nothrow) unsigned int[elementCount];
     Util::checkAllocation(
+        out,
         elements,
         "Can not allocate elements memory in ClusteringAlgorithms::execute");
     unsigned int **elementLookupTable =
         new (std::nothrow) unsigned int *[dbSize];
-    Util::checkAllocation(elementLookupTable,
+    Util::checkAllocation(out, elementLookupTable,
                           "Can not allocate elementLookupTable memory in "
                           "ClusteringAlgorithms::execute");
     unsigned short **scoreLookupTable =
         new (std::nothrow) unsigned short *[dbSize];
-    Util::checkAllocation(scoreLookupTable,
+    Util::checkAllocation(out, scoreLookupTable,
                           "Can not allocate scoreLookupTable memory in "
                           "ClusteringAlgorithms::execute");
     unsigned short *score = NULL;
     size_t *elementOffsets = new (std::nothrow) size_t[dbSize + 1];
-    Util::checkAllocation(elementOffsets,
+    Util::checkAllocation(out, elementOffsets,
                           "Can not allocate elementOffsets memory in "
                           "ClusteringAlgorithms::execute");
     elementOffsets[dbSize] = 0;
     short *bestscore = new (std::nothrow) short[dbSize];
     Util::checkAllocation(
+        out,
         bestscore,
         "Can not allocate bestscore memory in ClusteringAlgorithms::execute");
     std::fill_n(bestscore, dbSize, SHRT_MIN);
@@ -175,13 +177,13 @@ void ClusteringAlgorithms::initClustersizes() {
   }
   // fill array
   sorted_clustersizes = new (std::nothrow) unsigned int[dbSize + 1];
-  Util::checkAllocation(sorted_clustersizes,
+  Util::checkAllocation(out, sorted_clustersizes,
                         "Can not allocate sorted_clustersizes memory in "
                         "ClusteringAlgorithms::initClustersizes");
 
   std::fill_n(sorted_clustersizes, dbSize + 1, 0);
   clusterid_to_arrayposition = new (std::nothrow) unsigned int[dbSize + 1];
-  Util::checkAllocation(clusterid_to_arrayposition,
+  Util::checkAllocation(out, clusterid_to_arrayposition,
                         "Can not allocate sorted_clustersizes memory in "
                         "ClusteringAlgorithms::initClustersizes");
 
@@ -381,16 +383,16 @@ void ClusteringAlgorithms::readInClusterData(unsigned int **elementLookupTable,
   }
 
   // make offset table
-  AlignmentSymmetry::computeOffsetFromCounts(elementOffsets, dbSize);
+  AlignmentSymmetry::computeOffsetFromCounts(out, elementOffsets, dbSize);
   // set element edge pointers by using the offset table
   AlignmentSymmetry::setupPointers<unsigned int>(
-      elements, elementLookupTable, elementOffsets, dbSize, totalElementCount);
+      out, elements, elementLookupTable, elementOffsets, dbSize, totalElementCount);
   // fill elements
-  AlignmentSymmetry::readInData(alnDbr, seqDbr, elementLookupTable, NULL, 0,
+  AlignmentSymmetry::readInData(out, alnDbr, seqDbr, elementLookupTable, NULL, 0,
                                 elementOffsets);
 
   out->info("Sort entries");
-  AlignmentSymmetry::sortElements(elementLookupTable, elementOffsets, dbSize);
+  AlignmentSymmetry::sortElements(out, elementLookupTable, elementOffsets, dbSize);
   out->info("Find missing connections");
 
   size_t *newElementOffsets = new size_t[dbSize + 1];
@@ -399,33 +401,33 @@ void ClusteringAlgorithms::readInClusterData(unsigned int **elementLookupTable,
   // findMissingLinks detects new possible connections and updates the
   // elementOffsets with new sizes
   const size_t symmetricElementCount = AlignmentSymmetry::findMissingLinks(
-      elementLookupTable, newElementOffsets, dbSize, threads);
+      out, elementLookupTable, newElementOffsets, dbSize, threads);
   // resize elements
   delete[] elements;
   elements = new (std::nothrow) unsigned int[symmetricElementCount];
   Util::checkAllocation(
-      elements, "Can not allocate elements memory in readInClusterData");
+      out, elements, "Can not allocate elements memory in readInClusterData");
   std::fill_n(elements, symmetricElementCount, UINT_MAX);
   // init score vector
   scores = new (std::nothrow) unsigned short[symmetricElementCount];
-  Util::checkAllocation(scores,
+  Util::checkAllocation(out, scores,
                         "Can not allocate scores memory in readInClusterData");
   std::fill_n(scores, symmetricElementCount, 0);
   out->info("Found {} new connections", symmetricElementCount - totalElementCount);
-  AlignmentSymmetry::setupPointers<unsigned int>(elements, elementLookupTable,
+  AlignmentSymmetry::setupPointers<unsigned int>(out, elements, elementLookupTable,
                                                  newElementOffsets, dbSize,
                                                  symmetricElementCount);
-  AlignmentSymmetry::setupPointers<unsigned short>(scores, scoreLookupTable,
+  AlignmentSymmetry::setupPointers<unsigned short>(out, scores, scoreLookupTable,
                                                    newElementOffsets, dbSize,
                                                    symmetricElementCount);
   // time
   out->info("Reconstruct initial order");
   alnDbr->remapData();  // need to free memory
-  AlignmentSymmetry::readInData(alnDbr, seqDbr, elementLookupTable,
+  AlignmentSymmetry::readInData(out, alnDbr, seqDbr, elementLookupTable,
                                 scoreLookupTable, scoretype, elementOffsets);
   alnDbr->remapData();  // need to free memory
   out->info("Add missing connections");
-  AlignmentSymmetry::addMissingLinks(elementLookupTable, elementOffsets,
+  AlignmentSymmetry::addMissingLinks(out, elementLookupTable, elementOffsets,
                                      newElementOffsets, dbSize,
                                      scoreLookupTable);
   maxClustersize = 0;

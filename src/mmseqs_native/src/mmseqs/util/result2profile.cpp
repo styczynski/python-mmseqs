@@ -64,7 +64,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
   bool templateDBIsIndex = false;
 
   int targetSeqType = -1;
-  int targetDbtype = FileUtil::parseDbType(par.db2.c_str());
+  int targetDbtype = FileUtil::parseDbType(out, par.db2.c_str());
   if (Parameters::isEqualDbtype(targetDbtype, Parameters::DBTYPE_INDEX_DB)) {
     bool touch = (par.preloadMode != Parameters::PRELOAD_MODE_MMAP);
     tDbrIdx = new IndexReader(

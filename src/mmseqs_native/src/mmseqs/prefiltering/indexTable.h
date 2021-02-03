@@ -76,7 +76,7 @@ class IndexTable {
         offsets(NULL) {
     if (externalData == false) {
       offsets = new (std::nothrow) size_t[tableSize + 1];
-      Util::checkAllocation(offsets,
+      Util::checkAllocation(out, offsets,
                             "Can not allocate entries memory in IndexTable");
       memset(offsets, 0, (tableSize + 1) * sizeof(size_t));
     }
@@ -219,7 +219,7 @@ class IndexTable {
     // allocate memory for the sequence id lists
     entries = new (std::nothrow) IndexEntryLocal[tableEntriesNum];
     Util::checkAllocation(
-        entries, "Can not allocate entries memory in IndexTable::initMemory");
+        out, entries, "Can not allocate entries memory in IndexTable::initMemory");
   }
 
   // allocates memory for index tables
@@ -252,7 +252,7 @@ class IndexTable {
     this->size = sequenceCount;
 
     this->entries = new (std::nothrow) IndexEntryLocal[tableEntriesNum];
-    Util::checkAllocation(entries,
+    Util::checkAllocation(out, entries,
                           "Can not allocate " +
                               SSTR(tableEntriesNum * sizeof(IndexEntryLocal)) +
                               " bytes for entries in IndexTable::initMemory");

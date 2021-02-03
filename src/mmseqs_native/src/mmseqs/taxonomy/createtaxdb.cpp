@@ -14,10 +14,10 @@ int createtaxdb(mmseqs_output* out, Parameters& par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   std::string tmp = par.filenames.back();
-  if (FileUtil::directoryExists(tmp.c_str()) == false) {
+  if (FileUtil::directoryExists(out, tmp.c_str()) == false) {
     out->info("Tmp {} folder does not exist or is not a directory.\n", tmp
                       );
-    if (FileUtil::makeDir(tmp.c_str()) == false) {
+    if (FileUtil::makeDir(out, tmp.c_str()) == false) {
       out->failure("Can not create tmp folder {}.", tmp);
     } else {
       out->info("Created dir {}\n", tmp);
@@ -43,7 +43,7 @@ int createtaxdb(mmseqs_output* out, Parameters& par) {
   cmd.addVariable("ARIA_NUM_CONN", SSTR(std::min(16, par.threads)).c_str());
   cmd.addVariable("VERBOSITY_PAR",
                   par.createParameterString(par.onlyverbosity).c_str());
-  FileUtil::writeFile(tmp + "/createindex.sh", createtaxdb_sh,
+  FileUtil::writeFile(out, tmp + "/createindex.sh", createtaxdb_sh,
                       createtaxdb_sh_len);
   std::string program(tmp + "/createindex.sh");
   cmd.execProgram(program.c_str(), par.filenames);

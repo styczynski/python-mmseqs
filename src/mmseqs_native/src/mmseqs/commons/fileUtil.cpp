@@ -18,13 +18,13 @@
 #include <sys/statvfs.h>
 #include <sys/types.h>
 
-bool FileUtil::fileExists(mmseqs_output* out. const char *fileName) {
+bool FileUtil::fileExists(mmseqs_output* out, const char *fileName) {
   struct stat st;
   return stat(fileName, &st) == 0;
 }
 
 bool FileUtil::fileExistsAndIsNotEmpty(mmseqs_output* out, const char *fileName) {
-  if (!fileExists(fileName)) {
+  if (!fileExists(out, fileName)) {
     return false;
   }
   std::ifstream file(fileName);
@@ -69,7 +69,7 @@ void FileUtil::munmapData(mmseqs_output* out, void *ptr, size_t dataSize) {
 
 FILE *FileUtil::openFileOrDie(mmseqs_output* out, const char *fileName, const char *mode,
                               bool shouldExist) {
-  bool exists = FileUtil::fileExists(fileName);
+  bool exists = FileUtil::fileExists(out, fileName);
   if (exists && !shouldExist) {
     errno = EEXIST;
     perror(fileName);
@@ -90,7 +90,7 @@ FILE *FileUtil::openFileOrDie(mmseqs_output* out, const char *fileName, const ch
   return file;
 }
 size_t FileUtil::countLines(mmseqs_output* out, const char *name) {
-  FILE *fp = FileUtil::openFileOrDie(name, "r", true);
+  FILE *fp = FileUtil::openFileOrDie(out, name, "r", true);
   size_t cnt = 0;
   while (!feof(fp)) {
     char ch = fgetc(fp);
@@ -107,7 +107,7 @@ void FileUtil::deleteTempFiles(mmseqs_output* out, const std::list<std::string> 
        it != tmpFiles.end(); it++) {
     out->debug("Deleting {}", *it);
     std::string file = *it;
-    FileUtil::remove(file.c_str());
+    FileUtil::remove(out, file.c_str());
   }
 }
 
@@ -168,7 +168,7 @@ std::string FileUtil::getHashFromSymLink(mmseqs_output* out, const std::string p
     out->failure("Could not get path of {}", path);
   }
 
-  std::string base = baseName(p);
+  std::string base = baseName(out, p);
   free(p);
 
   return base;
@@ -180,8 +180,8 @@ void FileUtil::symlinkAlias(mmseqs_output* out, const std::string &file, const s
     out->failure("Could not get path of {}", file);
   }
 
-  std::string path = dirName(p);
-  std::string base = baseName(p);
+  std::string path = dirName(out, p);
+  std::string base = baseName(out, p);
   free(p);
 
   DIR *dir = opendir(path.c_str());
@@ -190,13 +190,13 @@ void FileUtil::symlinkAlias(mmseqs_output* out, const std::string &file, const s
   }
 
   std::string pathToAlias = (path + "/" + alias);
-  if (symlinkExists(pathToAlias) == true) {
-    FileUtil::remove(pathToAlias.c_str());
+  if (symlinkExists(out, pathToAlias) == true) {
+    FileUtil::remove(out, pathToAlias.c_str());
   }
   // symlinkat is not available in Conda macOS
   // Conda uses the macOS 10.9 SDK, and symlinkat was introduced in 10.10
   // We emulate symlinkat by manipulating the CWD instead
-  std::string oldWd = FileUtil::getCurrentWorkingDirectory();
+  std::string oldWd = FileUtil::getCurrentWorkingDirectory(out);
   if (chdir(path.c_str()) != 0) {
     out->failure("Could not change working directory to {}", path);
   }
@@ -232,8 +232,8 @@ std::string FileUtil::getCurrentWorkingDirectory(mmseqs_output* out) {
 }
 
 void FileUtil::symlinkAbs(mmseqs_output* out, const std::string &target, const std::string &link) {
-  if (FileUtil::fileExists(link.c_str())) {
-    FileUtil::remove(link.c_str());
+  if (FileUtil::fileExists(out, link.c_str())) {
+    FileUtil::remove(out, link.c_str());
   }
   char *t = realpath(target.c_str(), NULL);
   if (t == NULL) {
@@ -243,8 +243,8 @@ void FileUtil::symlinkAbs(mmseqs_output* out, const std::string &target, const s
   std::string realLink;
   char *l = realpath(link.c_str(), NULL);
   if (l == NULL) {
-    std::string path = dirName(link);
-    std::string base = baseName(link);
+    std::string path = dirName(out, link);
+    std::string base = baseName(out, link);
     l = realpath(path.c_str(), NULL);
     if (l == NULL) {
       out->failure("Could not get realpath of {}", link);
@@ -253,8 +253,8 @@ void FileUtil::symlinkAbs(mmseqs_output* out, const std::string &target, const s
     }
   } else {
     realLink = l;
-    if (symlinkExists(realLink) == true) {
-      FileUtil::remove(realLink.c_str());
+    if (symlinkExists(out, realLink) == true) {
+      FileUtil::remove(out, realLink.c_str());
     }
   }
 
@@ -302,11 +302,11 @@ void FileUtil::copyFile(mmseqs_output* out, const char *src, const char *dst) {
 }
 
 FILE *FileUtil::openAndDelete(mmseqs_output* out, const char *fileName, const char *mode) {
-  if (FileUtil::fileExists(fileName) == true) {
-    if (FileUtil::directoryExists(fileName)) {
+  if (FileUtil::fileExists(out, fileName) == true) {
+    if (FileUtil::directoryExists(out, fileName)) {
       out->failure("Can not open {} for writing. It is a directory.", fileName);
     } else {
-      FileUtil::remove(fileName);
+      FileUtil::remove(out, fileName);
     }
   }
   FILE *file = fopen(fileName, mode);
@@ -321,13 +321,13 @@ std::vector<std::string> FileUtil::findDatafiles(mmseqs_output* out, const char 
   std::string checkName = baseName + ".0";
   std::vector<std::string> filenames;
   size_t cnt = 0;
-  while (FileUtil::fileExists(checkName.c_str()) == true) {
+  while (FileUtil::fileExists(out, checkName.c_str()) == true) {
     filenames.push_back(checkName);
     cnt++;
     checkName = baseName + "." + SSTR(cnt);
   }
   if (cnt == 0) {
-    if (FileUtil::fileExists(baseName.c_str())) {
+    if (FileUtil::fileExists(out, baseName.c_str())) {
       filenames.push_back(baseName);
     }
   }
@@ -342,14 +342,14 @@ void FileUtil::remove(mmseqs_output* out, const char *file) {
 
 void FileUtil::move(mmseqs_output* out, const char *src, const char *dst) {
   struct stat srcFileInfo;
-  FILE *srcFile = FileUtil::openFileOrDie(src, "rw", true);
+  FILE *srcFile = FileUtil::openFileOrDie(out, src, "rw", true);
   if (fstat(fileno(srcFile), &srcFileInfo) < 0) {
     int errsv = errno;
     out->failure("Failed to fstat File={}. Error {}", src, errsv);
   }
   struct stat srcDirInfo;
-  std::string dirName = FileUtil::dirName(dst);
-  FILE *dstDir = FileUtil::openFileOrDie(dirName.c_str(), "r", true);
+  std::string dirName = FileUtil::dirName(out, dst);
+  FILE *dstDir = FileUtil::openFileOrDie(out, dirName.c_str(), "r", true);
   if (fstat(fileno(dstDir), &srcDirInfo) < 0) {
     int errsv = errno;
     out->failure("Failed to fstat File={}. Error {}", dirName, errsv);
@@ -366,18 +366,18 @@ void FileUtil::move(mmseqs_output* out, const char *src, const char *dst) {
       out->failure("Cannot copy file {} to {}", src, dst);
     }
   } else {
-    FileUtil::copyFile(src, dst);
-    FileUtil::remove(src);
+    FileUtil::copyFile(out, src, dst);
+    FileUtil::remove(out, src);
   }
 }
 
 int FileUtil::parseDbType(mmseqs_output* out, const char *name) {
   std::string dbTypeFile = std::string(name) + ".dbtype";
-  if (FileUtil::fileExists(dbTypeFile.c_str()) == false) {
+  if (FileUtil::fileExists(out, dbTypeFile.c_str()) == false) {
     return Parameters::DBTYPE_GENERIC_DB;
   }
 
-  size_t fileSize = FileUtil::getFileSize(dbTypeFile);
+  size_t fileSize = FileUtil::getFileSize(out, dbTypeFile);
   if (fileSize != sizeof(int)) {
     out->failure("File size of {} seems to be wrong. It should have {} bytes but it has {} bytes.", dbTypeFile, sizeof(int), fileSize);
   }
@@ -401,21 +401,21 @@ std::string FileUtil::createTemporaryDirectory(
     const std::string &subDirectory) {
   std::string basePath = baseTmpPath + tmpPath;
   std::string tmpDir(basePath);
-  if (FileUtil::directoryExists(tmpDir.c_str()) == false) {
+  if (FileUtil::directoryExists(out, tmpDir.c_str()) == false) {
     out->info("Temporary path {} does not exist or is not a directory. It will be created.", tmpDir);
-    if (FileUtil::makeDir(tmpDir.c_str()) == false) {
-      out->failure("Cannot create temporary folder {}", tmpDir)
+    if (FileUtil::makeDir(out, tmpDir.c_str()) == false) {
+      out->failure("Cannot create temporary folder {}", tmpDir);
     } else {
       out->info("Created temporary directory {}", tmpDir);
     }
   }
   tmpDir += "/" + subDirectory;
-  if (FileUtil::directoryExists(tmpDir.c_str()) == false) {
-    if (FileUtil::makeDir(tmpDir.c_str()) == false) {
+  if (FileUtil::directoryExists(out, tmpDir.c_str()) == false) {
+    if (FileUtil::makeDir(out, tmpDir.c_str()) == false) {
       out->failure("Cannot create temporary subfolder {}", tmpDir);
     }
   }
-  FileUtil::symlinkAlias(tmpDir, "latest");
+  FileUtil::symlinkAlias(out, tmpDir, "latest");
   return tmpDir;
 }
 

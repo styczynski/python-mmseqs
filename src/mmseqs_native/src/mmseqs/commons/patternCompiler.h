@@ -6,7 +6,7 @@
 
 class PatternCompiler {
  public:
-  PatternCompiler(const char *pattern) {
+  PatternCompiler(mmseqs_output* output, const char *pattern): out(output) {
     if (regcomp(&regex, pattern, REG_EXTENDED | REG_NEWLINE) != 0) {
       out->failure("Error in regex {}", pattern);
     }
@@ -23,6 +23,7 @@ class PatternCompiler {
   }
 
  private:
+  mmseqs_output* out;
   regex_t regex;
 };
 

@@ -34,7 +34,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
   out->info("Database size: {}\n", seqDbr.getSize()
                      << " type: " << seqDbr.getDbTypeName());
   std::string indexDB = LinsearchIndexReader::indexName(par.db2);
-  if (par.checkCompatible > 0 && FileUtil::fileExists(indexDB.c_str())) {
+  if (par.checkCompatible > 0 && FileUtil::fileExists(out, indexDB.c_str())) {
     out->info("Check index {}\n", indexDB);
     DBReader<unsigned int> index(
         indexDB.c_str(), (indexDB + ".index").c_str(), par.threads,
@@ -228,7 +228,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
     const int headers1 = 1;
     const int headers2 = (sameDB) ? 1 : 0;
     const int seqType = seqDbr.getDbtype();
-    const int srcSeqType = FileUtil::parseDbType(par.db2.c_str());
+    const int srcSeqType = FileUtil::parseDbType(out, par.db2.c_str());
     // Reuse the compBiasCorr field to store the adjustedKmerSize, It is not
     // needed in the linsearch
     int metadata[] = {static_cast<int>(par.maxSeqLen),

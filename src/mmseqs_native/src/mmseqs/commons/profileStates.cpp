@@ -1,70 +1,35 @@
 
-#include <mmseqs/commons/profileStates.h>
 #include <_simd/simd.h>
 #include <sstream>
-#include <mmseqs/commons/mathUtil.h>
-#include <mmseqs/commons/util.h>
-//#include <LibraryPure.lib.h>
-//#include <LibraryPureMMorder.lib.h>
-//#include <Library_Training2_run17.lib.h>
-//#include <LibraryExpOpt.lib.h>
-//#include <LibraryExpOpt7_10_polished.lib.h>
-//#include <LibraryMix.lib.h>
 #include <ExpOpt3_8_polished.cs32.lib.h>
 #include <Library255_may17.lib.h>
 #include <cs219.lib.h>
 #include <libPolished_8.lib.h>
+#include <mmseqs/commons/profileStates.h>
+#include <mmseqs/commons/mathUtil.h>
+#include <mmseqs/commons/util.h>
 
-//#include <libPure_blosum62_255.lib.h>
-//#include <libPure_blosum62_32.lib.h>
-//#include <libPureMMorder20_blosum62_255.lib.h>
-//#include <LibraryExpOpt3_8_polished2.lib.h>
-
-// **********************************************
-// ********** ProfileStates *********************
-// **********************************************
-ProfileStates::ProfileStates(int pAlphSize, double *pBack) {
-  // std::string libraryString((const char *)LibraryExpOpt_lib,
-  // LibraryExpOpt_lib_len); std::string libraryString((const char *)
-  // LibraryPureMMorder_lib, LibraryPureMMorder_lib_len); std::string
-  // libraryString((const char *) LibraryExpOpt7_10_polished_lib,
-  // LibraryExpOpt7_10_polished_lib_len); std::string libraryString((const char
-  // *) Library_Training2_run17_lib, Library_Training2_run17_lib_len);
+ProfileStates::ProfileStates(mmseqs_output* output, int pAlphSize, double *pBack): out(output) {
   std::string libraryString;
   switch (pAlphSize) {
     case 8:
-      // libraryString=std::string((const char *)libPure_blosum62_32_lib,
-      // libPure_blosum62_32_lib_len);
       libraryString =
           std::string((const char *)libPolished_8_lib, libPolished_8_lib_len);
       break;
     case 32:
-      // libraryString=std::string((const char *)libPure_blosum62_32_lib,
-      // libPure_blosum62_32_lib_len);
       libraryString = std::string((const char *)ExpOpt3_8_polished_cs32_lib,
                                   ExpOpt3_8_polished_cs32_lib_len);
       break;
     case 219:
-      // libraryString=std::string((const char *)libPure_blosum62_255_lib,
-      // libPure_blosum62_255_lib_len); libraryString=std::string((const char
-      // *)libPureMMorder20_blosum62_255_lib,
-      // libPureMMorder20_blosum62_255_lib_len);
       libraryString = std::string((const char *)cs219_lib, cs219_lib_len);
       break;
     case 255:
-      // libraryString=std::string((const char *)libPure_blosum62_255_lib,
-      // libPure_blosum62_255_lib_len); libraryString=std::string((const char
-      // *)libPureMMorder20_blosum62_255_lib,
-      // libPureMMorder20_blosum62_255_lib_len);
       libraryString = std::string((const char *)Library255_may17_lib,
                                   Library255_may17_lib_len);
       break;
     default:
       out->failure("Could not load library for alphabet size {}", alphSize);
   }
-  // std::string libraryString((const char *)LibraryExpOpt3_8_polished2_lib,
-  // LibraryExpOpt3_8_polished2_lib_len); std::string libraryString((const char
-  // *)LibraryMix_lib, LibraryMix_lib_len);
 
   background = new float[20];
   for (size_t k = 0; k < 20; k++) {
@@ -101,36 +66,33 @@ int ProfileStates::readProfile(std::stringstream &in, float *profile,
   line = reader.getline(in);
   if (strstr(line.c_str(), "NAME")) {
     std::string name = reader.ReadString(
-        line.c_str(), "NAME", "Unable to parse context profile 'NAME'!");
+        out, line.c_str(), "NAME", "Unable to parse context profile 'NAME'!");
     names.push_back(name);
     line = reader.getline(in);
   } else {
     names.push_back("0");  // default name
   }
 
-  prior = reader.ReadDouble(line.c_str(), "PRIOR",
+  prior = reader.ReadDouble(out, line.c_str(), "PRIOR",
                             "Unable to parse context profile 'PRIOR'!");
   line = reader.getline(in);
   if (strstr(line.c_str(), "COLOR")) {
     std::string coldef;
-    coldef = reader.ReadString(line.c_str(), "COLOR",
+    coldef = reader.ReadString(out, line.c_str(), "COLOR",
                                "Unable to parse context profile 'COLOR'!");
     colors.push_back(Color(coldef));
     line = reader.getline(in);
   } else {
     colors.push_back(Color(0.0, 0.0, 0.0));
   }
-  reader.ReadBool(line.c_str(), "ISLOG",
+  reader.ReadBool(out, line.c_str(), "ISLOG",
                   "Unable to parse context profile 'ISLOG'!");
   line = reader.getline(in);
-  reader.ReadInt(line.c_str(), "LENG",
+  reader.ReadInt(out, line.c_str(), "LENG",
                  "Unable to parse context profile 'LENG'!");
   line = reader.getline(in);
-  int nalph = reader.ReadInt(line.c_str(), "ALPH",
+  int nalph = reader.ReadInt(out, line.c_str(), "ALPH",
                              "Unable to parse context profile 'ALPH'!");
-
-  // if (is_log) prior = log(prior);
-  // assert(len == 1); // no context
 
   if (nalph != 20) {
     out->warn("Alphabet size of serialized context profile should be {} but is actually {}", 20, nalph);
@@ -193,10 +155,10 @@ int ProfileStates::read(std::string libraryData) {
   std::string line;
 
   if ((line = reader.getline(in)) != "")
-    alphSize = reader.ReadInt(line.c_str(), "SIZE",
+    alphSize = reader.ReadInt(out, line.c_str(), "SIZE",
                               "Unable to parse context library 'SIZE'!");
   if ((line = reader.getline(in)) != "")
-    reader.ReadInt(line.c_str(), "LENG",
+    reader.ReadInt(out, line.c_str(), "LENG",
                    "Unable to parse context library 'LENG'!");
 
   profiles = new float *[alphSize];
@@ -229,21 +191,7 @@ int ProfileStates::read(std::string libraryData) {
 
   for (k = 0; k < alphSize; ++k) {
     prior[k] /= zPrior;
-    // DEBUG: std::cout<<"Prior["<<k<<"] = "<<prior[k]<<std::endl;
   }
-
-  /*   zPrior = 0;
-     for (k = 0; k < 20; ++k)
-     {
-         zPrior += prior[k];
-     }
-
-
-
-     for (k = 20; k < alphSize; ++k)
-     {
-         prior[k] = 0;
-     }*/
 
   discProfScores = new float *[alphSize];
   for (k = 0; k < alphSize; k++) {
@@ -256,10 +204,7 @@ int ProfileStates::read(std::string libraryData) {
 
     for (size_t l = 0; l < alphSize; l++) {
       discProfScores[k][l] = score(k, l);
-      // DEBUG: print the disc sub mat
-      // std::cout<<discProfScores[k][l]<<"\t";
     }
-    // std::cout<<"\n";
   }
 
   return 0;
@@ -309,28 +254,10 @@ void ProfileStates::discretize(const float *sequence, size_t length,
     profileCol = (float *)&sequence[i * Sequence::PROFILE_AA_SIZE];
 
     float maxScore = -FLT_MIN;
-    //        size_t maxScoreIndex = 0;
-
-    /*for (size_t a = 0 ; a < 20 ; a++)
-    {
-            std::cout<<profileCol[a]<<"\t";
-    }*/
-
-    //        for(size_t pos = 0; pos < 20; pos++){
-    //            printf("%.3f\t", profileCol[pos]);
-    //        }
-    //        std::cout << std::endl;
-    // S(profile, c_k)
     for (size_t k = 0; k < alphSize; k++) {
       repScore[k] = score(profileCol, profiles[k]);
-
-      //            for(size_t pos = 0; pos < 20; pos++){
-      //                printf("%.3f\t", profiles[k][pos]);
-      //            }
-      //            std::cout << repScore[k] << std::endl;
       if (repScore[k] > maxScore) {
         maxScore = repScore[k];
-        //                maxScoreIndex = k;
       }
     }
 
@@ -341,11 +268,6 @@ void ProfileStates::discretize(const float *sequence, size_t length,
       unsigned int ceilAlphSize =
           MathUtil::ceilIntDivision(static_cast<unsigned int>(alphSize),
                                     static_cast<unsigned int>(VECSIZE_FLOAT));
-      //            for (size_t l=0;l<alphSize;l++)
-      //            {
-      //                float diff = repScore[l] - discProfScores[k][l];
-      //                tmp += diff*diff;
-      //            }
 
       for (size_t l = 0; l < ceilAlphSize * VECSIZE_FLOAT; l += VECSIZE_FLOAT) {
         simd_float priorLSimd = simdf32_load(&prior[l]);
@@ -357,16 +279,6 @@ void ProfileStates::discretize(const float *sequence, size_t length,
         curDiffScoreSimd = simdf32_add(curDiffScoreSimd, postDiff);
       }
       float *curDiffScoreSimdFlt = (float *)&curDiffScoreSimd;
-      // std::cout<<k<<":"<<*curDiffScoreSimdFlt<<"\n";
-      /*if (alphSize==255)
-          {
-
-              for (size_t y = 0; y<21;y++)
-                  {
-                  std::cout<<k<<" "<<prior[y]<<" "<<repScore[y]<<"
-         "<<discProfScores[k][y]<<" "<<std::endl;
-                  }
-          }*/
       for (size_t l = 0; l < VECSIZE_FLOAT; l++) {
         curDiffScore += curDiffScoreSimdFlt[l];
       }
@@ -376,21 +288,17 @@ void ProfileStates::discretize(const float *sequence, size_t length,
         closestState = k;
       }
     }
-    // std::cout<<"Pos "<<i<<", closest state: "<<(int)closestState<<", max
-    // score index: "<<maxScoreIndex<<"\n";
-    result.push_back(closestState);  //(maxScoreIndex);//
+    result.push_back(closestState);
   }
   free(repScore);
 }
 
 void ProfileStates::discretizeCs219(const float *sequence, size_t length,
                                     std::string &result) {
-  //    float curDiffScore;
   float *profileCol;
   float *repScore = (float *)mem_align(ALIGN_FLOAT, 256 * sizeof(float));
   memset(repScore, 0, sizeof(float) * 256);
   for (size_t i = 0; i < length; i++) {
-    //        float minDiffScore = FLT_MAX;
     profileCol = (float *)&sequence[i * Sequence::PROFILE_AA_SIZE];
     // Calculate posterior probabilities given sequence window around 'i'
     double max = -FLT_MAX;

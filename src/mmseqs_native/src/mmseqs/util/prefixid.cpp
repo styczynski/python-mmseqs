@@ -83,7 +83,7 @@ int addid(const std::string &db1, const std::string &db1Index,
   }
   writer.close(tsvOut);
   if (tsvOut) {
-    FileUtil::remove(writer.getIndexFileName());
+    FileUtil::remove(out, writer.getIndexFileName());
   }
   reader.close();
   if (doMapping) {

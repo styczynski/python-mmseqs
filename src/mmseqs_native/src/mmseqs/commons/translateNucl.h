@@ -66,19 +66,6 @@ First      T             C             A             G      Third
       GTG Val [V]   GCG Ala [A]   GAG Glu [E]   GGG Gly [G]   G
 -----------------------------------------------------------------
 */
-
-// local copy of gc.prt genetic code table ASN.1
-// const char * CGen_code_table_imp::sm_GenCodeTblMemStr [] =
-//        {
-//                "Genetic-code-table ::= {\n",
-// CANONICAL
-//                "{ name \"Standard\" , name \"SGC0\" , id 1 ,\n",
-//                "ncbieaa
-//                \"FFLLSSSSYY**CC*WLLLLPPPPHHQQRRRRIIIMTTTTNNKKSSRRVVVVAAAADDEEGGGG\",\n",
-//                "sncbieaa
-//                \"---M------**--*----M---------------M----------------------------\"
-//                } ,\n",
-
 class TranslateNucl {
  public:
   enum GenCode {
@@ -109,7 +96,7 @@ class TranslateNucl {
     BLASTOCRITHIDIA
   };
 
-  TranslateNucl(GenCode code) {
+  TranslateNucl(mmseqs_output* output, GenCode code): out(output) {
     std::string ncbieaa = "";
     std::string sncbieaa = "";
     switch (code) {
@@ -563,6 +550,9 @@ class TranslateNucl {
     }
     return getCodonResidue(state);
   }
+
+  private:
+    mmseqs_output* out;
 };
 
 #endif  // MMSEQS_TRANSLATE_H

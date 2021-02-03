@@ -1,9 +1,9 @@
 #include <mmseqs/commons/nucleotideMatrix.h>
 #include <climits>
 
-NucleotideMatrix::NucleotideMatrix(const char* scoringMatrixFileName,
+NucleotideMatrix::NucleotideMatrix(mmseqs_output* output, const char* scoringMatrixFileName,
                                    float bitFactor, float scoreBias)
-    : SubstitutionMatrix(scoringMatrixFileName, bitFactor, scoreBias) {
+    : SubstitutionMatrix(output, scoringMatrixFileName, bitFactor, scoreBias) {
   setupLetterMapping();
   reverseLookup = new int[alphabetSize];
   // TODO think about making the matrix dynamic

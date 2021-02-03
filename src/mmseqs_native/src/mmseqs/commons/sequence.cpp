@@ -11,10 +11,10 @@
 #include <climits>  // short_max
 #include <cstddef>
 
-Sequence::Sequence(size_t maxLen, int seqType, const BaseMatrix *subMat,
+Sequence::Sequence(mmseqs_output* output, size_t maxLen, int seqType, const BaseMatrix *subMat,
                    const unsigned int kmerSize, const bool spaced,
                    const bool aaBiasCorrection, bool shouldAddPC,
-                   const std::string &userSpacedKmerPattern) {
+                   const std::string &userSpacedKmerPattern): out(output) {
   this->maxLen = maxLen;
   this->numSequence = (unsigned char *)malloc(maxLen + 1);
   this->numConsensusSequence = (unsigned char *)malloc(maxLen + 1);
@@ -352,12 +352,9 @@ void Sequence::mapProfile(const char *profileData, bool mapScores,
     PSSMCalculator::computePseudoCounts(profile, profile, pseudocountsWeight,
                                         PROFILE_AA_SIZE, neffM, L, pca, pcb);
   }
-  //    printProfile();
 
   if (mapScores) {
     for (int l = 0; l < this->L; l++) {
-      //        MathUtil::NormalizeTo1(&profile[l * profile_row_size],
-      //        PROFILE_AA_SIZE);
       for (size_t aa_idx = 0; aa_idx < PROFILE_AA_SIZE; aa_idx++) {
         float bitScore = probaToBitScore(profile[l * PROFILE_AA_SIZE + aa_idx],
                                          subMat->pBack[aa_idx]);
@@ -371,7 +368,6 @@ void Sequence::mapProfile(const char *profileData, bool mapScores,
             profile_score[l * PROFILE_ROW_SIZE + aa_idx] * 4;
       }
     }
-    // printPSSM();
 
     if (aaBiasCorrection == true) {
       SubstitutionMatrix::calcGlobalAaBiasCorrection(
@@ -398,9 +394,6 @@ void Sequence::mapProfile(const char *profileData, bool mapScores,
     }
     // TODO what is with the X
   }
-  // printPSSM();
-
-  //    printProfile();
 }
 
 template <int T>
@@ -438,7 +431,6 @@ void Sequence::mapProfileState(const char *profileState, unsigned int seqLen) {
             static_cast<short>((pssmVal < 0.0) ? pssmVal - 0.5 : pssmVal + 0.5);
       }
     }
-    //        printProfileStatePSSM();
 
     if (aaBiasCorrection == true) {
       // TODO use new formular
@@ -446,7 +438,6 @@ void Sequence::mapProfileState(const char *profileState, unsigned int seqLen) {
           profile_score, PROFILE_ROW_SIZE, this->L,
           profileStateMat->alphabetSize);
     }
-    //    printProfileStatePSSM();
 
     // sort profile scores and index for KmerGenerator (prefilter step)
     for (int l = 0; l < this->L; l++) {
@@ -498,17 +489,10 @@ void Sequence::mapProfileState(const char *profileState, unsigned int seqLen) {
     }
     if (aaBiasCorrection == true) {
       SubstitutionMatrix::calcProfileProfileLocalAaBiasCorrectionAln(
+          out,
           profile_for_alignment, this->L, profileStateMat->alphabetSize,
           subMat);
     }
-    /*
-    //TEST with a neg bias to avoid over extension
-    for (int l = 0; l < this->L; ++l) {
-        for (size_t aa_num = 0; aa_num <
-    static_cast<size_t>(subMat->alphabetSize); ++aa_num) {
-            profile_for_alignment[aa_num * this->L + l] -= 1;
-        }
-    }*/
   }
 }
 
@@ -553,7 +537,6 @@ void Sequence::printPSSM() {
     printf("%3d ", i);
     for (size_t aa = 0; aa < PROFILE_AA_SIZE; aa++) {
       printf("%3d ", profile_for_alignment[aa * L + i]);
-      //            printf("%3d ", profile_score[i * profile_row_size + aa] );
     }
     printf("%.1f\n", neffM[i]);
   }

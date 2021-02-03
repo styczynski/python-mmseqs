@@ -34,7 +34,7 @@ struct Color {
 
 class ProfileStates {
  public:
-  ProfileStates(int alphSize, double* pBack);
+  ProfileStates(mmseqs_output* output, int alphSize, double* pBack);
   ~ProfileStates();
   int read(std::string libraryData);
   int readProfile(std::stringstream& in, float* profile,
@@ -67,16 +67,6 @@ class ProfileStates {
       for (size_t aa = 0; aa < Sequence::PROFILE_AA_SIZE; aa++) {
         avgA += profileColA[aa];
         avgB += profileColB[aa];
-
-        /*// Test of scoring scheme
-        float la = MathUtil::flog2(profileColA[aa]);
-        float lna = MathUtil::flog2(1-profileColA[aa]);
-        float lb = MathUtil::flog2(profileColB[aa]);
-        float lnb = MathUtil::flog2(1-profileColB[aa]);
-        result += (profileColB[aa] - avgProfColA[aa])*(la-lna) +
-        (profileColA[aa] - avgProfColA[aa])*(lb-lnb);
-            */
-        // result += profileColB[aa] * profileColA[aa] / avgProfColA[aa];
       }
       avgA /= Sequence::PROFILE_AA_SIZE;
       avgB /= Sequence::PROFILE_AA_SIZE;
@@ -85,7 +75,6 @@ class ProfileStates {
         varB += (profileColB[aa] - avgB) * (profileColB[aa] - avgB);
         upper += (profileColA[aa] - avgA) * (profileColB[aa] - avgB);
       }
-      // result  = MathUtil::flog2(result);
       result = upper / sqrt(varA) / sqrt(varB);
       return result / 2;
     } else {  // HHBlits score
@@ -110,6 +99,7 @@ class ProfileStates {
   float* prior;
 
  private:
+  mmseqs_output* out;
   LibraryReader reader;
   float entropy(float*);
   std::vector<Color> colors;

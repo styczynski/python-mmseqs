@@ -48,9 +48,9 @@ int easytaxonomy(mmseqs_output *out, Parameters &par) {
   std::string hash = "abc";  // SSTR(par.hashParameter(par.databases_types,
                              // par.filenames, *command.params));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
 
   CommandCaller cmd;
@@ -85,7 +85,7 @@ int easytaxonomy(mmseqs_output *out, Parameters &par) {
                   par.createParameterString(par.addtaxonomy).c_str());
   cmd.addVariable("THREADS_COMP_PAR",
                   par.createParameterString(par.threadsandcompression).c_str());
-  FileUtil::writeFile(tmpDir + "/easy-taxonomy.sh", easytaxonomy_sh,
+  FileUtil::writeFile(out, tmpDir + "/easy-taxonomy.sh", easytaxonomy_sh,
                       easytaxonomy_sh_len);
   std::string program(tmpDir + "/easy-taxonomy.sh");
   cmd.execProgram(program.c_str(), par.filenames);

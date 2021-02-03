@@ -69,7 +69,7 @@ class SubstitutionMatrixProfileStates : public BaseMatrix {
       }
     }
 
-    ps = new ProfileStates(libAlphabetSize, this->pBack);
+    ps = new ProfileStates(out, libAlphabetSize, this->pBack);
     this->scoreNormalization = ps->getScoreNormalization();
     this->bitFactor = bitFactor * scoreNormalization;
     // this->num2aa[toIndex] = this->num2aa[fromIndex];

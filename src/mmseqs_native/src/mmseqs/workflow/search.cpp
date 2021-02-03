@@ -104,7 +104,7 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
         align_path = blastp_tmp + "/aln_" + step_str;
       }
       std::cout << "step_search K_4\n" << std::flush;
-      if (!FileUtil::fileExists((align_path + ".dbtype").c_str())) {
+      if (!FileUtil::fileExists(out, (align_path + ".dbtype").c_str())) {
         std::cout << "step_search K_5\n" << std::flush;
         Parameters align_par(par);
         std::vector<std::string> align_filenames = {
@@ -226,7 +226,7 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
         }
         std::cout << "step_search K_15\n" << std::flush;
 
-        if (!FileUtil::fileExists((next_input + ".dbtype").c_str())) {
+        if (!FileUtil::fileExists(out, (next_input + ".dbtype").c_str())) {
           Parameters createsubdb_par(par);
           std::vector<std::string> createsubdb_filenames = {
               (blastp_tmp + "/order_" + step_str),
@@ -523,7 +523,7 @@ int search(mmseqs_output *out, Parameters &par) {
 
   std::string indexStr = PrefilteringIndexReader::searchForIndex(par.db2);
 
-  int targetDbType = FileUtil::parseDbType(par.db2.c_str());
+  int targetDbType = FileUtil::parseDbType(out, par.db2.c_str());
   std::string targetDB = (indexStr == "") ? par.db2.c_str() : indexStr.c_str();
   int targetSrcDbType = -1;
   if (indexStr != "" ||
@@ -537,7 +537,7 @@ int search(mmseqs_output *out, Parameters &par) {
     targetSrcDbType = data.srcSeqType;
     targetDbType = data.seqType;
   }
-  const int queryDbType = FileUtil::parseDbType(par.db1.c_str());
+  const int queryDbType = FileUtil::parseDbType(out, par.db1.c_str());
   if (queryDbType == -1 || targetDbType == -1) {
     out->failure("Please recreate your database or add a .dbtype file to your sequence/profile database");
   }
@@ -604,10 +604,10 @@ int search(mmseqs_output *out, Parameters &par) {
   std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames,
                                             par.searchworkflow));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
   std::string parentTmpDir = tmpDir;
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
@@ -648,8 +648,8 @@ int search(mmseqs_output *out, Parameters &par) {
     cmd.addVar("AVAIL_DISK", SSTR(static_cast<size_t>(par.diskSpaceLimit)));
 
     // correct Eval threshold for inverted search
-    const size_t queryDbSize = FileUtil::countLines(par.db1Index.c_str());
-    const size_t targetDbSize = FileUtil::countLines(par.db2Index.c_str());
+    const size_t queryDbSize = FileUtil::countLines(out, par.db1Index.c_str());
+    const size_t targetDbSize = FileUtil::countLines(out, par.db2Index.c_str());
     par.evalThr *= ((float)queryDbSize) / targetDbSize;
 
     int originalCovMode = par.covMode;
@@ -674,7 +674,7 @@ int search(mmseqs_output *out, Parameters &par) {
     par.covMode = originalCovMode;
 
     program = tmpDir + "/searchslicedtargetprofile.sh";
-    FileUtil::writeFile(program, searchslicedtargetprofile_sh,
+    FileUtil::writeFile(out, program, searchslicedtargetprofile_sh,
                         searchslicedtargetprofile_sh_len);
   } else if (searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_PROFILE) {
     cmd.addVar("PREFILTER_PAR", par.createParameterString(par.prefilter));
@@ -694,7 +694,7 @@ int search(mmseqs_output *out, Parameters &par) {
     par.covMode = originalCovMode;
     par.maxResListLen = maxResListLen;
     cmd.addVar("SWAP_PAR", par.createParameterString(par.swapresult));
-    FileUtil::writeFile(tmpDir + "/searchtargetprofile.sh",
+    FileUtil::writeFile(out, tmpDir + "/searchtargetprofile.sh",
                         searchtargetprofile_sh, searchtargetprofile_sh_len);
     program = std::string(tmpDir + "/searchtargetprofile.sh");
   } else if (par.numIterations > 1) {
@@ -737,7 +737,7 @@ int search(mmseqs_output *out, Parameters &par) {
       par.pca = 1.0;
     }
 
-    FileUtil::writeFile(tmpDir + "/blastpgp.sh", blastpgp_sh, blastpgp_sh_len);
+    FileUtil::writeFile(out, tmpDir + "/blastpgp.sh", blastpgp_sh, blastpgp_sh_len);
     program = std::string(tmpDir + "/blastpgp.sh");
   } else {
     if (par.sensSteps > 1) {
@@ -784,14 +784,14 @@ int search(mmseqs_output *out, Parameters &par) {
     } else {
       cmd.addVar("ALIGNMENT_PAR", par.createParameterString(par.align));
     }
-    FileUtil::writeFile(tmpDir + "/blastp.sh", blastp_sh, blastp_sh_len);
+    FileUtil::writeFile(out, tmpDir + "/blastp.sh", blastp_sh, blastp_sh_len);
     program = std::string(tmpDir + "/blastp.sh");
   }
 
   if (searchMode & (Parameters::SEARCH_MODE_FLAG_QUERY_TRANSLATED |
                     Parameters::SEARCH_MODE_FLAG_TARGET_TRANSLATED)) {
     cmd.addVar("NO_TARGET_INDEX", (indexStr == "") ? "TRUE" : "");
-    FileUtil::writeFile(tmpDir + "/translated_search.sh", translated_search_sh,
+    FileUtil::writeFile(out, tmpDir + "/translated_search.sh", translated_search_sh,
                         translated_search_sh_len);
     cmd.addVar("QUERY_NUCL",
                (searchMode & Parameters::SEARCH_MODE_FLAG_QUERY_TRANSLATED)
@@ -814,7 +814,7 @@ int search(mmseqs_output *out, Parameters &par) {
     program = std::string(tmpDir + "/translated_search.sh");
   } else if (searchMode & Parameters::SEARCH_MODE_FLAG_QUERY_NUCLEOTIDE &&
              searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_NUCLEOTIDE) {
-    FileUtil::writeFile(tmpDir + "/blastn.sh", blastn_sh, blastn_sh_len);
+    FileUtil::writeFile(out, tmpDir + "/blastn.sh", blastn_sh, blastn_sh_len);
     //  0: reverse, 1: forward, 2: both
     switch (par.strand) {
       case 0:
@@ -856,7 +856,7 @@ int search(mmseqs_output *out, Parameters &par) {
   std::string result = par.filenames[2];
   std::string searchTmpDir = par.baseTmpPath + parentTmpDir + "/search";
   // mkdir tmpDir
-  FileUtil::makeDir(searchTmpDir.c_str());
+  FileUtil::makeDir(out, searchTmpDir.c_str());
 
   if (program == tmpDir + "/blastp.sh") {
     call_blastp(out, par, no_steps, senses, align_module, query, target, result,
@@ -868,7 +868,7 @@ int search(mmseqs_output *out, Parameters &par) {
 
   std::cout << "step_search A\n" << std::flush;
   if (needTargetSplit) {
-    if (!FileUtil::fileExists((tmpDir + "/target_seqs_split.dbtype").c_str())) {
+    if (!FileUtil::fileExists(out, (tmpDir + "/target_seqs_split.dbtype").c_str())) {
       std::cout << "step_search B\n" << std::flush;
       Parameters splitsequence_par(par);
 
@@ -896,7 +896,7 @@ int search(mmseqs_output *out, Parameters &par) {
 
   std::cout << "step_search D\n" << std::flush;
   if (extract_frames) {
-    if (!FileUtil::fileExists((tmpDir + "/query_seqs.dbtype").c_str())) {
+    if (!FileUtil::fileExists(out, (tmpDir + "/query_seqs.dbtype").c_str())) {
       std::cout << "step_search E\n" << std::flush;
       Parameters extractframes_par(par);
       std::vector<std::string> extractframes_filenames = {
@@ -925,7 +925,7 @@ int search(mmseqs_output *out, Parameters &par) {
 
   std::cout << "step_search G\n" << std::flush;
   if (need_query_split) {
-    if (!FileUtil::fileExists((tmpDir + "/query_seqs_split.dbtype").c_str())) {
+    if (!FileUtil::fileExists(out, (tmpDir + "/query_seqs_split.dbtype").c_str())) {
       std::cout << "step_search H " << query << " "
                 << (tmpDir + "/query_seqs_split") << "\n"
                 << std::flush;
@@ -949,13 +949,13 @@ int search(mmseqs_output *out, Parameters &par) {
   }
 
   std::cout << "step_search J\n" << std::flush;
-  if (!FileUtil::fileExists((tmpDir + "/aln.dbtype").c_str())) {
+  if (!FileUtil::fileExists(out, (tmpDir + "/aln.dbtype").c_str())) {
     call_blastp(out, par, no_steps, senses, align_module, query, target,
                 tmpDir + "/aln", searchTmpDir, "", cmd);
   }
 
   std::cout << "step_search M\n" << std::flush;
-  if (!FileUtil::fileExists((result + ".dbtype").c_str())) {
+  if (!FileUtil::fileExists(out, (result + ".dbtype").c_str())) {
     Parameters offsetalignment_par(par);
     std::vector<std::string> alignment_filenames = {
         par.filenames[0], query,           par.filenames[1],

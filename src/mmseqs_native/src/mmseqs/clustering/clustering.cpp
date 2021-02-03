@@ -18,12 +18,12 @@ Clustering::Clustering(mmseqs_output* output, const std::string &seqDB, const st
       outDB(outDB),
       outDBIndex(outDBIndex) {
   seqDbr =
-      new DBReader<unsigned int>(seqDB.c_str(), seqDBIndex.c_str(), threads,
+      new DBReader<unsigned int>(out, seqDB.c_str(), seqDBIndex.c_str(), threads,
                                  DBReader<unsigned int>::USE_INDEX);
   seqDbr->open(DBReader<unsigned int>::SORT_BY_LENGTH);
 
   alnDbr = new DBReader<unsigned int>(
-      alnDB.c_str(), alnDBIndex.c_str(), threads,
+      out, alnDB.c_str(), alnDBIndex.c_str(), threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   alnDbr->open(DBReader<unsigned int>::NOSORT);
 }
@@ -35,13 +35,13 @@ Clustering::~Clustering() {
 
 void Clustering::run(int mode) {
   Timer timer;
-  DBWriter *dbw = new DBWriter(outDB.c_str(), outDBIndex.c_str(), 1, compressed,
+  DBWriter *dbw = new DBWriter(out, outDB.c_str(), outDBIndex.c_str(), 1, compressed,
                                Parameters::DBTYPE_CLUSTER_RES);
   dbw->open();
 
   std::pair<unsigned int, unsigned int> *ret;
   ClusteringAlgorithms *algorithm = new ClusteringAlgorithms(
-      seqDbr, alnDbr, threads, similarityScoreType, maxIteration);
+      out, seqDbr, alnDbr, threads, similarityScoreType, maxIteration);
 
   if (mode == Parameters::GREEDY) {
     out->info("Clustering mode: Greedy");

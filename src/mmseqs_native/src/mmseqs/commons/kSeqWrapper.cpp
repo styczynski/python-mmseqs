@@ -10,7 +10,7 @@ KSEQ_INIT(int, read)
 }
 
 KSeqFile::KSeqFile(mmseqs_output* output, const char* fileName): out(output) {
-  file = FileUtil::openFileOrDie(fileName, "r", true);
+  file = FileUtil::openFileOrDie(out, fileName, "r", true);
   seq = (void*)KSEQFILE::kseq_init(fileno(file));
   type = KSEQ_FILE;
 }
@@ -41,7 +41,7 @@ namespace KSEQSTREAM {
 KSEQ_INIT(int, read)
 }
 
-KSeqStream::KSeqStream() {
+KSeqStream::KSeqStream(mmseqs_output* out) {
   seq = (void*)KSEQSTREAM::kseq_init(STDIN_FILENO);
   type = KSEQ_STREAM;
 }
@@ -66,8 +66,8 @@ namespace KSEQGZIP {
 KSEQ_INIT(gzFile, gzread)
 }
 
-KSeqGzip::KSeqGzip(const char* fileName) {
-  if (FileUtil::fileExists(fileName) == false) {
+KSeqGzip::KSeqGzip(mmseqs_output* out, const char* fileName) {
+  if (FileUtil::fileExists(out, fileName) == false) {
     errno = ENOENT;
     perror(fileName);
     EXIT(EXIT_FAILURE);
@@ -110,13 +110,13 @@ namespace KSEQBZIP {
 KSEQ_INIT(BZFILE*, BZ2_bzread)
 }
 
-KSeqBzip::KSeqBzip(const char* fileName) {
-  if (FileUtil::fileExists(fileName) == false) {
+KSeqBzip::KSeqBzip(mmseqs_output* out, const char* fileName) {
+  if (FileUtil::fileExists(out, fileName) == false) {
     errno = ENOENT;
     perror(fileName);
     EXIT(EXIT_FAILURE);
   }
-  FILE* fp = FileUtil::openFileOrDie(fileName, "r+b", true);
+  FILE* fp = FileUtil::openFileOrDie(out, fileName, "r+b", true);
   int bzError;
   file = BZ2_bzReadOpen(&bzError, fp, 0, 0, NULL, 0);
   if (bzError != 0) {
@@ -150,21 +150,21 @@ KSeqBzip::~KSeqBzip() {
 }
 #endif
 
-KSeqWrapper* KSeqFactory(const char* file) {
+KSeqWrapper* KSeqFactory(mmseqs_output* out, const char* file) {
   KSeqWrapper* kseq = NULL;
   if (strcmp(file, "stdin") == 0) {
-    kseq = new KSeqStream();
+    kseq = new KSeqStream(out);
     return kseq;
   }
 
   if (Util::endsWith(".gz", file) == false &&
       Util::endsWith(".bz2", file) == false) {
-    kseq = new KSeqFile(file);
+    kseq = new KSeqFile(out, file);
     return kseq;
   }
 #ifdef HAVE_ZLIB
   else if (Util::endsWith(".gz", file) == true) {
-    kseq = new KSeqGzip(file);
+    kseq = new KSeqGzip(out, file);
     return kseq;
   }
 #else
@@ -175,7 +175,7 @@ KSeqWrapper* KSeqFactory(const char* file) {
 
 #ifdef HAVE_BZLIB
   else if (Util::endsWith(".bz2", file) == true) {
-    kseq = new KSeqBzip(file);
+    kseq = new KSeqBzip(out, file);
     return kseq;
   }
 #else
@@ -191,7 +191,7 @@ namespace KSEQBUFFER {
 KSEQ_INIT(kseq_buffer_t*, kseq_buffer_reader)
 }
 
-KSeqBuffer::KSeqBuffer(const char* buffer, size_t length) {
+KSeqBuffer::KSeqBuffer(mmseqs_output* out, const char* buffer, size_t length) {
   d.buffer = (char*)buffer;
   d.length = length;
   d.position = 0;

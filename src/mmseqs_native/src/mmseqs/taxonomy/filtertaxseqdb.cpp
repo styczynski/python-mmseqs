@@ -25,7 +25,7 @@ int filtertaxseqdb(mmseqs_output* out, Parameters& par) {
 
   // open mapping (dbKey to taxid)
   std::vector<std::pair<unsigned int, unsigned int>> mapping;
-  if (FileUtil::fileExists(std::string(par.db1 + "_mapping").c_str()) ==
+  if (FileUtil::fileExists(out, std::string(par.db1 + "_mapping").c_str()) ==
       false) {
     out->failure("{}_mapping does not exist. Please create the taxonomy mapping", par.db1);
   }

@@ -58,7 +58,7 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
   }
 
   std::string indexStr = PrefilteringIndexReader::searchForIndex(par.db2);
-  int targetDbType = FileUtil::parseDbType(par.db2.c_str());
+  int targetDbType = FileUtil::parseDbType(out, par.db2.c_str());
   std::string targetDB = (indexStr == "") ? par.db2.c_str() : indexStr.c_str();
   int targetSrcDbType = -1;
   if (indexStr != "" ||
@@ -72,7 +72,7 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
     targetSrcDbType = data.srcSeqType;
     targetDbType = data.seqType;
   }
-  const int queryDbType = FileUtil::parseDbType(par.db1.c_str());
+  const int queryDbType = FileUtil::parseDbType(out, par.db1.c_str());
   if (queryDbType == -1 || targetDbType == -1) {
     out->failure("Please recreate your database or add a .dbtype file to your sequence/profile database");
   }
@@ -91,9 +91,9 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
   std::string hash =
       SSTR(par.hashParameter(par.databases_types, par.filenames, par.taxonomy));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
@@ -148,7 +148,7 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
                     par.createParameterString(par.createsubdb).c_str());
 
     program = tmpDir + "/taxpercontig.sh";
-    FileUtil::writeFile(program, taxpercontig_sh, taxpercontig_sh_len);
+    FileUtil::writeFile(out, program, taxpercontig_sh, taxpercontig_sh_len);
   } else {
     if (par.taxonomySearchMode == Parameters::TAXONOMY_TOP_HIT) {
       cmd.addVariable("TOPHIT_MODE", "1");
@@ -162,7 +162,7 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
         par.createParameterString(par.searchworkflow, true).c_str());
 
     program = tmpDir + "/taxonomy.sh";
-    FileUtil::writeFile(program.c_str(), taxonomy_sh, taxonomy_sh_len);
+    FileUtil::writeFile(out, program.c_str(), taxonomy_sh, taxonomy_sh_len);
   }
   if (par.taxonomyOutputMode == Parameters::TAXONOMY_OUTPUT_LCA) {
     cmd.addVariable("TAX_OUTPUT", "0");

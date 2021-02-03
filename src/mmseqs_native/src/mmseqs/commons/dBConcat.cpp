@@ -28,16 +28,16 @@ DBConcat::DBConcat(mmseqs_output* output, const std::string &dataFileNameA,
   bool shouldConcatLookup = false;
   bool shouldConcatSource = false;
   if (write == true) {
-    if (FileUtil::fileExists((dataFileNameA + "_mapping").c_str()) &&
-        FileUtil::fileExists((dataFileNameB + "_mapping").c_str())) {
+    if (FileUtil::fileExists(out, (dataFileNameA + "_mapping").c_str()) &&
+        FileUtil::fileExists(out, (dataFileNameB + "_mapping").c_str())) {
       shouldConcatMapping = true;
     }
-    if (FileUtil::fileExists((dataFileNameA + ".lookup").c_str()) &&
-        FileUtil::fileExists((dataFileNameB + ".lookup").c_str())) {
+    if (FileUtil::fileExists(out, (dataFileNameA + ".lookup").c_str()) &&
+        FileUtil::fileExists(out, (dataFileNameB + ".lookup").c_str())) {
       shouldConcatLookup = true;
     }
-    if (FileUtil::fileExists((dataFileNameA + ".source").c_str()) &&
-        FileUtil::fileExists((dataFileNameB + ".source").c_str())) {
+    if (FileUtil::fileExists(out, (dataFileNameA + ".source").c_str()) &&
+        FileUtil::fileExists(out, (dataFileNameB + ".source").c_str())) {
       shouldConcatSource = true;
     }
   }
@@ -49,9 +49,9 @@ DBConcat::DBConcat(mmseqs_output* output, const std::string &dataFileNameA,
   if (shouldConcatLookup) {
     mode |= DBReader<unsigned int>::USE_LOOKUP;
   }
-  DBReader<unsigned int> dbA(dataFileNameA.c_str(), indexFileNameA.c_str(),
+  DBReader<unsigned int> dbA(out, dataFileNameA.c_str(), indexFileNameA.c_str(),
                              threads, mode);
-  DBReader<unsigned int> dbB(dataFileNameB.c_str(), indexFileNameB.c_str(),
+  DBReader<unsigned int> dbB(out, dataFileNameB.c_str(), indexFileNameB.c_str(),
                              threads, mode);
   dbA.open(DBReader<unsigned int>::LINEAR_ACCCESS);
   dbB.open(DBReader<unsigned int>::LINEAR_ACCCESS);
@@ -65,7 +65,7 @@ DBConcat::DBConcat(mmseqs_output* output, const std::string &dataFileNameA,
   DBWriter *concatWriter = NULL;
   if (write == true) {
     concatWriter =
-        new DBWriter(dataFileNameC.c_str(), indexFileNameC.c_str(), threads,
+        new DBWriter(out, dataFileNameC.c_str(), indexFileNameC.c_str(), threads,
                      Parameters::WRITER_ASCII_MODE, dbA.getDbtype());
     concatWriter->open();
   }
@@ -165,9 +165,9 @@ DBConcat::DBConcat(mmseqs_output* output, const std::string &dataFileNameA,
   if (shouldConcatMapping) {
     char buffer[1024];
     std::vector<std::pair<unsigned int, unsigned int>> mappingA;
-    Util::readMapping((dataFileNameA + "_mapping"), mappingA);
+    Util::readMapping(out, (dataFileNameA + "_mapping"), mappingA);
     std::vector<std::pair<unsigned int, unsigned int>> mappingB;
-    Util::readMapping((dataFileNameB + "_mapping"), mappingB);
+    Util::readMapping(out, (dataFileNameB + "_mapping"), mappingB);
 
     FILE *mappingFilePtr = fopen((dataFileNameC + "_mapping").c_str(), "w");
 
@@ -216,7 +216,7 @@ DBConcat::DBConcat(mmseqs_output* output, const std::string &dataFileNameA,
   unsigned int maxSetIdA = 0;
   // handle lookup
   if (shouldConcatLookup) {
-    DBReader<unsigned int> lookupReaderA(dataFileNameA.c_str(),
+    DBReader<unsigned int> lookupReaderA(out, dataFileNameA.c_str(),
                                          indexFileNameA.c_str(), 1,
                                          DBReader<unsigned int>::USE_LOOKUP);
     lookupReaderA.open(DBReader<unsigned int>::NOSORT);
@@ -256,7 +256,7 @@ DBConcat::DBConcat(mmseqs_output* output, const std::string &dataFileNameA,
     lookupReaderA.close();
 
     // for B we compute: newSetIdB = maxSetIdA + 1 + setIdB
-    DBReader<unsigned int> lookupReaderB(dataFileNameB.c_str(),
+    DBReader<unsigned int> lookupReaderB(out, dataFileNameB.c_str(),
                                          indexFileNameB.c_str(), 1,
                                          DBReader<unsigned int>::USE_LOOKUP);
     lookupReaderB.open(DBReader<unsigned int>::NOSORT);
@@ -296,7 +296,7 @@ DBConcat::DBConcat(mmseqs_output* output, const std::string &dataFileNameA,
   if (shouldConcatSource) {
     unsigned int sourceMaxSetIdA = 0;
     std::map<unsigned int, std::string> sourceMapA =
-        Util::readLookup((dataFileNameA + ".source"), false);
+        Util::readLookup(out, (dataFileNameA + ".source"), false);
     std::map<unsigned int, std::string>::iterator itA;
 
     char buffer[1024];
@@ -331,7 +331,7 @@ DBConcat::DBConcat(mmseqs_output* output, const std::string &dataFileNameA,
     }
 
     std::map<unsigned int, std::string> sourceMapB =
-        Util::readLookup((dataFileNameB + ".source"), false);
+        Util::readLookup(out, (dataFileNameB + ".source"), false);
     std::map<unsigned int, std::string>::iterator itB;
 
     for (itB = sourceMapB.begin(); itB != sourceMapB.end(); itB++) {
@@ -392,7 +392,7 @@ int concatdbs(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   // TODO check equal db type
-  DBConcat outDB(par.db1.c_str(), par.db1Index.c_str(), par.db2.c_str(),
+  DBConcat outDB(out, par.db1.c_str(), par.db1Index.c_str(), par.db2.c_str(),
                  par.db2Index.c_str(), par.db3.c_str(), par.db3Index.c_str(),
                  static_cast<unsigned int>(par.threads), true, true,
                  par.preserveKeysB, par.takeLargerEntry);

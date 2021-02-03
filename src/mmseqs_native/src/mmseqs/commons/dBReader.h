@@ -241,18 +241,18 @@ class DBReader : public MemoryTracker {
 
   size_t getTotalDataSize() { return totalDataSize; }
 
-  static void moveDatafiles(const std::vector<std::string>& files,
+  static void moveDatafiles(mmseqs_output* out, const std::vector<std::string>& files,
                             const std::string& destination);
 
-  static void moveDb(const std::string& srcDbName,
+  static void moveDb(mmseqs_output* out, const std::string& srcDbName,
                      const std::string& dstDbName);
 
-  static void removeDb(const std::string& databaseName);
+  static void removeDb(mmseqs_output* out, const std::string& databaseName);
 
-  static void softlinkDb(const std::string& databaseName,
+  static void softlinkDb(mmseqs_output* out, const std::string& databaseName,
                          const std::string& outDb,
                          DBFiles::Files dbFilesFlags = DBFiles::ALL);
-  static void copyDb(const std::string& databaseName, const std::string& outDb,
+  static void copyDb(mmseqs_output* out, const std::string& databaseName, const std::string& outDb,
                      DBFiles::Files dbFilesFlags = DBFiles::ALL);
 
   char* mmapData(FILE* file, size_t* dataSize);
@@ -294,7 +294,7 @@ class DBReader : public MemoryTracker {
 
   static char* serialize(const DBReader<unsigned int>& idx);
 
-  static DBReader<unsigned int>* unserialize(const char* data, int threads);
+  static DBReader<unsigned int>* unserialize(mmseqs_output* out, const char* data, int threads);
 
   int getDbtype() { return dbtype; }
 

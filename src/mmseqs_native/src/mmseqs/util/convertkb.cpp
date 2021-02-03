@@ -92,7 +92,7 @@ int convertkb(mmseqs_output *out, Parameters &par) {
   DBReader<unsigned int> *reader = NULL;
   std::ofstream *lookupStream = NULL;
 
-  const bool doMapping = FileUtil::fileExists(par.mappingFile.c_str());
+  const bool doMapping = FileUtil::fileExists(out, par.mappingFile.c_str());
   if (!doMapping) {
     std::string lookupFile = outputBase + ".lookup";
     lookupStream = new std::ofstream(lookupFile);

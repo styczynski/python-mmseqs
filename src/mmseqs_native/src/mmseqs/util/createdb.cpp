@@ -23,13 +23,13 @@ int createdb(mmseqs_output* out, Parameters& par) {
   filenames.pop_back();
 
   for (size_t i = 0; i < filenames.size(); i++) {
-    if (FileUtil::directoryExists(filenames[i].c_str()) == true) {
+    if (FileUtil::directoryExists(out, filenames[i].c_str()) == true) {
       out->failure("File {} is a directory\n", filenames[i] );
     }
   }
 
   bool dbInput = false;
-  if (FileUtil::fileExists(par.db1dbtype.c_str()) == true) {
+  if (FileUtil::fileExists(out, par.db1dbtype.c_str()) == true) {
     if (filenames.size() > 1) {
       out->failure("Only one database can be used with database input");
     }
@@ -121,7 +121,7 @@ redoComputation:
       size_t lookupId = reader->getLookupIdByKey(dbKey);
       sourceName = reader->getLookupEntryName(lookupId);
     } else {
-      sourceName = FileUtil::baseName(filenames[fileIdx]);
+      sourceName = FileUtil::baseName(out, filenames[fileIdx]);
     }
     char buffer[4096];
     size_t len = snprintf(buffer, sizeof(buffer), "%zu\t%s\n", fileIdx,
@@ -245,7 +245,7 @@ redoComputation:
     delete kseq;
     if (filenames.size() > 1 &&
         par.createdbMode == Parameters::SEQUENCE_SPLIT_MODE_SOFT) {
-      size_t fileSize = FileUtil::getFileSize(filenames[fileIdx].c_str());
+      size_t fileSize = FileUtil::getFileSize(out, filenames[fileIdx].c_str());
       headerFileOffset += fileSize;
       seqFileOffset += fileSize;
     }
@@ -285,13 +285,13 @@ redoComputation:
   }
   if (par.createdbMode == Parameters::SEQUENCE_SPLIT_MODE_SOFT) {
     if (filenames.size() == 1) {
-      FileUtil::symlinkAbs(filenames[0], dataFile);
-      FileUtil::symlinkAbs(filenames[0], hdrDataFile);
+      FileUtil::symlinkAbs(out, filenames[0], dataFile);
+      FileUtil::symlinkAbs(out, filenames[0], hdrDataFile);
     } else {
       for (size_t fileIdx = 0; fileIdx < filenames.size(); fileIdx++) {
-        FileUtil::symlinkAbs(filenames[fileIdx],
+        FileUtil::symlinkAbs(out, filenames[fileIdx],
                              dataFile + "." + SSTR(fileIdx));
-        FileUtil::symlinkAbs(filenames[fileIdx],
+        FileUtil::symlinkAbs(out, filenames[fileIdx],
                              hdrDataFile + "." + SSTR(fileIdx));
       }
     }
@@ -304,7 +304,7 @@ redoComputation:
     readerHeader.open(DBReader<unsigned int>::NOSORT);
     // create lookup file
     std::string lookupFile = dataFile + ".lookup";
-    FILE* file = FileUtil::openAndDelete(lookupFile.c_str(), "w");
+    FILE* file = FileUtil::openAndDelete(out, lookupFile.c_str(), "w");
     std::string buffer;
     buffer.reserve(2048);
     unsigned int splitIdx = 0;

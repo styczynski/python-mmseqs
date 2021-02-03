@@ -126,8 +126,8 @@ int convertprofiledb(mmseqs_output *out, Parameters &par) {
 
   std::string data = par.db1;
   std::string index = par.db1Index;
-  if (FileUtil::fileExists((par.db1 + ".ffdata").c_str()) &&
-      FileUtil::fileExists((par.db1 + ".ffindex").c_str())) {
+  if (FileUtil::fileExists(out, (par.db1 + ".ffdata").c_str()) &&
+      FileUtil::fileExists(out, (par.db1 + ".ffindex").c_str())) {
     data = par.db1 + ".ffdata";
     index = par.db1 + ".ffindex";
   }

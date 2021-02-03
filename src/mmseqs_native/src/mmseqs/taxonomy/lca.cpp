@@ -24,7 +24,7 @@ int dolca(mmseqs_output* out, Parameters& par, bool majority) {
   NcbiTaxonomy* t = NcbiTaxonomy::openTaxonomy(par.db1);
 
   std::vector<std::pair<unsigned int, unsigned int>> mapping;
-  if (FileUtil::fileExists(std::string(par.db1 + "_mapping").c_str()) ==
+  if (FileUtil::fileExists(out, std::string(par.db1 + "_mapping").c_str()) ==
       false) {
     out->failure("{}_mapping does not exist. Please create the taxonomy mapping", par.db1);
   }

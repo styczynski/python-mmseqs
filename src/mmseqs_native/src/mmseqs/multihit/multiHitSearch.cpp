@@ -52,10 +52,10 @@ int multihitsearch(mmseqs_output *out, Parameters &par) {
   //
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
-  if (FileUtil::directoryExists(par.db4.c_str()) == false) {
+  if (FileUtil::directoryExists(out, par.db4.c_str()) == false) {
     out->info("Tmp {} folder does not exist or is not a directory.\n", par.db4
                       );
-    if (FileUtil::makeDir(par.db4.c_str()) == false) {
+    if (FileUtil::makeDir(out, par.db4.c_str()) == false) {
       out->failure("Can not create tmp folder {}", par.db4 );
     } else {
       out->info("Created dir {}\n", par.db4);
@@ -64,14 +64,14 @@ int multihitsearch(mmseqs_output *out, Parameters &par) {
   size_t hash =
       par.hashParameter(par.databases_types, par.filenames, par.multihitsearch);
   std::string tmpDir = par.db4 + "/" + SSTR(hash);
-  if (FileUtil::directoryExists(tmpDir.c_str()) == false) {
-    if (FileUtil::makeDir(tmpDir.c_str()) == false) {
+  if (FileUtil::directoryExists(out, tmpDir.c_str()) == false) {
+    if (FileUtil::makeDir(out, tmpDir.c_str()) == false) {
       out->failure("Can not create sub tmp folder {}", tmpDir);
     }
   }
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
-  FileUtil::symlinkAlias(tmpDir, "latest");
+  FileUtil::symlinkAlias(out, tmpDir, "latest");
 
   CommandCaller cmd;
   if (par.removeTmpFiles) {
@@ -86,7 +86,7 @@ int multihitsearch(mmseqs_output *out, Parameters &par) {
   cmd.addVariable("VERBOSITY",
                   par.createParameterString(par.onlyverbosity).c_str());
 
-  FileUtil::writeFile(tmpDir + "/multihitsearch.sh", multihitsearch_sh,
+  FileUtil::writeFile(out, tmpDir + "/multihitsearch.sh", multihitsearch_sh,
                       multihitsearch_sh_len);
   std::string program(tmpDir + "/multihitsearch.sh");
   cmd.execProgram(program.c_str(), par.filenames);

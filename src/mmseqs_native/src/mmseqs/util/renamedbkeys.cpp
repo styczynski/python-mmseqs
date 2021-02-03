@@ -48,7 +48,7 @@ int renamedbkeys(mmseqs_output* out, Parameters& par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   FILE* orderFile = NULL;
-  if (FileUtil::fileExists(par.db1.c_str())) {
+  if (FileUtil::fileExists(out, par.db1.c_str())) {
     orderFile = fopen(par.db1.c_str(), "r");
   } else {
     out->failure("File {} does not exist", par.db1 );
@@ -57,9 +57,9 @@ int renamedbkeys(mmseqs_output* out, Parameters& par) {
   FILE* newLookupFile = NULL;
   unsigned int mode =
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA;
-  if (FileUtil::fileExists((par.db2 + ".lookup").c_str())) {
+  if (FileUtil::fileExists(out, (par.db2 + ".lookup").c_str())) {
     mode |= DBReader<unsigned int>::USE_LOOKUP;
-    newLookupFile = FileUtil::openAndDelete((par.db3 + ".lookup").c_str(), "w");
+    newLookupFile = FileUtil::openAndDelete(out, (par.db3 + ".lookup").c_str(), "w");
   }
   DBReader<unsigned int> reader(par.db2.c_str(), par.db2Index.c_str(), 1, mode);
   reader.open(DBReader<unsigned int>::NOSORT);
@@ -68,7 +68,7 @@ int renamedbkeys(mmseqs_output* out, Parameters& par) {
   FILE* newMappingFile = NULL;
   std::vector<std::pair<unsigned int, unsigned int>> mapping;
   std::vector<std::pair<unsigned int, unsigned int>> newMapping;
-  if (FileUtil::fileExists((par.db2 + "_mapping").c_str())) {
+  if (FileUtil::fileExists(out, (par.db2 + "_mapping").c_str())) {
     mapping.reserve(reader.getSize());
     newMapping.reserve(reader.getSize());
     bool isSorted = Util::readMapping(par.db2 + "_mapping", mapping);
@@ -76,12 +76,12 @@ int renamedbkeys(mmseqs_output* out, Parameters& par) {
       std::stable_sort(mapping.begin(), mapping.end(), compareToFirst);
     }
     newMappingFile =
-        FileUtil::openAndDelete((par.db3 + "_mapping").c_str(), "w");
+        FileUtil::openAndDelete(out, (par.db3 + "_mapping").c_str(), "w");
   }
 
   bool isHeaderCompressed = false;
   DBReader<unsigned int>* headerReader = NULL;
-  if (FileUtil::fileExists(par.hdr2dbtype.c_str())) {
+  if (FileUtil::fileExists(out, par.hdr2dbtype.c_str())) {
     headerReader = new DBReader<unsigned int>(
         par.hdr2.c_str(), par.hdr2Index.c_str(), 1,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);

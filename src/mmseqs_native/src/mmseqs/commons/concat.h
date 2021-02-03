@@ -129,7 +129,7 @@ class Concat {
         out->failure("posix_fadvise returned an error");
       }
 #endif
-      doConcat(input_desc, output_desc, inbuf, insize);
+      doConcat(out, input_desc, output_desc, inbuf, insize);
       free(inbuf);
     }
   }

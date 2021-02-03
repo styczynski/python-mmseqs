@@ -240,7 +240,7 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
     }
   }
   writer.close(true);
-  FileUtil::remove(resultDbIndex.c_str());
+  FileUtil::remove(out, resultDbIndex.c_str());
   reader.close();
   uniqueNames.clear();
   accessionMapping.clear();
@@ -270,7 +270,7 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
   }
   mappingUnsorted.close();
   SORT_PARALLEL(mapping.begin(), mapping.end(), sortMappingByDbKey);
-  FILE* handle = FileUtil::openFileOrDie(resultDbData.c_str(), "w", true);
+  FILE* handle = FileUtil::openFileOrDie(out, resultDbData.c_str(), "w", true);
   if (handle == NULL) {
     out->failure("Could not write to mapping file {}", resultDbData);
   }

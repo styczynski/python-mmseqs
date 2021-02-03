@@ -140,7 +140,6 @@ Alignment::Alignment(mmseqs_output* output, const std::string &querySeqDB,
     }
   }
 
-  // qdbr->readMmapedDataInMemory();
   // make sure to touch target after query, so if there is not enough memory for
   // the query, at least the targets might have had enough space left to be
   // residung in the page cache
@@ -182,13 +181,13 @@ Alignment::Alignment(mmseqs_output* output, const std::string &querySeqDB,
       prefdbr->getDbtype(), Parameters::DBTYPE_PREFILTER_REV_RES);
 
   if (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_NUCLEOTIDES)) {
-    m = new NucleotideMatrix(par.scoringMatrixFile.nucleotides, 1.0, scoreBias);
+    m = new NucleotideMatrix(out, par.scoringMatrixFile.nucleotides, 1.0, scoreBias);
     gapOpen = par.gapOpen.nucleotides;
     gapExtend = par.gapExtend.nucleotides;
     zdrop = par.zdrop;
   } else if (Parameters::isEqualDbtype(
                  querySeqType, Parameters::DBTYPE_PROFILE_STATE_PROFILE)) {
-    SubstitutionMatrix s(par.scoringMatrixFile.aminoacids, 2.0, scoreBias);
+    SubstitutionMatrix s(out, par.scoringMatrixFile.aminoacids, 2.0, scoreBias);
     m = new SubstitutionMatrixProfileStates(out, s.matrixName, s.probMatrix, s.pBack,
                                             s.subMatrixPseudoCounts, 2.0,
                                             scoreBias, 219);
@@ -196,7 +195,7 @@ Alignment::Alignment(mmseqs_output* output, const std::string &querySeqDB,
     gapExtend = par.gapExtend.aminoacids;
   } else {
     // keep score bias at 0.0 (improved ROC)
-    m = new SubstitutionMatrix(par.scoringMatrixFile.aminoacids, 2.0,
+    m = new SubstitutionMatrix(out, par.scoringMatrixFile.aminoacids, 2.0,
                                scoreBias);
     gapOpen = par.gapOpen.aminoacids;
     gapExtend = par.gapExtend.aminoacids;
@@ -206,10 +205,10 @@ Alignment::Alignment(mmseqs_output* output, const std::string &querySeqDB,
   if (realign == true && realignScoreBias != 0.0f) {
     if (Parameters::isEqualDbtype(querySeqType,
                                   Parameters::DBTYPE_NUCLEOTIDES)) {
-      realign_m = new NucleotideMatrix(par.scoringMatrixFile.nucleotides, 1.0,
+      realign_m = new NucleotideMatrix(out, par.scoringMatrixFile.nucleotides, 1.0,
                                        scoreBias + realignScoreBias);
     } else {
-      realign_m = new SubstitutionMatrix(par.scoringMatrixFile.aminoacids, 2.0,
+      realign_m = new SubstitutionMatrix(out, par.scoringMatrixFile.aminoacids, 2.0,
                                          scoreBias + realignScoreBias);
     }
   }
@@ -289,7 +288,7 @@ void Alignment::run(const unsigned int mpiRank, const unsigned int mpiNumProc) {
     }
 
     // merge output databases
-    DBWriter::mergeResults(outDB, outDBIndex, splitFiles);
+    DBWriter::mergeResults(out, outDB, outDBIndex, splitFiles);
   }
 }
 
@@ -334,8 +333,8 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
       std::string alnResultsOutString;
       alnResultsOutString.reserve(1024 * 1024);
       char buffer[1024 + 32768];
-      Sequence qSeq(maxSeqLen, querySeqType, m, 0, false, compBiasCorrection);
-      Sequence dbSeq(maxSeqLen, targetSeqType, m, 0, false, compBiasCorrection);
+      Sequence qSeq(out, maxSeqLen, querySeqType, m, 0, false, compBiasCorrection);
+      Sequence dbSeq(out, maxSeqLen, targetSeqType, m, 0, false, compBiasCorrection);
 
       const size_t maxMatcherSeqLen =
           Parameters::isEqualDbtype(querySeqType,

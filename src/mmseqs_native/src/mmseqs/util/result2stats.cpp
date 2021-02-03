@@ -118,7 +118,7 @@ int StatsComputer::run() {
 StatsComputer::~StatsComputer() {
   statWriter->close(tsvOut);
   if (tsvOut) {
-    FileUtil::remove(statWriter->getIndexFileName());
+    FileUtil::remove(out, statWriter->getIndexFileName());
   }
   resultReader->close();
   delete statWriter;

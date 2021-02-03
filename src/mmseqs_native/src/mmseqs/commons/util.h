@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <mmseqs/commons/mMseqsMPI.h>
+#include <mmseqs/output.h>
 
 #ifndef EXIT
 #define EXIT(exitCode)         \
@@ -97,7 +98,7 @@ std::string SSTR(float);
 
 class Util {
  public:
-  static void decomposeDomain(size_t domain_size, size_t world_rank,
+  static void decomposeDomain(mmseqs_output* out, size_t domain_size, size_t world_rank,
                               size_t world_size, size_t *subdomain_start,
                               size_t *subdomain_size);
 
@@ -110,7 +111,7 @@ class Util {
   static size_t getTotalMemoryPages();
   static uint64_t getL2CacheSize();
 
-  static char touchMemory(const char *memory, size_t size);
+  static char touchMemory(mmseqs_output* out, const char *memory, size_t size);
 
   static size_t countLines(const char *data, size_t length);
 
@@ -118,6 +119,7 @@ class Util {
                               unsigned int threads);
 
   static int readMapping(
+      mmseqs_output* out,
       std::string mappingFilename,
       std::vector<std::pair<unsigned int, unsigned int> > &mapping);
 
@@ -299,7 +301,7 @@ class Util {
     return p > 0 && p != std::string::npos ? filename.substr(0, p) : filename;
   }
 
-  static void checkAllocation(void *pointer, std::string message);
+  static void checkAllocation(mmseqs_output* out, void *pointer, std::string message);
 
   template <typename Iterator, typename Container>
   static bool isLastIterator(Iterator iterator, const Container &container) {
@@ -346,7 +348,7 @@ class Util {
   static std::string removeWhiteSpace(std::string in);
 
   static std::map<unsigned int, std::string> readLookup(
-      const std::string &lookupFile, const bool removeSplit = false);
+      mmseqs_output* out, const std::string &lookupFile, const bool removeSplit = false);
 
   static bool canBeCovered(const float covThr, const int covMode,
                            float queryLength, float targetLength);
@@ -365,6 +367,6 @@ class Util {
     return alnLen >= alnLenThr;
   }
 
-  static size_t computeMemory(size_t limit);
+  static size_t computeMemory(mmseqs_output* out, size_t limit);
 };
 #endif

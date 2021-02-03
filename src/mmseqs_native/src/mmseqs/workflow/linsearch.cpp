@@ -33,7 +33,7 @@ void setLinsearchDefaults(Parameters *p) {
 }
 
 int linsearch(mmseqs_output *out, Parameters &par) {
-  const int queryDbType = FileUtil::parseDbType(par.db1.c_str());
+  const int queryDbType = FileUtil::parseDbType(out, par.db1.c_str());
   std::string indexStr = LinsearchIndexReader::searchForIndex(par.db2);
   if (indexStr.empty()) {
     out->failure("Database {} needs to be index: createlinindex {}", par.db2, par.db2);
@@ -93,9 +93,9 @@ int linsearch(mmseqs_output *out, Parameters &par) {
   std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames,
                                             par.linsearchworkflow));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
@@ -126,7 +126,7 @@ int linsearch(mmseqs_output *out, Parameters &par) {
   cmd.addVariable("NUCL", isNuclSearch ? "1" : NULL);
 
   std::string program = tmpDir + "/linsearch.sh";
-  FileUtil::writeFile(program, linsearch_sh, linsearch_sh_len);
+  FileUtil::writeFile(out, program, linsearch_sh, linsearch_sh_len);
 
   if (isTranslatedNuclSearch == true) {
     cmd.addVariable("NO_TARGET_INDEX", (indexStr == "") ? "TRUE" : NULL);
@@ -149,7 +149,7 @@ int linsearch(mmseqs_output *out, Parameters &par) {
                     par.createParameterString(par.translatenucs).c_str());
     cmd.addVariable("SEARCH", program.c_str());
     program = std::string(tmpDir + "/translated_search.sh");
-    FileUtil::writeFile(program, Linsearch::translated_search_sh,
+    FileUtil::writeFile(out, program, Linsearch::translated_search_sh,
                         Linsearch::translated_search_sh_len);
   }
   cmd.execProgram(program.c_str(), par.filenames);

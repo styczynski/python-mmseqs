@@ -57,7 +57,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
 
   std::vector<std::string> filenames(par.filenames);
   for (size_t i = 0; i < filenames.size(); i++) {
-    if (FileUtil::directoryExists(filenames[i].c_str()) == true) {
+    if (FileUtil::directoryExists(out, filenames[i].c_str()) == true) {
       out->failure("File {} is a directory", filenames[i] );
     }
   }
@@ -70,10 +70,10 @@ int tar2db(mmseqs_output *out, Parameters &par) {
   std::string indexFile = dataFile + ".index";
 
   std::string sourceFile = dataFile + ".source";
-  FILE *source = FileUtil::openAndDelete(sourceFile.c_str(), "w");
+  FILE *source = FileUtil::openAndDelete(out, sourceFile.c_str(), "w");
 
   std::string lookupFile = dataFile + ".lookup";
-  FILE *lookup = FileUtil::openAndDelete(lookupFile.c_str(), "w");
+  FILE *lookup = FileUtil::openAndDelete(out, lookupFile.c_str(), "w");
 
   DBWriter writer(dataFile.c_str(), indexFile.c_str(), par.threads,
                   par.compressed, par.outputDbType);
@@ -84,7 +84,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
   size_t globalKey = 0;
   for (size_t i = 0; i < filenames.size(); i++) {
     size_t len = snprintf(buffer, sizeof(buffer), "%zu\t%s\n", i,
-                          FileUtil::baseName(filenames[i]).c_str());
+                          FileUtil::baseName(out, filenames[i]).c_str());
     int written = fwrite(buffer, sizeof(char), len, source);
     if (written != (int)len) {
       out->failure("Cannot write to source file {}", sourceFile);
@@ -161,7 +161,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
 
                 size_t len = snprintf(
                     buffer, sizeof(buffer), "%zu\t%s\t%zu\n", currentKey,
-                    FileUtil::baseName(header.name).c_str(), i);
+                    FileUtil::baseName(out, header.name).c_str(), i);
                 int written = fwrite(buffer, sizeof(char), len, lookup);
                 if (written != (int)len) {
                   out->failure("Cannot write to lookup file {}", lookupFile);

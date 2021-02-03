@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+#include <mmseqs/output.h>
 #include <mmseqs/commons/dBReader.h>
 #include <mmseqs/commons/memoryTracker.h>
 
@@ -44,6 +45,7 @@ class DBWriter : public MemoryTracker {
   void sortDatafileByIdOrder(DBReader<unsigned int>& qdbr);
 
   static void mergeResults(
+      mmseqs_output* out,
       const std::string& outFileName, const std::string& outFileNameIndex,
       const std::vector<std::pair<std::string, std::string>>& files,
       bool lexicographicOrder = false);
@@ -51,7 +53,7 @@ class DBWriter : public MemoryTracker {
   void writeIndexEntry(unsigned int key, size_t offset, size_t length,
                        unsigned int thrIdx);
 
-  static void writeDbtypeFile(const char* path, int dbtype, bool isCompressed);
+  static void writeDbtypeFile(mmseqs_output* out, const char* path, int dbtype, bool isCompressed);
 
   size_t getStart(unsigned int threadIdx) { return starts[threadIdx]; }
 
@@ -64,6 +66,7 @@ class DBWriter : public MemoryTracker {
   static void writeIndexEntryToFile(FILE* outFile, char* buff1, T& index);
 
   static void createRenumberedDB(
+      mmseqs_output* out,
       const std::string& dataFile, const std::string& indexFile,
       const std::string& origData, const std::string& origIndex,
       int sortMode = DBReader<unsigned int>::SORT_BY_ID_OFFSET);
@@ -79,17 +82,18 @@ class DBWriter : public MemoryTracker {
 
   void checkClosed();
 
-  static void mergeResults(const char* outFileName,
+  static void mergeResults(mmseqs_output* out,
+                           const char* outFileName,
                            const char* outFileNameIndex,
                            const char** dataFileNames,
                            const char** indexFileNames, unsigned long fileCount,
                            bool mergeDatafiles, bool lexicographicOrder = false,
                            bool indexNeedsToBeSorted = true);
 
-  static void mergeIndex(const char** indexFilenames, unsigned int fileCount,
+  static void mergeIndex(mmseqs_output* out, const char** indexFilenames, unsigned int fileCount,
                          const std::vector<size_t>& dataSizes);
 
-  static void sortIndex(const char* inFileNameIndex,
+  static void sortIndex(mmseqs_output* out, const char* inFileNameIndex,
                         const char* outFileNameIndex,
                         const bool lexicographicOrder);
 

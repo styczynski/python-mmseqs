@@ -5,7 +5,7 @@
 
 class NucleotideMatrix : public SubstitutionMatrix {
  public:
-  NucleotideMatrix(const char *scoringMatrixFileName, float bitFactor,
+  NucleotideMatrix(mmseqs_output* output, const char *scoringMatrixFileName, float bitFactor,
                    float scoreBias);
 
   virtual ~NucleotideMatrix();

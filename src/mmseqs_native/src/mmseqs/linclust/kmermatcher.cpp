@@ -750,7 +750,7 @@ int kmermatcherInner(Parameters &par, DBReader<unsigned int> &seqDbr) {
                       );
 
     std::string splitFileNameDone = splitFileName + ".done";
-    if (FileUtil::fileExists(splitFileNameDone.c_str()) == false) {
+    if (FileUtil::fileExists(out, splitFileNameDone.c_str()) == false) {
       hashSeqPair = doComputation<T>(
           totalKmersPerSplit, hashRanges[split].first, hashRanges[split].second,
           splitFileName, seqDbr, par, subMat);
@@ -782,9 +782,9 @@ int kmermatcherInner(Parameters &par, DBReader<unsigned int> &seqDbr) {
             dbw, splitFiles, repSequence);
       }
       for (size_t i = 0; i < splitFiles.size(); i++) {
-        FileUtil::remove(splitFiles[i].c_str());
+        FileUtil::remove(out, splitFiles[i].c_str());
         std::string splitFilesDone = splitFiles[i] + ".done";
-        FileUtil::remove(splitFilesDone.c_str());
+        FileUtil::remove(out, splitFilesDone.c_str());
       }
     } else {
       if (Parameters::isEqualDbtype(seqDbr.getDbtype(),
@@ -1071,12 +1071,12 @@ void mergeKmerFilesAndOutput(DBWriter &dbw, std::vector<std::string> tmpFiles,
   size_t *dataSizes = new size_t[fileCnt];
   // init structures
   for (size_t file = 0; file < tmpFiles.size(); file++) {
-    files[file] = FileUtil::openFileOrDie(tmpFiles[file].c_str(), "r", true);
+    files[file] = FileUtil::openFileOrDie(out, tmpFiles[file].c_str(), "r", true);
     size_t dataSize;
     struct stat sb;
     fstat(fileno(files[file]), &sb);
     if (sb.st_size > 0) {
-      entries[file] = (T *)FileUtil::mmapFile(files[file], &dataSize);
+      entries[file] = (T *)FileUtil::mmapFile(out, files[file], &dataSize);
 #if HAVE_POSIX_MADVISE
       if (posix_madvise(entries[file], dataSize, POSIX_MADV_SEQUENTIAL) != 0) {
         out->error("posix_madvise returned an error for file {}", tmpFiles[file]);
@@ -1318,7 +1318,7 @@ void writeKmersToDisk(std::string tmpFile,
     out->failure("Cannot close file {}", tmpFile);
   }
   std::string fileName = tmpFile + ".done";
-  FILE *done = FileUtil::openFileOrDie(fileName.c_str(), "w", false);
+  FILE *done = FileUtil::openFileOrDie(out, fileName.c_str(), "w", false);
   if (fclose(done) != 0) {
     out->failure("Cannot close file {}", fileName);
   }

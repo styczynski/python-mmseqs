@@ -13,10 +13,11 @@
 #include <cstddef>
 #include <mmseqs/commons/baseMatrix.h>
 #include <mmseqs/commons/profileStates.h>
+#include <mmseqs/output.h>
 
 class SubstitutionMatrix : public BaseMatrix {
  public:
-  SubstitutionMatrix(const char *filename, float bitFactor, float scoreBias);
+  SubstitutionMatrix(mmseqs_output* output, const char *filename, float bitFactor, float scoreBias);
 
   virtual ~SubstitutionMatrix();
 
@@ -30,7 +31,7 @@ class SubstitutionMatrix : public BaseMatrix {
   static void calcProfileProfileLocalAaBiasCorrection(
       short *profileScores, const size_t profileAASize, const int N,
       size_t alphabetSize);
-  static void calcProfileProfileLocalAaBiasCorrectionAln(int8_t *profileScores,
+  static void calcProfileProfileLocalAaBiasCorrectionAln(mmseqs_output* out, int8_t *profileScores,
                                                          int N,
                                                          size_t alphabetSize,
                                                          BaseMatrix *subMat);

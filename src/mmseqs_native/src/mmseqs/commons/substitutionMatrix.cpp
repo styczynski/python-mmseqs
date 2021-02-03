@@ -9,9 +9,9 @@
 #include <cstring>
 #include <fstream>
 
-SubstitutionMatrix::SubstitutionMatrix(const char *filename, float bitFactor,
+SubstitutionMatrix::SubstitutionMatrix(mmseqs_output* output, const char *filename, float bitFactor,
                                        float scoreBias)
-    : bitFactor(bitFactor) {
+    : bitFactor(bitFactor), BaseMatrix(output) {
   std::pair<std::string, std::string> parsedMatrix =
       BaseMatrix::unserialize(filename);
   if (parsedMatrix.second != "") {
@@ -154,6 +154,7 @@ void SubstitutionMatrix::calcProfileProfileLocalAaBiasCorrection(
 }
 
 void SubstitutionMatrix::calcProfileProfileLocalAaBiasCorrectionAln(
+    mmseqs_output* out,
     int8_t *profileScores, int N, size_t alphabetSize, BaseMatrix *subMat) {
   const int windowSize = 40;
 
@@ -162,7 +163,7 @@ void SubstitutionMatrix::calcProfileProfileLocalAaBiasCorrectionAln(
   memset(pnul, 0, sizeof(float) * N);
   float *aaSum = new float[alphabetSize];
 
-  ProfileStates ps(alphabetSize, subMat->pBack);
+  ProfileStates ps(out, alphabetSize, subMat->pBack);
 
   for (int pos = 0; pos < N; pos++) {
     for (size_t aa = 0; aa < alphabetSize; aa++) {
@@ -380,7 +381,7 @@ void SubstitutionMatrix::readProbMatrix(const std::string &matrixData,
   }
 
   if (containsX == false) {
-    out->failure("Please add X to your substitution matrix.")
+    out->failure("Please add X to your substitution matrix.");
   }
 
   if (hasLambda == false || hasBackground == false) {

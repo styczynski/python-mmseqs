@@ -58,7 +58,7 @@ int msa2result(mmseqs_output *out, Parameters &par) {
   unsigned int mode =
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA;
   std::string lookupFile = msaData + ".lookup";
-  if (FileUtil::fileExists(lookupFile.c_str())) {
+  if (FileUtil::fileExists(out, lookupFile.c_str())) {
     mode |= DBReader<unsigned int>::USE_LOOKUP;
   }
   DBReader<unsigned int> msaReader(msaData.c_str(), msaIndex.c_str(),

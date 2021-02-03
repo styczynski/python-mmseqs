@@ -26,6 +26,7 @@
 #endif
 
 int Util::readMapping(
+    mmseqs_output* out,
     std::string mappingFilename,
     std::vector<std::pair<unsigned int, unsigned int>> &mapping) {
   MemoryMapped indexData(mappingFilename, MemoryMapped::WholeFile,
@@ -65,7 +66,7 @@ size_t Util::countLines(const char *data, size_t length) {
   return newlines;
 }
 
-void Util::decomposeDomain(size_t domain_size, size_t world_rank,
+void Util::decomposeDomain(mmseqs_output* out, size_t domain_size, size_t world_rank,
                            size_t world_size, size_t *subdomain_start,
                            size_t *subdomain_size) {
   if (world_size > domain_size) {
@@ -605,7 +606,7 @@ bool Util::getLine(const char *data, size_t dataLength, char *buffer,
   return didCutoff == false;
 }
 
-void Util::checkAllocation(void *pointer, std::string message) {
+void Util::checkAllocation(mmseqs_output* out, void *pointer, std::string message) {
   if (pointer == NULL) {
     out->failure(message);
   }
@@ -633,9 +634,6 @@ size_t Util::getTotalSystemMemory() {
   long pages = getTotalMemoryPages();
   long page_size = getPageSize();
   uint64_t sysMemory = pages * page_size;
-  // check for ulimit
-  //    struct rlimit limit;
-  //    getrlimit(RLIMIT_MEMLOCK, &limit);
   return sysMemory;
 }
 
@@ -657,7 +655,7 @@ uint64_t Util::getL2CacheSize() {
   return 262144;
 }
 
-char Util::touchMemory(const char *memory, size_t size) {
+char Util::touchMemory(mmseqs_output* out, const char *memory, size_t size) {
 #ifdef HAVE_POSIX_MADVISE
   if (posix_madvise((void *)memory, size, POSIX_MADV_WILLNEED) != 0) {
     out->error("posix_madvise returned an error (touchMemory)");
@@ -717,45 +715,6 @@ size_t Util::ompCountLines(const char *data, size_t dataSize,
   return cnt;
 }
 
-///* Scaled log-likelihood ratios for coiled-coil heptat repeat */
-// const float     ccoilmat[23][7] =
-//        {
-//                {249, 310, 74, 797, -713, 235, -102},           // 0 A
-//                {-85, -6214, -954, -820, -1980, -839, -2538},   // 1 C
-//                {-2688, 743, 498, -1703, -409, 458, 337},       // 2 D
-//                {-1269, 1209, 1097, -236, 1582, 1006, 1338},    // 3 E
-//                {-713, -2590, -939, -447, -2079, -2513, -3270}, // 4 F
-//                {-2476, -1537, -839, -2198, -1877, -1002, -2079}, // 5 G
-//                {-527, -436, -537, -171, -1180, -492, -926},      // 6 H
-//                {878, -1343, -1064, -71, -911, -820, -1241},      // 7 I
-//                {209, 785, 597, -492, 739, 522, 706},             // 8 K
-//                {1097, -1313, -1002, 1348, -673, -665, -576},     // 9 L
-//                {770, -502, -816, 365, -499, -783, -562},         // 10 M
-//                {207, 520, 768, -1624, 502, 887, 725},            // 11 N
-//                {-5521, -2225, -4017, -5115, -4605, -5521, -4961},// 12 P
-//                {-1167, 828, 845, -209, 953, 767, 949},           // 13 Q
-//                {13, 389, 571, -2171, 511, 696, 611},             // 14 R
-//                {-1102, -283, -72, -858, -309, -221, -657},       // 15 S
-//                {-1624, -610, -435, -385, -99, -441, -213},       // 16 T
-//                {421, -736, -1049, -119, -1251, -1049, -1016},    // 17 V
-//                {-2718, -2748, -2733, -291, -5115, -2162, -4268}, // 18 W
-//                {276, -2748, -2513, 422, -1589, -2137, -2343},    // 19 Y
-//                {0, 0, 0, 0, 0, 0, 0}                             // 20 X
-//        };
-//
-///* Sample Means for 100-residue windows */
-// const float     aamean100[20] =
-//        {
-//                7.44,5.08,4.69,5.36,1.54,3.93,6.24,6.34,2.24,6.09,
-//                9.72, 6.00,2.39,4.30,4.69,7.23,5.61,1.25,3.31,6.53
-//        };
-///* Sample Standard Deviations for 100-residue windows */
-// const float     aasd100[20] =
-//        {
-//                4.02,3.05,2.87,2.71,1.88,2.63,3.46,3.45,1.79,3.19,
-//                3.77,3.64,1.71,2.62,3.00,3.63,2.83,1.32,2.18,2.92
-//        };
-
 int Util::omp_thread_count() {
   int n = 0;
 #pragma omp parallel reduction(+ : n)
@@ -763,7 +722,7 @@ int Util::omp_thread_count() {
   return n;
 }
 
-std::map<unsigned int, std::string> Util::readLookup(const std::string &file,
+std::map<unsigned int, std::string> Util::readLookup(mmseqs_output* out, const std::string &file,
                                                      const bool removeSplit) {
   std::map<unsigned int, std::string> mapping;
   if (file.length() > 0) {
@@ -917,7 +876,7 @@ uint64_t Util::revComplement(const uint64_t kmer, const int k) {
   return (((uint64_t)_mm_cvtsi128_si64(x)) >> (uint64_t)(64 - 2 * k));
 }
 
-size_t Util::computeMemory(size_t limit) {
+size_t Util::computeMemory(mmseqs_output* out, size_t limit) {
   size_t memoryLimit;
   if (limit > 0) {
     memoryLimit = limit;

@@ -57,9 +57,9 @@ int easycluster(mmseqs_output *out, Parameters &par) {
   std::string hash = "abc";  // SSTR(par.hashParameter(par.databases_types,
                              // par.filenames, *command.params));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
 
   CommandCaller cmd;
@@ -82,7 +82,7 @@ int easycluster(mmseqs_output *out, Parameters &par) {
                   par.createParameterString(par.onlyverbosity).c_str());
 
   std::string program = tmpDir + "/easycluster.sh";
-  FileUtil::writeFile(program, easycluster_sh, easycluster_sh_len);
+  FileUtil::writeFile(out, program, easycluster_sh, easycluster_sh_len);
   cmd.execProgram(program.c_str(), par.filenames);
 
   // Should never get here

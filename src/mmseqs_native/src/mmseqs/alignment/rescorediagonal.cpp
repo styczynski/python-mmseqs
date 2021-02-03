@@ -51,7 +51,7 @@ int doRescorediagonal(mmseqs_output* out, Parameters &par, DBWriter &resultWrite
   DBReader<unsigned int> *tdbr = NULL;
   bool touch = (par.preloadMode != Parameters::PRELOAD_MODE_MMAP);
   IndexReader *tDbrIdx = new IndexReader(
-      par.db2, par.threads, IndexReader::SEQUENCES,
+      out, par.db2, par.threads, IndexReader::SEQUENCES,
       (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0);
   int querySeqType = 0;
   tdbr = tDbrIdx->sequenceReader;
@@ -63,7 +63,7 @@ int doRescorediagonal(mmseqs_output* out, Parameters &par, DBWriter &resultWrite
     querySeqType = targetSeqType;
   } else {
     // open the sequence, prefiltering and output databases
-    qDbrIdx = new IndexReader(par.db1, par.threads, IndexReader::SEQUENCES,
+    qDbrIdx = new IndexReader(out, par.db1, par.threads, IndexReader::SEQUENCES,
                               (touch) ? IndexReader::PRELOAD_INDEX : 0);
     qdbr = qDbrIdx->sequenceReader;
     querySeqType = qdbr->getDbtype();
@@ -81,10 +81,10 @@ int doRescorediagonal(mmseqs_output* out, Parameters &par, DBWriter &resultWrite
 
   BaseMatrix *subMat;
   if (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_NUCLEOTIDES)) {
-    subMat = new NucleotideMatrix(par.scoringMatrixFile.nucleotides, 1.0, 0.0);
+    subMat = new NucleotideMatrix(out, par.scoringMatrixFile.nucleotides, 1.0, 0.0);
   } else {
     // keep score bias at 0.0 (improved ROC)
-    subMat = new SubstitutionMatrix(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+    subMat = new SubstitutionMatrix(out, par.scoringMatrixFile.aminoacids, 2.0, 0.0);
   }
 
   SubstitutionMatrix::FastMatrix fastMatrix =
@@ -104,11 +104,11 @@ int doRescorediagonal(mmseqs_output* out, Parameters &par, DBWriter &resultWrite
             : std::string((const char *)CovSeqidQscPercMinDiagTargetCov_lib,
                           CovSeqidQscPercMinDiagTargetCov_lib_len);
     scorePerColThr =
-        parsePrecisionLib(libraryString, par.seqIdThr, par.covThr, 0.99);
+        parsePrecisionLib(out, libraryString, par.seqIdThr, par.covThr, 0.99);
   }
   bool reversePrefilterResult = (Parameters::isEqualDbtype(
       resultReader.getDbtype(), Parameters::DBTYPE_PREFILTER_REV_RES));
-  EvalueComputation evaluer(tdbr->getAminoAcidDBSize(), subMat);
+  EvalueComputation evaluer(out, tdbr->getAminoAcidDBSize(), subMat);
 
   size_t totalMemory = Util::getTotalSystemMemory();
   size_t flushSize = 100000000;
@@ -424,7 +424,7 @@ int rescorediagonal(mmseqs_output *out, Parameters &par) {
   }
 
   DBReader<unsigned int> resultReader(
-      par.db3.c_str(), par.db3Index.c_str(), par.threads,
+      out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   resultReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
   int dbtype = resultReader.getDbtype();  // this is DBTYPE_PREFILTER_RES ||
@@ -466,7 +466,7 @@ int rescorediagonal(mmseqs_output *out, Parameters &par) {
   DBWriter resultWriter(out, par.db4.c_str(), par.db4Index.c_str(), par.threads,
                         par.compressed, dbtype);
   resultWriter.open();
-  int status = doRescorediagonal(par, resultWriter, resultReader, 0,
+  int status = doRescorediagonal(out, par, resultWriter, resultReader, 0,
                                  resultReader.getSize());
   resultWriter.close();
 

@@ -26,6 +26,7 @@ typedef unsigned __int64 uint64_t;
 #include <stdint.h>
 #endif
 
+#include <mmseqs/output.h>
 #include <string>
 
 /// Portable read-only memory mapping (Windows and Linux)
@@ -85,7 +86,7 @@ class MemoryMapped {
  private:
   mmseqs_output* out;
   /// don't copy object
-  MemoryMapped(const MemoryMapped&);
+  MemoryMapped(mmseqs_output* out, const MemoryMapped&);
   /// don't copy object
   MemoryMapped& operator=(const MemoryMapped&);
 

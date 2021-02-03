@@ -1,6 +1,7 @@
 #ifndef MMSEQS_COMMANDCALLER_H
 #define MMSEQS_COMMANDCALLER_H
 
+#include <mmseqs/output.h>
 #include <cstddef>
 #include <string>
 #include <vector>
@@ -14,7 +15,7 @@ class CommandCaller {
 
   int callProgram(const char* program, size_t argc, const char** argv);
 
-  static unsigned int getCallDepth();
+  static unsigned int getCallDepth(mmseqs_output* out);
 
   // Does not return on success
   void execProgram(const char* program, const std::vector<std::string>& argv);

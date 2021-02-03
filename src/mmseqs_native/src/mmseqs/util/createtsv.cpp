@@ -22,9 +22,9 @@ int createtsv(mmseqs_output *out, Parameters &par) {
   //    Parameters::PARSE_VARIADIC, 0);
 
   bool queryNucs = Parameters::isEqualDbtype(
-      FileUtil::parseDbType(par.db1.c_str()), Parameters::DBTYPE_NUCLEOTIDES);
+      FileUtil::parseDbType(out, par.db1.c_str()), Parameters::DBTYPE_NUCLEOTIDES);
   bool targetNucs = Parameters::isEqualDbtype(
-      FileUtil::parseDbType(par.db2.c_str()), Parameters::DBTYPE_NUCLEOTIDES);
+      FileUtil::parseDbType(out, par.db2.c_str()), Parameters::DBTYPE_NUCLEOTIDES);
   const bool touch = (par.preloadMode != Parameters::PRELOAD_MODE_MMAP);
   int queryHeaderType =
       (queryNucs) ? IndexReader::SRC_HEADERS : IndexReader::HEADERS;
@@ -187,9 +187,9 @@ int createtsv(mmseqs_output *out, Parameters &par) {
 
   if (par.dbOut == false) {
     if (hasTargetDB) {
-      FileUtil::remove(par.db4Index.c_str());
+      FileUtil::remove(out, par.db4Index.c_str());
     } else {
-      FileUtil::remove(par.db3Index.c_str());
+      FileUtil::remove(out, par.db3Index.c_str());
     }
   }
 

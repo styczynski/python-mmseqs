@@ -333,9 +333,9 @@ int databases(mmseqs_output *out, Parameters &par) {
   std::string hash = SSTR(
       par.hashParameter(par.databases_types, par.filenames, par.databases));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
@@ -358,7 +358,7 @@ int databases(mmseqs_output *out, Parameters &par) {
   cmd.addVariable("THREADS_COMP_PAR",
                   par.createParameterString(par.threadsandcompression).c_str());
   std::string program = tmpDir + "/download.sh";
-  FileUtil::writeFile(program, downloads[downloadIdx].script,
+  FileUtil::writeFile(out, program, downloads[downloadIdx].script,
                       downloads[downloadIdx].scriptLength);
   cmd.execProgram(program.c_str(), par.filenames);
 

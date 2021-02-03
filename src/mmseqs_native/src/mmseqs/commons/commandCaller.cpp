@@ -24,11 +24,11 @@ CommandCaller::CommandCaller(mmseqs_output* output): out(output) {
   }
 #endif
 
-  std::string depth = SSTR(getCallDepth());
+  std::string depth = SSTR(getCallDepth(out));
   addVariable("MMSEQS_CALL_DEPTH", depth.c_str());
 }
 
-unsigned int CommandCaller::getCallDepth() {
+unsigned int CommandCaller::getCallDepth(mmseqs_output* out) {
   char* currentCallDepth = getenv("MMSEQS_CALL_DEPTH");
   if (currentCallDepth == NULL) {
     return 0;

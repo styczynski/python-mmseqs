@@ -119,7 +119,7 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
   //    par.PARAM_S.addCategory(MMseqsParameter::COMMAND_EXPERT);
   //    par.PARAM_INCLUDE_ONLY_EXTENDABLE.addCategory(MMseqsParameter::COMMAND_EXPERT);
   //    par.parseParameters(argc, argv, command, false, 0, 0);
-  const int dbType = FileUtil::parseDbType(par.db1.c_str());
+  const int dbType = FileUtil::parseDbType(out, par.db1.c_str());
   bool isNucleotideDb =
       (Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_NUCLEOTIDES));
   if (isNucleotideDb) {
@@ -139,9 +139,9 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
   std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames,
                                             par.clusterworkflow));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
@@ -195,7 +195,7 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
     cmd.addVariable("OFFSETALIGNMENT_PAR",
                     par.createParameterString(par.offsetalignment).c_str());
     std::string program = tmpDir + "/nucleotide_clustering.sh";
-    FileUtil::writeFile(program, nucleotide_clustering_sh,
+    FileUtil::writeFile(out, program, nucleotide_clustering_sh,
                         nucleotide_clustering_sh_len);
     cmd.execProgram(program.c_str(), par.filenames);
   } else if (par.singleStepClustering == false) {
@@ -276,7 +276,7 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
                     par.createParameterString(par.mergedbs).c_str());
 
     std::string program = tmpDir + "/cascaded_clustering.sh";
-    FileUtil::writeFile(program, cascaded_clustering_sh,
+    FileUtil::writeFile(out, program, cascaded_clustering_sh,
                         cascaded_clustering_sh_len);
     cmd.execProgram(program.c_str(), par.filenames);
   } else {
@@ -302,7 +302,7 @@ int clusteringworkflow(mmseqs_output *out, Parameters &par) {
     cmd.addVariable("CLUSTER_PAR",
                     par.createParameterString(par.clust).c_str());
     std::string program = tmpDir + "/clustering.sh";
-    FileUtil::writeFile(program, clustering_sh, clustering_sh_len);
+    FileUtil::writeFile(out, program, clustering_sh, clustering_sh_len);
     cmd.execProgram(program.c_str(), par.filenames);
   }
 

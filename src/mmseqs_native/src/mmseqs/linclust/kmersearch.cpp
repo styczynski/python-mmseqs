@@ -156,7 +156,7 @@ int kmersearch(mmseqs_output *out, Parameters &par) {
   //    MMseqsParameter::COMMAND_CLUSTLINEAR);
   int targetSeqType;
   int adjustedKmerSize = 0;
-  if (Parameters::isEqualDbtype(FileUtil::parseDbType(par.db2.c_str()),
+  if (Parameters::isEqualDbtype(FileUtil::parseDbType(out, par.db2.c_str()),
                                 Parameters::DBTYPE_INDEX_DB) == false) {
     out->failure("Create index before calling kmersearch with mmseqs createlinindex");
   }
@@ -282,7 +282,7 @@ int kmersearch(mmseqs_output *out, Parameters &par) {
     splitFiles.push_back(tmpFiles.first);
 
     std::string splitFileNameDone = tmpFiles.first + ".done";
-    if (FileUtil::fileExists(splitFileNameDone.c_str()) == false) {
+    if (FileUtil::fileExists(out, splitFileNameDone.c_str()) == false) {
       KmerSearch::ExtractKmerAndSortResult sortedKmers =
           KmerSearch::extractKmerAndSort(
               totalKmersPerSplit, hashRanges[split].first,
@@ -344,9 +344,9 @@ int kmersearch(mmseqs_output *out, Parameters &par) {
           writer, splitFiles, empty);
     }
     for (size_t i = 0; i < splitFiles.size(); i++) {
-      FileUtil::remove(splitFiles[i].c_str());
+      FileUtil::remove(out, splitFiles[i].c_str());
       std::string splitFilesDone = splitFiles[i] + ".done";
-      FileUtil::remove(splitFilesDone.c_str());
+      FileUtil::remove(out, splitFilesDone.c_str());
     }
     writer.close();
   }

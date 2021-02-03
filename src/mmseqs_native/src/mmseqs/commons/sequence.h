@@ -11,6 +11,7 @@
 #include <mmseqs/commons/mathUtil.h>
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/commons/scoreMatrix.h>
+#include <mmseqs/output.h>
 
 #include <_simd/simd.h>
 #include <cstddef>
@@ -119,7 +120,7 @@ const int8_t spaced_seed_30[] = {1, 1, 1, 1, 1, 1, 0, 1, 1, 0, 1, 0, 1, 0, 1,
 
 class Sequence {
  public:
-  Sequence(size_t maxLen, int seqType, const BaseMatrix *subMat,
+  Sequence(mmseqs_output* output, size_t maxLen, int seqType, const BaseMatrix *subMat,
            const unsigned int kmerSize, const bool spaced,
            const bool aaBiasCorrection, bool shouldAddPC = true,
            const std::string &userSpacedKmerPattern = "");
@@ -589,6 +590,7 @@ class Sequence {
   int8_t *profile_for_alignment;
 
  private:
+  mmseqs_output* out;
   void mapSequence(const char *seq, unsigned int dataLen);
   // read next kmer profile in profile_matrix
   void nextProfileKmer();

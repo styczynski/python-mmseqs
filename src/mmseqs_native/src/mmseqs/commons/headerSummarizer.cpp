@@ -7,6 +7,7 @@
 #include <set>
 
 struct UniprotHeader {
+  mmseqs_output* out;
   std::string dbType;
   std::string identifier;
   std::string proteinName;
@@ -14,10 +15,11 @@ struct UniprotHeader {
   unsigned int existence;
   unsigned int priority;
 
-  UniprotHeader(const std::string& dbType, const std::string& identifier,
+  UniprotHeader(mmseqs_output* output, const std::string& dbType, const std::string& identifier,
                 const std::string& proteinName, const std::string& organismName,
                 unsigned int existence)
-      : dbType(dbType),
+      : out(output),
+        dbType(dbType),
         identifier(identifier),
         proteinName(proteinName),
         organismName(organismName),
@@ -27,6 +29,7 @@ struct UniprotHeader {
 
   PatternCompiler& isUninformative() {
     static PatternCompiler uninformative(
+        out,
         "hypothetical|unknown|putative|predicted|unnamed|probable|partial|"
         "possible|uncharacterized|fragment");
     return uninformative;
@@ -77,6 +80,7 @@ struct MetaclustHeader {
 };
 
 std::string UniprotHeaderSummarizer::summarize(
+    mmseqs_output* out,
     const std::vector<std::string>& headers) {
   std::vector<UniprotHeader> headerQueue;
 
@@ -132,7 +136,7 @@ std::string UniprotHeaderSummarizer::summarize(
     unsigned int existence =
         static_cast<unsigned int>(strtoul(existenceString.c_str(), NULL, 10));
 
-    headerQueue.emplace_back(dbType, identifier, proteinName, organismName,
+    headerQueue.emplace_back(out, dbType, identifier, proteinName, organismName,
                              existence);
   }
 
@@ -185,6 +189,7 @@ std::string UniprotHeaderSummarizer::summarize(
 }
 
 std::string MetaclustHeaderSummarizer::summarize(
+    mmseqs_output* out,
     const std::vector<std::string>& headers) {
   std::vector<MetaclustHeader> headerQueue;
 

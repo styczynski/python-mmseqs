@@ -48,7 +48,7 @@ DBReader<T>::DBReader(mmseqs_output* output, const char *dataFileName_, const ch
       externalData(false),
       didMlock(false) {
   if (threads > 1) {
-    FileUtil::fixRlimitNoFile();
+    FileUtil::fixRlimitNoFile(out);
   }
 }
 
@@ -98,7 +98,7 @@ void DBReader<T>::readMmapedDataInMemory() {
   if ((dataMode & USE_DATA) && (dataMode & USE_FREAD) == 0) {
     for (size_t fileIdx = 0; fileIdx < dataFileCnt; fileIdx++) {
       size_t dataSize = dataSizeOffset[fileIdx + 1] - dataSizeOffset[fileIdx];
-      magicBytes += Util::touchMemory(dataFiles[fileIdx], dataSize);
+      magicBytes += Util::touchMemory(out, dataFiles[fileIdx], dataSize);
     }
   }
 }
@@ -145,10 +145,10 @@ bool DBReader<T>::open(int accessType) {
   // count the number of entries
   this->accessType = accessType;
   if (dataFileName != NULL) {
-    dbtype = FileUtil::parseDbType(dataFileName);
+    dbtype = FileUtil::parseDbType(out, dataFileName);
   }
   if (dataMode & USE_DATA) {
-    dataFileNames = FileUtil::findDatafiles(dataFileName);
+    dataFileNames = FileUtil::findDatafiles(out, dataFileName);
     if (dataFileNames.empty()) {
       out->failure("No datafile could be found for {}", dataFileName);
     }
@@ -177,10 +177,10 @@ bool DBReader<T>::open(int accessType) {
   }
   if (dataMode & USE_LOOKUP || dataMode & USE_LOOKUP_REV) {
     std::string lookupFilename = (std::string(dataFileName) + ".lookup");
-    if (FileUtil::fileExists(lookupFilename.c_str()) == false) {
+    if (FileUtil::fileExists(out, lookupFilename.c_str()) == false) {
       out->failure("Can not open lookup file {}", lookupFilename);
     }
-    MemoryMapped indexData(lookupFilename, MemoryMapped::WholeFile,
+    MemoryMapped indexData(out, lookupFilename, MemoryMapped::WholeFile,
                            MemoryMapped::SequentialScan);
     char *lookupDataChar = (char *)indexData.getData();
     size_t lookupDataSize = indexData.size();
@@ -198,10 +198,10 @@ bool DBReader<T>::open(int accessType) {
   }
   bool isSortedById = false;
   if (externalData == false) {
-    if (FileUtil::fileExists(indexFileName) == false) {
+    if (FileUtil::fileExists(out, indexFileName) == false) {
       out->failure("Can not open index file {}", indexFileName);
     }
-    MemoryMapped indexData(indexFileName, MemoryMapped::WholeFile,
+    MemoryMapped indexData(out, indexFileName, MemoryMapped::WholeFile,
                            MemoryMapped::SequentialScan);
     if (!indexData.isValid()) {
       out->failure("Can map open index file {}", indexFileName);
@@ -213,7 +213,7 @@ bool DBReader<T>::open(int accessType) {
     index = new (std::nothrow) Index[this->size];
     incrementMemory(sizeof(Index) * size);
 
-    Util::checkAllocation(index, "Can not allocate index memory in DBReader");
+    Util::checkAllocation(out, index, "Can not allocate index memory in DBReader");
 
     bool isSortedById =
         readIndex(indexDataChar, indexDataSize, index, dataSize);
@@ -245,7 +245,7 @@ bool DBReader<T>::open(int accessType) {
       }
       dstream[i] = ZSTD_createDStream();
       if (dstream == NULL) {
-        out->failure("ZSTD_createDStream() error")
+        out->failure("ZSTD_createDStream() error");
       }
     }
   }
@@ -478,7 +478,7 @@ char *DBReader<T>::mmapData(FILE *file, size_t *dataSize) {
       ret = static_cast<char *>(malloc(*dataSize));
       incrementMemory(*dataSize);
       Util::checkAllocation(
-          ret, "Not enough system memory to read in the whole data file.");
+          out, ret, "Not enough system memory to read in the whole data file.");
       size_t result = fread(ret, 1, *dataSize, file);
       if (result != *dataSize) {
         out->failure("Failed to read in datafile ({}). Error {}", dataFileName, errno);
@@ -646,7 +646,7 @@ void DBReader<T>::touchData(size_t id) {
     size_t currDataOffset = getOffset(id);
     size_t nextDataOffset = findNextOffsetid(id);
     size_t dataSize = nextDataOffset - currDataOffset;
-    magicBytes = Util::touchMemory(data, dataSize);
+    magicBytes = Util::touchMemory(out, data, dataSize);
   }
 }
 
@@ -982,7 +982,7 @@ char *DBReader<unsigned int>::serialize(const DBReader<unsigned int> &idx) {
 }
 
 template <>
-DBReader<unsigned int> *DBReader<unsigned int>::unserialize(const char *data,
+DBReader<unsigned int> *DBReader<unsigned int>::unserialize(mmseqs_output* out, const char *data,
                                                             int threads) {
   const char *p = data;
   size_t size = *((size_t *)p);
@@ -998,7 +998,7 @@ DBReader<unsigned int> *DBReader<unsigned int>::unserialize(const char *data,
   DBReader<unsigned int>::Index *idx = (DBReader<unsigned int>::Index *)p;
   p += size * sizeof(DBReader<unsigned int>::Index);
 
-  return new DBReader<unsigned int>(idx, size, dataSize, lastKey, dbType,
+  return new DBReader<unsigned int>(out, idx, size, dataSize, lastKey, dbType,
                                     maxSeqLen, threads);
 }
 
@@ -1092,78 +1092,78 @@ void DBReader<T>::readLookup(char *data, size_t dataSize,
 // TODO: Move to DbUtils?
 
 template <typename T>
-void DBReader<T>::moveDatafiles(const std::vector<std::string> &files,
+void DBReader<T>::moveDatafiles(mmseqs_output* out, const std::vector<std::string> &files,
                                 const std::string &destination) {
   for (size_t i = 0; i < files.size(); i++) {
     std::string extention = files[i].substr(files[i].find_last_of(".") + 1);
     if (Util::isNumber(extention)) {
       std::string dst = (destination + "." + extention);
-      FileUtil::move(files[i].c_str(), dst.c_str());
+      FileUtil::move(out, files[i].c_str(), dst.c_str());
     } else {
       if (files.size() > 1) {
         out->failure("Both merged and unmerged database exist at the same path");
       }
 
-      FileUtil::move(files[i].c_str(), destination.c_str());
+      FileUtil::move(out, files[i].c_str(), destination.c_str());
     }
   }
 }
 
 template <typename T>
-void DBReader<T>::moveDb(const std::string &srcDbName,
+void DBReader<T>::moveDb(mmseqs_output* out, const std::string &srcDbName,
                          const std::string &dstDbName) {
-  std::vector<std::string> files = FileUtil::findDatafiles(srcDbName.c_str());
-  moveDatafiles(files, dstDbName);
+  std::vector<std::string> files = FileUtil::findDatafiles(out, srcDbName.c_str());
+  moveDatafiles(out, files, dstDbName);
 
-  if (FileUtil::fileExists((srcDbName + ".index").c_str())) {
-    FileUtil::move((srcDbName + ".index").c_str(),
+  if (FileUtil::fileExists(out, (srcDbName + ".index").c_str())) {
+    FileUtil::move(out, (srcDbName + ".index").c_str(),
                    (dstDbName + ".index").c_str());
   }
-  if (FileUtil::fileExists((srcDbName + ".dbtype").c_str())) {
-    FileUtil::move((srcDbName + ".dbtype").c_str(),
+  if (FileUtil::fileExists(out, (srcDbName + ".dbtype").c_str())) {
+    FileUtil::move(out, (srcDbName + ".dbtype").c_str(),
                    (dstDbName + ".dbtype").c_str());
   }
-  if (FileUtil::fileExists((srcDbName + ".lookup").c_str())) {
-    FileUtil::move((srcDbName + ".lookup").c_str(),
+  if (FileUtil::fileExists(out, (srcDbName + ".lookup").c_str())) {
+    FileUtil::move(out, (srcDbName + ".lookup").c_str(),
                    (dstDbName + ".lookup").c_str());
   }
 }
 
 template <typename T>
-void DBReader<T>::removeDb(const std::string &databaseName) {
+void DBReader<T>::removeDb(mmseqs_output* out, const std::string &databaseName) {
   std::vector<std::string> files =
-      FileUtil::findDatafiles(databaseName.c_str());
+      FileUtil::findDatafiles(out, databaseName.c_str());
   for (size_t i = 0; i < files.size(); ++i) {
-    FileUtil::remove(files[i].c_str());
+    FileUtil::remove(out, files[i].c_str());
   }
   std::string index = databaseName + ".index";
-  if (FileUtil::fileExists(index.c_str())) {
-    FileUtil::remove(index.c_str());
+  if (FileUtil::fileExists(out, index.c_str())) {
+    FileUtil::remove(out, index.c_str());
   }
   std::string dbTypeFile = databaseName + ".dbtype";
-  if (FileUtil::fileExists(dbTypeFile.c_str())) {
-    FileUtil::remove(dbTypeFile.c_str());
+  if (FileUtil::fileExists(out, dbTypeFile.c_str())) {
+    FileUtil::remove(out, dbTypeFile.c_str());
   }
   std::string sourceFile = databaseName + ".source";
-  if (FileUtil::fileExists(sourceFile.c_str())) {
-    FileUtil::remove(sourceFile.c_str());
+  if (FileUtil::fileExists(out, sourceFile.c_str())) {
+    FileUtil::remove(out, sourceFile.c_str());
   }
   std::string lookupFile = databaseName + ".lookup";
-  if (FileUtil::fileExists(lookupFile.c_str())) {
-    FileUtil::remove(lookupFile.c_str());
+  if (FileUtil::fileExists(out, lookupFile.c_str())) {
+    FileUtil::remove(out, lookupFile.c_str());
   }
 }
 
-void copyLinkDb(const std::string &databaseName, const std::string &outDb,
+void copyLinkDb(mmseqs_output* out, const std::string &databaseName, const std::string &outDb,
                 DBFiles::Files dbFilesFlags, bool link) {
   if (dbFilesFlags & DBFiles::DATA) {
     std::vector<std::string> names =
-        FileUtil::findDatafiles(databaseName.c_str());
+        FileUtil::findDatafiles(out, databaseName.c_str());
     if (names.size() == 1) {
       if (link) {
-        FileUtil::symlinkAbs(names[0].c_str(), outDb.c_str());
+        FileUtil::symlinkAbs(out, names[0].c_str(), outDb.c_str());
       } else {
-        FileUtil::copyFile(names[0].c_str(), outDb.c_str());
+        FileUtil::copyFile(out, names[0].c_str(), outDb.c_str());
       }
     } else {
       for (size_t i = 0; i < names.size(); i++) {
@@ -1175,9 +1175,9 @@ void copyLinkDb(const std::string &databaseName, const std::string &outDb,
           out->failure("File extension was not found but it is expected to be there. Filename: {}", names[i]);
         }
         if (link) {
-          FileUtil::symlinkAbs(names[i], outDb + ext);
+          FileUtil::symlinkAbs(out, names[i], outDb + ext);
         } else {
-          FileUtil::copyFile(names[i].c_str(), (outDb + ext).c_str());
+          FileUtil::copyFile(out, names[i].c_str(), (outDb + ext).c_str());
         }
       }
     }
@@ -1210,28 +1210,28 @@ void copyLinkDb(const std::string &databaseName, const std::string &outDb,
 
   for (size_t i = 0; i < ARRAY_SIZE(suffices); ++i) {
     std::string file = databaseName + suffices[i].suffix;
-    if (dbFilesFlags & suffices[i].flag && FileUtil::fileExists(file.c_str())) {
+    if (dbFilesFlags & suffices[i].flag && FileUtil::fileExists(out, file.c_str())) {
       if (link) {
-        FileUtil::symlinkAbs(file, outDb + suffices[i].suffix);
+        FileUtil::symlinkAbs(out, file, outDb + suffices[i].suffix);
       } else {
-        FileUtil::copyFile(file.c_str(), (outDb + suffices[i].suffix).c_str());
+        FileUtil::copyFile(out, file.c_str(), (outDb + suffices[i].suffix).c_str());
       }
     }
   }
 }
 
 template <typename T>
-void DBReader<T>::softlinkDb(const std::string &databaseName,
+void DBReader<T>::softlinkDb(mmseqs_output* out, const std::string &databaseName,
                              const std::string &outDb,
                              DBFiles::Files dbFilesFlags) {
-  copyLinkDb(databaseName, outDb, dbFilesFlags, true);
+  copyLinkDb(out, databaseName, outDb, dbFilesFlags, true);
 }
 
 template <typename T>
-void DBReader<T>::copyDb(const std::string &databaseName,
+void DBReader<T>::copyDb(mmseqs_output* out, const std::string &databaseName,
                          const std::string &outDb,
                          DBFiles::Files dbFilesFlags) {
-  copyLinkDb(databaseName, outDb, dbFilesFlags, false);
+  copyLinkDb(out, databaseName, outDb, dbFilesFlags, false);
 }
 
 template <typename T>
@@ -1242,7 +1242,7 @@ void DBReader<T>::decomposeDomainByAminoAcid(size_t worldRank, size_t worldSize,
   const size_t dbEntries = getSize();
   if (worldSize > dataSize) {
     // Assume the domain numEntries is greater than the world numEntries.
-    out->failure("World Size: {}, dbSize: {}", worldSize, dbSize);
+    out->failure("World Size: {}, dataSize: {}", worldSize, dataSize);
   }
 
   if (worldSize == 1) {

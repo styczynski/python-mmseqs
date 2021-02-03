@@ -23,9 +23,9 @@ int enrich(mmseqs_output *out, Parameters &par) {
   std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames,
                                             par.enrichworkflow));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
@@ -86,7 +86,7 @@ int enrich(mmseqs_output *out, Parameters &par) {
   }
 
   std::string program = tmpDir + "/enrich.sh";
-  FileUtil::writeFile(program, enrich_sh, enrich_sh_len);
+  FileUtil::writeFile(out, program, enrich_sh, enrich_sh_len);
   cmd.execProgram(program.c_str(), par.filenames);
 
   // Should never get here

@@ -82,10 +82,10 @@ void LinsearchIndexReader::mergeAndWriteIndex(DBWriter &dbw,
   size_t *dataSizes = new size_t[fileCnt];
   // init structures
   for (size_t file = 0; file < tmpFiles.size(); file++) {
-    files[file] = FileUtil::openFileOrDie(tmpFiles[file].c_str(), "r", true);
+    files[file] = FileUtil::openFileOrDie(out, tmpFiles[file].c_str(), "r", true);
     size_t dataSize;
     entries[file] =
-        (KmerPosition<short> *)FileUtil::mmapFile(files[file], &dataSize);
+        (KmerPosition<short> *)FileUtil::mmapFile(out, files[file], &dataSize);
     dataSizes[file] = dataSize;
     entrySizes[file] = dataSize / sizeof(KmerPosition<short>);
     offsetPos[file] = 0;
@@ -150,7 +150,7 @@ void LinsearchIndexReader::mergeAndWriteIndex(DBWriter &dbw,
     if (fclose(files[file]) != 0) {
       out->failure("Cannot close file {}", tmpFiles[file]);
     }
-    FileUtil::munmapData((void *)entries[file], dataSizes[file]);
+    FileUtil::munmapData(out, (void *)entries[file], dataSizes[file]);
   }
   delete[] dataSizes;
   delete[] offsetPos;
@@ -309,7 +309,7 @@ std::string LinsearchIndexReader::findIncompatibleParameter(
 
 std::string LinsearchIndexReader::searchForIndex(const std::string &dbName) {
   std::string outIndexName = dbName + ".linidx";
-  if (FileUtil::fileExists((outIndexName + ".dbtype").c_str()) == true) {
+  if (FileUtil::fileExists(out, (outIndexName + ".dbtype").c_str()) == true) {
     return outIndexName;
   }
   return "";

@@ -46,9 +46,9 @@ int map(mmseqs_output *out, Parameters &par) {
   std::string hash = SSTR(
       par.hashParameter(par.databases_types, par.filenames, par.mapworkflow));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
@@ -61,7 +61,7 @@ int map(mmseqs_output *out, Parameters &par) {
                   par.createParameterString(par.mapworkflow).c_str());
 
   std::string program = tmpDir + "/map.sh";
-  FileUtil::writeFile(program, map_sh, map_sh_len);
+  FileUtil::writeFile(out, program, map_sh, map_sh_len);
   cmd.execProgram(program.c_str(), par.filenames);
 
   // Should never get here

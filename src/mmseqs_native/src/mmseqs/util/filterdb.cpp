@@ -130,10 +130,10 @@ int filterdb(mmseqs_output *out, Parameters &par) {
     out->info("Filtering using file(s)");
     // Fill the filter with the data contained in the file
     std::vector<std::string> filenames;
-    if (FileUtil::fileExists(par.filteringFile.c_str())) {
+    if (FileUtil::fileExists(out, par.filteringFile.c_str())) {
       filenames.push_back(par.filteringFile);
-    } else if (FileUtil::fileExists((par.filteringFile + ".dbtype").c_str())) {
-      filenames = FileUtil::findDatafiles(par.filteringFile.c_str());
+    } else if (FileUtil::fileExists(out, (par.filteringFile + ".dbtype").c_str())) {
+      filenames = FileUtil::findDatafiles(out, par.filteringFile.c_str());
     } else {
       out->failure("File {} does not exist", par.filteringFile);
     }

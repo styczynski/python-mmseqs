@@ -39,9 +39,9 @@ int linclust(mmseqs_output *out, Parameters &par) {
   std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames,
                                             par.linclustworkflow));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
@@ -93,7 +93,7 @@ int linclust(mmseqs_output *out, Parameters &par) {
         MultiParam<int>(Parameters::CLUST_LINEAR_DEFAULT_ALPH_SIZE, 5);
   }
 
-  const int dbType = FileUtil::parseDbType(par.db1.c_str());
+  const int dbType = FileUtil::parseDbType(out, par.db1.c_str());
   const bool isUngappedMode =
       par.alignmentMode == Parameters::ALIGNMENT_MODE_UNGAPPED;
   if (isUngappedMode &&
@@ -158,7 +158,7 @@ int linclust(mmseqs_output *out, Parameters &par) {
                   par.createParameterString(par.threadsandcompression).c_str());
 
   std::string program = tmpDir + "/linclust.sh";
-  FileUtil::writeFile(program, linclust_sh, linclust_sh_len);
+  FileUtil::writeFile(out, program, linclust_sh, linclust_sh_len);
   cmd.execProgram(program.c_str(), par.filenames);
 
   // Unreachable

@@ -107,7 +107,7 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
   bool isCa3m = false;
   DBReader<unsigned int> *resultAbReader = NULL;
   DBReader<unsigned int> *cReader = NULL;
-  if (FileUtil::fileExists((par.db3 + "_ca3m.ffdata").c_str())) {
+  if (FileUtil::fileExists(out, (par.db3 + "_ca3m.ffdata").c_str())) {
     resultAbReader = new DBReader<unsigned int>(
         (par.db3 + "_ca3m.ffdata").c_str(), (par.db3 + "_ca3m.ffindex").c_str(),
         par.threads,

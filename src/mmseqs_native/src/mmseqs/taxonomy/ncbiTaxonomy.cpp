@@ -497,7 +497,7 @@ std::unordered_map<TaxID, TaxonCounts> NcbiTaxonomy::getCladeCounts(
 
 NcbiTaxonomy* NcbiTaxonomy::openTaxonomy(const std::string& database) {
   std::string binFile = database + "_taxonomy";
-  if (FileUtil::fileExists(binFile.c_str())) {
+  if (FileUtil::fileExists(out, binFile.c_str())) {
     FILE* handle = fopen(binFile.c_str(), "r");
     struct stat sb;
     if (fstat(fileno(handle), &sb) < 0) {
@@ -522,12 +522,12 @@ NcbiTaxonomy* NcbiTaxonomy::openTaxonomy(const std::string& database) {
   std::string nodesFile = database + "_nodes.dmp";
   std::string namesFile = database + "_names.dmp";
   std::string mergedFile = database + "_merged.dmp";
-  if (FileUtil::fileExists(nodesFile.c_str()) &&
-      FileUtil::fileExists(namesFile.c_str()) &&
-      FileUtil::fileExists(mergedFile.c_str())) {
-  } else if (FileUtil::fileExists("nodes.dmp") &&
-             FileUtil::fileExists("names.dmp") &&
-             FileUtil::fileExists("merged.dmp")) {
+  if (FileUtil::fileExists(out, nodesFile.c_str()) &&
+      FileUtil::fileExists(out, namesFile.c_str()) &&
+      FileUtil::fileExists(out, mergedFile.c_str())) {
+  } else if (FileUtil::fileExists(out, "nodes.dmp") &&
+             FileUtil::fileExists(out, "names.dmp") &&
+             FileUtil::fileExists(out, "merged.dmp")) {
     nodesFile = "nodes.dmp";
     namesFile = "names.dmp";
     mergedFile = "merged.dmp";

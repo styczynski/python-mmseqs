@@ -18,10 +18,10 @@ int multihitdb(mmseqs_output *out, Parameters &par) {
   std::string tmpDir = par.filenames.back();
   par.filenames.pop_back();
 
-  if (FileUtil::directoryExists(tmpDir.c_str()) == false) {
+  if (FileUtil::directoryExists(out, tmpDir.c_str()) == false) {
     out->info("Tmp {} folder does not exist or is not a directory.\n", tmpDir
                       );
-    if (FileUtil::makeDir(tmpDir.c_str()) == false) {
+    if (FileUtil::makeDir(out, tmpDir.c_str()) == false) {
       out->failure("Can not create tmp folder {}.", tmpDir);
     } else {
       out->info("Created dir {}\n", tmpDir);
@@ -30,15 +30,15 @@ int multihitdb(mmseqs_output *out, Parameters &par) {
   std::string hash = SSTR(
       par.hashParameter(par.databases_types, par.filenames, par.multihitdb));
   if (par.reuseLatest == true) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
   tmpDir = tmpDir + "/" + hash;
-  if (FileUtil::directoryExists(tmpDir.c_str()) == false) {
-    if (FileUtil::makeDir(tmpDir.c_str()) == false) {
+  if (FileUtil::directoryExists(out, tmpDir.c_str()) == false) {
+    if (FileUtil::makeDir(out, tmpDir.c_str()) == false) {
       out->failure("Can not create sub tmp folder {}", tmpDir);
     }
   }
-  FileUtil::symlinkAlias(tmpDir, "latest");
+  FileUtil::symlinkAlias(out, tmpDir, "latest");
 
   std::string outDb = par.filenames.back();
   par.filenames.pop_back();
@@ -64,7 +64,7 @@ int multihitdb(mmseqs_output *out, Parameters &par) {
   cmd.addVariable("THREADS_PAR",
                   par.createParameterString(par.onlythreads).c_str());
 
-  FileUtil::writeFile(tmpDir + "/multihitdb.sh", multihitdb_sh,
+  FileUtil::writeFile(out, tmpDir + "/multihitdb.sh", multihitdb_sh,
                       multihitdb_sh_len);
   std::string program(tmpDir + "/multihitdb.sh");
   cmd.execProgram(program.c_str(), par.filenames);

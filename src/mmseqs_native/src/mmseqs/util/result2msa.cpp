@@ -444,7 +444,7 @@ int result2msa(mmseqs_output *out, Parameters &par) {
   }
   resultWriter.close(true);
   if (shouldWriteNullByte == false) {
-    FileUtil::remove(resultWriter.getIndexFileName());
+    FileUtil::remove(out, resultWriter.getIndexFileName());
   }
   resultReader.close();
   queryHeaderReader.close();

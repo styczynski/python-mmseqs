@@ -1994,7 +1994,7 @@ Parameters::Parameters()
   setDefaults();
 }
 
-int compileRegex(regex_t *regex, const char *regexText) {
+int compileRegex(mmseqs_output* out, regex_t *regex, const char *regexText) {
   int status = regcomp(regex, regexText, REG_EXTENDED | REG_NEWLINE);
   if (status != 0) {
     out->failure("Error in regex {}", regexText);
@@ -2002,7 +2002,7 @@ int compileRegex(regex_t *regex, const char *regexText) {
   return 0;
 }
 
-bool parseBool(const std::string &p) {
+bool parseBool(mmseqs_output* out, const std::string &p) {
   if (p == "true" || p == "TRUE" || p == "1") {
     return true;
   } else if (p == "false" || p == "FALSE" || p == "0") {
@@ -2013,24 +2013,25 @@ bool parseBool(const std::string &p) {
 }
 
 std::vector<std::string> Parameters::findMissingTaxDbFiles(
+    mmseqs_output* out,
     const std::string &filename) {
   std::vector<std::string> missingFiles;
-  if (FileUtil::fileExists((filename + "_mapping").c_str()) == false) {
+  if (FileUtil::fileExists(out, (filename + "_mapping").c_str()) == false) {
     missingFiles.emplace_back(filename + "_mapping");
-  } else if (FileUtil::fileExists((filename + "_taxonomy").c_str()) == true) {
+  } else if (FileUtil::fileExists(out, (filename + "_taxonomy").c_str()) == true) {
     return missingFiles;
   }
   const std::vector<std::string> suffices = {"_nodes.dmp", "_names.dmp",
                                              "_merged.dmp"};
   for (size_t i = 0; i < suffices.size(); ++i) {
-    if (FileUtil::fileExists((filename + suffices[i]).c_str()) == false) {
+    if (FileUtil::fileExists(out, (filename + suffices[i]).c_str()) == false) {
       missingFiles.emplace_back(filename + suffices[i]);
     }
   }
   return missingFiles;
 }
 
-void Parameters::printTaxDbError(const std::string &filename,
+void Parameters::printTaxDbError(mmseqs_output* out, const std::string &filename,
                                  const std::vector<std::string> &missingFiles) {
   out->error("Input taxonomy database \"{}\" is missing files.", filename);
   for (size_t i = 0; i < missingFiles.size(); ++i) {
@@ -2181,7 +2182,7 @@ void Parameters::setDefaults() {
   tau = 0.9;
 
   // logging
-  verbosity = Debug::INFO;
+  verbosity = Log::INFO;
 
   // extractorfs
   orfMinLength = 30;
@@ -2377,7 +2378,7 @@ std::vector<MMseqsParameter *> Parameters::combineList(
   return retVec;
 }
 
-size_t Parameters::hashParameter(const std::vector<DbType> &dbtypes,
+size_t Parameters::hashParameter(mmseqs_output* out, const std::vector<DbType> &dbtypes,
                                  const std::vector<std::string> &filenames,
                                  const std::vector<MMseqsParameter *> &par) {
   std::string hashString;
@@ -2424,7 +2425,7 @@ size_t Parameters::hashParameter(const std::vector<DbType> &dbtypes,
       }
     }
   }
-  hashString.append(createParameterString(par));
+  hashString.append(createParameterString(out, par));
   hashString.append(version);
   for (int i = 0; i < restArgc; ++i) {
     hashString.append(restArgv[i]);
@@ -2433,6 +2434,7 @@ size_t Parameters::hashParameter(const std::vector<DbType> &dbtypes,
 }
 
 std::string Parameters::createParameterString(
+    mmseqs_output* out,
     const std::vector<MMseqsParameter *> &par, bool wasSet) {
   std::ostringstream ss;
   for (size_t i = 0; i < par.size(); ++i) {
@@ -2451,7 +2453,7 @@ std::string Parameters::createParameterString(
       ss << *((int *)par[i]->value) << " ";
     } else if (typeid(ByteParser) == par[i]->type) {
       ss << par[i]->name << " ";
-      ss << ByteParser::format(*((size_t *)par[i]->value), 'a', 'h') << " ";
+      ss << ByteParser::format(out, *((size_t *)par[i]->value), 'a', 'h') << " ";
     } else if (typeid(float) == par[i]->type) {
       ss << par[i]->name << " ";
       ss << *((float *)par[i]->value) << " ";
@@ -2542,6 +2544,7 @@ void Parameters::overrideParameterDescription(MMseqsParameter &par,
 }
 
 std::vector<int> Parameters::getOutputFormat(
+    mmseqs_output* out,
     int formatMode, const std::string &outformat, bool &needSequences,
     bool &needBacktrace, bool &needFullHeaders, bool &needLookup,
     bool &needSource, bool &needTaxonomyMapping, bool &needTaxonomy) {

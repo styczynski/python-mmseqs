@@ -124,7 +124,7 @@ size_t AlignmentSymmetry::findMissingLinks(mmseqs_output* out, unsigned int **el
                                            int threads) {
   // init memory for parallel merge
   unsigned int *tmpSize = new (std::nothrow) unsigned int[threads * dbSize];
-  Util::checkAllocation(tmpSize, "Can not allocate memory in findMissingLinks");
+  Util::checkAllocation(out, tmpSize, "Can not allocate memory in findMissingLinks");
   memset(tmpSize, 0,
          static_cast<size_t>(threads) * dbSize * sizeof(unsigned int));
 #pragma omp parallel
@@ -162,7 +162,7 @@ size_t AlignmentSymmetry::findMissingLinks(mmseqs_output* out, unsigned int **el
     }
     symmetricElementCount += offsetTable[setId];
   }
-  computeOffsetFromCounts(offsetTable, dbSize);
+  computeOffsetFromCounts(out, offsetTable, dbSize);
 
   // clear memory
   delete[] tmpSize;

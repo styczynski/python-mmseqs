@@ -50,8 +50,9 @@ const char *Orf::iupacReverseComplementTable =
     "................................................................"
     "................................................................";
 
-Orf::Orf(const unsigned int requestedGenCode, bool useAllTableStarts) {
+Orf::Orf(mmseqs_output* output, const unsigned int requestedGenCode, bool useAllTableStarts): out(output) {
   TranslateNucl translateNucl(
+      out,
       static_cast<TranslateNucl::GenCode>(requestedGenCode));
   std::vector<std::string> codons = translateNucl.getStopCodons();
   stopCodons = (char *)mem_align(ALIGN_INT, 8 * sizeof(int));
@@ -101,7 +102,7 @@ Orf::~Orf() {
   free(codon);
 }
 
-Matcher::result_t Orf::getFromDatabase(const size_t id,
+Matcher::result_t Orf::getFromDatabase(mmseqs_output* out, const size_t id,
                                        DBReader<unsigned int> &contigsReader,
                                        DBReader<unsigned int> &orfHeadersReader,
                                        int thread_idx) {

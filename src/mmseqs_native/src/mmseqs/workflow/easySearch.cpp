@@ -101,10 +101,10 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
   std::string hash = "abc";  // SSTR(par.hashParameter(par.databases_types,
                              // par.filenames, *command.params));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
   std::string originalTmpDir = tmpDir;
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
 
   out->output_string("TMP_PATH", tmpDir);
@@ -168,7 +168,7 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
 
   std::string query_file_path = par.filenames.back();
 
-  if (!FileUtil::fileExists((tmpDir + "/query.dbtype").c_str())) {
+  if (!FileUtil::fileExists(out, (tmpDir + "/query.dbtype").c_str())) {
     Parameters createdb_par(par);
     std::vector<std::string> createdb_filenames = {query_file_path,
                                                    tmpDir + "/query"};
@@ -182,8 +182,8 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
     subcall_mmseqs(out, "createdb", createdb_par);
   }
 
-  if (!FileUtil::fileExists((target + ".dbtype").c_str())) {
-    if (!FileUtil::fileExists((tmpDir + "/target").c_str())) {
+  if (!FileUtil::fileExists(out, (target + ".dbtype").c_str())) {
+    if (!FileUtil::fileExists(out, (tmpDir + "/target").c_str())) {
       Parameters createdb_par(par);
       std::vector<std::string> createdb_filenames = {target,
                                                      tmpDir + "/target"};
@@ -200,7 +200,7 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
   }
 
   if (linsearch) {
-    if (!FileUtil::fileExists((target + ".linidx").c_str())) {
+    if (!FileUtil::fileExists(out, (target + ".linidx").c_str())) {
       Parameters createlinindex_par(par);
       std::vector<std::string> createlinindex_filenames = {tmpDir +
                                                            "/index_tmp"};
@@ -219,7 +219,7 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
   }
 
   std::string intermediate = tmpDir + "/result";
-  if (!FileUtil::fileExists((intermediate + ".dbtype").c_str())) {
+  if (!FileUtil::fileExists(out, (intermediate + ".dbtype").c_str())) {
     // search_module
     Parameters search_par(par);
     std::vector<std::string> search_filenames = {
@@ -318,7 +318,7 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
   return 0;
 
   //    std::string program = tmpDir + "/easysearch.sh";
-  //    FileUtil::writeFile(program, easysearch_sh, easysearch_sh_len);
+  //    FileUtil::writeFile(out, program, easysearch_sh, easysearch_sh_len);
   //    cmd.execProgram(program.c_str(), par.filenames);
   //
   //    // Should never get here

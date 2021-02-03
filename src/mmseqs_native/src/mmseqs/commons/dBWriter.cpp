@@ -139,7 +139,7 @@ void DBWriter::open(size_t bufferSize) {
     indexFileNames[i] = makeResultFilename(indexFileName, i);
 
     dataFiles[i] =
-        FileUtil::openAndDelete(dataFileNames[i], datafileMode.c_str());
+        FileUtil::openAndDelete(out, dataFileNames[i], datafileMode.c_str());
     int fd = fileno(dataFiles[i]);
     int flags;
     if ((flags = fcntl(fd, F_GETFL, 0)) < 0 ||
@@ -158,7 +158,7 @@ void DBWriter::open(size_t bufferSize) {
      out->warn("Write buffer could not be allocated (bufferSize={})", bufferSize);
     }
 
-    indexFiles[i] = FileUtil::openAndDelete(indexFileNames[i], "w");
+    indexFiles[i] = FileUtil::openAndDelete(out, indexFileNames[i], "w");
     fd = fileno(indexFiles[i]);
     if ((flags = fcntl(fd, F_GETFL, 0)) < 0 ||
         fcntl(fd, F_SETFD, flags | FD_CLOEXEC) == -1) {
@@ -194,14 +194,14 @@ void DBWriter::open(size_t bufferSize) {
   closed = false;
 }
 
-void DBWriter::writeDbtypeFile(const char *path, int dbtype,
+void DBWriter::writeDbtypeFile(mmseqs_output* out, const char *path, int dbtype,
                                bool isCompressed) {
   if (dbtype == Parameters::DBTYPE_OMIT_FILE) {
     return;
   }
 
   std::string name = std::string(path) + ".dbtype";
-  FILE *file = FileUtil::openAndDelete(name.c_str(), "wb");
+  FILE *file = FileUtil::openAndDelete(out, name.c_str(), "wb");
   dbtype = isCompressed ? dbtype | (1 << 31) : dbtype & ~(1 << 31);
   size_t written = fwrite(&dbtype, sizeof(int), 1, file);
   if (written != 1) {
@@ -234,12 +234,12 @@ void DBWriter::close(bool merge, bool needsSort) {
   }
 
   merge = getenv("MMSEQS_FORCE_MERGE") != NULL ? true : merge;
-  mergeResults(dataFileName, indexFileName, (const char **)dataFileNames,
+  mergeResults(out, dataFileName, indexFileName, (const char **)dataFileNames,
                (const char **)indexFileNames, threads, merge,
                ((mode & Parameters::WRITER_LEXICOGRAPHIC_MODE) != 0),
                needsSort);
 
-  writeDbtypeFile(dataFileName, dbtype,
+  writeDbtypeFile(out, dataFileName, dbtype,
                   (mode & Parameters::WRITER_COMPRESSED_MODE) != 0);
 
   for (unsigned int i = 0; i < threads; i++) {
@@ -442,6 +442,7 @@ void DBWriter::checkClosed() {
 }
 
 void DBWriter::mergeResults(
+    mmseqs_output* out,
     const std::string &outFileName, const std::string &outFileNameIndex,
     const std::vector<std::pair<std::string, std::string>> &files,
     const bool lexicographicOrder) {
@@ -451,7 +452,7 @@ void DBWriter::mergeResults(
     datafilesNames[i] = files[i].first.c_str();
     indexFilesNames[i] = files[i].second.c_str();
   }
-  mergeResults(outFileName.c_str(), outFileNameIndex.c_str(), datafilesNames,
+  mergeResults(out, outFileName.c_str(), outFileNameIndex.c_str(), datafilesNames,
                indexFilesNames, files.size(), true, lexicographicOrder);
   delete[] datafilesNames;
   delete[] indexFilesNames;
@@ -460,13 +461,13 @@ void DBWriter::mergeResults(
   if (files.size() > 0) {
     std::string typeSrc = files[0].first + ".dbtype";
     std::string typeDest = outFileName + ".dbtype";
-    if (FileUtil::fileExists(typeSrc.c_str())) {
+    if (FileUtil::fileExists(out, typeSrc.c_str())) {
       std::rename(typeSrc.c_str(), typeDest.c_str());
     }
     for (size_t i = 1; i < files.size(); i++) {
       std::string typeFile = files[i].first + ".dbtype";
-      if (FileUtil::fileExists(typeFile.c_str())) {
-        FileUtil::remove(typeFile.c_str());
+      if (FileUtil::fileExists(out, typeFile.c_str())) {
+        FileUtil::remove(out, typeFile.c_str());
       }
     }
   }
@@ -524,7 +525,7 @@ void DBWriter::writeIndex(FILE *outFile, size_t indexSize,
   }
 }
 
-void DBWriter::mergeResults(const char *outFileName,
+void DBWriter::mergeResults(mmseqs_output* out, const char *outFileName,
                             const char *outFileNameIndex,
                             const char **dataFileNames,
                             const char **indexFileNames,
@@ -534,7 +535,7 @@ void DBWriter::mergeResults(const char *outFileName,
   Timer timer;
   std::vector<std::vector<std::string>> dataFilenames;
   for (unsigned int i = 0; i < fileCount; ++i) {
-    dataFilenames.emplace_back(FileUtil::findDatafiles(dataFileNames[i]));
+    dataFilenames.emplace_back(FileUtil::findDatafiles(out, dataFileNames[i]));
   }
 
   // merge results into one result file
@@ -561,8 +562,8 @@ void DBWriter::mergeResults(const char *outFileName,
     }
 
     if (mergeDatafiles) {
-      FILE *outFh = FileUtil::openAndDelete(outFileName, "w");
-      Concat::concatFiles(datafiles, outFh);
+      FILE *outFh = FileUtil::openAndDelete(out, outFileName, "w");
+      Concat::concatFiles(out, datafiles, outFh);
       if (fclose(outFh) != 0) {
         out->failure("Cannot close data file {}", outFileName);
       }
@@ -578,34 +579,34 @@ void DBWriter::mergeResults(const char *outFileName,
       for (unsigned int i = 0; i < dataFilenames.size(); i++) {
         std::vector<std::string> &filenames = dataFilenames[i];
         for (size_t j = 0; j < filenames.size(); ++j) {
-          FileUtil::remove(filenames[j].c_str());
+          FileUtil::remove(out, filenames[j].c_str());
         }
       }
     }
 
     // merge index
-    mergeIndex(indexFileNames, dataFilenames.size(), mergedSizes);
+    mergeIndex(out, indexFileNames, dataFilenames.size(), mergedSizes);
   } else {
     std::vector<std::string> &filenames = dataFilenames[0];
     if (filenames.size() == 1) {
       // In single thread dbreader mode it will create a .0
       // that should be moved to the final destination dest instead of dest.0
-      FileUtil::move(filenames[0].c_str(), outFileName);
+      FileUtil::move(out, filenames[0].c_str(), outFileName);
     } else {
-      DBReader<unsigned int>::moveDatafiles(filenames, outFileName);
+      DBReader<unsigned int>::moveDatafiles(out, filenames, outFileName);
     }
   }
   if (indexNeedsToBeSorted) {
-    DBWriter::sortIndex(indexFileNames[0], outFileNameIndex,
+    DBWriter::sortIndex(out, indexFileNames[0], outFileNameIndex,
                         lexicographicOrder);
-    FileUtil::remove(indexFileNames[0]);
+    FileUtil::remove(out, indexFileNames[0]);
   } else {
-    FileUtil::move(indexFileNames[0], outFileNameIndex);
+    FileUtil::move(out, indexFileNames[0], outFileNameIndex);
   }
-  out->info("Time for merging to {}: {}", FileUtil::baseName(outFileName), timer.lap());
+  out->info("Time for merging to {}: {}", FileUtil::baseName(out, outFileName), timer.lap());
 }
 
-void DBWriter::mergeIndex(const char **indexFilenames, unsigned int fileCount,
+void DBWriter::mergeIndex(mmseqs_output* out, const char **indexFilenames, unsigned int fileCount,
                           const std::vector<size_t> &dataSizes) {
   FILE *index_file = fopen(indexFilenames[0], "a");
   if (index_file == NULL) {
@@ -614,7 +615,7 @@ void DBWriter::mergeIndex(const char **indexFilenames, unsigned int fileCount,
   }
   size_t globalOffset = dataSizes[0];
   for (unsigned int fileIdx = 1; fileIdx < fileCount; fileIdx++) {
-    DBReader<unsigned int> reader(indexFilenames[fileIdx],
+    DBReader<unsigned int> reader(out, indexFilenames[fileIdx],
                                   indexFilenames[fileIdx], 1,
                                   DBReader<unsigned int>::USE_INDEX);
     reader.open(DBReader<unsigned int>::HARDNOSORT);
@@ -627,7 +628,7 @@ void DBWriter::mergeIndex(const char **indexFilenames, unsigned int fileCount,
       writeIndex(index_file, reader.getSize(), index);
     }
     reader.close();
-    FileUtil::remove(indexFilenames[fileIdx]);
+    FileUtil::remove(out, indexFilenames[fileIdx]);
 
     globalOffset += dataSizes[fileIdx];
   }
@@ -636,16 +637,16 @@ void DBWriter::mergeIndex(const char **indexFilenames, unsigned int fileCount,
   }
 }
 
-void DBWriter::sortIndex(const char *inFileNameIndex,
+void DBWriter::sortIndex(mmseqs_output* out, const char *inFileNameIndex,
                          const char *outFileNameIndex,
                          const bool lexicographicOrder) {
   if (lexicographicOrder == false) {
     // sort the index
-    DBReader<unsigned int> indexReader(inFileNameIndex, inFileNameIndex, 1,
+    DBReader<unsigned int> indexReader(out, inFileNameIndex, inFileNameIndex, 1,
                                        DBReader<unsigned int>::USE_INDEX);
     indexReader.open(DBReader<unsigned int>::NOSORT);
     DBReader<unsigned int>::Index *index = indexReader.getIndex();
-    FILE *index_file = FileUtil::openAndDelete(outFileNameIndex, "w");
+    FILE *index_file = FileUtil::openAndDelete(out, outFileNameIndex, "w");
     writeIndex(index_file, indexReader.getSize(), index);
     if (fclose(index_file) != 0) {
       out->failure("Cannot close index file {}", outFileNameIndex);
@@ -653,11 +654,11 @@ void DBWriter::sortIndex(const char *inFileNameIndex,
     indexReader.close();
 
   } else {
-    DBReader<std::string> indexReader(inFileNameIndex, inFileNameIndex, 1,
+    DBReader<std::string> indexReader(out, inFileNameIndex, inFileNameIndex, 1,
                                       DBReader<std::string>::USE_INDEX);
     indexReader.open(DBReader<std::string>::SORT_BY_ID);
     DBReader<std::string>::Index *index = indexReader.getIndex();
-    FILE *index_file = FileUtil::openAndDelete(outFileNameIndex, "w");
+    FILE *index_file = FileUtil::openAndDelete(out, outFileNameIndex, "w");
     writeIndex(index_file, indexReader.getSize(), index);
     if (fclose(index_file) != 0) {
       out->failure("Cannot close index file {}", outFileNameIndex);
@@ -673,7 +674,8 @@ void DBWriter::writeThreadBuffer(unsigned int idx, size_t dataSize) {
   }
 }
 
-void DBWriter::createRenumberedDB(const std::string &dataFile,
+void DBWriter::createRenumberedDB(mmseqs_output* out,
+                                  const std::string &dataFile,
                                   const std::string &indexFile,
                                   const std::string &origData,
                                   const std::string &origIndex, int sortMode) {
@@ -681,17 +683,17 @@ void DBWriter::createRenumberedDB(const std::string &dataFile,
   FILE *sLookup = NULL;
   if (origData.empty() == false && origIndex.empty() == false) {
     lookupReader =
-        new DBReader<unsigned int>(origData.c_str(), origIndex.c_str(), 1,
+        new DBReader<unsigned int>(out, origData.c_str(), origIndex.c_str(), 1,
                                    DBReader<unsigned int>::USE_LOOKUP);
     lookupReader->open(DBReader<unsigned int>::NOSORT);
-    sLookup = FileUtil::openAndDelete((dataFile + ".lookup").c_str(), "w");
+    sLookup = FileUtil::openAndDelete(out, (dataFile + ".lookup").c_str(), "w");
   }
 
-  DBReader<unsigned int> reader(dataFile.c_str(), indexFile.c_str(), 1,
+  DBReader<unsigned int> reader(out, dataFile.c_str(), indexFile.c_str(), 1,
                                 DBReader<unsigned int>::USE_INDEX);
   reader.open(sortMode);
   std::string indexTmp = indexFile + "_tmp";
-  FILE *sIndex = FileUtil::openAndDelete(indexTmp.c_str(), "w");
+  FILE *sIndex = FileUtil::openAndDelete(out, indexTmp.c_str(), "w");
 
   char buffer[1024];
   std::string strBuffer;

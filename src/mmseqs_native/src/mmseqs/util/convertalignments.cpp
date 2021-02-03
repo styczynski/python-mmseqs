@@ -871,7 +871,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
   // tsv output
   resultWriter.close(true);
   if (isDb == false) {
-    FileUtil::remove(par.db4Index.c_str());
+    FileUtil::remove(out, par.db4Index.c_str());
   }
   if (needTaxonomy) {
     delete t;

@@ -45,7 +45,7 @@ int indexdb(mmseqs_output *out, Parameters &par) {
 
   const bool sameDB = (par.db1 == par.db2);
 
-  std::string path = FileUtil::getRealPathFromSymLink(par.db2dbtype);
+  std::string path = FileUtil::getRealPathFromSymLink(out, par.db2dbtype);
   DBReader<unsigned int> dbr(
       par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
@@ -106,7 +106,7 @@ int indexdb(mmseqs_output *out, Parameters &par) {
   int status = EXIT_SUCCESS;
   bool recreate = true;
   std::string indexDbType = indexDB + ".dbtype";
-  if (par.checkCompatible > 0 && FileUtil::fileExists(indexDbType.c_str())) {
+  if (par.checkCompatible > 0 && FileUtil::fileExists(out, indexDbType.c_str())) {
     out->info("Check index {}\n", indexDB);
     DBReader<unsigned int> index(
         indexDB.c_str(), (indexDB + ".index").c_str(), par.threads,

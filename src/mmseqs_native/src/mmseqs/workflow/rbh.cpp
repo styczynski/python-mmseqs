@@ -45,9 +45,9 @@ int rbh(mmseqs_output *out, Parameters &par) {
   std::string hash = SSTR(par.hashParameter(par.databases_types, par.filenames,
                                             par.searchworkflow));
   if (par.reuseLatest) {
-    hash = FileUtil::getHashFromSymLink(tmpDir + "/latest");
+    hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
-  tmpDir = FileUtil::createTemporaryDirectory(par.baseTmpPath, tmpDir, hash);
+  tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
   par.filenames.push_back(tmpDir);
 
@@ -67,7 +67,7 @@ int rbh(mmseqs_output *out, Parameters &par) {
   cmd.addVariable("VERBOSITY",
                   par.createParameterString(par.onlyverbosity).c_str());
   std::string program = tmpDir + "/rbh.sh";
-  FileUtil::writeFile(program, rbh_sh, rbh_sh_len);
+  FileUtil::writeFile(out, program, rbh_sh, rbh_sh_len);
   cmd.execProgram(program.c_str(), par.filenames);
 
   // Should never get here

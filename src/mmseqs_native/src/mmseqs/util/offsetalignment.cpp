@@ -203,7 +203,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(arargv, command, true, 0, 0);
 
   const bool touch = par.preloadMode != Parameters::PRELOAD_MODE_MMAP;
-  int queryDbType = FileUtil::parseDbType(par.db1.c_str());
+  int queryDbType = FileUtil::parseDbType(out, par.db1.c_str());
   if (Parameters::isEqualDbtype(queryDbType, Parameters::DBTYPE_INDEX_DB)) {
     DBReader<unsigned int> idxdbr(
         par.db1.c_str(), par.db1Index.c_str(), 1,
@@ -213,7 +213,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
     queryDbType = data.srcSeqType;
     idxdbr.close();
   }
-  int targetDbType = FileUtil::parseDbType(par.db3.c_str());
+  int targetDbType = FileUtil::parseDbType(out, par.db3.c_str());
   if (Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_INDEX_DB)) {
     DBReader<unsigned int> idxdbr(
         par.db3.c_str(), par.db3Index.c_str(), 1,

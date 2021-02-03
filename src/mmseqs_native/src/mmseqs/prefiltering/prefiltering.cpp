@@ -90,7 +90,7 @@ Prefiltering::Prefiltering(mmseqs_output *out, const std::string &queryDB,
       out->failure("Query sequence type not implemented");
   }
 
-  if (Parameters::isEqualDbtype(FileUtil::parseDbType(targetDB.c_str()),
+  if (Parameters::isEqualDbtype(FileUtil::parseDbType(out, targetDB.c_str()),
                                 Parameters::DBTYPE_INDEX_DB)) {
     if (preloadMode == Parameters::PRELOAD_MODE_AUTO) {
       if (sensitivity > 6.0) {
@@ -418,7 +418,7 @@ void Prefiltering::mergeTargetSplits(
   }
 
   Timer timer;
-  out->info("Merging {} target splits to {}", splits, FileUtil::baseName(outDB));
+  out->info("Merging {} target splits to {}", splits, FileUtil::baseName(out, outDB));
 
   DBReader<unsigned int> reader1(fileNames[0].first.c_str(),
                                  fileNames[0].second.c_str(), 1,
@@ -454,9 +454,9 @@ void Prefiltering::mergeTargetSplits(
   size_t *dataFileSize = new size_t[fileNames.size()];
   size_t globalIdOffset = 0;
   for (size_t i = 0; i < splits; ++i) {
-    files[i] = FileUtil::openFileOrDie(fileNames[i].first.c_str(), "r", true);
+    files[i] = FileUtil::openFileOrDie(out, fileNames[i].first.c_str(), "r", true);
     dataFile[i] =
-        static_cast<char *>(FileUtil::mmapFile(files[i], &dataFileSize[i]));
+        static_cast<char *>(FileUtil::mmapFile(out, files[i], &dataFileSize[i]));
 #ifdef HAVE_POSIX_MADVISE
     if (posix_madvise(dataFile[i], dataFileSize[i], POSIX_MADV_SEQUENTIAL) !=
         0) {
@@ -522,7 +522,7 @@ void Prefiltering::mergeTargetSplits(
 
   for (size_t i = 0; i < splits; ++i) {
     DBReader<unsigned int>::removeDb(fileNames[i].first);
-    FileUtil::munmapData(dataFile[i], dataFileSize[i]);
+    FileUtil::munmapData(out, dataFile[i], dataFileSize[i]);
     if (fclose(files[i]) != 0) {
       out->failure("Cannot close file {}", fileNames[i].first);
     }
@@ -664,13 +664,13 @@ void Prefiltering::runMpiSplits(mmseqs_output *out, const std::string &resultDB,
     procTmpResultDB = resultDB;
     procTmpResultDBIndex = resultDBIndex;
   } else {
-    procTmpResultDB = procTmpResultDB + "/" + FileUtil::baseName(resultDB);
+    procTmpResultDB = procTmpResultDB + "/" + FileUtil::baseName(out, resultDB);
     procTmpResultDBIndex =
-        procTmpResultDBIndex + "/" + FileUtil::baseName(resultDBIndex);
+        procTmpResultDBIndex + "/" + FileUtil::baseName(out, resultDBIndex);
 
-    if (FileUtil::directoryExists(localTmpPath.c_str()) == false) {
+    if (FileUtil::directoryExists(out, localTmpPath.c_str()) == false) {
       out->info("Local tmp dir {} does not exist or is not a directory", localTmpPath);
-      if (FileUtil::makeDir(localTmpPath.c_str()) == false) {
+      if (FileUtil::makeDir(out, localTmpPath.c_str()) == false) {
         out->failure("Cannot create local tmp dir {}", localTmpPath);
       } else {
         out->info("Created local tmp dir {}", localTmpPath);
@@ -735,7 +735,7 @@ int Prefiltering::runSplits(mmseqs_output *out, const std::string &resultDB,
   }
 
   size_t freeSpace =
-      FileUtil::getFreeSpace(FileUtil::dirName(resultDB).c_str());
+      FileUtil::getFreeSpace(out, FileUtil::dirName(resultDB).c_str());
   size_t estimatedHDDMemory =
       estimateHDDMemoryConsumption(qdbr->getSize(), maxResListLen);
   if (freeSpace < estimatedHDDMemory) {
