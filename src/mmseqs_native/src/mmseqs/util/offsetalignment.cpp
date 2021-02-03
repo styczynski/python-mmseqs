@@ -206,7 +206,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
   int queryDbType = FileUtil::parseDbType(out, par.db1.c_str());
   if (Parameters::isEqualDbtype(queryDbType, Parameters::DBTYPE_INDEX_DB)) {
     DBReader<unsigned int> idxdbr(
-        par.db1.c_str(), par.db1Index.c_str(), 1,
+        out, par.db1.c_str(), par.db1Index.c_str(), 1,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     idxdbr.open(DBReader<unsigned int>::NOSORT);
     PrefilteringIndexData data = PrefilteringIndexReader::getMetadata(&idxdbr);
@@ -216,7 +216,7 @@ int offsetalignment(mmseqs_output *out, Parameters &par) {
   int targetDbType = FileUtil::parseDbType(out, par.db3.c_str());
   if (Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_INDEX_DB)) {
     DBReader<unsigned int> idxdbr(
-        par.db3.c_str(), par.db3Index.c_str(), 1,
+        out, par.db3.c_str(), par.db3Index.c_str(), 1,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     idxdbr.open(DBReader<unsigned int>::NOSORT);
     PrefilteringIndexData data = PrefilteringIndexReader::getMetadata(&idxdbr);

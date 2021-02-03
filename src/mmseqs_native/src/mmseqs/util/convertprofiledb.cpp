@@ -131,7 +131,7 @@ int convertprofiledb(mmseqs_output *out, Parameters &par) {
     data = par.db1 + ".ffdata";
     index = par.db1 + ".ffindex";
   }
-  DBReader<std::string> reader(
+  DBReader<std::string> reader(out,
       data.c_str(), index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<std::string>::NOSORT);

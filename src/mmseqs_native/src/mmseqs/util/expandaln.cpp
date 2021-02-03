@@ -96,7 +96,7 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   DBReader<unsigned int> aReader(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   aReader.open(DBReader<unsigned int>::NOSORT);
   const int aSeqDbType = aReader.getDbtype();
@@ -109,25 +109,25 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
   DBReader<unsigned int> *cReader = NULL;
   if (FileUtil::fileExists(out, (par.db3 + "_ca3m.ffdata").c_str())) {
     resultAbReader = new DBReader<unsigned int>(
-        (par.db3 + "_ca3m.ffdata").c_str(), (par.db3 + "_ca3m.ffindex").c_str(),
+        out, (par.db3 + "_ca3m.ffdata").c_str(), (par.db3 + "_ca3m.ffindex").c_str(),
         par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     resultAbReader->open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
     cReader = new DBReader<unsigned int>(
-        (par.db3 + "_sequence.ffdata").c_str(),
+        out, (par.db3 + "_sequence.ffdata").c_str(),
         (par.db3 + "_sequence.ffindex").c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     cReader->open(DBReader<unsigned int>::SORT_BY_LINE);
     isCa3m = true;
   } else {
     resultAbReader = new DBReader<unsigned int>(
-        par.db3.c_str(), par.db3Index.c_str(), par.threads,
+        out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     resultAbReader->open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
     cReader = new DBReader<unsigned int>(
-        par.db2.c_str(), par.db2Index.c_str(), par.threads,
+        out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     cReader->open(DBReader<unsigned int>::NOSORT);
     if (par.preloadMode != Parameters::PRELOAD_MODE_MMAP) {
@@ -143,7 +143,7 @@ int expandaln(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
   }
 
   DBReader<unsigned int> resultBcReader(
-      par.db4.c_str(), par.db4Index.c_str(), par.threads,
+      out, par.db4.c_str(), par.db4Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   resultBcReader.open(DBReader<unsigned int>::NOSORT);
   if (par.preloadMode != Parameters::PRELOAD_MODE_MMAP) {

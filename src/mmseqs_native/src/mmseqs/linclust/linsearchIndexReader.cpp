@@ -16,7 +16,7 @@
 #endif
 
 template <int TYPE>
-size_t LinsearchIndexReader::pickCenterKmer(KmerPosition<short> *hashSeqPair,
+size_t LinsearchIndexReader::pickCenterKmer(mmseqs_output* out, KmerPosition<short> *hashSeqPair,
                                             size_t splitKmerCount) {
   size_t writePos = 0;
   size_t prevHash = hashSeqPair[0].kmer;
@@ -62,15 +62,15 @@ size_t LinsearchIndexReader::pickCenterKmer(KmerPosition<short> *hashSeqPair,
 }
 
 template size_t LinsearchIndexReader::pickCenterKmer<0>(
-    KmerPosition<short> *hashSeqPair, size_t splitKmerCount);
+    mmseqs_output* out, KmerPosition<short> *hashSeqPair, size_t splitKmerCount);
 template size_t LinsearchIndexReader::pickCenterKmer<1>(
-    KmerPosition<short> *hashSeqPair, size_t splitKmerCount);
+    mmseqs_output* out, KmerPosition<short> *hashSeqPair, size_t splitKmerCount);
 
 template <int TYPE>
-void LinsearchIndexReader::mergeAndWriteIndex(DBWriter &dbw,
+void LinsearchIndexReader::mergeAndWriteIndex(mmseqs_output* out, DBWriter &dbw,
                                               std::vector<std::string> tmpFiles,
                                               int alphSize, int kmerSize) {
-  KmerIndex kmerIndex(alphSize, kmerSize);
+  KmerIndex kmerIndex(out, alphSize, kmerSize);
 
   dbw.writeStart(0);
   out->info("Merge splits ... ");
@@ -185,18 +185,18 @@ void LinsearchIndexReader::mergeAndWriteIndex(DBWriter &dbw,
 }
 
 template void LinsearchIndexReader::mergeAndWriteIndex<0>(
-    DBWriter &dbw, std::vector<std::string> tmpFiles, int alphSize,
+    mmseqs_output* out, DBWriter &dbw, std::vector<std::string> tmpFiles, int alphSize,
     int kmerSize);
 template void LinsearchIndexReader::mergeAndWriteIndex<1>(
-    DBWriter &dbw, std::vector<std::string> tmpFiles, int alphSize,
+    mmseqs_output* out, DBWriter &dbw, std::vector<std::string> tmpFiles, int alphSize,
     int kmerSize);
 
 template <int TYPE>
-void LinsearchIndexReader::writeIndex(DBWriter &dbw,
+void LinsearchIndexReader::writeIndex(mmseqs_output* out, DBWriter &dbw,
                                       KmerPosition<short> *hashSeqPair,
                                       size_t totalKmers, int alphSize,
                                       int kmerSize) {
-  KmerIndex kmerIndex(alphSize - 1, kmerSize);
+  KmerIndex kmerIndex(out, alphSize - 1, kmerSize);
   out->info("Write ENTRIES ({})\n", PrefilteringIndexReader::ENTRIES
                     );
   // write entries
@@ -247,19 +247,19 @@ void LinsearchIndexReader::writeIndex(DBWriter &dbw,
 }
 
 template void LinsearchIndexReader::writeIndex<0>(
-    DBWriter &dbw, KmerPosition<short> *hashSeqPair, size_t totalKmers,
+    mmseqs_output* out, DBWriter &dbw, KmerPosition<short> *hashSeqPair, size_t totalKmers,
     int alphSize, int kmerSize);
 template void LinsearchIndexReader::writeIndex<1>(
-    DBWriter &dbw, KmerPosition<short> *hashSeqPair, size_t totalKmers,
+    mmseqs_output* out, DBWriter &dbw, KmerPosition<short> *hashSeqPair, size_t totalKmers,
     int alphSize, int kmerSize);
 
-std::string LinsearchIndexReader::indexName(std::string baseName) {
+std::string LinsearchIndexReader::indexName(mmseqs_output* out, std::string baseName) {
   std::string result(baseName);
   result.append(".").append("linidx");
   return result;
 }
 
-bool LinsearchIndexReader::checkIfIndexFile(DBReader<unsigned int> *pReader) {
+bool LinsearchIndexReader::checkIfIndexFile(mmseqs_output* out, DBReader<unsigned int> *pReader) {
   char *version = pReader->getDataByDBKey(PrefilteringIndexReader::VERSION, 0);
   if (version == NULL) {
     return false;
@@ -270,7 +270,7 @@ bool LinsearchIndexReader::checkIfIndexFile(DBReader<unsigned int> *pReader) {
              : false;
 }
 
-void LinsearchIndexReader::writeKmerIndexToDisk(std::string fileName,
+void LinsearchIndexReader::writeKmerIndexToDisk(mmseqs_output* out, std::string fileName,
                                                 KmerPosition<short> *kmers,
                                                 size_t kmerCnt) {
   FILE *filePtr = fopen(fileName.c_str(), "wb");
@@ -285,7 +285,7 @@ void LinsearchIndexReader::writeKmerIndexToDisk(std::string fileName,
 }
 
 std::string LinsearchIndexReader::findIncompatibleParameter(
-    DBReader<unsigned int> &index, Parameters &par, int dbtype) {
+    mmseqs_output* out, DBReader<unsigned int> &index, Parameters &par, int dbtype) {
   PrefilteringIndexData meta = PrefilteringIndexReader::getMetadata(&index);
   if (meta.maxSeqLength != static_cast<int>(par.maxSeqLen)) return "maxSeqLen";
   if (meta.seqType != dbtype) return "seqType";
@@ -307,7 +307,7 @@ std::string LinsearchIndexReader::findIncompatibleParameter(
   return "";
 }
 
-std::string LinsearchIndexReader::searchForIndex(const std::string &dbName) {
+std::string LinsearchIndexReader::searchForIndex(mmseqs_output* out, const std::string &dbName) {
   std::string outIndexName = dbName + ".linidx";
   if (FileUtil::fileExists(out, (outIndexName + ".dbtype").c_str()) == true) {
     return outIndexName;

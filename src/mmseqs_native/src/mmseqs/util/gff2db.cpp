@@ -23,7 +23,7 @@ int gff2db(mmseqs_output *out, Parameters &par) {
                                     DBReader<unsigned int>::USE_LOOKUP_REV);
   reader.open(DBReader<unsigned int>::NOSORT);
   DBReader<unsigned int> headerReader(
-      par.hdr2.c_str(), par.hdr2Index.c_str(), 1,
+      out, par.hdr2.c_str(), par.hdr2Index.c_str(), 1,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   headerReader.open(DBReader<unsigned int>::NOSORT);
 

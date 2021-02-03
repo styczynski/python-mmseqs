@@ -21,28 +21,29 @@ static bool compareToFirstInt(
 int dolca(mmseqs_output* out, Parameters& par, bool majority) {
   //    Parameters& par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true, 0, 0);
-  NcbiTaxonomy* t = NcbiTaxonomy::openTaxonomy(par.db1);
+  NcbiTaxonomy* t = NcbiTaxonomy::openTaxonomy(out, par.db1);
 
   std::vector<std::pair<unsigned int, unsigned int>> mapping;
   if (FileUtil::fileExists(out, std::string(par.db1 + "_mapping").c_str()) ==
       false) {
     out->failure("{}_mapping does not exist. Please create the taxonomy mapping", par.db1);
   }
-  bool isSorted = Util::readMapping(par.db1 + "_mapping", mapping);
+  bool isSorted = Util::readMapping(out, par.db1 + "_mapping", mapping);
   if (isSorted == false) {
     std::stable_sort(mapping.begin(), mapping.end(), compareToFirstInt);
   }
 
   DBReader<unsigned int> reader(
+      out,
       par.db2.c_str(), par.db2Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter writer(par.db3.c_str(), par.db3Index.c_str(), par.threads,
+  DBWriter writer(out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
                   par.compressed, Parameters::DBTYPE_TAXONOMICAL_RESULT);
   writer.open();
 
-  std::vector<std::string> ranks = NcbiTaxonomy::parseRanks(par.lcaRanks);
+  std::vector<std::string> ranks = NcbiTaxonomy::parseRanks(out, par.lcaRanks);
 
   // a few NCBI taxa are blacklisted by default, they contain unclassified
   // sequences (e.g. metagenomes) or other sequences (e.g. plasmids) if we do
@@ -163,7 +164,7 @@ int dolca(mmseqs_output* out, Parameters& par, bool majority) {
               }
               weight = strtod(entry[1], NULL);
             }
-            weightedTaxa.emplace_back(taxon, weight, par.voteMode);
+            weightedTaxa.emplace_back(out, taxon, weight, par.voteMode);
           } else {
             taxa.emplace_back(taxon);
           }
@@ -212,8 +213,7 @@ int dolca(mmseqs_output* out, Parameters& par, bool majority) {
       result.clear();
     }
   }
-  out->info("Taxonomy for {} entries not found\n", taxonNotFound << " out of "
-                     << taxonNotFound + found);
+  out->info("Taxonomy for {} out of {} entries not found ", taxonNotFound, taxonNotFound + found);
   writer.close();
   reader.close();
   delete t;

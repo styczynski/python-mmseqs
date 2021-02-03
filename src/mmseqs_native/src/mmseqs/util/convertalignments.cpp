@@ -289,7 +289,7 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
   }
 
   DBReader<unsigned int> alnDbr(
-      par.db3.c_str(), par.db3Index.c_str(), par.threads,
+      out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   alnDbr.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 

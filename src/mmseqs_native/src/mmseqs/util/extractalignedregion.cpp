@@ -18,7 +18,7 @@ int extractalignedregion(mmseqs_output *out, Parameters &par) {
   par.allowDeletion = false;
 
   DBReader<unsigned int> qdbr(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   qdbr.open(DBReader<unsigned int>::NOSORT);
   if (par.preloadMode != Parameters::PRELOAD_MODE_MMAP) {
@@ -32,7 +32,7 @@ int extractalignedregion(mmseqs_output *out, Parameters &par) {
     tdbr = &qdbr;
   } else {
     tdbr = new DBReader<unsigned int>(
-        par.db2.c_str(), par.db2Index.c_str(), par.threads,
+        out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     tdbr->open(DBReader<unsigned int>::NOSORT);
     if (par.preloadMode != Parameters::PRELOAD_MODE_MMAP) {
@@ -41,7 +41,7 @@ int extractalignedregion(mmseqs_output *out, Parameters &par) {
   }
 
   DBReader<unsigned int> alndbr(
-      par.db3.c_str(), par.db3Index.c_str(), par.threads,
+      out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   alndbr.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
@@ -97,10 +97,10 @@ int extractalignedregion(mmseqs_output *out, Parameters &par) {
   dbw.close();
 
   if (par.extractMode == Parameters::EXTRACT_QUERY) {
-    DBReader<unsigned int>::softlinkDb(par.db1, par.db4,
+    DBReader<unsigned int>::softlinkDb(out, par.db1, par.db4,
                                        DBFiles::SEQUENCE_ANCILLARY);
   } else {
-    DBReader<unsigned int>::softlinkDb(par.db2, par.db4,
+    DBReader<unsigned int>::softlinkDb(out, par.db2, par.db4,
                                        DBFiles::SEQUENCE_ANCILLARY);
   }
 

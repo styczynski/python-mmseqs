@@ -15,7 +15,7 @@ int addid(const std::string &db1, const std::string &db1Index,
           const std::string &userStrToAdd, const bool isPrefix,
           const int threads, const int compressed) {
   DBReader<unsigned int> reader(
-      db1.c_str(), db1Index.c_str(), threads,
+      out, db1.c_str(), db1Index.c_str(), threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 

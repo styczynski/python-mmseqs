@@ -62,7 +62,7 @@ int multihitsearch(mmseqs_output *out, Parameters &par) {
     }
   }
   size_t hash =
-      par.hashParameter(par.databases_types, par.filenames, par.multihitsearch);
+      par.hashParameter(out, par.databases_types, par.filenames, par.multihitsearch);
   std::string tmpDir = par.db4 + "/" + SSTR(hash);
   if (FileUtil::directoryExists(out, tmpDir.c_str()) == false) {
     if (FileUtil::makeDir(out, tmpDir.c_str()) == false) {
@@ -73,18 +73,18 @@ int multihitsearch(mmseqs_output *out, Parameters &par) {
   par.filenames.push_back(tmpDir);
   FileUtil::symlinkAlias(out, tmpDir, "latest");
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   if (par.removeTmpFiles) {
     cmd.addVariable("REMOVE_TMP", "TRUE");
   }
   cmd.addVariable("SEARCH_PAR",
-                  par.createParameterString(par.searchworkflow).c_str());
+                  par.createParameterString(out, par.searchworkflow).c_str());
   cmd.addVariable("BESTHITBYSET_PAR",
-                  par.createParameterString(par.besthitbyset).c_str());
+                  par.createParameterString(out, par.besthitbyset).c_str());
   cmd.addVariable("THREADS_PAR",
-                  par.createParameterString(par.onlythreads).c_str());
+                  par.createParameterString(out, par.onlythreads).c_str());
   cmd.addVariable("VERBOSITY",
-                  par.createParameterString(par.onlyverbosity).c_str());
+                  par.createParameterString(out, par.onlyverbosity).c_str());
 
   FileUtil::writeFile(out, tmpDir + "/multihitsearch.sh", multihitsearch_sh,
                       multihitsearch_sh_len);

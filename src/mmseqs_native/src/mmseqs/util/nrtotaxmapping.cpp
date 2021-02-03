@@ -137,11 +137,11 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
   nodesCopy.clear();
 
   DBReader<unsigned int> reader(
-      seqHdrData.c_str(), seqHdrIndex.c_str(), par.threads,
+      out, seqHdrData.c_str(), seqHdrIndex.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter writer(resultDbData.c_str(), resultDbIndex.c_str(), par.threads,
+  DBWriter writer(out, resultDbData.c_str(), resultDbIndex.c_str(), par.threads,
                   false, Parameters::DBTYPE_OMIT_FILE);
   writer.open();
 

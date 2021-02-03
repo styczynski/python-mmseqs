@@ -23,7 +23,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
   //    MMseqsParameter::COMMAND_CLUSTLINEAR);
 
   DBReader<unsigned int> seqDbr(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   seqDbr.open(DBReader<unsigned int>::NOSORT);
   int querySeqType = seqDbr.getDbtype();
@@ -31,13 +31,12 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
   setKmerLengthAndAlphabet(par, seqDbr.getAminoAcidDBSize(), querySeqType);
   // par.printParameters(command.cmd, argc, argv, *command.params);
 
-  out->info("Database size: {}\n", seqDbr.getSize()
-                     << " type: " << seqDbr.getDbTypeName());
-  std::string indexDB = LinsearchIndexReader::indexName(par.db2);
+  out->info("Database size: {} type: {}", seqDbr.getSize(), seqDbr.getDbTypeName());
+  std::string indexDB = LinsearchIndexReader::indexName(out, par.db2);
   if (par.checkCompatible > 0 && FileUtil::fileExists(out, indexDB.c_str())) {
-    out->info("Check index {}\n", indexDB);
+    out->info("Check index {}", indexDB);
     DBReader<unsigned int> index(
-        indexDB.c_str(), (indexDB + ".index").c_str(), par.threads,
+        out, indexDB.c_str(), (indexDB + ".index").c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     index.open(DBReader<unsigned int>::NOSORT);
 
@@ -49,9 +48,9 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
 
     std::string check;
     const bool compatible =
-        LinsearchIndexReader::checkIfIndexFile(&index) &&
+        LinsearchIndexReader::checkIfIndexFile(out, &index) &&
         (check = LinsearchIndexReader::findIncompatibleParameter(
-             index, par, seqDbr.getDbtype())) == "";
+             out, index, par, seqDbr.getDbtype())) == "";
     index.close();
     seqDbr.close();
     if (compatible) {
@@ -70,14 +69,14 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
   BaseMatrix *subMat;
   if (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_NUCLEOTIDES)) {
     subMat =
-        new NucleotideMatrix(par.seedScoringMatrixFile.nucleotides, 1.0, 0.0);
+        new NucleotideMatrix(out, par.seedScoringMatrixFile.nucleotides, 1.0, 0.0);
   } else {
     if (par.alphabetSize.aminoacids == 21) {
-      subMat = new SubstitutionMatrix(par.seedScoringMatrixFile.aminoacids, 2.0,
+      subMat = new SubstitutionMatrix(out, par.seedScoringMatrixFile.aminoacids, 2.0,
                                       0.0);
     } else {
-      SubstitutionMatrix sMat(par.seedScoringMatrixFile.aminoacids, 2.0, 0.0);
-      subMat = new ReducedMatrix(sMat.probMatrix, sMat.subMatrixPseudoCounts,
+      SubstitutionMatrix sMat(out, par.seedScoringMatrixFile.aminoacids, 2.0, 0.0);
+      subMat = new ReducedMatrix(out, sMat.probMatrix, sMat.subMatrixPseudoCounts,
                                  sMat.aa2num, sMat.num2aa, sMat.alphabetSize,
                                  par.alphabetSize.aminoacids, 2.0);
     }
@@ -86,7 +85,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
   // seqDbr.readMmapedDataInMemory();
 
   // memoryLimit in bytes
-  size_t memoryLimit = Util::computeMemory(par.splitMemoryLimit);
+  size_t memoryLimit = Util::computeMemory(out, par.splitMemoryLimit);
 
   out->info("\n");
 
@@ -179,6 +178,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
 
     KmerSearch::ExtractKmerAndSortResult kmerRet =
         KmerSearch::extractKmerAndSort(
+            out,
             totalKmersPerSplit, hashRanges[split].first,
             hashRanges[split].second, seqDbr, par, subMat);
     hashSeqPair = kmerRet.kmers;
@@ -189,15 +189,15 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
                                   Parameters::DBTYPE_NUCLEOTIDES)) {
       writePos =
           LinsearchIndexReader::pickCenterKmer<Parameters::DBTYPE_NUCLEOTIDES>(
-              hashSeqPair, totalKmersPerSplit);
+              out, hashSeqPair, totalKmersPerSplit);
     } else {
       writePos =
           LinsearchIndexReader::pickCenterKmer<Parameters::DBTYPE_AMINO_ACIDS>(
-              hashSeqPair, totalKmersPerSplit);
+              out, hashSeqPair, totalKmersPerSplit);
     }
 
     if (splits > 1) {
-      LinsearchIndexReader::writeKmerIndexToDisk(splitFileName, hashSeqPair,
+      LinsearchIndexReader::writeKmerIndexToDisk(out, splitFileName, hashSeqPair,
                                                  writePos);
       delete[] hashSeqPair;
       hashSeqPair = NULL;
@@ -208,7 +208,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
 #endif
   if (mpiRank == 0) {
     // write result
-    DBWriter dbw(indexDB.c_str(), (indexDB + ".index").c_str(), 1,
+    DBWriter dbw(out, indexDB.c_str(), (indexDB + ".index").c_str(), 1,
                  par.compressed, Parameters::DBTYPE_INDEX_DB);
     dbw.open();
 
@@ -254,20 +254,20 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
                                     Parameters::DBTYPE_NUCLEOTIDES)) {
         LinsearchIndexReader::mergeAndWriteIndex<
             Parameters::DBTYPE_NUCLEOTIDES>(
-            dbw, splitFiles, subMat->alphabetSize, adjustedKmerSize);
+            out, dbw, splitFiles, subMat->alphabetSize, adjustedKmerSize);
       } else {
         LinsearchIndexReader::mergeAndWriteIndex<
             Parameters::DBTYPE_AMINO_ACIDS>(
-            dbw, splitFiles, subMat->alphabetSize, adjustedKmerSize);
+            out, dbw, splitFiles, subMat->alphabetSize, adjustedKmerSize);
       }
     } else {
       if (Parameters::isEqualDbtype(seqDbr.getDbtype(),
                                     Parameters::DBTYPE_NUCLEOTIDES)) {
         LinsearchIndexReader::writeIndex<Parameters::DBTYPE_NUCLEOTIDES>(
-            dbw, hashSeqPair, writePos, subMat->alphabetSize, adjustedKmerSize);
+            out, dbw, hashSeqPair, writePos, subMat->alphabetSize, adjustedKmerSize);
       } else {
         LinsearchIndexReader::writeIndex<Parameters::DBTYPE_AMINO_ACIDS>(
-            dbw, hashSeqPair, writePos, subMat->alphabetSize, adjustedKmerSize);
+            out, dbw, hashSeqPair, writePos, subMat->alphabetSize, adjustedKmerSize);
       }
     }
     if (hashSeqPair) {
@@ -302,7 +302,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
     seqDbr.close();
 
     DBReader<unsigned int> dbr1(
-        par.db1.c_str(), par.db1Index.c_str(), par.threads,
+        out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     dbr1.open(DBReader<unsigned int>::NOSORT);
     out->info("Write DBR1INDEX ({})", PrefilteringIndexReader::DBR1INDEX);
@@ -332,7 +332,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
     } else {
       dbr1.close();
       DBReader<unsigned int> dbr2(
-          par.db2.c_str(), par.db2Index.c_str(), par.threads,
+          out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
           DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
       dbr2.open(DBReader<unsigned int>::NOSORT);
       out->info("Write DBR2INDEX ({})", PrefilteringIndexReader::DBR2INDEX);
@@ -355,7 +355,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
     {
       out->info("Write HDR1INDEX ({})", PrefilteringIndexReader::HDR1INDEX);
       DBReader<unsigned int> hdbr1(
-          par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
+          out, par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
           DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
       hdbr1.open(DBReader<unsigned int>::NOSORT);
 
@@ -383,7 +383,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
         hdbr1.close();
       } else {
         hdbr1.close();
-        DBReader<unsigned int> hdbr2(par.hdr2.c_str(), par.hdr2Index.c_str(),
+        DBReader<unsigned int> hdbr2(out, par.hdr2.c_str(), par.hdr2Index.c_str(),
                                      par.threads,
                                      DBReader<unsigned int>::USE_INDEX |
                                          DBReader<unsigned int>::USE_DATA);

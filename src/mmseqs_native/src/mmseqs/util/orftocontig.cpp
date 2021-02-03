@@ -17,13 +17,13 @@ int orftocontig(mmseqs_output* out, Parameters& par) {
 
   // contig length is needed for computation:
   DBReader<unsigned int> contigsReader(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   contigsReader.open(DBReader<unsigned int>::NOSORT);
 
   // info will be obtained from orf headers:
   DBReader<unsigned int> orfHeadersReader(
-      par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
+      out, par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   orfHeadersReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 

@@ -47,14 +47,14 @@ int indexdb(mmseqs_output *out, Parameters &par) {
 
   std::string path = FileUtil::getRealPathFromSymLink(out, par.db2dbtype);
   DBReader<unsigned int> dbr(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   dbr.open(DBReader<unsigned int>::NOSORT);
 
   DBReader<unsigned int> *dbr2 = NULL;
   if (sameDB == false) {
     dbr2 = new DBReader<unsigned int>(
-        par.db2.c_str(), par.db2Index.c_str(), par.threads,
+        out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     dbr2->open(DBReader<unsigned int>::NOSORT);
   }

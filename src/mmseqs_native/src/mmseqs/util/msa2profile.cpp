@@ -41,12 +41,12 @@ int msa2profile(mmseqs_output *out, Parameters &par) {
     std::string msaSequenceIndex = par.db1 + "_sequence.ffindex";
 
     headerReader = new DBReader<unsigned int>(
-        msaHeaderData.c_str(), msaHeaderIndex.c_str(), par.threads,
+        out, msaHeaderData.c_str(), msaHeaderIndex.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     headerReader->open(DBReader<unsigned int>::SORT_BY_LINE);
 
     sequenceReader = new DBReader<unsigned int>(
-        msaSequenceData.c_str(), msaSequenceIndex.c_str(), par.threads,
+        out, msaSequenceData.c_str(), msaSequenceIndex.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     sequenceReader->open(DBReader<unsigned int>::SORT_BY_LINE);
   }

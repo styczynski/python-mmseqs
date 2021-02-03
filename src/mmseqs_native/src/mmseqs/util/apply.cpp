@@ -291,7 +291,7 @@ int apply(mmseqs_output *out, Parameters &par) {
 #endif
 
   DBReader<unsigned int> reader(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   reader.open(DBReader<unsigned int>::SORT_BY_LENGTH);
 
@@ -323,7 +323,7 @@ int apply(mmseqs_output *out, Parameters &par) {
 
         // get progress only from first thread on master
         if (thread != 0 || mpiRank != MMseqsMPI::MASTER) {
-          Debug::setDebugLevel(0);
+          Log::setLogLevel(0);
         }
 
 #ifdef HAVE_MPI
@@ -342,7 +342,7 @@ int apply(mmseqs_output *out, Parameters &par) {
             Util::createTmpFileNames(par.db2, par.db2Index, thread);
 #endif
 
-        DBWriter writer(outDb.first.c_str(), outDb.second.c_str(), 1,
+        DBWriter writer(out, outDb.first.c_str(), outDb.second.c_str(), 1,
                         par.compressed, Parameters::DBTYPE_GENERIC_DB);
         writer.open();
 
@@ -415,7 +415,7 @@ int apply(mmseqs_output *out, Parameters &par) {
     splitFiles.emplace_back(
         Util::createTmpFileNames(outDb.first, outDb.second, proc_idx));
   }
-  DBWriter::mergeResults(outDb.first, outDb.second, splitFiles);
+  DBWriter::mergeResults(out, outDb.first, outDb.second, splitFiles);
 
 #ifdef HAVE_MPI
   MPI_Barrier(MPI_COMM_WORLD);

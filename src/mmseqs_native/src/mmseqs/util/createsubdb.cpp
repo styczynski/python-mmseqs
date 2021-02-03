@@ -24,7 +24,7 @@ int createsubdb(mmseqs_output *out, Parameters &par) {
   }
 
   DBReader<unsigned int> reader(
-      par.db2.c_str(), par.db2Index.c_str(), 1,
+      out, par.db2.c_str(), par.db2Index.c_str(), 1,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::NOSORT);
   const bool isCompressed = reader.isCompressed();

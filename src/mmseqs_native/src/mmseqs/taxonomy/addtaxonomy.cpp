@@ -25,22 +25,23 @@ int addtaxonomy(mmseqs_output *out, Parameters &par) {
   if (FileUtil::fileExists(out, (par.db1 + "_mapping").c_str()) == false) {
     out->failure("{}_mapping does not exist. Run createtaxdb to create taxonomy mapping", par.db1);
   }
-  const bool isSorted = Util::readMapping(par.db1 + "_mapping", mapping);
+  const bool isSorted = Util::readMapping(out, par.db1 + "_mapping", mapping);
   if (isSorted == false) {
     std::stable_sort(mapping.begin(), mapping.end(), compareToFirstInt);
   }
   if (mapping.size() == 0) {
     out->failure("{}_mapping is empty. Rerun createtaxdb to recreate taxonomy mapping", par.db1);
   }
-  NcbiTaxonomy *t = NcbiTaxonomy::openTaxonomy(par.db1);
-  std::vector<std::string> ranks = NcbiTaxonomy::parseRanks(par.lcaRanks);
+  NcbiTaxonomy *t = NcbiTaxonomy::openTaxonomy(out, par.db1);
+  std::vector<std::string> ranks = NcbiTaxonomy::parseRanks(out, par.lcaRanks);
 
   DBReader<unsigned int> reader(
+      out,
       par.db2.c_str(), par.db2Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter writer(par.db3.c_str(), par.db3Index.c_str(), par.threads,
+  DBWriter writer(out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
                   par.compressed, reader.getDbtype());
   writer.open();
 
@@ -133,9 +134,7 @@ int addtaxonomy(mmseqs_output *out, Parameters &par) {
       result.clear();
     }
   }
-  out->info("Taxonomy for {} are deleted\n", taxonNotFound
-                     << " entries not found and " << deletedNodes
-                    );
+  out->info("Taxonomy for {} entries not found and {} are deleted ", taxonNotFound, deletedNodes);
   writer.close();
   reader.close();
   delete t;

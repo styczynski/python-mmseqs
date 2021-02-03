@@ -32,9 +32,9 @@
 #endif
 
 template <typename T>
-KmerPosition<T> *initKmerPositionMemory(size_t size) {
+KmerPosition<T> *initKmerPositionMemory(mmseqs_output* out, size_t size) {
   KmerPosition<T> *hashSeqPair = new (std::nothrow) KmerPosition<T>[size + 1];
-  Util::checkAllocation(hashSeqPair, "Can not allocate memory");
+  Util::checkAllocation(out, hashSeqPair, "Can not allocate memory");
   size_t pageSize = Util::getPageSize() / sizeof(KmerPosition<T>);
 #pragma omp parallel
   {
@@ -72,6 +72,7 @@ void maskSequence(int maskMode, int maskLowerCase, Sequence &seq,
 
 template <int TYPE, typename T>
 std::pair<size_t, size_t> fillKmerPositionArray(
+    mmseqs_output* out,
     KmerPosition<T> *kmerArray, size_t kmerArraySize,
     DBReader<unsigned int> &seqDbr, Parameters &par, BaseMatrix *subMat,
     bool hashWholeSequence, size_t hashStartRange, size_t hashEndRange,
@@ -87,8 +88,8 @@ std::pair<size_t, size_t> fillKmerPositionArray(
   ScoreMatrix two;
   ScoreMatrix three;
   if (TYPE == Parameters::DBTYPE_HMM_PROFILE) {
-    two = ExtendedSubstitutionMatrix::calcScoreMatrix(*subMat, 2);
-    three = ExtendedSubstitutionMatrix::calcScoreMatrix(*subMat, 3);
+    two = ExtendedSubstitutionMatrix::calcScoreMatrix(out, *subMat, 2);
+    three = ExtendedSubstitutionMatrix::calcScoreMatrix(out, *subMat, 3);
   }
 
   Log::Progress progress(seqDbr.getSize());
@@ -103,14 +104,14 @@ std::pair<size_t, size_t> fillKmerPositionArray(
 
     const int adjustedKmerSize =
         (par.adjustKmerLength) ? std::min(par.kmerSize + 5, 23) : par.kmerSize;
-    Sequence seq(par.maxSeqLen, querySeqType, subMat, adjustedKmerSize,
+    Sequence seq(out, par.maxSeqLen, querySeqType, subMat, adjustedKmerSize,
                  par.spacedKmer, false, true, par.spacedKmerPattern);
     KmerGenerator *generator;
     if (TYPE == Parameters::DBTYPE_HMM_PROFILE) {
-      generator = new KmerGenerator(par.kmerSize, subMat->alphabetSize, 150);
+      generator = new KmerGenerator(out, par.kmerSize, subMat->alphabetSize, 150);
       generator->setDivideStrategy(&three, &two);
     }
-    Indexer idxer(subMat->alphabetSize - 1, par.kmerSize);
+    Indexer idxer(out, subMat->alphabetSize - 1, par.kmerSize);
     const unsigned int BUFFER_SIZE = 1048576;
     size_t bufferPos = 0;
     KmerPosition<T> *threadKmerBuffer = new KmerPosition<T>[BUFFER_SIZE];
@@ -416,7 +417,7 @@ std::pair<size_t, size_t> fillKmerPositionArray(
 }
 
 template <typename T>
-KmerPosition<T> *doComputation(size_t totalKmers, size_t hashStartRange,
+KmerPosition<T> *doComputation(mmseqs_output* out, size_t totalKmers, size_t hashStartRange,
                                size_t hashEndRange, std::string splitFile,
                                DBReader<unsigned int> &seqDbr, Parameters &par,
                                BaseMatrix *subMat) {
@@ -426,7 +427,7 @@ KmerPosition<T> *doComputation(size_t totalKmers, size_t hashStartRange,
                                 Parameters::DBTYPE_NUCLEOTIDES)) {
     std::pair<size_t, size_t> ret =
         fillKmerPositionArray<Parameters::DBTYPE_NUCLEOTIDES, T>(
-            hashSeqPair, totalKmers, seqDbr, par, subMat, true, hashStartRange,
+            out, hashSeqPair, totalKmers, seqDbr, par, subMat, true, hashStartRange,
             hashEndRange, NULL);
     elementsToSort = ret.first;
     par.kmerSize = ret.second;
@@ -663,27 +664,25 @@ size_t computeMemoryNeededLinearfilter(size_t totalKmer) {
 }
 
 template <typename T>
-int kmermatcherInner(Parameters &par, DBReader<unsigned int> &seqDbr) {
+int kmermatcherInner(mmseqs_output* out, Parameters &par, DBReader<unsigned int> &seqDbr) {
   int querySeqType = seqDbr.getDbtype();
   BaseMatrix *subMat;
   if (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_NUCLEOTIDES)) {
-    subMat = new NucleotideMatrix(par.scoringMatrixFile.nucleotides, 1.0, 0.0);
+    subMat = new NucleotideMatrix(out, par.scoringMatrixFile.nucleotides, 1.0, 0.0);
   } else {
     if (par.alphabetSize.aminoacids == 21) {
       subMat =
-          new SubstitutionMatrix(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+          new SubstitutionMatrix(out, par.scoringMatrixFile.aminoacids, 2.0, 0.0);
     } else {
-      SubstitutionMatrix sMat(par.scoringMatrixFile.aminoacids, 8.0, -0.2f);
-      subMat = new ReducedMatrix(sMat.probMatrix, sMat.subMatrixPseudoCounts,
+      SubstitutionMatrix sMat(out, par.scoringMatrixFile.aminoacids, 8.0, -0.2f);
+      subMat = new ReducedMatrix(out, sMat.probMatrix, sMat.subMatrixPseudoCounts,
                                  sMat.aa2num, sMat.num2aa, sMat.alphabetSize,
                                  par.alphabetSize.aminoacids, 2.0);
     }
   }
 
-  // seqDbr.readMmapedDataInMemory();
-
   // memoryLimit in bytes
-  size_t memoryLimit = Util::computeMemory(par.splitMemoryLimit);
+  size_t memoryLimit = Util::computeMemory(out, par.splitMemoryLimit);
 
   out->info("\n");
   float kmersPerSequenceScale =
@@ -732,7 +731,7 @@ int kmermatcherInner(Parameters &par, DBReader<unsigned int> &seqDbr) {
 
   for (size_t split = fromSplit; split < fromSplit + splitCount; split++) {
     std::string splitFileName = par.db2 + "_split_" + SSTR(split);
-    hashSeqPair = doComputation<T>(totalKmers, hashRanges[split].first,
+    hashSeqPair = doComputation<T>(out, totalKmers, hashRanges[split].first,
                                    hashRanges[split].second, splitFileName,
                                    seqDbr, par, subMat);
   }
@@ -752,7 +751,7 @@ int kmermatcherInner(Parameters &par, DBReader<unsigned int> &seqDbr) {
     std::string splitFileNameDone = splitFileName + ".done";
     if (FileUtil::fileExists(out, splitFileNameDone.c_str()) == false) {
       hashSeqPair = doComputation<T>(
-          totalKmersPerSplit, hashRanges[split].first, hashRanges[split].second,
+          out, totalKmersPerSplit, hashRanges[split].first, hashRanges[split].second,
           splitFileName, seqDbr, par, subMat);
     }
 
@@ -763,7 +762,7 @@ int kmermatcherInner(Parameters &par, DBReader<unsigned int> &seqDbr) {
     std::vector<char> repSequence(seqDbr.getLastKey() + 1);
     std::fill(repSequence.begin(), repSequence.end(), false);
     // write result
-    DBWriter dbw(par.db2.c_str(), par.db2Index.c_str(), 1, par.compressed,
+    DBWriter dbw(out, par.db2.c_str(), par.db2Index.c_str(), 1, par.compressed,
                  (Parameters::isEqualDbtype(seqDbr.getDbtype(),
                                             Parameters::DBTYPE_NUCLEOTIDES))
                      ? Parameters::DBTYPE_PREFILTER_REV_RES
@@ -832,6 +831,7 @@ int kmermatcherInner(Parameters &par, DBReader<unsigned int> &seqDbr) {
 
 template <typename T>
 std::vector<std::pair<size_t, size_t>> setupKmerSplits(
+    mmseqs_output* out,
     Parameters &par, BaseMatrix *subMat, DBReader<unsigned int> &seqDbr,
     size_t totalKmers, size_t splits) {
   std::vector<std::pair<size_t, size_t>> hashRanges;
@@ -843,7 +843,7 @@ std::vector<std::pair<size_t, size_t>> setupKmerSplits(
     if (Parameters::isEqualDbtype(seqDbr.getDbtype(),
                                   Parameters::DBTYPE_NUCLEOTIDES)) {
       fillKmerPositionArray<Parameters::DBTYPE_NUCLEOTIDES, T>(
-          NULL, SIZE_T_MAX, seqDbr, par, subMat, true, 0, SIZE_T_MAX, hashDist);
+          out, NULL, SIZE_T_MAX, seqDbr, par, subMat, true, 0, SIZE_T_MAX, hashDist);
     } else {
       fillKmerPositionArray<Parameters::DBTYPE_AMINO_ACIDS, T>(
           NULL, SIZE_T_MAX, seqDbr, par, subMat, true, 0, SIZE_T_MAX, hashDist);
@@ -887,6 +887,7 @@ int kmermatcher(mmseqs_output *out, Parameters &par) {
   //    MMseqsParameter::COMMAND_CLUSTLINEAR);
 
   DBReader<unsigned int> seqDbr(
+      out,
       par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   seqDbr.open(DBReader<unsigned int>::NOSORT);
@@ -895,13 +896,12 @@ int kmermatcher(mmseqs_output *out, Parameters &par) {
   setKmerLengthAndAlphabet(par, seqDbr.getAminoAcidDBSize(), querySeqType);
   //    std::vector<MMseqsParameter *> *params = command.params;
   //    par.printParameters(command.cmd, argc, argv, *params);
-  out->info("Database size: {}\n", seqDbr.getSize()
-                     << " type: " << seqDbr.getDbTypeName());
+  out->info("Database size: {} type: {}", seqDbr.getSize(), seqDbr.getDbTypeName());
 
   if (seqDbr.getMaxSeqLen() < SHRT_MAX) {
-    kmermatcherInner<short>(par, seqDbr);
+    kmermatcherInner<short>(out, par, seqDbr);
   } else {
-    kmermatcherInner<int>(par, seqDbr);
+    kmermatcherInner<int>(out, par, seqDbr);
   }
 
   seqDbr.close();
@@ -1059,7 +1059,7 @@ size_t queueNextEntry(KmerPositionQueue &queue, int file, size_t offsetPos,
 }
 
 template <int TYPE, typename T>
-void mergeKmerFilesAndOutput(DBWriter &dbw, std::vector<std::string> tmpFiles,
+void mergeKmerFilesAndOutput(mmseqs_output* out, DBWriter &dbw, std::vector<std::string> tmpFiles,
                              std::vector<char> &repSequence) {
   out->info("Merge splits ... ");
 
@@ -1114,15 +1114,6 @@ void mergeKmerFilesAndOutput(DBWriter &dbw, std::vector<std::string> tmpFiles,
     }
   }
 
-  //    while(queue.empty() == false) {
-  //        res = queue.top();
-  //        std::cout << (int)res.repSeq << "\t" << (int)res.id << "\t" <<(int)
-  //        res.pos << "\t" << (int) res.reverse << std::endl; queue.pop();
-  //        offsetPos[res.file] = queueNextEntry<TYPE,T>(queue, res.file,
-  //        offsetPos[res.file],
-  //                                                     entries[res.file],
-  //                                                     entrySizes[res.file]);
-  //    }
   while (queue.empty() == false) {
     res = queue.top();
     queue.pop();
@@ -1224,7 +1215,7 @@ void mergeKmerFilesAndOutput(DBWriter &dbw, std::vector<std::string> tmpFiles,
 }
 
 template <int TYPE, typename T, typename seqLenType>
-void writeKmersToDisk(std::string tmpFile,
+void writeKmersToDisk(mmseqs_output* out, std::string tmpFile,
                       KmerPosition<seqLenType> *hashSeqPair,
                       size_t totalKmers) {
   size_t repSeqId = SIZE_T_MAX;
@@ -1356,47 +1347,54 @@ void setKmerLengthAndAlphabet(Parameters &parameters, size_t aaDbSize,
 }
 
 template std::pair<size_t, size_t> fillKmerPositionArray<0, short>(
+    mmseqs_output* out,
     KmerPosition<short> *kmerArray, size_t kmerArraySize,
     DBReader<unsigned int> &seqDbr, Parameters &par, BaseMatrix *subMat,
     bool hashWholeSequence, size_t hashStartRange, size_t hashEndRange,
     size_t *hashDistribution);
 template std::pair<size_t, size_t> fillKmerPositionArray<1, short>(
+    mmseqs_output* out,
     KmerPosition<short> *kmerArray, size_t kmerArraySize,
     DBReader<unsigned int> &seqDbr, Parameters &par, BaseMatrix *subMat,
     bool hashWholeSequence, size_t hashStartRange, size_t hashEndRange,
     size_t *hashDistribution);
 template std::pair<size_t, size_t> fillKmerPositionArray<2, short>(
+    mmseqs_output* out,
     KmerPosition<short> *kmerArray, size_t kmerArraySize,
     DBReader<unsigned int> &seqDbr, Parameters &par, BaseMatrix *subMat,
     bool hashWholeSequence, size_t hashStartRange, size_t hashEndRange,
     size_t *hashDistribution);
 template std::pair<size_t, size_t> fillKmerPositionArray<0, int>(
+    mmseqs_output* out,
     KmerPosition<int> *kmerArray, size_t kmerArraySize,
     DBReader<unsigned int> &seqDbr, Parameters &par, BaseMatrix *subMat,
     bool hashWholeSequence, size_t hashStartRange, size_t hashEndRange,
     size_t *hashDistribution);
 template std::pair<size_t, size_t> fillKmerPositionArray<1, int>(
+    mmseqs_output* out,
     KmerPosition<int> *kmerArray, size_t kmerArraySize,
     DBReader<unsigned int> &seqDbr, Parameters &par, BaseMatrix *subMat,
     bool hashWholeSequence, size_t hashStartRange, size_t hashEndRange,
     size_t *hashDistribution);
 template std::pair<size_t, size_t> fillKmerPositionArray<2, int>(
+    mmseqs_output* out,
     KmerPosition<int> *kmerArray, size_t kmerArraySize,
     DBReader<unsigned int> &seqDbr, Parameters &par, BaseMatrix *subMat,
     bool hashWholeSequence, size_t hashStartRange, size_t hashEndRange,
     size_t *hashDistribution);
 
-template KmerPosition<short> *initKmerPositionMemory(size_t size);
-template KmerPosition<int> *initKmerPositionMemory(size_t size);
+template KmerPosition<short> *initKmerPositionMemory(mmseqs_output *out, size_t size);
+template KmerPosition<int> *initKmerPositionMemory(mmseqs_output *out,size_t size);
 
 template size_t computeMemoryNeededLinearfilter<short>(size_t totalKmer);
 template size_t computeMemoryNeededLinearfilter<int>(size_t totalKmer);
 
 template std::vector<std::pair<size_t, size_t>> setupKmerSplits<short>(
+    mmseqs_output* out,
     Parameters &par, BaseMatrix *subMat, DBReader<unsigned int> &seqDbr,
     size_t totalKmers, size_t splits);
 template std::vector<std::pair<size_t, size_t>> setupKmerSplits<int>(
-    Parameters &par, BaseMatrix *subMat, DBReader<unsigned int> &seqDbr,
+    mmseqs_output* out, Parameters &par, BaseMatrix *subMat, DBReader<unsigned int> &seqDbr,
     size_t totalKmers, size_t splits);
 
 #undef SIZE_T_MAX

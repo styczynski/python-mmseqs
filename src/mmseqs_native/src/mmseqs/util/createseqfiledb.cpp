@@ -14,7 +14,7 @@ int createseqfiledb(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   DBReader<unsigned int> headerDb(
-      par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
+      out, par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   headerDb.open(DBReader<unsigned int>::NOSORT);
   if (par.preloadMode != Parameters::PRELOAD_MODE_MMAP) {
@@ -22,7 +22,7 @@ int createseqfiledb(mmseqs_output *out, Parameters &par) {
   }
 
   DBReader<unsigned int> seqDb(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   seqDb.open(DBReader<unsigned int>::NOSORT);
   if (par.preloadMode != Parameters::PRELOAD_MODE_MMAP) {
@@ -30,7 +30,7 @@ int createseqfiledb(mmseqs_output *out, Parameters &par) {
   }
 
   DBReader<unsigned int> resultDb(
-      par.db2.c_str(), par.db2Index.c_str(), par.threads,
+      out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   resultDb.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 

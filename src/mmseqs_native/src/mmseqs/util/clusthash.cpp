@@ -22,7 +22,7 @@ int clusthash(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   DBReader<unsigned int> reader(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
   if (par.preloadMode != Parameters::PRELOAD_MODE_MMAP) {
@@ -33,13 +33,13 @@ int clusthash(mmseqs_output *out, Parameters &par) {
       reader.getDbtype(), Parameters::DBTYPE_NUCLEOTIDES);
   BaseMatrix *subMat = NULL;
   if (isNuclInput == false) {
-    SubstitutionMatrix sMat(par.scoringMatrixFile.aminoacids, 2.0, -0.2);
-    subMat = new ReducedMatrix(sMat.probMatrix, sMat.subMatrixPseudoCounts,
+    SubstitutionMatrix sMat(out, par.scoringMatrixFile.aminoacids, 2.0, -0.2);
+    subMat = new ReducedMatrix(out, sMat.probMatrix, sMat.subMatrixPseudoCounts,
                                sMat.aa2num, sMat.num2aa, sMat.alphabetSize,
                                par.alphabetSize.aminoacids, 2.0);
   }
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
                   par.compressed, Parameters::DBTYPE_ALIGNMENT_RES);
   writer.open();
   out->info("Hashing sequences...");
@@ -71,7 +71,7 @@ int clusthash(mmseqs_output *out, Parameters &par) {
         hashSeqPair[id] = std::make_pair(std::min(h1, h2), id);
       }
     } else {
-      Sequence seq(par.maxSeqLen, reader.getDbtype(), subMat, 0, false, false);
+      Sequence seq(out, par.maxSeqLen, reader.getDbtype(), subMat, 0, false, false);
 #pragma omp for schedule(dynamic, 100)
       for (size_t id = 0; id < reader.getSize(); ++id) {
         progress.updateProgress();

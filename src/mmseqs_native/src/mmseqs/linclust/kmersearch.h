@@ -5,6 +5,7 @@
 #ifndef MMSEQS_KMERSEARCH_H
 #define MMSEQS_KMERSEARCH_H
 
+#include <mmseqs/output.h>
 #include <mmseqs/linclust/kmerIndex.h>
 #include <mmseqs/linclust/kmermatcher.h>
 
@@ -12,7 +13,7 @@ class KmerSearch {
  public:
   template <int TYPE>
   static std::pair<KmerPosition<short> *, size_t> searchInIndex(
-      KmerPosition<short> *kmers, size_t kmersSize, KmerIndex &kmerIndex,
+      mmseqs_output* out, KmerPosition<short> *kmers, size_t kmersSize, KmerIndex &kmerIndex,
       int resultDirection);
 
   template <int TYPE>
@@ -28,7 +29,7 @@ class KmerSearch {
     size_t adjustedKmer;
   };
   static ExtractKmerAndSortResult extractKmerAndSort(
-      size_t splitKmerCount, size_t split, size_t splits,
+      mmseqs_output* out, size_t splitKmerCount, size_t split, size_t splits,
       DBReader<unsigned int> &seqDbr, Parameters &par, BaseMatrix *subMat);
 };
 

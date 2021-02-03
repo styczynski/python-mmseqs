@@ -37,7 +37,7 @@ int mergeclusters(mmseqs_output *out, Parameters &par) {
 
   out->info("Clustering step 1");
   DBReader<unsigned int> cluDb(
-      firstClu.c_str(), firstCluStepIndex.c_str(), par.threads,
+      out, firstClu.c_str(), firstCluStepIndex.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   cluDb.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 

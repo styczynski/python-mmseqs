@@ -16,13 +16,13 @@ int proteinaln2nucl(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   DBReader<unsigned int> *qdbr_nuc = new DBReader<unsigned int>(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   qdbr_nuc->open(DBReader<unsigned int>::NOSORT);
   qdbr_nuc->readMmapedDataInMemory();
 
   DBReader<unsigned int> *qdbr_aa = new DBReader<unsigned int>(
-      par.db3.c_str(), par.db3Index.c_str(), par.threads,
+      out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   qdbr_aa->open(DBReader<unsigned int>::NOSORT);
   qdbr_aa->readMmapedDataInMemory();
@@ -71,7 +71,7 @@ int proteinaln2nucl(mmseqs_output *out, Parameters &par) {
                             gapExtend);
 
   DBReader<unsigned int> alnDbr(
-      par.db5.c_str(), par.db5Index.c_str(), par.threads,
+      out, par.db5.c_str(), par.db5Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   alnDbr.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 

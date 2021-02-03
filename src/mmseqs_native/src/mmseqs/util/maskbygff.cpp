@@ -13,7 +13,7 @@ int maskbygff(mmseqs_output* out, Parameters& par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   DBReader<std::string> reader(
-      par.db2.c_str(), par.db2Index.c_str(), par.threads,
+      out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
       DBReader<std::string>::USE_DATA | DBReader<std::string>::USE_WRITABLE);
   reader.open(DBReader<std::string>::NOSORT);
 

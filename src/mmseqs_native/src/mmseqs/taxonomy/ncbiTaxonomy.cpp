@@ -32,10 +32,10 @@ void deleteMatrix(int** M) {
   delete[] M;
 }
 
-NcbiTaxonomy::NcbiTaxonomy(const std::string& namesFile,
+NcbiTaxonomy::NcbiTaxonomy(mmseqs_output* output, const std::string& namesFile,
                            const std::string& nodesFile,
                            const std::string& mergedFile)
-    : externalData(false) {
+    : out(output), externalData(false) {
   block = new StringBlock<unsigned int>();
   std::vector<TaxonNode> tmpNodes;
   loadNodes(tmpNodes, nodesFile);
@@ -157,7 +157,7 @@ size_t NcbiTaxonomy::loadNodes(std::vector<TaxonNode>& tmpNodes,
   return tmpNodes.size();
 }
 
-std::pair<int, std::string> parseName(const std::string& line) {
+std::pair<int, std::string> parseName(mmseqs_output* out, const std::string& line) {
   std::vector<std::string> result = splitByDelimiter(line, "\t|\t", 2);
   if (result.size() != 2) {
     out->failure("Invalid name entry");
@@ -179,7 +179,7 @@ void NcbiTaxonomy::loadNames(std::vector<TaxonNode>& tmpNodes,
       continue;
     }
 
-    std::pair<int, std::string> entry = parseName(line);
+    std::pair<int, std::string> entry = parseName(out, line);
     if (!nodeExists(entry.first)) {
       out->failure("loadNames: Taxon {} not present in nodes file", entry.first);
     }
@@ -348,7 +348,7 @@ std::vector<std::string> NcbiTaxonomy::AtRanks(
   return result;
 }
 
-std::vector<std::string> NcbiTaxonomy::parseRanks(const std::string& ranks) {
+std::vector<std::string> NcbiTaxonomy::parseRanks(mmseqs_output* out, const std::string& ranks) {
   std::vector<std::string> temp = Util::split(ranks, ",");
   for (size_t i = 0; i < temp.size(); ++i) {
     if (findRankIndex(temp[i]) == -1) {
@@ -495,7 +495,7 @@ std::unordered_map<TaxID, TaxonCounts> NcbiTaxonomy::getCladeCounts(
   return cladeCounts;
 }
 
-NcbiTaxonomy* NcbiTaxonomy::openTaxonomy(const std::string& database) {
+NcbiTaxonomy* NcbiTaxonomy::openTaxonomy(mmseqs_output* out, const std::string& database) {
   std::string binFile = database + "_taxonomy";
   if (FileUtil::fileExists(out, binFile.c_str())) {
     FILE* handle = fopen(binFile.c_str(), "r");
@@ -534,7 +534,7 @@ NcbiTaxonomy* NcbiTaxonomy::openTaxonomy(const std::string& database) {
   } else {
     out->failure("names.dmp, nodes.dmp, merged.dmp from NCBI taxdump could not be found!");
   }
-  return new NcbiTaxonomy(namesFile, nodesFile, mergedFile);
+  return new NcbiTaxonomy(out, namesFile, nodesFile, mergedFile);
 }
 
 const TaxID ROOT_TAXID = 1;
@@ -561,9 +561,9 @@ const char* NcbiTaxonomy::getString(size_t blockIdx) const {
   return block->getString(blockIdx);
 }
 
-WeightedTaxHit::WeightedTaxHit(const TaxID taxon, const float evalue,
+WeightedTaxHit::WeightedTaxHit(mmseqs_output* output, const TaxID taxon, const float evalue,
                                const int weightVoteMode)
-    : taxon(taxon) {
+    : out(output), taxon(taxon) {
   switch (weightVoteMode) {
     case Parameters::AGG_TAX_UNIFORM:
       weight = 1.0;

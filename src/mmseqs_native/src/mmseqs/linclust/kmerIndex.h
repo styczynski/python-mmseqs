@@ -16,6 +16,7 @@
 
 class KmerIndex {
  private:
+  mmseqs_output* out;
   // index data
   const size_t indexGridResolution = 32768;
   size_t indexGridSize;
@@ -53,7 +54,7 @@ class KmerIndex {
     KmerEntry() {}
   };
 
-  KmerIndex() {}
+  KmerIndex(mmseqs_output* output): out(output) {}
 
   void init(const size_t alphabetSize, const size_t kmerSize,
             const size_t entryCount) {
@@ -69,8 +70,8 @@ class KmerIndex {
     this->writingPosition = 0;
   }
   // use for writing the data to file
-  KmerIndex(const size_t alphabetSize, const size_t kmerSize)
-      : alphabetSize(alphabetSize), kmerSize(kmerSize) {
+  KmerIndex(mmseqs_output* output, const size_t alphabetSize, const size_t kmerSize)
+      : out(output), alphabetSize(alphabetSize), kmerSize(kmerSize) {
     init(alphabetSize, kmerSize, indexGridResolution);
   }
 
@@ -202,7 +203,7 @@ class KmerIndex {
 
   template <int TYPE>
   void printIndex(BaseMatrix *mat) {
-    Indexer indexer(alphabetSize, kmerSize);
+    Indexer indexer(out, alphabetSize, kmerSize);
     reset();
     out->info("Entry Count: {}\n", entryCount);
     size_t id = 0;

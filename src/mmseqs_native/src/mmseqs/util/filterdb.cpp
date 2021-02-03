@@ -100,7 +100,7 @@ int filterdb(mmseqs_output *out, Parameters &par) {
   const ComparisonOperator compOperator = mapOperator(par.compOperator);
 
   DBReader<unsigned int> reader(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 

@@ -26,7 +26,7 @@ int alignbykmer(mmseqs_output *out, Parameters &par) {
 
   bool touch = (par.preloadMode != Parameters::PRELOAD_MODE_MMAP);
   IndexReader *tDbrIdx = new IndexReader(
-      par.db2, par.threads, IndexReader::SEQUENCES,
+      out, par.db2, par.threads, IndexReader::SEQUENCES,
       (touch) ? (IndexReader::PRELOAD_INDEX | IndexReader::PRELOAD_DATA) : 0);
   IndexReader *qDbrIdx = NULL;
   int querySeqType = 0;
@@ -40,7 +40,7 @@ int alignbykmer(mmseqs_output *out, Parameters &par) {
     querySeqType = targetSeqType;
   } else {
     // open the sequence, prefiltering and output databases
-    qDbrIdx = new IndexReader(par.db1, par.threads, IndexReader::SEQUENCES,
+    qDbrIdx = new IndexReader(out, par.db1, par.threads, IndexReader::SEQUENCES,
                               (touch) ? IndexReader::PRELOAD_INDEX : 0);
     qdbr = qDbrIdx->sequenceReader;
     querySeqType = qdbr->getDbtype();
@@ -68,7 +68,7 @@ int alignbykmer(mmseqs_output *out, Parameters &par) {
   // par.printParameters(command.cmd, argc, argv, *command.params);
 
   DBReader<unsigned int> dbr_res(
-      par.db3.c_str(), par.db3Index.c_str(), par.threads,
+      out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   dbr_res.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
@@ -78,14 +78,14 @@ int alignbykmer(mmseqs_output *out, Parameters &par) {
 
   BaseMatrix *subMat;
   if (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_NUCLEOTIDES)) {
-    subMat = new NucleotideMatrix(par.scoringMatrixFile.nucleotides, 1.0, 0.0);
+    subMat = new NucleotideMatrix(out, par.scoringMatrixFile.nucleotides, 1.0, 0.0);
   } else {
     if (par.alphabetSize.aminoacids == 21) {
       subMat =
-          new SubstitutionMatrix(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+          new SubstitutionMatrix(out, par.scoringMatrixFile.aminoacids, 2.0, 0.0);
     } else {
-      SubstitutionMatrix sMat(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
-      subMat = new ReducedMatrix(sMat.probMatrix, sMat.subMatrixPseudoCounts,
+      SubstitutionMatrix sMat(out, par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+      subMat = new ReducedMatrix(out, sMat.probMatrix, sMat.subMatrixPseudoCounts,
                                  sMat.aa2num, sMat.num2aa, sMat.alphabetSize,
                                  par.alphabetSize.aminoacids, 2.0);
       SubstitutionMatrix::print(subMat->subMatrix, subMat->num2aa,
@@ -93,12 +93,12 @@ int alignbykmer(mmseqs_output *out, Parameters &par) {
     }
   }
   ScoreMatrix _2merSubMatrix =
-      ExtendedSubstitutionMatrix::calcScoreMatrix(*subMat, 2);
+      ExtendedSubstitutionMatrix::calcScoreMatrix(out, *subMat, 2);
 
-  EvalueComputation evaluer(tdbr->getAminoAcidDBSize(), subMat, gapOpen,
+  EvalueComputation evaluer(out, tdbr->getAminoAcidDBSize(), subMat, gapOpen,
                             gapExtend);
 
-  DBWriter resultWriter(par.db4.c_str(), par.db4Index.c_str(), par.threads,
+  DBWriter resultWriter(out, par.db4.c_str(), par.db4Index.c_str(), par.threads,
                         par.compressed, Parameters::DBTYPE_ALIGNMENT_RES);
   resultWriter.open();
 
@@ -172,18 +172,18 @@ int alignbykmer(mmseqs_output *out, Parameters &par) {
 
 #pragma omp parallel
     {
-      Sequence query(par.maxSeqLen, querySeqType, subMat, par.kmerSize,
+      Sequence query(out, par.maxSeqLen, querySeqType, subMat, par.kmerSize,
                      par.spacedKmer, false, true, par.spacedKmerPattern);
-      Sequence target(par.maxSeqLen, targetSeqType, subMat, par.kmerSize,
+      Sequence target(out, par.maxSeqLen, targetSeqType, subMat, par.kmerSize,
                       par.spacedKmer, false, true, par.spacedKmerPattern);
-      KmerGenerator kmerGenerator(par.kmerSize, subMat->alphabetSize, 70.0);
+      KmerGenerator kmerGenerator(out, par.kmerSize, subMat->alphabetSize, 70.0);
       kmerGenerator.setDivideStrategy(NULL, &_2merSubMatrix);
       size_t lookupSize =
           MathUtil::ipow<size_t>(subMat->alphabetSize, par.kmerSize);
       unsigned short *queryPosLookup = new unsigned short[lookupSize];
       memset(queryPosLookup, 255, lookupSize * sizeof(unsigned short));
 
-      Indexer idxer(subMat->alphabetSize, par.kmerSize);
+      Indexer idxer(out, subMat->alphabetSize, par.kmerSize);
       KmerPos *kmerPosVec = new KmerPos[par.maxSeqLen + 1];
       Stretche *stretcheVec = new Stretche[par.maxSeqLen + 1];
       DpMatrixRow *dpMatrixRow = new DpMatrixRow[par.maxSeqLen + 1];

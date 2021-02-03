@@ -67,11 +67,11 @@ int createtsv(mmseqs_output *out, Parameters &par) {
   DBReader<unsigned int> *reader;
   if (hasTargetDB) {
     reader = new DBReader<unsigned int>(
-        par.db3.c_str(), par.db3Index.c_str(), par.threads,
+        out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   } else {
     reader = new DBReader<unsigned int>(
-        par.db2.c_str(), par.db2Index.c_str(), par.threads,
+        out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   }
   reader->open(DBReader<unsigned int>::LINEAR_ACCCESS);

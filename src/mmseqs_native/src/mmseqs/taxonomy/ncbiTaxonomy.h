@@ -6,6 +6,7 @@
 #ifndef MMSEQS_NCBITAXONOMY_H
 #define MMSEQS_NCBITAXONOMY_H
 
+#include <mmseqs/output.h>
 #include <mmseqs/commons/stringBlock.h>
 
 #include <map>
@@ -32,15 +33,17 @@ struct TaxonNode {
         parentTaxId(parentTaxId),
         rankIdx(rankIdx),
         nameIdx(nameIdx){};
+
 };
 
 const double MAX_TAX_WEIGHT = 1000;
 struct WeightedTaxHit {
-  WeightedTaxHit(const TaxID taxon, const float evalue,
+  WeightedTaxHit(mmseqs_output* output, const TaxID taxon, const float evalue,
                  const int weightVoteMode);
 
   TaxID taxon;
   double weight;
+  mmseqs_output* out;
 };
 
 struct WeightedTaxResult {
@@ -101,8 +104,8 @@ static const std::map<std::string, char> NcbiShortRanks = {
 
 class NcbiTaxonomy {
  public:
-  static NcbiTaxonomy *openTaxonomy(const std::string &database);
-  NcbiTaxonomy(const std::string &namesFile, const std::string &nodesFile,
+  static NcbiTaxonomy *openTaxonomy(mmseqs_output* out, const std::string &database);
+  NcbiTaxonomy(mmseqs_output* output, const std::string &namesFile, const std::string &nodesFile,
                const std::string &mergedFile);
   ~NcbiTaxonomy();
 
@@ -113,7 +116,7 @@ class NcbiTaxonomy {
   std::map<std::string, std::string> AllRanks(TaxonNode const *node) const;
   std::string taxLineage(TaxonNode const *node, bool infoAsName = true);
 
-  static std::vector<std::string> parseRanks(const std::string &ranks);
+  static std::vector<std::string> parseRanks(mmseqs_output* out, const std::string &ranks);
   static int findRankIndex(const std::string &rank);
   static char findShortRank(const std::string &rank);
 
@@ -136,6 +139,7 @@ class NcbiTaxonomy {
   size_t maxNodes;
 
  private:
+  mmseqs_output* out;
   size_t loadNodes(std::vector<TaxonNode> &tmpNodes,
                    const std::string &nodesFile);
   size_t loadMerged(const std::string &mergedFile);

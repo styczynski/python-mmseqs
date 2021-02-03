@@ -103,7 +103,7 @@ redoComputation:
   DBReader<unsigned int>* reader = NULL;
   if (dbInput == true) {
     reader = new DBReader<unsigned int>(
-        par.db1.c_str(), par.db1Index.c_str(), 1,
+        out, par.db1.c_str(), par.db1Index.c_str(), 1,
         DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX |
             DBReader<unsigned int>::USE_LOOKUP);
     reader->open(DBReader<unsigned int>::LINEAR_ACCCESS);

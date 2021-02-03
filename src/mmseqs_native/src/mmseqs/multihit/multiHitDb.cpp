@@ -28,7 +28,7 @@ int multihitdb(mmseqs_output *out, Parameters &par) {
     }
   }
   std::string hash = SSTR(
-      par.hashParameter(par.databases_types, par.filenames, par.multihitdb));
+      par.hashParameter(out, par.databases_types, par.filenames, par.multihitdb));
   if (par.reuseLatest == true) {
     hash = FileUtil::getHashFromSymLink(out, tmpDir + "/latest");
   }
@@ -43,7 +43,7 @@ int multihitdb(mmseqs_output *out, Parameters &par) {
   std::string outDb = par.filenames.back();
   par.filenames.pop_back();
 
-  CommandCaller cmd;
+  CommandCaller cmd(out);
   cmd.addVariable("OUTDB", outDb.c_str());
   cmd.addVariable("TMP_PATH", tmpDir.c_str());
 
@@ -57,7 +57,7 @@ int multihitdb(mmseqs_output *out, Parameters &par) {
                   par.createParameterString(out, par.extractorfs).c_str());
   cmd.addVariable("TRANSLATENUCS_PAR",
                   par.createParameterString(out, par.translatenucs).c_str());
-  cmd.addVariable("SWAPDB_PAR", par.createParameterString(par.swapdb).c_str());
+  cmd.addVariable("SWAPDB_PAR", par.createParameterString(out, par.swapdb).c_str());
   par.stat = "linecount";
   cmd.addVariable("RESULT2STATS_PAR",
                   par.createParameterString(out, par.result2stats).c_str());

@@ -31,7 +31,7 @@ int alignall(mmseqs_output *out, Parameters &par) {
       Alignment::initSWMode(par.alignmentMode, par.covThr, par.seqIdThr);
 
   DBReader<unsigned int> tdbr(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   tdbr.open(DBReader<unsigned int>::NOSORT);
   if (par.preloadMode != Parameters::PRELOAD_MODE_MMAP) {
@@ -43,28 +43,28 @@ int alignall(mmseqs_output *out, Parameters &par) {
   BaseMatrix *subMat;
   if (Parameters::isEqualDbtype(targetSeqType,
                                 Parameters::DBTYPE_NUCLEOTIDES)) {
-    subMat = new NucleotideMatrix(par.scoringMatrixFile.nucleotides, 1.0,
+    subMat = new NucleotideMatrix(out, par.scoringMatrixFile.nucleotides, 1.0,
                                   par.scoreBias);
     gapOpen = par.gapOpen.nucleotides;
     gapExtend = par.gapExtend.nucleotides;
   } else {
     // keep score bias at 0.0 (improved ROC)
-    subMat = new SubstitutionMatrix(par.scoringMatrixFile.aminoacids, 2.0,
+    subMat = new SubstitutionMatrix(out, par.scoringMatrixFile.aminoacids, 2.0,
                                     par.scoreBias);
     gapOpen = par.gapOpen.aminoacids;
     gapExtend = par.gapExtend.aminoacids;
   }
 
   DBReader<unsigned int> dbr_res(
-      par.db2.c_str(), par.db2Index.c_str(), par.threads,
+      out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   dbr_res.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter resultWriter(par.db3.c_str(), par.db3Index.c_str(), par.threads,
+  DBWriter resultWriter(out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
                         par.compressed, Parameters::DBTYPE_GENERIC_DB);
   resultWriter.open();
 
-  EvalueComputation evaluer(tdbr.getAminoAcidDBSize(), subMat, gapOpen,
+  EvalueComputation evaluer(out, tdbr.getAminoAcidDBSize(), subMat, gapOpen,
                             gapExtend);
   const size_t flushSize = 100000000;
   size_t iterations = static_cast<int>(ceil(
@@ -82,12 +82,12 @@ int alignall(mmseqs_output *out, Parameters &par) {
       thread_idx = (unsigned int)omp_get_thread_num();
 #endif
 
-      Matcher matcher(targetSeqType, par.maxSeqLen, subMat, &evaluer,
+      Matcher matcher(out, targetSeqType, par.maxSeqLen, subMat, &evaluer,
                       par.compBiasCorrection, gapOpen, gapExtend, par.zdrop);
 
-      Sequence query(par.maxSeqLen, targetSeqType, subMat, 0, false,
+      Sequence query(out, par.maxSeqLen, targetSeqType, subMat, 0, false,
                      par.compBiasCorrection);
-      Sequence target(par.maxSeqLen, targetSeqType, subMat, 0, false,
+      Sequence target(out, par.maxSeqLen, targetSeqType, subMat, 0, false,
                       par.compBiasCorrection);
 
       char buffer[1024 + 32768];

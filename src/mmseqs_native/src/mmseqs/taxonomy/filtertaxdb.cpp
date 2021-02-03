@@ -15,14 +15,15 @@ int filtertaxdb(mmseqs_output* out, Parameters& par) {
   //    Parameters& par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
-  NcbiTaxonomy* t = NcbiTaxonomy::openTaxonomy(par.db1);
+  NcbiTaxonomy* t = NcbiTaxonomy::openTaxonomy(out, par.db1);
 
   DBReader<unsigned int> reader(
+      out,
       par.db2.c_str(), par.db2Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
-  DBWriter writer(par.db3.c_str(), par.db3Index.c_str(), par.threads,
+  DBWriter writer(out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
                   par.compressed, reader.getDbtype());
   writer.open();
 

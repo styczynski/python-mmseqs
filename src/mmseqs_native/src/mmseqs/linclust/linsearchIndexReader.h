@@ -37,29 +37,29 @@ class CompareRepSequenceAndIdAndDiag {
 class LinsearchIndexReader {
  public:
   template <int TYPE>
-  static size_t pickCenterKmer(KmerPosition<short> *kmers,
+  static size_t pickCenterKmer(mmseqs_output* out, KmerPosition<short> *kmers,
                                size_t splitKmerCount);
 
   template <int TYPE>
-  static void mergeAndWriteIndex(DBWriter &dbw,
+  static void mergeAndWriteIndex(mmseqs_output* out, DBWriter &dbw,
                                  std::vector<std::string> tmpFiles,
                                  int alphSize, int kmerSize);
 
   template <int TYPE>
-  static void writeIndex(DBWriter &dbw, KmerPosition<short> *hashSeqPair,
+  static void writeIndex(mmseqs_output* out, DBWriter &dbw, KmerPosition<short> *hashSeqPair,
                          size_t totalKmers, int alphSize, int kmerSize);
 
-  static std::string indexName(std::string baseName);
+  static std::string indexName(mmseqs_output* out, std::string baseName);
 
-  static void writeKmerIndexToDisk(std::string fileName,
+  static void writeKmerIndexToDisk(mmseqs_output* out, std::string fileName,
                                    KmerPosition<short> *kmers, size_t kmerCnt);
 
-  static bool checkIfIndexFile(DBReader<unsigned int> *pReader);
+  static bool checkIfIndexFile(mmseqs_output* out, DBReader<unsigned int> *pReader);
 
-  static std::string findIncompatibleParameter(DBReader<unsigned int> &index,
+  static std::string findIncompatibleParameter(mmseqs_output* out, DBReader<unsigned int> &index,
                                                Parameters &parameters,
                                                int dbtype);
 
-  static std::string searchForIndex(const std::string &dbName);
+  static std::string searchForIndex(mmseqs_output* out, const std::string &dbName);
 };
 #endif

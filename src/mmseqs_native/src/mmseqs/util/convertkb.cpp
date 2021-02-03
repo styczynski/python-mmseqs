@@ -100,7 +100,7 @@ int convertkb(mmseqs_output *out, Parameters &par) {
       out->failure("Could not open {} for writing", lookupFile);
     }
   } else {
-    reader = new DBReader<unsigned int>(par.mappingFile.c_str(),
+    reader = new DBReader<unsigned int>(out, par.mappingFile.c_str(),
                                         par.mappingFile.c_str(), 1,
                                         DBReader<unsigned int>::USE_LOOKUP_REV);
     reader->open(DBReader<unsigned int>::NOSORT);

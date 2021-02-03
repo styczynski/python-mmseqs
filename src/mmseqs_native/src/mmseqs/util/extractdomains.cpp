@@ -253,7 +253,7 @@ int doExtract(Parameters &par, DBReader<unsigned int> &blastTabReader,
     msaSequenceIndexName = par.db2 + "_sequence.ffindex";
 
     headerReader = new DBReader<unsigned int>(
-        msaHeaderDataName.c_str(), msaHeaderIndexName.c_str(), par.threads,
+        out, msaHeaderDataName.c_str(), msaHeaderIndexName.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     headerReader->open(DBReader<unsigned int>::SORT_BY_LINE);
 
@@ -264,7 +264,7 @@ int doExtract(Parameters &par, DBReader<unsigned int> &blastTabReader,
   }
 
   DBReader<unsigned int> msaReader(
-      msaDataName.c_str(), msaIndexName.c_str(), par.threads,
+      out, msaDataName.c_str(), msaIndexName.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   msaReader.open(DBReader<unsigned int>::NOSORT);
 
@@ -356,7 +356,7 @@ int doExtract(Parameters &par, DBReader<unsigned int> &blastTabReader,
 int doExtract(Parameters &par, const unsigned int mpiRank,
               const unsigned int mpiNumProc) {
   DBReader<unsigned int> reader(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
@@ -391,7 +391,7 @@ int doExtract(Parameters &par) {
   size_t resultSize;
 
   DBReader<unsigned int> reader(
-      par.db1.c_str(), par.db1Index.c_str(), par.threads,
+      out, par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
   resultSize = reader.getSize();

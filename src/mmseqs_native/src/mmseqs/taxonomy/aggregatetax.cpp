@@ -18,16 +18,17 @@ int aggregate(mmseqs_output *out, const bool useAln, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   // open taxonomy - evolutionary relationships amongst taxa
-  NcbiTaxonomy *t = NcbiTaxonomy::openTaxonomy(par.db1);
+  NcbiTaxonomy *t = NcbiTaxonomy::openTaxonomy(out, par.db1);
 
   // open mapping of set to sequence
   DBReader<unsigned int> setToSeqReader(
-      par.db2.c_str(), par.db2Index.c_str(), par.threads,
+      out, par.db2.c_str(), par.db2Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   setToSeqReader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
   // open tax assignments per sequence
   DBReader<unsigned int> taxSeqReader(
+      out,
       par.db3.c_str(), par.db3Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   taxSeqReader.open(DBReader<unsigned int>::NOSORT);
@@ -36,6 +37,7 @@ int aggregate(mmseqs_output *out, const bool useAln, Parameters &par) {
   DBReader<unsigned int> *alnSeqReader = NULL;
   if (useAln == true) {
     alnSeqReader = new DBReader<unsigned int>(
+        out,
         par.db4.c_str(), par.db4Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
     alnSeqReader->open(DBReader<unsigned int>::NOSORT);
@@ -49,11 +51,11 @@ int aggregate(mmseqs_output *out, const bool useAln, Parameters &par) {
     outDbIndexStr = par.db5Index;
   }
 
-  DBWriter writer(outDbStr.c_str(), outDbIndexStr.c_str(), par.threads,
+  DBWriter writer(out, outDbStr.c_str(), outDbIndexStr.c_str(), par.threads,
                   par.compressed, Parameters::DBTYPE_TAXONOMICAL_RESULT);
   writer.open();
 
-  std::vector<std::string> ranks = NcbiTaxonomy::parseRanks(par.lcaRanks);
+  std::vector<std::string> ranks = NcbiTaxonomy::parseRanks(out, par.lcaRanks);
 
   Log::Progress progress(setToSeqReader.getSize());
 
@@ -109,10 +111,10 @@ int aggregate(mmseqs_output *out, const bool useAln, Parameters &par) {
             }
             weight = strtod(entry[1], NULL);
           }
-          setTaxa.emplace_back(taxon, weight, par.voteMode);
+          setTaxa.emplace_back(out, taxon, weight, par.voteMode);
         } else {
           const int uniformMode = Parameters::AGG_TAX_UNIFORM;
-          setTaxa.emplace_back(taxon, 1.0, uniformMode);
+          setTaxa.emplace_back(out, taxon, 1.0, uniformMode);
         }
 
         results = Util::skipLine(results);

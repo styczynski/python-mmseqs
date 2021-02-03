@@ -21,12 +21,12 @@ int convert2fasta(mmseqs_output* out, Parameters& par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   DBReader<unsigned int> db(
-      par.db1.c_str(), par.db1Index.c_str(), 1,
+      out, par.db1.c_str(), par.db1Index.c_str(), 1,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   db.open(DBReader<unsigned int>::NOSORT);
 
   DBReader<unsigned int> db_header(
-      par.hdr1.c_str(), par.hdr1Index.c_str(), 1,
+      out, par.hdr1.c_str(), par.hdr1Index.c_str(), 1,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   db_header.open(DBReader<unsigned int>::NOSORT);
 

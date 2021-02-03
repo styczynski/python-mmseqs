@@ -30,7 +30,7 @@ int mergedbs(mmseqs_output *out, Parameters &par) {
   for (size_t i = 0; i < fileCount; i++) {
     std::string indexName = par.filenames[i + 2] + ".index";
     filesToMerge[i] = new DBReader<unsigned int>(
-        par.filenames[i + 2].c_str(), indexName.c_str(), 1,
+        out, par.filenames[i + 2].c_str(), indexName.c_str(), 1,
         DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
     filesToMerge[i]->open(DBReader<unsigned int>::NOSORT);
   }

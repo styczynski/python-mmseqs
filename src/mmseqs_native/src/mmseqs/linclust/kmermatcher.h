@@ -1,5 +1,6 @@
 #ifndef MMSEQS_KMERMATCHER_H
 #define MMSEQS_KMERMATCHER_H
+#include <mmseqs/output.h>
 #include <mmseqs/commons/baseMatrix.h>
 #include <mmseqs/commons/dBReader.h>
 #include <mmseqs/commons/dBWriter.h>

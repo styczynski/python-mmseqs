@@ -15,13 +15,13 @@ int convertca3m(mmseqs_output* out, Parameters& par) {
   //    Parameters &par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
-  DBReader<std::string> reader(
+  DBReader<std::string> reader(out,
       (par.db1 + "_ca3m.ffdata").c_str(), (par.db1 + "_ca3m.ffindex").c_str(),
       par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   reader.open(DBReader<std::string>::NOSORT);
 
-  DBReader<unsigned int> sequences(
+  DBReader<unsigned int> sequences(out,
       (par.db1 + "_sequence.ffdata").c_str(),
       (par.db1 + "_sequence.ffindex").c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);

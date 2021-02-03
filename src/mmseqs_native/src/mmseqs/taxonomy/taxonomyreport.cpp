@@ -155,19 +155,20 @@ int taxonomyreport(mmseqs_output* out, Parameters& par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   // 1. Read taxonomy
-  NcbiTaxonomy* taxDB = NcbiTaxonomy::openTaxonomy(par.db1);
+  NcbiTaxonomy* taxDB = NcbiTaxonomy::openTaxonomy(out, par.db1);
 
   std::vector<std::pair<unsigned int, unsigned int>> mapping;
   if (FileUtil::fileExists(out, std::string(par.db1 + "_mapping").c_str()) ==
       false) {
     out->failure("{}_mapping does not exist. Please create the taxonomy mapping", par.db1);
   }
-  bool isSorted = Util::readMapping(par.db1 + "_mapping", mapping);
+  bool isSorted = Util::readMapping(out, par.db1 + "_mapping", mapping);
   if (isSorted == false) {
     std::stable_sort(mapping.begin(), mapping.end(), compareToFirstInt);
   }
 
   DBReader<unsigned int> reader(
+      out,
       par.db2.c_str(), par.db2Index.c_str(), 1,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
@@ -207,9 +208,7 @@ int taxonomyreport(mmseqs_output* out, Parameters& par) {
       }
     }
   };
-  out->info("\n");
-  out->info("Found {} different reads.\n", taxCounts.size() << " different taxa for "
-                     << reader.getSize());
+  out->info("Found {} different taxa for {} different reads", taxCounts.size(), reader.getSize());
   unsigned int unknownCnt =
       (taxCounts.find(0) != taxCounts.end()) ? taxCounts.at(0) : 0;
   out->info("{} reads are unclassified.", unknownCnt);

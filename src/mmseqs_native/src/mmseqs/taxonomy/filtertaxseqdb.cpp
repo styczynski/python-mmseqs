@@ -29,21 +29,22 @@ int filtertaxseqdb(mmseqs_output* out, Parameters& par) {
       false) {
     out->failure("{}_mapping does not exist. Please create the taxonomy mapping", par.db1);
   }
-  bool isSorted = Util::readMapping(par.db1 + "_mapping", mapping);
+  bool isSorted = Util::readMapping(out, par.db1 + "_mapping", mapping);
   if (isSorted == false) {
     std::stable_sort(mapping.begin(), mapping.end(), compareToFirstInt);
   }
 
   // open taxonomy - evolutionary relationships amongst taxa
-  NcbiTaxonomy* t = NcbiTaxonomy::openTaxonomy(par.db1);
+  NcbiTaxonomy* t = NcbiTaxonomy::openTaxonomy(out, par.db1);
 
   DBReader<unsigned int> reader(
+      out,
       par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
   const bool isCompressed = reader.isCompressed();
 
-  DBWriter writer(par.db2.c_str(), par.db2Index.c_str(), par.threads, 0,
+  DBWriter writer(out, par.db2.c_str(), par.db2Index.c_str(), par.threads, 0,
                   Parameters::DBTYPE_OMIT_FILE);
   writer.open();
 
@@ -114,12 +115,12 @@ int filtertaxseqdb(mmseqs_output* out, Parameters& par) {
 
   writer.close(true);
   if (par.subDbMode == Parameters::SUBDB_MODE_SOFT) {
-    DBReader<unsigned int>::softlinkDb(par.db1, par.db2,
+    DBReader<unsigned int>::softlinkDb(out, par.db1, par.db2,
                                        DBFiles::SEQUENCE_NO_DATA_INDEX);
   } else {
-    DBWriter::writeDbtypeFile(par.db2.c_str(), reader.getDbtype(),
+    DBWriter::writeDbtypeFile(out, par.db2.c_str(), reader.getDbtype(),
                               isCompressed);
-    DBReader<unsigned int>::softlinkDb(par.db1, par.db2,
+    DBReader<unsigned int>::softlinkDb(out, par.db1, par.db2,
                                        DBFiles::SEQUENCE_ANCILLARY);
   }
 

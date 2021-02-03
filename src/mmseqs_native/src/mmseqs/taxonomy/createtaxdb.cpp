@@ -23,7 +23,7 @@ int createtaxdb(mmseqs_output* out, Parameters& par) {
       out->info("Created dir {}\n", tmp);
     }
   }
-  CommandCaller cmd;
+  CommandCaller cmd(out);
 
   cmd.addVariable("TMP_PATH", tmp.c_str());
   if (par.taxMappingFile.empty()) {
@@ -42,7 +42,7 @@ int createtaxdb(mmseqs_output* out, Parameters& par) {
   }
   cmd.addVariable("ARIA_NUM_CONN", SSTR(std::min(16, par.threads)).c_str());
   cmd.addVariable("VERBOSITY_PAR",
-                  par.createParameterString(par.onlyverbosity).c_str());
+                  par.createParameterString(out, par.onlyverbosity).c_str());
   FileUtil::writeFile(out, tmp + "/createindex.sh", createtaxdb_sh,
                       createtaxdb_sh_len);
   std::string program(tmp + "/createindex.sh");

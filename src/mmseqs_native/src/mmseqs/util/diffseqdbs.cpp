@@ -42,12 +42,12 @@ int diffseqdbs(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   DBReader<unsigned int> oldReader(
-      par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
+      out, par.hdr1.c_str(), par.hdr1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   oldReader.open(DBReader<unsigned int>::NOSORT);
 
   DBReader<unsigned int> newReader(
-      par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
+      out, par.hdr2.c_str(), par.hdr2Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
   newReader.open(DBReader<unsigned int>::NOSORT);
 
