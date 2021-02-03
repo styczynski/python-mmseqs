@@ -19,7 +19,7 @@ struct sort_by_score {
 };
 
 ScoreMatrix ExtendedSubstitutionMatrix::calcScoreMatrix(
-    const BaseMatrix &matrix, const size_t kmerSize) {
+    mmseqs_output* out, const BaseMatrix &matrix, const size_t kmerSize) {
   short **subMatrix = matrix.subMatrix;
   const size_t alphabetSize = matrix.alphabetSize;
   size_t size = pow(alphabetSize, kmerSize);
@@ -43,7 +43,7 @@ ScoreMatrix ExtendedSubstitutionMatrix::calcScoreMatrix(
   {
     std::pair<short, unsigned int> *tmpScoreMatrix =
         new std::pair<short, unsigned int>[size];
-    Indexer indexer((int)alphabetSize, (int)kmerSize);
+    Indexer indexer(out, (int)alphabetSize, (int)kmerSize);
     // fill matrix
 #pragma omp for schedule(static)
     for (size_t i = 0; i < permutation.size(); i++) {
@@ -51,7 +51,7 @@ ScoreMatrix ExtendedSubstitutionMatrix::calcScoreMatrix(
 
       for (size_t j = 0; j < permutation.size(); j++) {
         const unsigned int j_index = indexer.int2index(&permutation[j][0]);
-        const short score = calcScore(&permutation[i][0], &permutation[j][0],
+        const short score = calcScore(out, &permutation[i][0], &permutation[j][0],
                                       kmerSize, subMatrix);
         tmpScoreMatrix[j].first = score;
         tmpScoreMatrix[j].second = j_index;
@@ -79,7 +79,7 @@ void ExtendedSubstitutionMatrix::freeScoreMatrix(ScoreMatrix &matrix) {
   free(matrix.index);
 }
 
-short ExtendedSubstitutionMatrix::calcScore(unsigned char *i_seq,
+short ExtendedSubstitutionMatrix::calcScore(mmseqs_output* out, unsigned char *i_seq,
                                             unsigned char *j_seq,
                                             size_t seq_size,
                                             short **subMatrix) {

@@ -5,7 +5,7 @@
 #include <omp.h>
 #endif
 
-char *getScoreLookup(BaseMatrix &matrix) {
+char *getScoreLookup(mmseqs_output* out, BaseMatrix &matrix) {
   char *idScoreLookup = NULL;
   idScoreLookup = new char[matrix.alphabetSize];
   for (int aa = 0; aa < matrix.alphabetSize; aa++) {
@@ -47,7 +47,7 @@ class DbInfo {
   size_t *sequenceOffsets;
 };
 
-void IndexBuilder::fillDatabase(IndexTable *indexTable,
+void IndexBuilder::fillDatabase(mmseqs_output* out, IndexTable *indexTable,
                                 SequenceLookup **maskedLookup,
                                 SequenceLookup **unmaskedLookup,
                                 BaseMatrix &subMat, Sequence *seq,
@@ -65,17 +65,17 @@ void IndexBuilder::fillDatabase(IndexTable *indexTable,
 
   SequenceLookup *sequenceLookup;
   if (unmaskedLookup != NULL && maskedLookup == NULL) {
-    *unmaskedLookup = new SequenceLookup(dbSize, info->aaDbSize);
+    *unmaskedLookup = new SequenceLookup(out, dbSize, info->aaDbSize);
     sequenceLookup = *unmaskedLookup;
   } else if (unmaskedLookup == NULL && maskedLookup != NULL) {
-    *maskedLookup = new SequenceLookup(dbSize, info->aaDbSize);
+    *maskedLookup = new SequenceLookup(out, dbSize, info->aaDbSize);
     sequenceLookup = *maskedLookup;
   } else if (unmaskedLookup != NULL && maskedLookup != NULL) {
-    *unmaskedLookup = new SequenceLookup(dbSize, info->aaDbSize);
-    *maskedLookup = new SequenceLookup(dbSize, info->aaDbSize);
+    *unmaskedLookup = new SequenceLookup(out, dbSize, info->aaDbSize);
+    *maskedLookup = new SequenceLookup(out, dbSize, info->aaDbSize);
     sequenceLookup = *maskedLookup;
   } else {
-    out->failure("Failed assertion that should never fail during database filling.")
+    out->failure("Failed assertion that should never fail during database filling.");
   }
 
   // need to prune low scoring k-mers through masking
@@ -88,7 +88,7 @@ void IndexBuilder::fillDatabase(IndexTable *indexTable,
   char *idScoreLookup = NULL;
   if (Parameters::isEqualDbtype(
           seq->getSeqType(), Parameters::DBTYPE_PROFILE_STATE_SEQ) == false) {
-    idScoreLookup = getScoreLookup(subMat);
+    idScoreLookup = getScoreLookup(out, subMat);
   }
   Log::Progress progress(dbTo - dbFrom);
 
@@ -101,14 +101,14 @@ void IndexBuilder::fillDatabase(IndexTable *indexTable,
     thread_idx = static_cast<unsigned int>(omp_get_thread_num());
 #endif
 
-    Indexer idxer(static_cast<unsigned int>(indexTable->getAlphabetSize()),
+    Indexer idxer(out, static_cast<unsigned int>(indexTable->getAlphabetSize()),
                   seq->getKmerSize());
-    Sequence s(seq->getMaxLen(), seq->getSeqType(), &subMat, seq->getKmerSize(),
+    Sequence s(out, seq->getMaxLen(), seq->getSeqType(), &subMat, seq->getKmerSize(),
                seq->isSpaced(), false, true, seq->getUserSpacedKmerPattern());
 
     KmerGenerator *generator = NULL;
     if (isProfile) {
-      generator = new KmerGenerator(seq->getKmerSize(),
+      generator = new KmerGenerator(out, seq->getKmerSize(),
                                     indexTable->getAlphabetSize(), kmerThr);
       generator->setDivideStrategy(s.profile_matrix);
     }
@@ -213,16 +213,16 @@ void IndexBuilder::fillDatabase(IndexTable *indexTable,
 #ifdef OPENMP
     thread_idx = static_cast<unsigned int>(omp_get_thread_num());
 #endif
-    Sequence s(seq->getMaxLen(), seq->getSeqType(), &subMat, seq->getKmerSize(),
+    Sequence s(out, seq->getMaxLen(), seq->getSeqType(), &subMat, seq->getKmerSize(),
                seq->isSpaced(), false, true, seq->getUserSpacedKmerPattern());
-    Indexer idxer(static_cast<unsigned int>(indexTable->getAlphabetSize()),
+    Indexer idxer(out, static_cast<unsigned int>(indexTable->getAlphabetSize()),
                   seq->getKmerSize());
     IndexEntryLocalTmp *buffer = static_cast<IndexEntryLocalTmp *>(
         malloc(seq->getMaxLen() * sizeof(IndexEntryLocalTmp)));
     size_t bufferSize = seq->getMaxLen();
     KmerGenerator *generator = NULL;
     if (isProfile) {
-      generator = new KmerGenerator(seq->getKmerSize(),
+      generator = new KmerGenerator(out, seq->getKmerSize(),
                                     indexTable->getAlphabetSize(), kmerThr);
       generator->setDivideStrategy(s.profile_matrix);
     }

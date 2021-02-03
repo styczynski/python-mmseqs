@@ -29,14 +29,14 @@ QueryMatcher::QueryMatcher(mmseqs_output* output, IndexTable *indexTable,
                            size_t maxHitsPerQuery, bool aaBiasCorrection,
                            bool diagonalScoring, unsigned int minDiagScoreThr,
                            bool takeOnlyBestKmer)
-    : out(output), idx(indexTable->getAlphabetSize(), kmerSize) {
+    : out(output), idx(output, indexTable->getAlphabetSize(), kmerSize) {
   this->kmerSubMat = kmerSubMat;
   this->ungappedAlignmentSubMat = ungappedAlignmentSubMat;
   this->indexTable = indexTable;
   this->kmerSize = kmerSize;
   this->kmerThr = kmerThr;
   this->kmerGenerator =
-      new KmerGenerator(kmerSize, indexTable->getAlphabetSize(), kmerThr);
+      new KmerGenerator(out, kmerSize, indexTable->getAlphabetSize(), kmerThr);
   this->aaBiasCorrection = aaBiasCorrection;
   this->takeOnlyBestKmer = takeOnlyBestKmer;
   this->stats = new statistics_t();
@@ -50,15 +50,15 @@ QueryMatcher::QueryMatcher(mmseqs_output* output, IndexTable *indexTable,
   this->resList =
       (hit_t *)mem_align(ALIGN_INT, maxHitsPerQuery * sizeof(hit_t));
   this->databaseHits = new (std::nothrow) IndexEntryLocal[maxDbMatches];
-  Util::checkAllocation(databaseHits,
+  Util::checkAllocation(out, databaseHits,
                         "Can not allocate databaseHits memory in QueryMatcher");
   this->foundDiagonals =
       (CounterResult *)calloc(foundDiagonalsSize, sizeof(CounterResult));
   Util::checkAllocation(
-      foundDiagonals, "Can not allocate foundDiagonals memory in QueryMatcher");
+      out, foundDiagonals, "Can not allocate foundDiagonals memory in QueryMatcher");
   this->lastSequenceHit = this->databaseHits + maxDbMatches;
   this->indexPointer = new (std::nothrow) IndexEntryLocal *[maxSeqLen + 1];
-  Util::checkAllocation(indexPointer,
+  Util::checkAllocation(out, indexPointer,
                         "Can not allocate indexPointer memory in QueryMatcher");
   this->diagonalScoring = diagonalScoring;
   this->minDiagScoreThr = minDiagScoreThr;
@@ -68,8 +68,6 @@ QueryMatcher::QueryMatcher(mmseqs_output* output, IndexTable *indexTable,
   // this array will need 128 * (maxDbMatches / 128) * 5byte ~ 500MB for 50 Mio.
   // Sequences
   initDiagonalMatcher(dbSize, maxDbMatches);
-  //    this->diagonalMatcher = new CacheFriendlyOperations(dbSize, maxDbMatches
-  //    / 128 );
   // needed for p-value calc.
   ungappedAlignment = NULL;
   if (diagonalScoring) {
@@ -406,7 +404,7 @@ void QueryMatcher::initDiagonalMatcher(size_t dbsize,
   uint64_t l2CacheSize = Util::getL2CacheSize();
 #define INIT(x)                                                 \
   cachedOperation##x =                                          \
-      new CacheFriendlyOperations<x>(dbsize, maxDbMatches / x); \
+      new CacheFriendlyOperations<x>(out, dbsize, maxDbMatches / x); \
   activeCounter = x;
   if (dbsize / 2 < l2CacheSize) {
     INIT(2)

@@ -63,24 +63,24 @@ class PrefilteringIndexReader {
       int kmerThr, int splits);
 
   static DBReader<unsigned int> *openNewHeaderReader(
-      DBReader<unsigned int> *dbr, unsigned int dataIdx, unsigned int indexIdx,
+      mmseqs_output* out, DBReader<unsigned int> *dbr, unsigned int dataIdx, unsigned int indexIdx,
       int threads, bool touchIndex, bool touchData);
 
-  static DBReader<unsigned int> *openNewReader(DBReader<unsigned int> *dbr,
+  static DBReader<unsigned int> *openNewReader(mmseqs_output* out, DBReader<unsigned int> *dbr,
                                                unsigned int dataIdx,
                                                unsigned int indexIdx,
                                                bool includeData, int threads,
                                                bool touchIndex, bool touchData);
 
-  static SequenceLookup *getSequenceLookup(unsigned int split,
+  static SequenceLookup *getSequenceLookup(mmseqs_output* out, unsigned int split,
                                            DBReader<unsigned int> *dbr,
                                            int preloadMode);
 
-  static IndexTable *getIndexTable(unsigned int split,
+  static IndexTable *getIndexTable(mmseqs_output* out, unsigned int split,
                                    DBReader<unsigned int> *dbr,
                                    int preloadMode);
 
-  static void printSummary(DBReader<unsigned int> *dbr);
+  static void printSummary(mmseqs_output* out, DBReader<unsigned int> *dbr);
 
   static PrefilteringIndexData getMetadata(DBReader<unsigned int> *dbr);
 
@@ -96,12 +96,12 @@ class PrefilteringIndexReader {
   static ScoreMatrix get3MerScoreMatrix(DBReader<unsigned int> *dbr,
                                         int preloadMode);
 
-  static std::string searchForIndex(const std::string &pathToDB);
+  static std::string searchForIndex(mmseqs_output* out, const std::string &pathToDB);
 
   static std::string dbPathWithoutIndex(std::string &dbname);
 
  private:
-  static void printMeta(int *meta);
+  static void printMeta(mmseqs_output* out, int *meta);
 };
 
 #endif

@@ -5,7 +5,7 @@
 
 class ReducedMatrix : public BaseMatrix {
  public:
-  ReducedMatrix(double** probMatrix, float** rMatrix, unsigned char* aa2num,
+  ReducedMatrix(mmseqs_output* output, double** probMatrix, float** rMatrix, unsigned char* aa2num,
                 char* num2aa, size_t orgAlphabetSize,
                 size_t reducedAlphabetSize, float bitFactor);
   virtual ~ReducedMatrix();

@@ -8,23 +8,24 @@
 #include <mmseqs/output.h>
 #include <mmseqs/commons/util.h>
 
-SequenceLookup::SequenceLookup(size_t sequenceCount, size_t dataSize)
-    : sequenceCount(sequenceCount),
+SequenceLookup::SequenceLookup(mmseqs_output* output, size_t sequenceCount, size_t dataSize)
+    : out(output), sequenceCount(sequenceCount),
       dataSize(dataSize),
       currentIndex(0),
       currentOffset(0),
       externalData(false) {
   data = new (std::nothrow) char[dataSize + 1];
-  Util::checkAllocation(data, "Can not allocate data memory in SequenceLookup");
+  Util::checkAllocation(out, data, "Can not allocate data memory in SequenceLookup");
 
   offsets = new (std::nothrow) size_t[sequenceCount + 1];
-  Util::checkAllocation(offsets,
+  Util::checkAllocation(out, offsets,
                         "Can not allocate offsets memory in SequenceLookup");
   offsets[sequenceCount] = dataSize;
 }
 
-SequenceLookup::SequenceLookup(size_t sequenceCount)
-    : sequenceCount(sequenceCount),
+SequenceLookup::SequenceLookup(mmseqs_output* output, size_t sequenceCount)
+    : out(output),
+      sequenceCount(sequenceCount),
       data(NULL),
       dataSize(0),
       offsets(NULL),

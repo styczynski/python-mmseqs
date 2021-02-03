@@ -19,7 +19,7 @@
 #include <omp.h>
 #endif
 
-int doRescorealldiagonal(Parameters &par, DBReader<unsigned int> &qdbr,
+int doRescorealldiagonal(mmseqs_output* out, Parameters &par, DBReader<unsigned int> &qdbr,
                          DBWriter &resultWriter, size_t dbStart,
                          size_t dbSize) {
   int querySeqType = qdbr.getDbtype();
@@ -30,6 +30,7 @@ int doRescorealldiagonal(Parameters &par, DBReader<unsigned int> &qdbr,
     tdbr = &qdbr;
   } else {
     tdbr = new DBReader<unsigned int>(
+        out,
         par.db2.c_str(), par.db2Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
     tdbr->open(DBReader<unsigned int>::NOSORT);
@@ -48,8 +49,8 @@ int doRescorealldiagonal(Parameters &par, DBReader<unsigned int> &qdbr,
   EvalueComputation *evaluer;
   int8_t *tinySubMat;
   if (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_NUCLEOTIDES)) {
-    subMat = new NucleotideMatrix(par.scoringMatrixFile.nucleotides, 1.0, 0.0);
-    evaluer = new EvalueComputation(tdbr->getAminoAcidDBSize(), subMat);
+    subMat = new NucleotideMatrix(out, par.scoringMatrixFile.nucleotides, 1.0, 0.0);
+    evaluer = new EvalueComputation(out, tdbr->getAminoAcidDBSize(), subMat);
     tinySubMat = new int8_t[subMat->alphabetSize * subMat->alphabetSize];
     for (int i = 0; i < subMat->alphabetSize; i++) {
       for (int j = 0; j < subMat->alphabetSize; j++) {
@@ -58,9 +59,10 @@ int doRescorealldiagonal(Parameters &par, DBReader<unsigned int> &qdbr,
     }
   } else if (Parameters::isEqualDbtype(targetSeqType,
                                        Parameters::DBTYPE_PROFILE_STATE_SEQ)) {
-    SubstitutionMatrix sMat(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
-    evaluer = new EvalueComputation(tdbr->getAminoAcidDBSize(), &sMat);
+    SubstitutionMatrix sMat(out, par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+    evaluer = new EvalueComputation(out, tdbr->getAminoAcidDBSize(), &sMat);
     subMat = new SubstitutionMatrixProfileStates(
+        out,
         sMat.matrixName, sMat.probMatrix, sMat.pBack,
         sMat.subMatrixPseudoCounts, 2.0, 0.0, 219);
     tinySubMat = new int8_t[sMat.alphabetSize * sMat.alphabetSize];
@@ -71,8 +73,8 @@ int doRescorealldiagonal(Parameters &par, DBReader<unsigned int> &qdbr,
     }
   } else {
     // keep score bias at 0.0 (improved ROC)
-    subMat = new SubstitutionMatrix(par.scoringMatrixFile.aminoacids, 2.0, 0.0);
-    evaluer = new EvalueComputation(tdbr->getAminoAcidDBSize(), subMat);
+    subMat = new SubstitutionMatrix(out, par.scoringMatrixFile.aminoacids, 2.0, 0.0);
+    evaluer = new EvalueComputation(out, tdbr->getAminoAcidDBSize(), subMat);
     tinySubMat = new int8_t[subMat->alphabetSize * subMat->alphabetSize];
     for (int i = 0; i < subMat->alphabetSize; i++) {
       for (int j = 0; j < subMat->alphabetSize; j++) {
@@ -92,9 +94,9 @@ int doRescorealldiagonal(Parameters &par, DBReader<unsigned int> &qdbr,
     char buffer[1024 + 32768];
     std::vector<hit_t> shortResults;
     shortResults.reserve(std::max(static_cast<size_t>(1), tdbr->getSize() / 5));
-    Sequence qSeq(par.maxSeqLen, querySeqType, subMat, 0, false,
+    Sequence qSeq(out, par.maxSeqLen, querySeqType, subMat, 0, false,
                   par.compBiasCorrection);
-    Sequence tSeq(par.maxSeqLen, targetSeqType, subMat, 0, false,
+    Sequence tSeq(out, par.maxSeqLen, targetSeqType, subMat, 0, false,
                   par.compBiasCorrection);
     SmithWaterman aligner(par.maxSeqLen, subMat->alphabetSize,
                           par.compBiasCorrection);
@@ -182,6 +184,7 @@ int ungappedprefilter(mmseqs_output *out, Parameters &par) {
   //    Parameters &par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true, 0, 0);
   DBReader<unsigned int> qdbr(
+      out,
       par.db1.c_str(), par.db1Index.c_str(), par.threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   qdbr.open(DBReader<unsigned int>::NOSORT);
@@ -197,7 +200,7 @@ int ungappedprefilter(mmseqs_output *out, Parameters &par) {
                                   &dbSize);
   std::pair<std::string, std::string> tmpOutput =
       Util::createTmpFileNames(par.db3, par.db3Index, MMseqsMPI::rank);
-  DBWriter resultWriter(tmpOutput.first.c_str(), tmpOutput.second.c_str(),
+  DBWriter resultWriter(out, tmpOutput.first.c_str(), tmpOutput.second.c_str(),
                         par.threads, par.compressed,
                         Parameters::DBTYPE_PREFILTER_RES);
   resultWriter.open();
@@ -212,13 +215,13 @@ int ungappedprefilter(mmseqs_output *out, Parameters &par) {
           Util::createTmpFileNames(par.db3, par.db3Index, proc);
       splitFiles.push_back(std::make_pair(tmpFile.first, tmpFile.second));
     }
-    DBWriter::mergeResults(par.db3, par.db3Index, splitFiles);
+    DBWriter::mergeResults(out, par.db3, par.db3Index, splitFiles);
   }
 #else
-  DBWriter resultWriter(par.db3.c_str(), par.db3Index.c_str(), par.threads,
+  DBWriter resultWriter(out, par.db3.c_str(), par.db3Index.c_str(), par.threads,
                         par.compressed, Parameters::DBTYPE_PREFILTER_RES);
   resultWriter.open();
-  int status = doRescorealldiagonal(par, qdbr, resultWriter, 0, qdbr.getSize());
+  int status = doRescorealldiagonal(out, par, qdbr, resultWriter, 0, qdbr.getSize());
   resultWriter.close();
 #endif
   return status;

@@ -10,8 +10,8 @@
 
 class SequenceLookup {
  public:
-  SequenceLookup(size_t dbSize, size_t entrySize);
-  SequenceLookup(size_t dbSize);
+  SequenceLookup(mmseqs_output* output, size_t dbSize, size_t entrySize);
+  SequenceLookup(mmseqs_output* output, size_t dbSize);
   ~SequenceLookup();
 
   // add sequence at offset
@@ -36,6 +36,7 @@ class SequenceLookup {
   void initLookupByExternalDataCopy(char *seqData, size_t *seqOffsets);
 
  private:
+  mmseqs_output* out;
   size_t sequenceCount;
 
   // data contains sequence data

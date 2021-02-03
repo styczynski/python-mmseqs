@@ -4,16 +4,17 @@
 #include <string>
 #include <vector>
 
+#include <mmseqs/output.h>
 #include <mmseqs/commons/baseMatrix.h>
 #include <mmseqs/commons/scoreMatrix.h>  // ScoreMatrix
 
 class ExtendedSubstitutionMatrix {
  public:
-  static ScoreMatrix calcScoreMatrix(const BaseMatrix& matrix,
+  static ScoreMatrix calcScoreMatrix(mmseqs_output* out, const BaseMatrix& matrix,
                                      const size_t kmerSize);
   static void freeScoreMatrix(ScoreMatrix& matrix);
 
-  static short calcScore(unsigned char* i_seq, unsigned char* j_seq,
+  static short calcScore(mmseqs_output* out, unsigned char* i_seq, unsigned char* j_seq,
                          size_t seq_size, short** subMatrix);
 
  private:

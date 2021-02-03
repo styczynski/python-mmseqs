@@ -59,7 +59,7 @@ void PrefilteringIndexReader::createIndexFile(
   const int SPLIT_SEQS = splits > 1 ? 1 : 0;
   const int SPLIT_INDX = splits > 1 ? 2 : 0;
 
-  DBWriter writer(outDB.c_str(), std::string(outDB).append(".index").c_str(),
+  DBWriter writer(out, outDB.c_str(), std::string(outDB).append(".index").c_str(),
                   splits > 1 ? splits + 2 : 1, Parameters::WRITER_ASCII_MODE,
                   Parameters::DBTYPE_INDEX_DB);
   writer.open();
@@ -90,8 +90,8 @@ void PrefilteringIndexReader::createIndexFile(
           seqType, Parameters::DBTYPE_PROFILE_STATE_SEQ) == false) {
     int alphabetSize = subMat->alphabetSize;
     subMat->alphabetSize = subMat->alphabetSize - 1;
-    ScoreMatrix s3 = ExtendedSubstitutionMatrix::calcScoreMatrix(*subMat, 3);
-    ScoreMatrix s2 = ExtendedSubstitutionMatrix::calcScoreMatrix(*subMat, 2);
+    ScoreMatrix s3 = ExtendedSubstitutionMatrix::calcScoreMatrix(out, *subMat, 3);
+    ScoreMatrix s2 = ExtendedSubstitutionMatrix::calcScoreMatrix(out, *subMat, 2);
     subMat->alphabetSize = alphabetSize;
 
     char *serialized3mer = ScoreMatrix::serialize(s3);
@@ -214,7 +214,7 @@ void PrefilteringIndexReader::createIndexFile(
     free(data);
   }
 
-  Sequence seq(maxSeqLen, seqType, subMat, kmerSize, hasSpacedKmer,
+  Sequence seq(out, maxSeqLen, seqType, subMat, kmerSize, hasSpacedKmer,
                compBiasCorrection, true, spacedKmerPattern);
   // remove x (not needed in index)
   const int adjustAlphabetSize =
@@ -231,9 +231,10 @@ void PrefilteringIndexReader::createIndexFile(
       continue;
     }
 
-    IndexTable indexTable(adjustAlphabetSize, kmerSize, false);
+    IndexTable indexTable(out, adjustAlphabetSize, kmerSize, false);
     SequenceLookup *sequenceLookup = NULL;
     IndexBuilder::fillDatabase(
+        out,
         &indexTable,
         (maskMode == 1 || maskLowerCase == 1) ? &sequenceLookup : NULL,
         (maskMode == 0) ? &sequenceLookup : NULL, *subMat, &seq, dbr1, dbFrom,
@@ -307,6 +308,7 @@ void PrefilteringIndexReader::createIndexFile(
 }
 
 DBReader<unsigned int> *PrefilteringIndexReader::openNewHeaderReader(
+    mmseqs_output* out,
     DBReader<unsigned int> *dbr, unsigned int dataIdx, unsigned int indexIdx,
     int threads, bool touchIndex, bool touchData) {
   size_t indexId = dbr->getId(indexIdx);
@@ -327,7 +329,7 @@ DBReader<unsigned int> *PrefilteringIndexReader::openNewHeaderReader(
   }
 
   DBReader<unsigned int> *reader =
-      DBReader<unsigned int>::unserialize(indexData, threads);
+      DBReader<unsigned int>::unserialize(out, indexData, threads);
   reader->open(DBReader<unsigned int>::NOSORT);
   reader->setData(data, dataSize);
   reader->setMode(DBReader<unsigned int>::USE_DATA);
@@ -335,6 +337,7 @@ DBReader<unsigned int> *PrefilteringIndexReader::openNewHeaderReader(
 }
 
 DBReader<unsigned int> *PrefilteringIndexReader::openNewReader(
+    mmseqs_output* out,
     DBReader<unsigned int> *dbr, unsigned int dataIdx, unsigned int indexIdx,
     bool includeData, int threads, bool touchIndex, bool touchData) {
   size_t id = dbr->getId(indexIdx);
@@ -353,7 +356,7 @@ DBReader<unsigned int> *PrefilteringIndexReader::openNewReader(
     }
 
     DBReader<unsigned int> *reader =
-        DBReader<unsigned int>::unserialize(data, threads);
+        DBReader<unsigned int>::unserialize(out, data, threads);
     reader->open(DBReader<unsigned int>::NOSORT);
     size_t currDataOffset = dbr->getOffset(id);
     size_t nextDataOffset = dbr->findNextOffsetid(id);
@@ -364,12 +367,13 @@ DBReader<unsigned int> *PrefilteringIndexReader::openNewReader(
   }
 
   DBReader<unsigned int> *reader =
-      DBReader<unsigned int>::unserialize(data, threads);
+      DBReader<unsigned int>::unserialize(out, data, threads);
   reader->open(DBReader<unsigned int>::NOSORT);
   return reader;
 }
 
 SequenceLookup *PrefilteringIndexReader::getSequenceLookup(
+    mmseqs_output* out,
     unsigned int split, DBReader<unsigned int> *dbr, int preloadMode) {
   PrefilteringIndexData data = getMetadata(dbr);
   if (split >= (unsigned int)data.splits) {
@@ -396,7 +400,7 @@ SequenceLookup *PrefilteringIndexReader::getSequenceLookup(
 
   if (preloadMode == Parameters::PRELOAD_MODE_FREAD) {
     SequenceLookup *sequenceLookup =
-        new SequenceLookup(sequenceCount, seqDataSize);
+        new SequenceLookup(out, sequenceCount, seqDataSize);
     sequenceLookup->initLookupByExternalDataCopy(seqData,
                                                  (size_t *)seqOffsetsData);
     return sequenceLookup;
@@ -407,13 +411,13 @@ SequenceLookup *PrefilteringIndexReader::getSequenceLookup(
     dbr->touchData(seqOffsetsId);
   }
 
-  SequenceLookup *sequenceLookup = new SequenceLookup(sequenceCount);
+  SequenceLookup *sequenceLookup = new SequenceLookup(out, sequenceCount);
   sequenceLookup->initLookupByExternalData(seqData, seqDataSize,
                                            (size_t *)seqOffsetsData);
   return sequenceLookup;
 }
 
-IndexTable *PrefilteringIndexReader::getIndexTable(unsigned int split,
+IndexTable *PrefilteringIndexReader::getIndexTable(mmseqs_output* out, unsigned int split,
                                                    DBReader<unsigned int> *dbr,
                                                    int preloadMode) {
   PrefilteringIndexData data = getMetadata(dbr);
@@ -443,7 +447,7 @@ IndexTable *PrefilteringIndexReader::getIndexTable(unsigned int split,
 
   if (preloadMode == Parameters::PRELOAD_MODE_FREAD) {
     IndexTable *table =
-        new IndexTable(adjustAlphabetSize, data.kmerSize, false);
+        new IndexTable(out, adjustAlphabetSize, data.kmerSize, false);
     table->initTableByExternalDataCopy(sequenceCount, entriesNum,
                                        (IndexEntryLocal *)entriesData,
                                        (size_t *)entriesOffsetsData);
@@ -457,14 +461,14 @@ IndexTable *PrefilteringIndexReader::getIndexTable(unsigned int split,
     dbr->touchData(entriesOffsetsDataId);
   }
 
-  IndexTable *table = new IndexTable(adjustAlphabetSize, data.kmerSize, true);
+  IndexTable *table = new IndexTable(out, adjustAlphabetSize, data.kmerSize, true);
   table->initTableByExternalData(sequenceCount, entriesNum,
                                  (IndexEntryLocal *)entriesData,
                                  (size_t *)entriesOffsetsData);
   return table;
 }
 
-void PrefilteringIndexReader::printSummary(DBReader<unsigned int> *dbr) {
+void PrefilteringIndexReader::printSummary(mmseqs_output* out, DBReader<unsigned int> *dbr) {
   out->info("Index version: {}\n", dbr->getDataByDBKey(VERSION, 0)
                     );
 
@@ -488,7 +492,7 @@ void PrefilteringIndexReader::printSummary(DBReader<unsigned int> *dbr) {
                     );
 }
 
-void PrefilteringIndexReader::printMeta(int *metadata_tmp) {
+void PrefilteringIndexReader::printMeta(mmseqs_output* out, int *metadata_tmp) {
   out->info("MaxSeqLength: {}", metadata_tmp[0]);
   out->info("KmerSize:     {}", metadata_tmp[1]);
   out->info("CompBiasCorr: {}", metadata_tmp[2]);
@@ -607,6 +611,7 @@ ScoreMatrix PrefilteringIndexReader::get3MerScoreMatrix(
 }
 
 std::string PrefilteringIndexReader::searchForIndex(
+    mmseqs_output* out,
     const std::string &pathToDB) {
   std::string outIndexName = pathToDB + ".idx";
   if (FileUtil::fileExists(out, (outIndexName + ".dbtype").c_str()) == true) {

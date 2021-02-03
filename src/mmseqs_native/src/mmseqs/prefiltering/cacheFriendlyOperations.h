@@ -56,7 +56,7 @@ class CacheFriendlyOperations {
   static const unsigned int MASK_0_5 = BINSIZE - 1;
   static const unsigned int MASK_0_5_BIT = BITS_TO_REPRESENT(MASK_0_5);
 
-  CacheFriendlyOperations(size_t maxElement, size_t initBinSize);
+  CacheFriendlyOperations(mmseqs_output* output, size_t maxElement, size_t initBinSize);
   ~CacheFriendlyOperations();
 
   size_t findDuplicates(IndexEntryLocal **input, CounterResult *output,
@@ -76,6 +76,7 @@ class CacheFriendlyOperations {
                                  const size_t N);
 
  private:
+  mmseqs_output* out;
   // this bit array should fit in L1/L2
   size_t duplicateBitArraySize;
   unsigned char *duplicateBitArray;

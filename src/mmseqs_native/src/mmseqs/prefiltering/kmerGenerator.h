@@ -8,7 +8,7 @@
 
 class KmerGenerator {
  public:
-  KmerGenerator(size_t kmerSize, size_t alphabetSize, short threshold);
+  KmerGenerator(mmseqs_output* output, size_t kmerSize, size_t alphabetSize, short threshold);
   ~KmerGenerator();
   /*calculates the kmer list */
   std::pair<size_t *, size_t> generateKmerList(const unsigned char *intSeq,
@@ -25,6 +25,7 @@ class KmerGenerator {
   void setThreshold(short threshold);
 
  private:
+  mmseqs_output* out;
   /*creates the product between two arrays and write it to the output array */
   size_t calculateArrayProduct(
       const short *__restrict scoreArray1, const size_t *__restrict indexArray1,

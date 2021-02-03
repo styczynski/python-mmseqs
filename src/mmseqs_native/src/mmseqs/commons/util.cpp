@@ -29,7 +29,7 @@ int Util::readMapping(
     mmseqs_output* out,
     std::string mappingFilename,
     std::vector<std::pair<unsigned int, unsigned int>> &mapping) {
-  MemoryMapped indexData(mappingFilename, MemoryMapped::WholeFile,
+  MemoryMapped indexData(out, mappingFilename, MemoryMapped::WholeFile,
                          MemoryMapped::SequentialScan);
   if (!indexData.isValid()) {
     out->failure("Could not open index file {}", mappingFilename);
@@ -797,7 +797,7 @@ bool Util::hasCoverage(float covThr, int covMode, float queryCov,
   }
 }
 
-int Util::swapCoverageMode(int covMode) {
+int Util::swapCoverageMode(mmseqs_output* out, int covMode) {
   switch (covMode) {
     case Parameters::COV_MODE_BIDIRECTIONAL:
       return Parameters::COV_MODE_BIDIRECTIONAL;

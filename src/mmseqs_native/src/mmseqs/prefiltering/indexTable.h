@@ -71,7 +71,7 @@ class IndexTable {
         externalData(externalData),
         tableEntriesNum(0),
         size(0),
-        indexer(new Indexer(alphabetSize, kmerSize)),
+        indexer(new Indexer(output, alphabetSize, kmerSize)),
         entries(NULL),
         offsets(NULL) {
     if (externalData == false) {

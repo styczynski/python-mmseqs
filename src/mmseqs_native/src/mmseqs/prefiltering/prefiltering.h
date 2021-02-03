@@ -38,24 +38,27 @@ class Prefiltering {
 
   // merge file
   void mergePrefilterSplits(
+      mmseqs_output* out,
       const std::string &outDb, const std::string &outDBIndex,
       const std::vector<std::pair<std::string, std::string>> &splitFiles);
 
   // get substitution matrix
   static BaseMatrix *getSubstitutionMatrix(
+      mmseqs_output* out,
       const MultiParam<char *> &scoringMatrixFile, MultiParam<int> alphabetSize,
       float bitFactor, bool profileState, bool isNucl);
 
-  static void setupSplit(DBReader<unsigned int> &dbr, const int alphabetSize,
+  static void setupSplit(mmseqs_output* out, DBReader<unsigned int> &dbr, const int alphabetSize,
                          const unsigned int querySeqType, const int threads,
                          const bool templateDBIsIndex, const size_t memoryLimit,
                          const size_t qDbSize, size_t &maxResListLen,
                          int &kmerSize, int &split, int &splitMode);
 
-  static int getKmerThreshold(const float sensitivity, const bool isProfile,
+  static int getKmerThreshold(mmseqs_output* out, const float sensitivity, const bool isProfile,
                               const int kmerScore, const int kmerSize);
 
   static void mergeTargetSplits(
+      mmseqs_output* out,
       const std::string &outDB, const std::string &outDBIndex,
       const std::vector<std::pair<std::string, std::string>> &fileNames,
       unsigned int threads);
@@ -113,7 +116,7 @@ class Prefiltering {
                 const std::string &resultDBIndex, size_t split, bool merge);
 
   // compute kmer size and split size for index table
-  static std::pair<int, int> optimizeSplit(size_t totalMemoryInByte,
+  static std::pair<int, int> optimizeSplit(mmseqs_output* out, size_t totalMemoryInByte,
                                            DBReader<unsigned int> *tdbr,
                                            int alphabetSize, int kmerSize,
                                            unsigned int querySeqType,
@@ -127,17 +130,17 @@ class Prefiltering {
   static size_t estimateHDDMemoryConsumption(size_t dbSize,
                                              size_t maxResListLen);
 
-  ScoreMatrix getScoreMatrix(const BaseMatrix &matrix, const size_t kmerSize);
+  ScoreMatrix getScoreMatrix(mmseqs_output* out, const BaseMatrix &matrix, const size_t kmerSize);
 
   // needed for index lookup
   void getIndexTable(mmseqs_output *out, int split, size_t dbFrom,
                      size_t dbSize);
 
-  void printStatistics(const statistics_t &stats, std::list<int> **reslens,
+  void printStatistics(mmseqs_output* out, const statistics_t &stats, std::list<int> **reslens,
                        unsigned int resLensSize, size_t empty,
                        size_t maxResults);
 
-  bool isSameQTDB();
+  bool isSameQTDB(mmseqs_output* out);
 };
 
 #endif

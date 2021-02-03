@@ -14,6 +14,16 @@
 #include <mmseqs/commons/timer.h>
 #include <mmseqs/commons/util.h>
 
+#ifndef EXIT
+#define EXIT(exitCode)         \
+  do {                         \
+    int __status = (exitCode); \
+    std::cerr.flush();         \
+    std::cout.flush();         \
+    exit(__status);            \
+  } while (0)
+#endif
+
 class Log {
  public:
   static const int NOTHING = 0;
@@ -31,9 +41,7 @@ class Log {
      setLogLevel(level);
   };
 
-  ~Log() {
-
-  }
+  ~Log() {}
 
   template<typename FormatString, typename... Args>
   void error(const FormatString &fmt, Args&&...args) {

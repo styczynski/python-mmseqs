@@ -1,14 +1,58 @@
 #ifndef OUTPUT_H
 #define OUTPUT_H
 
-struct mmseqs_output;
-
-#include <mmseqs/commons/util.h>
-#include <mmseqs/commons/log.h>
-
 #include <iostream>
 #include <map>
 #include <string>
+
+struct mmseqs_output;
+
+template <typename T>
+struct assert_false : std::false_type {};
+
+template <typename T>
+std::string SSTR(T) {
+  static_assert(assert_false<T>::value, "Not implemented for requested type");
+  return "";
+}
+
+template <>
+std::string SSTR(const char *);
+template <>
+std::string SSTR(char *);
+template <>
+std::string SSTR(bool);
+template <>
+std::string SSTR(const char[]);
+template <>
+std::string SSTR(const std::string &);
+template <>
+std::string SSTR(std::string);
+template <>
+std::string SSTR(char);
+template <>
+std::string SSTR(short);
+template <>
+std::string SSTR(unsigned short);
+template <>
+std::string SSTR(int);
+template <>
+std::string SSTR(unsigned int);
+template <>
+std::string SSTR(long);
+template <>
+std::string SSTR(unsigned long);
+template <>
+std::string SSTR(long long);
+template <>
+std::string SSTR(unsigned long long);
+template <>
+std::string SSTR(double);
+template <>
+std::string SSTR(float);
+
+#include <mmseqs/commons/util.h>
+#include <mmseqs/commons/log.h>
 
 struct mmseqs_blast_tab_record {
   std::string query_sequence_id;

@@ -6,17 +6,19 @@
 #include <omp.h>
 #endif
 
-Aggregation::Aggregation(const std::string &targetDbName,
+Aggregation::Aggregation(mmseqs_output* output, const std::string &targetDbName,
                          const std::string &resultDbName,
                          const std::string &outputDbName, unsigned int threads,
                          unsigned int compressed)
-    : resultDbName(resultDbName),
+    : out(output),
+      resultDbName(resultDbName),
       outputDbName(outputDbName),
       threads(threads),
       compressed(compressed) {
   std::string sizeDbName = targetDbName + "_member_to_set";
   std::string sizeDbIndex = targetDbName + "_member_to_set.index";
   targetSetReader = new DBReader<unsigned int>(
+      out,
       sizeDbName.c_str(), sizeDbIndex.c_str(), threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   targetSetReader->open(DBReader<unsigned int>::NOSORT);
@@ -58,12 +60,13 @@ void Aggregation::buildMap(
 int Aggregation::run() {
   std::string inputDBIndex = resultDbName + ".index";
   DBReader<unsigned int> reader(
+      out,
       resultDbName.c_str(), inputDBIndex.c_str(), threads,
       DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
   reader.open(DBReader<unsigned int>::LINEAR_ACCCESS);
 
   std::string outputDBIndex = outputDbName + ".index";
-  DBWriter writer(outputDbName.c_str(), outputDBIndex.c_str(), threads,
+  DBWriter writer(out, outputDbName.c_str(), outputDBIndex.c_str(), threads,
                   compressed, Parameters::DBTYPE_ALIGNMENT_RES);
   writer.open();
   Log::Progress progress(reader.getSize());

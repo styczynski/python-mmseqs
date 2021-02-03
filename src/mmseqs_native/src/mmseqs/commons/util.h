@@ -10,63 +10,9 @@
 #include <mmseqs/commons/mMseqsMPI.h>
 #include <mmseqs/output.h>
 
-#ifndef EXIT
-#define EXIT(exitCode)         \
-  do {                         \
-    int __status = (exitCode); \
-    std::cerr.flush();         \
-    std::cout.flush();         \
-    exit(__status);            \
-  } while (0)
-#endif
-
 #define BIT_SET(a, b) ((a) | (1ULL << (b)))
 #define BIT_CLEAR(a, b) ((a) & ~(1ULL << (b)))
 #define BIT_CHECK(a, b) (!!((a) & (1ULL << (b))))
-
-template <typename T>
-struct assert_false : std::false_type {};
-
-template <typename T>
-std::string SSTR(T) {
-  static_assert(assert_false<T>::value, "Not implemented for requested type");
-  return "";
-}
-
-template <>
-std::string SSTR(const char *);
-template <>
-std::string SSTR(char *);
-template <>
-std::string SSTR(bool);
-template <>
-std::string SSTR(const char[]);
-template <>
-std::string SSTR(const std::string &);
-template <>
-std::string SSTR(std::string);
-template <>
-std::string SSTR(char);
-template <>
-std::string SSTR(short);
-template <>
-std::string SSTR(unsigned short);
-template <>
-std::string SSTR(int);
-template <>
-std::string SSTR(unsigned int);
-template <>
-std::string SSTR(long);
-template <>
-std::string SSTR(unsigned long);
-template <>
-std::string SSTR(long long);
-template <>
-std::string SSTR(unsigned long long);
-template <>
-std::string SSTR(double);
-template <>
-std::string SSTR(float);
 
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
@@ -356,7 +302,7 @@ class Util {
   static bool hasCoverage(float covThr, int covMode, float queryCov,
                           float targetCov);
 
-  static int swapCoverageMode(int covMode);
+  static int swapCoverageMode(mmseqs_output* out, int covMode);
 
   static float computeSeqId(int seqIdMode, int aaIds, int qLen, int tLen,
                             int alnLen);

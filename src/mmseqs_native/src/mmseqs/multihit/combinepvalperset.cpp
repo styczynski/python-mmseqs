@@ -29,18 +29,19 @@ void precomputeLogB(const unsigned int orfCount, const double pvalThreshold,
 
 class PvalueAggregator : public Aggregation {
  public:
-  PvalueAggregator(std::string queryDbName, std::string targetDbName,
+  PvalueAggregator(mmseqs_output* output, std::string queryDbName, std::string targetDbName,
                    const std::string &resultDbName,
                    const std::string &outputDbName, float alpha,
                    unsigned int threads, unsigned int compressed,
                    int aggregationMode)
-      : Aggregation(targetDbName, resultDbName, outputDbName, threads,
+      : Aggregation(output, targetDbName, resultDbName, outputDbName, threads,
                     compressed),
         alpha(alpha),
         aggregationMode(aggregationMode) {
     std::string sizeDBName = queryDbName + "_set_size";
     std::string sizeDBIndex = queryDbName + "_set_size.index";
     querySizeReader = new DBReader<unsigned int>(
+        out,
         sizeDBName.c_str(), sizeDBIndex.c_str(), threads,
         DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
     querySizeReader->open(DBReader<unsigned int>::NOSORT);
@@ -48,6 +49,7 @@ class PvalueAggregator : public Aggregation {
     sizeDBName = targetDbName + "_set_size";
     sizeDBIndex = targetDbName + "_set_size.index";
     targetSizeReader = new DBReader<unsigned int>(
+        out,
         sizeDBName.c_str(), sizeDBIndex.c_str(), threads,
         DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
     targetSizeReader->open(DBReader<unsigned int>::NOSORT);
@@ -245,7 +247,7 @@ int combinepvalperset(mmseqs_output *out, Parameters &par) {
   //    Parameters &par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
-  PvalueAggregator aggregation(par.db1, par.db2, par.db3, par.db4, par.alpha,
+  PvalueAggregator aggregation(out, par.db1, par.db2, par.db3, par.db4, par.alpha,
                                (unsigned int)par.threads, par.compressed,
                                par.aggregationMode);
   return aggregation.run();

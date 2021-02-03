@@ -24,6 +24,7 @@ int prefilter(mmseqs_output* out, Parameters& par) {
   if (Parameters::isEqualDbtype(targetDbType, Parameters::DBTYPE_INDEX_DB) ==
       true) {
     DBReader<unsigned int> dbr(
+        out,
         par.db2.c_str(), par.db2Index.c_str(), par.threads,
         DBReader<unsigned int>::USE_INDEX | DBReader<unsigned int>::USE_DATA);
     dbr.open(DBReader<unsigned int>::NOSORT);

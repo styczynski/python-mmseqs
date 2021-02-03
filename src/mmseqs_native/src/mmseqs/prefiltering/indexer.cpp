@@ -1,7 +1,7 @@
 #include <mmseqs/prefiltering/indexer.h>
 #include <mmseqs/output.h>
 
-Indexer::Indexer(const size_t alphabetSize, const int maxKmerSize) {
+Indexer::Indexer(mmseqs_output* output, const size_t alphabetSize, const int maxKmerSize): out(output) {
   this->maxKmerSize = maxKmerSize;
   this->powers = new size_t[maxKmerSize];
   this->alphabetSize = alphabetSize;

@@ -3,12 +3,11 @@
 #include <_simd/simd.h>
 #include <algorithm>  // std::reverse
 
-KmerGenerator::KmerGenerator(size_t kmerSize, size_t alphabetSize,
-                             short threshold) {
+KmerGenerator::KmerGenerator(mmseqs_output* output, size_t kmerSize, size_t alphabetSize,
+                             short threshold): out(output) {
   this->threshold = threshold;
   this->kmerSize = kmerSize;
-  this->indexer = new Indexer((int)alphabetSize, (int)kmerSize);
-  //    calcDivideStrategy();
+  this->indexer = new Indexer(out, (int)alphabetSize, (int)kmerSize);
 }
 
 void KmerGenerator::setThreshold(short threshold) {

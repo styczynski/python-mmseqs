@@ -4,8 +4,8 @@
 #include <cmath>
 
 template <unsigned int BINSIZE>
-CacheFriendlyOperations<BINSIZE>::CacheFriendlyOperations(size_t maxElement,
-                                                          size_t initBinSize) {
+CacheFriendlyOperations<BINSIZE>::CacheFriendlyOperations(mmseqs_output* output, size_t maxElement,
+                                                          size_t initBinSize): out(output) {
   // find nearest upper power of 2^(x)
   size_t size = pow(2, ceil(log(maxElement) / log(2)));
   size =
@@ -13,6 +13,7 @@ CacheFriendlyOperations<BINSIZE>::CacheFriendlyOperations(size_t maxElement,
   duplicateBitArraySize = size;
   duplicateBitArray = new (std::nothrow) unsigned char[size];
   Util::checkAllocation(
+      out,
       duplicateBitArray,
       "Cannot allocate duplicateBitArray memory in CacheFriendlyOperations");
   memset(duplicateBitArray, 0, duplicateBitArraySize * sizeof(unsigned char));
@@ -21,16 +22,18 @@ CacheFriendlyOperations<BINSIZE>::CacheFriendlyOperations(size_t maxElement,
   initBinSize = pow(2, ceil(log(initBinSize) / log(2)));
   binSize = initBinSize;
   tmpElementBuffer = new (std::nothrow) TmpResult[binSize];
-  Util::checkAllocation(
+  Util::checkAllocation(out,
       tmpElementBuffer,
       "Cannot allocate tmpElementBuffer memory in CacheFriendlyOperations");
 
   bins = new (std::nothrow) CounterResult *[BINCOUNT];
   Util::checkAllocation(
+      out,
       bins, "Cannot allocate bins memory in CacheFriendlyOperations");
 
   binDataFrame = new (std::nothrow) CounterResult[BINCOUNT * binSize];
   Util::checkAllocation(
+      out,
       binDataFrame,
       "Cannot allocate binDataFrame memory in CacheFriendlyOperations");
 }
@@ -302,6 +305,7 @@ bool CacheFriendlyOperations<BINSIZE>::checkForOverflowAndResizeArray(
       binDataFrame = new (std::nothrow) CounterResult[BINCOUNT * binSize];
       memset(binDataFrame, 0, sizeof(CounterResult) * binSize * BINCOUNT);
       Util::checkAllocation(
+          out,
           binDataFrame,
           "Cannot reallocate reallocBinMemory in CacheFriendlyOperations");
 
@@ -310,6 +314,7 @@ bool CacheFriendlyOperations<BINSIZE>::checkForOverflowAndResizeArray(
         tmpElementBuffer = new (std::nothrow) TmpResult[binSize];
         memset(tmpElementBuffer, 0, sizeof(TmpResult) * binSize);
         Util::checkAllocation(
+            out,
             tmpElementBuffer,
             "Cannot reallocate tmpElementBuffer in CacheFriendlyOperations");
       }

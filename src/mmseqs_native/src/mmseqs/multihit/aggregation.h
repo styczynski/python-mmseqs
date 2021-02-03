@@ -9,7 +9,7 @@
 
 class Aggregation {
  public:
-  Aggregation(const std::string &targetDbName, const std::string &resultDbName,
+  Aggregation(mmseqs_output* output, const std::string &targetDbName, const std::string &resultDbName,
               const std::string &outputDbName, unsigned int threads,
               unsigned int compressed);
 
@@ -24,6 +24,7 @@ class Aggregation {
       unsigned int thread_idx) = 0;
 
  protected:
+  mmseqs_output* out;
   std::string resultDbName;
   std::string outputDbName;
   DBReader<unsigned int> *targetSetReader;

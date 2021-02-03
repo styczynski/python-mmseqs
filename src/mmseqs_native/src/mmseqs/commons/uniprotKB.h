@@ -7,7 +7,7 @@
 
 class UniprotKB {
  public:
-  UniprotKB() : dbColumns(17), isInEntry(false), hasEntry(false) {
+  UniprotKB(mmseqs_output* output) : out(output), dbColumns(17), isInEntry(false), hasEntry(false) {
     streams = new std::ostringstream[dbColumns];
   };
 
@@ -41,6 +41,7 @@ class UniprotKB {
   static const std::string columnNames[];
 
  private:
+  mmseqs_output* out;
   const size_t dbColumns;
   bool isInEntry;
   bool hasEntry;

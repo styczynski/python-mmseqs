@@ -2,10 +2,10 @@
 #include <cmath>
 #include <mmseqs/commons/util.h>
 
-ReducedMatrix::ReducedMatrix(double** probMatrix, float** rMatrix,
+ReducedMatrix::ReducedMatrix(mmseqs_output* output, double** probMatrix, float** rMatrix,
                              unsigned char* aa2num, char* num2aa,
                              size_t orgAlphabetSize, size_t reducedAlphabetSize,
-                             float bitFactor) {
+                             float bitFactor): BaseMatrix(output) {
   if (reducedAlphabetSize >= orgAlphabetSize) {
     out->failure("Reduced alphabet has to be smaller than the original one!");
   }

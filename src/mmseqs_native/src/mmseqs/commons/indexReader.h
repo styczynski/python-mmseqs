@@ -23,7 +23,7 @@ class IndexReader {
           DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
       index->open(DBReader<unsigned int>::NOSORT);
       if (PrefilteringIndexReader::checkIfIndexFile(index)) {
-        PrefilteringIndexReader::printSummary(index);
+        PrefilteringIndexReader::printSummary(out, index);
         PrefilteringIndexData data =
             PrefilteringIndexReader::getMetadata(index);
         seqType = data.seqType;
@@ -31,6 +31,7 @@ class IndexReader {
         bool touchData = preloadMode & PRELOAD_DATA;
         if (databaseType & SRC_SEQUENCES) {
           sequenceReader = PrefilteringIndexReader::openNewReader(
+              out,
               index, PrefilteringIndexReader::DBR2DATA,
               PrefilteringIndexReader::DBR2INDEX,
               dataMode & DBReader<unsigned int>::USE_DATA, threads, touchIndex,
@@ -38,17 +39,19 @@ class IndexReader {
 
         } else if (databaseType & SEQUENCES) {
           sequenceReader = PrefilteringIndexReader::openNewReader(
+              out,
               index, PrefilteringIndexReader::DBR1DATA,
               PrefilteringIndexReader::DBR1INDEX,
               dataMode & DBReader<unsigned int>::USE_DATA, threads, touchIndex,
               touchData);
         } else if (databaseType & SRC_HEADERS) {
           sequenceReader = PrefilteringIndexReader::openNewHeaderReader(
-              index, PrefilteringIndexReader::HDR2DATA,
+              out, index, PrefilteringIndexReader::HDR2DATA,
               PrefilteringIndexReader::HDR2INDEX, threads, touchIndex,
               touchData);
         } else if (databaseType & HEADERS) {
           sequenceReader = PrefilteringIndexReader::openNewHeaderReader(
+              out,
               index, PrefilteringIndexReader::HDR1DATA,
               PrefilteringIndexReader::HDR1INDEX, threads, touchIndex,
               touchData);

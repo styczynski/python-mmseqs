@@ -10,10 +10,11 @@
 
 #include <iostream>
 #include <string>
+#include <mmseqs/output.h>
 
 class Indexer {
  public:
-  Indexer(const size_t alphabetSize, const int maxKmerSize);
+  Indexer(mmseqs_output* output, const size_t alphabetSize, const int maxKmerSize);
   ~Indexer();
 
   // get the index of the k-mer, beginning at "begin" in the int_seq and ending
@@ -143,6 +144,7 @@ class Indexer {
   }
 
  private:
+  mmseqs_output* out;
   size_t alphabetSize;
   size_t maxKmerSize;
   size_t lastKmerIndex;
