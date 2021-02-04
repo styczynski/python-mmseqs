@@ -85,6 +85,6 @@ class KSeqBuffer : public KSeqWrapper {
   kseq_buffer_t d;
 };
 
-KSeqWrapper* KSeqFactory(const char* file);
+KSeqWrapper* KSeqFactory(mmseqs_output* out, const char* file);
 
 #endif  // MMSEQS_KSEQWRAPPER_H

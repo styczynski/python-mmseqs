@@ -26,6 +26,7 @@ set(commons_header_files
         mmseqs/commons/nucleotideMatrix.h
         mmseqs/commons/orf.h
         mmseqs/commons/alloc.h
+        mmseqs/commons/log.h
         mmseqs/commons/profileStates.h
         mmseqs/commons/libraryReader.h
         mmseqs/commons/parameters.h
@@ -70,5 +71,6 @@ set(commons_source_files
         mmseqs/commons/tantan.cpp
         mmseqs/commons/uniprotKB.cpp
         mmseqs/commons/util.cpp
+        mmseqs/commons/log.cpp
         PARENT_SCOPE
         )

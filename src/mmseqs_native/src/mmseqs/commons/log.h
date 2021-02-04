@@ -13,7 +13,6 @@
 #include <iostream>
 #include <mmseqs/commons/mathUtil.h>
 #include <mmseqs/commons/timer.h>
-#include <mmseqs/commons/util.h>
 
 struct FatalException : public std::exception {
    std::string message_body;

@@ -136,7 +136,7 @@ redoComputation:
       kseq = new KSeqBuffer(out, reader->getData(fileIdx, 0),
                             reader->getEntryLen(fileIdx) - 1);
     } else {
-      kseq = KSeqFactory(filenames[fileIdx].c_str());
+      kseq = KSeqFactory(out, filenames[fileIdx].c_str());
     }
     if (par.createdbMode == Parameters::SEQUENCE_SPLIT_MODE_SOFT &&
         kseq->type != KSeqWrapper::KSEQ_FILE) {
