@@ -1,14 +1,9 @@
 // Public domain code from Yi-Kuo Yu & Stephen Altschul, NCBI
 
 #include <math.h>
+#include "cacode.h"
 
 #define TINY 1.0e-20;
-
-double *dvector(int, int);
-
-void nrerror(const char *);
-
-void free_dvector(double *, int, int);
 
 void ludcmp(double **a, int n, int *indx, double *d) {
   int i, imax, j, k;

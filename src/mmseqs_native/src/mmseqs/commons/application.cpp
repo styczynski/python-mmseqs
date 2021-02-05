@@ -31,7 +31,7 @@ void subcall_mmseqs(mmseqs_output *out, std::string command_name,
 }
 
 mmseqs_output call_mmseqs(std::string command_name, Parameters args) {
-  mmseqs_output out;
+  mmseqs_output out(args.logFilePath);
   subcall_mmseqs(&out, command_name, args);
   return out;
 }

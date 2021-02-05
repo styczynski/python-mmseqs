@@ -288,6 +288,8 @@ class Parameters {
 
   std::string baseTmpPath = "";
 
+  std::string logFilePath = "";
+
   // path to databases
   std::string db1;
   std::string db1Index;

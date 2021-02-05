@@ -73,6 +73,7 @@ PYBIND11_MODULE(mmseqs_native, m) {
 
   pybind11::class_<Parameters>(m, "MMSeqsCallConfig")
       .def(pybind11::init<>())
+      .def_readwrite("logFilePath", &Parameters::logFilePath)
       .def_readwrite("baseTmpPath", &Parameters::baseTmpPath)
       .def_readwrite("db1", &Parameters::db1)
       .def_readwrite("db1Index", &Parameters::db1Index)

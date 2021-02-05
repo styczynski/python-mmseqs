@@ -323,7 +323,7 @@ int apply(mmseqs_output *out, Parameters &par) {
 
         // get progress only from first thread on master
         if (thread != 0 || mpiRank != MMseqsMPI::MASTER) {
-          Log::setLogLevel(0);
+          //Log::setLogLevel(0);
         }
 
 #ifdef HAVE_MPI

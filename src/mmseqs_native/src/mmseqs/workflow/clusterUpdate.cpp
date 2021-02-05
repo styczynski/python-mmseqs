@@ -9,7 +9,7 @@
 #include <mmseqs/output.h>
 #include "update_clustering.sh.h"
 
-extern void setClusterAutomagicParameters(Parameters &par);
+extern void setClusterAutomagicParameters(mmseqs_output* out, Parameters &par);
 
 void setClusterUpdateDefaults(Parameters *p) {
   p->alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV_SEQID;
@@ -51,7 +51,7 @@ int clusterupdate(mmseqs_output *out, Parameters &par) {
   //
   //    par.parseParameters(argc, argv, command, true, 0, 0);
   setClusterUpdateMustPassAlong(&par);
-  setClusterAutomagicParameters(par);
+  setClusterAutomagicParameters(out, par);
 
   CommandCaller cmd(out);
   cmd.addVariable("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : NULL);

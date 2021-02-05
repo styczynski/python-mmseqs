@@ -9,7 +9,7 @@
 #include "taxonomy.sh.h"
 #include "taxpercontig.sh.h"
 
-extern int computeSearchMode(int queryDbType, int targetDbType,
+extern int computeSearchMode(mmseqs_output* out, int queryDbType, int targetDbType,
                              int targetSrcDbType, int searchType);
 
 void setTaxonomyDefaults(Parameters *p) {
@@ -77,7 +77,7 @@ int taxonomy(mmseqs_output *out, Parameters &par) {
     out->failure("Please recreate your database or add a .dbtype file to your sequence/profile database");
   }
 
-  int searchMode = computeSearchMode(queryDbType, targetDbType, targetSrcDbType,
+  int searchMode = computeSearchMode(out, queryDbType, targetDbType, targetSrcDbType,
                                      par.searchType);
   if ((searchMode & Parameters::SEARCH_MODE_FLAG_QUERY_NUCLEOTIDE) &&
       (searchMode & Parameters::SEARCH_MODE_FLAG_TARGET_NUCLEOTIDE)) {

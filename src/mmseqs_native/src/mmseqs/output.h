@@ -85,10 +85,9 @@ struct mmseqs_blast_tab_record {
 };
 
 struct mmseqs_output {
-  mmseqs_output() {
+  mmseqs_output(std::string file_log_output = ""): logger(file_log_output) {
     vars_str = std::map<std::string, std::string>();
     blast_tab_records = std::vector<std::vector<mmseqs_blast_tab_record>>();
-    logger = Log();
   }
 
   std::map<std::string, std::string> vars_str;

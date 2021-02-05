@@ -421,7 +421,7 @@ KmerPosition<T> *doComputation(mmseqs_output* out, size_t totalKmers, size_t has
                                size_t hashEndRange, std::string splitFile,
                                DBReader<unsigned int> &seqDbr, Parameters &par,
                                BaseMatrix *subMat) {
-  KmerPosition<T> *hashSeqPair = initKmerPositionMemory<T>(totalKmers);
+  KmerPosition<T> *hashSeqPair = initKmerPositionMemory<T>(out, totalKmers);
   size_t elementsToSort;
   if (Parameters::isEqualDbtype(seqDbr.getDbtype(),
                                 Parameters::DBTYPE_NUCLEOTIDES)) {
@@ -435,7 +435,7 @@ KmerPosition<T> *doComputation(mmseqs_output* out, size_t totalKmers, size_t has
   } else {
     std::pair<size_t, size_t> ret =
         fillKmerPositionArray<Parameters::DBTYPE_AMINO_ACIDS, T>(
-            hashSeqPair, totalKmers, seqDbr, par, subMat, true, hashStartRange,
+            out, hashSeqPair, totalKmers, seqDbr, par, subMat, true, hashStartRange,
             hashEndRange, NULL);
     elementsToSort = ret.first;
   }
@@ -486,10 +486,10 @@ KmerPosition<T> *doComputation(mmseqs_output* out, size_t totalKmers, size_t has
     if (Parameters::isEqualDbtype(seqDbr.getDbtype(),
                                   Parameters::DBTYPE_NUCLEOTIDES)) {
       writeKmersToDisk<Parameters::DBTYPE_NUCLEOTIDES, KmerEntryRev, T>(
-          splitFile, hashSeqPair, writePos + 1);
+          out, splitFile, hashSeqPair, writePos + 1);
     } else {
       writeKmersToDisk<Parameters::DBTYPE_AMINO_ACIDS, KmerEntry, T>(
-          splitFile, hashSeqPair, writePos + 1);
+          out, splitFile, hashSeqPair, writePos + 1);
     }
     delete[] hashSeqPair;
     hashSeqPair = NULL;
@@ -684,7 +684,6 @@ int kmermatcherInner(mmseqs_output* out, Parameters &par, DBReader<unsigned int>
   // memoryLimit in bytes
   size_t memoryLimit = Util::computeMemory(out, par.splitMemoryLimit);
 
-  out->info("\n");
   float kmersPerSequenceScale =
       (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_NUCLEOTIDES))
           ? par.kmersPerSequenceScale.nucleotides
@@ -702,7 +701,7 @@ int kmermatcherInner(mmseqs_output* out, Parameters &par, DBReader<unsigned int>
                    1);
 
   std::vector<std::pair<size_t, size_t>> hashRanges =
-      setupKmerSplits<T>(par, subMat, seqDbr, totalKmersPerSplit, splits);
+      setupKmerSplits<T>(out, par, subMat, seqDbr, totalKmersPerSplit, splits);
   if (splits > 1) {
     out->info("Process file into {} parts\n", hashRanges.size()
                       );
@@ -775,10 +774,10 @@ int kmermatcherInner(mmseqs_output* out, Parameters &par, DBReader<unsigned int>
       if (Parameters::isEqualDbtype(seqDbr.getDbtype(),
                                     Parameters::DBTYPE_NUCLEOTIDES)) {
         mergeKmerFilesAndOutput<Parameters::DBTYPE_NUCLEOTIDES, KmerEntryRev>(
-            dbw, splitFiles, repSequence);
+            out, dbw, splitFiles, repSequence);
       } else {
         mergeKmerFilesAndOutput<Parameters::DBTYPE_AMINO_ACIDS, KmerEntry>(
-            dbw, splitFiles, repSequence);
+            out, dbw, splitFiles, repSequence);
       }
       for (size_t i = 0; i < splitFiles.size(); i++) {
         FileUtil::remove(out, splitFiles[i].c_str());
@@ -846,7 +845,7 @@ std::vector<std::pair<size_t, size_t>> setupKmerSplits(
           out, NULL, SIZE_T_MAX, seqDbr, par, subMat, true, 0, SIZE_T_MAX, hashDist);
     } else {
       fillKmerPositionArray<Parameters::DBTYPE_AMINO_ACIDS, T>(
-          NULL, SIZE_T_MAX, seqDbr, par, subMat, true, 0, SIZE_T_MAX, hashDist);
+          out, NULL, SIZE_T_MAX, seqDbr, par, subMat, true, 0, SIZE_T_MAX, hashDist);
     }
     seqDbr.remapData();
     // figure out if machine has enough memory to run this job

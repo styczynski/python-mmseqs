@@ -24,20 +24,20 @@
 KmerSearch::ExtractKmerAndSortResult KmerSearch::extractKmerAndSort(
     mmseqs_output* out, size_t totalKmers, size_t hashStartRange, size_t hashEndRange,
     DBReader<unsigned int> &seqDbr, Parameters &par, BaseMatrix *subMat) {
-  KmerPosition<short> *hashSeqPair = initKmerPositionMemory<short>(totalKmers);
+  KmerPosition<short> *hashSeqPair = initKmerPositionMemory<short>(out, totalKmers);
   Timer timer;
   size_t elementsToSort;
   if (par.pickNbest > 1) {
     std::pair<size_t, size_t> ret =
         fillKmerPositionArray<Parameters::DBTYPE_HMM_PROFILE, short>(
-            hashSeqPair, totalKmers, seqDbr, par, subMat, false, hashStartRange,
+           out, hashSeqPair, totalKmers, seqDbr, par, subMat, false, hashStartRange,
             hashEndRange, NULL);
     elementsToSort = ret.first;
   } else if (Parameters::isEqualDbtype(seqDbr.getDbtype(),
                                        Parameters::DBTYPE_NUCLEOTIDES)) {
     std::pair<size_t, size_t> ret =
         fillKmerPositionArray<Parameters::DBTYPE_NUCLEOTIDES, short>(
-            hashSeqPair, totalKmers, seqDbr, par, subMat, false, hashStartRange,
+            out, hashSeqPair, totalKmers, seqDbr, par, subMat, false, hashStartRange,
             hashEndRange, NULL);
     elementsToSort = ret.first;
     par.kmerSize = ret.second;
@@ -45,7 +45,7 @@ KmerSearch::ExtractKmerAndSortResult KmerSearch::extractKmerAndSort(
   } else {
     std::pair<size_t, size_t> ret =
         fillKmerPositionArray<Parameters::DBTYPE_AMINO_ACIDS, short>(
-            hashSeqPair, totalKmers, seqDbr, par, subMat, false, hashStartRange,
+            out, hashSeqPair, totalKmers, seqDbr, par, subMat, false, hashStartRange,
             hashEndRange, NULL);
     elementsToSort = ret.first;
   }
@@ -246,7 +246,7 @@ int kmersearch(mmseqs_output *out, Parameters &par) {
                    1);
 
   std::vector<std::pair<size_t, size_t>> hashRanges =
-      setupKmerSplits<short>(par, subMat, queryDbr, totalKmersPerSplit, splits);
+      setupKmerSplits<short>(out, par, subMat, queryDbr, totalKmersPerSplit, splits);
 
   int outDbType = (Parameters::isEqualDbtype(queryDbr.getDbtype(),
                                              Parameters::DBTYPE_NUCLEOTIDES))
@@ -320,10 +320,10 @@ int kmersearch(mmseqs_output *out, Parameters &par) {
         if (Parameters::isEqualDbtype(queryDbr.getDbtype(),
                                       Parameters::DBTYPE_NUCLEOTIDES)) {
           writeKmersToDisk<Parameters::DBTYPE_NUCLEOTIDES, KmerEntryRev, short>(
-              tmpFiles.first, kmers, kmerCount);
+              out, tmpFiles.first, kmers, kmerCount);
         } else {
           writeKmersToDisk<Parameters::DBTYPE_AMINO_ACIDS, KmerEntry, short>(
-              tmpFiles.first, kmers, kmerCount);
+              out, tmpFiles.first, kmers, kmerCount);
         }
       }
       delete[] kmers;
@@ -340,10 +340,10 @@ int kmersearch(mmseqs_output *out, Parameters &par) {
     if (Parameters::isEqualDbtype(querySeqType,
                                   Parameters::DBTYPE_NUCLEOTIDES)) {
       mergeKmerFilesAndOutput<Parameters::DBTYPE_NUCLEOTIDES, KmerEntryRev>(
-          writer, splitFiles, empty);
+          out, writer, splitFiles, empty);
     } else {
       mergeKmerFilesAndOutput<Parameters::DBTYPE_AMINO_ACIDS, KmerEntry>(
-          writer, splitFiles, empty);
+          out, writer, splitFiles, empty);
     }
     for (size_t i = 0; i < splitFiles.size(); i++) {
       FileUtil::remove(out, splitFiles[i].c_str());

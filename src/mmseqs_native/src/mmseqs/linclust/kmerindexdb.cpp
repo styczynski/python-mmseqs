@@ -106,7 +106,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
                                    sizeof(KmerPosition<short>)) +
                    1);
   std::vector<std::pair<size_t, size_t>> hashRanges =
-      setupKmerSplits<short>(par, subMat, seqDbr, totalKmersPerSplit, splits);
+      setupKmerSplits<short>(out, par, subMat, seqDbr, totalKmersPerSplit, splits);
 
   out->info("Process file into {} parts\n", hashRanges.size());
   std::vector<std::string> splitFiles;

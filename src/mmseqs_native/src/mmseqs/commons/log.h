@@ -4,6 +4,7 @@
 
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/ostream_sink.h>
 
 #include <stdlib.h>
@@ -31,9 +32,21 @@ class Log {
   static int debugLevel;
   std::shared_ptr<spdlog::logger> logger_instance;
 
-  explicit Log() {
-     logger_instance = spdlog::stdout_color_mt("console");
-     logger_instance->set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
+  explicit Log(std::string file_log_output) {
+
+     auto console_sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+     console_sink->set_level(spdlog::level::trace);
+     console_sink->set_pattern("[%H:%M:%S %z] [%n] [%^---%L---%$] [thread %t] %v");
+
+     if (file_log_output.size() > 0) {
+        auto file_sink = std::make_shared<spdlog::sinks::basic_file_sink_mt>("mmseqs_log.log", true);
+        file_sink->set_level(spdlog::level::trace);
+        spdlog::sinks_init_list sinks = {console_sink, file_sink};
+        logger_instance = std::make_shared<spdlog::logger>("mmseqs", sinks);
+     } else {
+        logger_instance = std::make_shared<spdlog::logger>("mmseqs", console_sink);
+     }
+
      level = Log::INFO;
      setLogLevel(level);
   };
@@ -42,22 +55,22 @@ class Log {
 
   template<typename FormatString, typename... Args>
   void error(const FormatString &fmt, Args&&...args) {
-      spdlog::get("console")->error(fmt, std::forward<Args>(args)...);
+      logger_instance->error(fmt, std::forward<Args>(args)...);
   }
 
   template<typename FormatString, typename... Args>
   void info(const FormatString &fmt, Args&&...args) {
-      spdlog::get("console")->info(fmt, std::forward<Args>(args)...);
+      logger_instance->info(fmt, std::forward<Args>(args)...);
   }
 
   template<typename FormatString, typename... Args>
   void warn(const FormatString &fmt, Args&&...args) {
-      spdlog::get("console")->warn(fmt, std::forward<Args>(args)...);
+      logger_instance->warn(fmt, std::forward<Args>(args)...);
   }
 
   template<typename FormatString, typename... Args>
   void debug(const FormatString &fmt, Args&&...args) {
-      spdlog::get("console")->debug(fmt, std::forward<Args>(args)...);
+      logger_instance->debug(fmt, std::forward<Args>(args)...);
   }
 
   // log to str and return it
@@ -73,7 +86,7 @@ class Log {
 
   template<typename FormatString, typename... Args>
   void failure(const FormatString &fmt, Args&&...args) {
-      spdlog::get("console")->error(fmt, std::forward<Args>(args)...);
+      logger_instance->error(fmt, std::forward<Args>(args)...);
       // TODO: Implement MPI cleanup
 //      int __status = (exitCode);                \
 //    if (MMseqsMPI::active && __status == 0) { \
@@ -86,19 +99,19 @@ class Log {
       throw FatalException(Log::log_to_str(fmt, std::forward<Args>(args)...));
   }
 
-  static void setLogLevel(int i) {
+  void setLogLevel(int i) {
     debugLevel = i;
     if (i == Log::NOTHING) {
-        spdlog::get("console")->set_level(spdlog::level::critical);
+        logger_instance->set_level(spdlog::level::critical);
     } else if (i == Log::ERROR) {
-        spdlog::get("console")->set_level(spdlog::level::err);
+        logger_instance->set_level(spdlog::level::err);
     } else if (i == Log::WARNING) {
-        spdlog::get("console")->set_level(spdlog::level::warn);
+        logger_instance->set_level(spdlog::level::warn);
     } else if (i == Log::INFO) {
-        spdlog::get("console")->set_level(spdlog::level::debug);
+        logger_instance->set_level(spdlog::level::debug);
     } else {
         // Level not supported
-        spdlog::get("console")->set_level(spdlog::level::critical);
+        logger_instance->set_level(spdlog::level::critical);
     }
   }
 

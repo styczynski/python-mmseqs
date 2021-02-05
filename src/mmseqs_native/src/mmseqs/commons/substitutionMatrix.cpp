@@ -1,7 +1,7 @@
 #include <mmseqs/commons/substitutionMatrix.h>
 #include <mmseqs/output.h>
 #include <mmseqs/commons/util.h>
-#include "lambda_calculator.h"
+#include "cacode.h"
 
 #include <algorithm>
 #include <climits>

@@ -159,7 +159,7 @@ size_t assignGroup(KmerPosition<T> *kmers, size_t splitKmerCount,
                    bool includeOnlyExtendable, int covMode, float covThr);
 
 template <int TYPE, typename T>
-void mergeKmerFilesAndOutput(DBWriter &dbw, std::vector<std::string> tmpFiles,
+void mergeKmerFilesAndOutput(mmseqs_output* out, DBWriter &dbw, std::vector<std::string> tmpFiles,
                              std::vector<char> &repSequence);
 
 typedef std::priority_queue<FileKmerPosition, std::vector<FileKmerPosition>,
@@ -174,7 +174,7 @@ void setKmerLengthAndAlphabet(Parameters &parameters, size_t aaDbSize,
                               int seqType);
 
 template <int TYPE, typename T, typename seqLenType>
-void writeKmersToDisk(std::string tmpFile, KmerPosition<seqLenType> *kmers,
+void writeKmersToDisk(mmseqs_output* out, std::string tmpFile, KmerPosition<seqLenType> *kmers,
                       size_t totalKmers);
 
 template <int TYPE, typename T>
@@ -190,11 +190,11 @@ KmerPosition<T> *doComputation(size_t totalKmers, size_t split, size_t splits,
                                size_t chooseTopKmer,
                                float chooseTopKmerScale = 0.0);
 template <typename T>
-KmerPosition<T> *initKmerPositionMemory(size_t size);
+KmerPosition<T> *initKmerPositionMemory(mmseqs_output* out, size_t size);
 
 template <int TYPE, typename T>
 std::pair<size_t, size_t> fillKmerPositionArray(
-    KmerPosition<T> *kmerArray, size_t kmerArraySize,
+    mmseqs_output* out, KmerPosition<T> *kmerArray, size_t kmerArraySize,
     DBReader<unsigned int> &seqDbr, Parameters &par, BaseMatrix *subMat,
     bool hashWholeSequence, size_t hashStartRange, size_t hashEndRange,
     size_t *hashDistribution);
@@ -207,6 +207,7 @@ size_t computeMemoryNeededLinearfilter(size_t totalKmer);
 
 template <typename T>
 std::vector<std::pair<size_t, size_t>> setupKmerSplits(
+    mmseqs_output* out,
     Parameters &par, BaseMatrix *subMat, DBReader<unsigned int> &seqDbr,
     size_t totalKmers, size_t splits);
 
