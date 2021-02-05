@@ -5,6 +5,7 @@
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/commons/log.h>
 #include <mmseqs/output.h>
+#include <mmseqs/api.h>
 
 namespace py = pybind11;
 
@@ -25,6 +26,39 @@ PYBIND11_MODULE(mmseqs_native, m) {
             ex(e.what());
         }
     });
+
+  pybind11::class_<Database>(m, "Database")
+      .def(pybind11::init<>())
+      .def("remove", &Database::remove)
+      .def("to_fasta", &Database::to_fasta,
+            py::arg("output_path") = "")
+      .def("copy", &Database::copy,
+            py::arg("search_input_fasta") = "")
+      .def("search", &Database::search,
+            py::arg("sequences"),
+            py::arg("search_type") = "auto")
+      .def("search_file", &Database::search_file,
+            py::arg("search_input_fasta") = "nucleotides",
+            py::arg("search_type") = "auto")
+      .def("create_index", &Database::create_index,
+            py::arg("search_type") = "nucleotides")
+      .def_property("name", &Database::getName, &Database::setName)
+      .def_property("description", &Database::getDescription, &Database::setDescription)
+      .def_property_readonly("type", &Database::getType);
+
+  pybind11::class_<Databases>(m, "Databases")
+      .def(pybind11::init<const std::string&, const std::string&>())
+      .def("create", &Databases::create,
+            py::arg("name"),
+            py::arg("description"),
+            py::arg("input_fasta"),
+            py::arg("mode") = "copy",
+            py::arg("database_type") = "auto",
+            py::arg("offset") = 0,
+            py::arg("shuffle") = false)
+      .def("list", &Databases::list)
+      .def("get", &Databases::get)
+      .def("__getitem__", &Databases::get);
 
   pybind11::class_<mmseqs_call_args>(m, "MMSeqsCallArgs")
       .def(pybind11::init<>())

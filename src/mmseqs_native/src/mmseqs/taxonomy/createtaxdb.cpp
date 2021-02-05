@@ -15,12 +15,12 @@ int createtaxdb(mmseqs_output* out, Parameters& par) {
 
   std::string tmp = par.filenames.back();
   if (FileUtil::directoryExists(out, tmp.c_str()) == false) {
-    out->info("Tmp {} folder does not exist or is not a directory.\n", tmp
+    out->info("Tmp {} folder does not exist or is not a directory.", tmp
                       );
     if (FileUtil::makeDir(out, tmp.c_str()) == false) {
       out->failure("Can not create tmp folder {}.", tmp);
     } else {
-      out->info("Created dir {}\n", tmp);
+      out->info("Created dir {}", tmp);
     }
   }
   CommandCaller cmd(out);

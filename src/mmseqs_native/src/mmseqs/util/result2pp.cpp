@@ -58,7 +58,7 @@ int result2pp(mmseqs_output *out, Parameters &par) {
 #ifdef HAVE_MPI
   resultReader.decomposeDomainByAminoAcid(MMseqsMPI::rank, MMseqsMPI::numProc,
                                           &dbFrom, &dbSize);
-  out->info("Compute split from {}\n", dbFrom << " to "
+  out->info("Compute split from {}", dbFrom << " to "
                      << (dbFrom + dbSize));
   std::pair<std::string, std::string> tmpOutput =
       Util::createTmpFileNames(par.db4, par.db4Index, MMseqsMPI::rank);

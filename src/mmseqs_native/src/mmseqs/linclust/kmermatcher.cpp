@@ -431,7 +431,7 @@ KmerPosition<T> *doComputation(mmseqs_output* out, size_t totalKmers, size_t has
             hashEndRange, NULL);
     elementsToSort = ret.first;
     par.kmerSize = ret.second;
-    out->info("\nAdjusted k-mer length {}\n", par.kmerSize);
+    out->info("\nAdjusted k-mer length {}", par.kmerSize);
   } else {
     std::pair<size_t, size_t> ret =
         fillKmerPositionArray<Parameters::DBTYPE_AMINO_ACIDS, T>(
@@ -703,7 +703,7 @@ int kmermatcherInner(mmseqs_output* out, Parameters &par, DBReader<unsigned int>
   std::vector<std::pair<size_t, size_t>> hashRanges =
       setupKmerSplits<T>(out, par, subMat, seqDbr, totalKmersPerSplit, splits);
   if (splits > 1) {
-    out->info("Process file into {} parts\n", hashRanges.size()
+    out->info("Process file into {} parts", hashRanges.size()
                       );
   }
   std::vector<std::string> splitFiles;
@@ -744,7 +744,7 @@ int kmermatcherInner(mmseqs_output* out, Parameters &par, DBReader<unsigned int>
 #else
   for (size_t split = 0; split < hashRanges.size(); split++) {
     std::string splitFileName = par.db2 + "_split_" + SSTR(split);
-    out->info("Generate k-mers list for {} split\n", (split + 1)
+    out->info("Generate k-mers list for {} split", (split + 1)
                       );
 
     std::string splitFileNameDone = splitFileName + ".done";
@@ -794,7 +794,7 @@ int kmermatcherInner(mmseqs_output* out, Parameters &par, DBReader<unsigned int>
             dbw, hashSeqPair, totalKmersPerSplit, repSequence, 1);
       }
     }
-    out->info("Time for fill: {}\n", timer.lap());
+    out->info("Time for fill: {}", timer.lap());
     // add missing entries to the result (needed for clustering)
 
 #pragma omp parallel num_threads(1)

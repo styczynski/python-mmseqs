@@ -84,7 +84,7 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
     }
 
     if (kbIn->fail()) {
-      out->failure("File {} not found\n", par.filenames[i] );
+      out->failure("File {} not found", par.filenames[i] );
     }
 
     std::string line;
@@ -93,7 +93,7 @@ int nrtotaxmapping(mmseqs_output* out, Parameters& par) {
       progress.updateProgress();
       const size_t columns = Util::getWordsOfLine(line.c_str(), entry, 255);
       if (columns < 4) {
-        out->failure("Invalid accession2taxid file {}\n", par.filenames[i] );
+        out->failure("Invalid accession2taxid file {}", par.filenames[i] );
       }
       std::string accession(entry[0], entry[1] - entry[0] - 1);
       unsigned int taxid = Util::fast_atoi<unsigned int>(entry[2]);

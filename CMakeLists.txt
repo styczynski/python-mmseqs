@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
 
 set(CMAKE_BUILD_TYPE Debug)
 if (MSVC)
@@ -184,10 +185,10 @@ if (PPC64)
 endif ()
 
 set(MMSEQS_C_FLAGS "${MMSEQS_CXX_FLAGS}")
-set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} -std=c++1y")
+set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} -std=c++17")
 # Compiler-specific features
 if (CMAKE_COMPILER_IS_CLANG AND (NOT EMSCRIPTEN))
-    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++17")
     set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
     set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} -stdlib=libc++")
 endif ()
@@ -291,22 +292,35 @@ set(BINDINGS_COMMON_SRCS
 
 # Generate python module
 
+set(MMSEQ_TARGET_INCLUDES
+    ${CMAKE_BINARY_DIR}/generated
+    ${PROJECT_BINARY_DIR}/generated
+    "src/mmseqs_native/src)"
+    "lib/toml11"
+    "lib/spdlog/include"
+    "lib/cppfs/include"
+    "src"
+    .
+)
+
+set(MMSEQ_TARGET_DEPENDENCIES
+    "generated"
+)
+
+set(MMSEQ_TARGET_LINKS
+    "spdlog"
+    "cppfs"
+)
+
+ # this will probably break if you omit the "s
+string(REPLACE " " ";" MMSEQS_CXX_FLAGS_LIST "${MMSEQS_CXX_FLAGS}")
+
 add_subdirectory(lib/pybind11)
 pybind11_add_module(mmseqs_native ${SOURCES} "${SOURCE_DIR}/bindings.cpp" ${BINDINGS_COMMON_SRCS})
 #set_target_properties(mmseqs_native PROPERTIES LINK_FLAGS "-Wl,-undefined,error")
-target_include_directories(mmseqs_native PUBLIC ${CMAKE_BINARY_DIR}/generated)
-target_include_directories(mmseqs_native PUBLIC ${PROJECT_BINARY_DIR}/generated)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src)
-target_include_directories(mmseqs_native PUBLIC lib/toml11)
-target_include_directories(mmseqs_native PUBLIC lib/spdlog/include)
-target_include_directories(mmseqs_native PUBLIC lib/cppfs/include)
-target_include_directories(mmseqs_native PUBLIC ${CMAKE_BINARY_DIR}/generated)
-target_include_directories(mmseqs_native PUBLIC ${PROJECT_BINARY_DIR}/generated)
-target_include_directories(mmseqs_native PUBLIC .)
-add_dependencies(mmseqs_native generated)
-
-target_link_libraries(mmseqs_native PRIVATE spdlog)
-target_link_libraries(mmseqs_native PRIVATE cppfs)
+target_include_directories(mmseqs_native PUBLIC ${MMSEQ_TARGET_INCLUDES})
+add_dependencies(mmseqs_native ${MMSEQ_TARGET_DEPENDENCIES})
+target_link_libraries(mmseqs_native PRIVATE ${MMSEQ_TARGET_LINKS})
 
 # Pedantic
 if (MSVC)
@@ -468,5 +482,12 @@ if (HAVE_GPROF)
         message(FATAL_ERROR "-- Could not find GPROF")
     endif ()
 endif ()
+
+###
+
+# add_executable(state_loader src/state/state_loader.cpp)
+# target_include_directories(state_loader PUBLIC ${MMSEQ_TARGET_INCLUDES})
+# add_dependencies(state_loader ${MMSEQ_TARGET_DEPENDENCIES})
+# target_link_libraries(state_loader PRIVATE ${MMSEQ_TARGET_LINKS})
 
 

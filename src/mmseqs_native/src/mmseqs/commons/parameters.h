@@ -1292,6 +1292,12 @@ extern int aggregatetaxweights(mmseqs_output *out, Parameters &par);
 extern int diskspaceavail(mmseqs_output *out, Parameters &par);
 
 static std::vector<Command> commands = {
+    {"convert2fasta", convert2fasta},
+    {"summarizeresult", summarizeresult},
+    {"convertalis", convertalignments},
+    {"align", align},
+    {"prefilter", prefilter},
+    {"search", search},
     {"easy-search", easysearch},
     {"easy-linsearch", easylinsearch},
     {"easy-cluster", easycluster},

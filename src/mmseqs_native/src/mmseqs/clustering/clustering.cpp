@@ -67,11 +67,11 @@ void Clustering::run(int mode) {
   for (size_t i = 1; i < dbSize; i++) {
     cluNum += (ret[i].first != ret[i - 1].first);
   }
-  out->info("Total time: {}\n", timer.lap());
-  out->info("\nSize of the sequence database: {}\n", seqDbSize
+  out->info("Total time: {}", timer.lap());
+  out->info("\nSize of the sequence database: {}", seqDbSize
                     );
-  out->info("Size of the alignment database: {}\n", dbSize);
-  out->info("Number of clusters: {}\n", cluNum);
+  out->info("Size of the alignment database: {}", dbSize);
+  out->info("Number of clusters: {}", cluNum);
 
   out->info("Writing results");
   writeData(dbw, ret, dbSize);

@@ -75,7 +75,7 @@ void setClusterAutomagicParameters(mmseqs_output* out, Parameters &par) {
   if (par.PARAM_S.wasSet == false) {
     par.sensitivity = setAutomaticThreshold(par.seqIdThr);
     par.PARAM_S.wasSet = true;
-    out->info("Set cluster sensitivity to -s {}\n", par.sensitivity
+    out->info("Set cluster sensitivity to -s {}", par.sensitivity
                       );
   }
 
@@ -103,7 +103,7 @@ void setClusterAutomagicParameters(mmseqs_output* out, Parameters &par) {
   if (par.PARAM_CLUSTER_STEPS.wasSet == false) {
     par.clusterSteps = setAutomaticIterations(par.sensitivity);
     par.PARAM_CLUSTER_STEPS.wasSet = true;
-    out->info("Set cluster iterations to {}\n", par.clusterSteps);
+    out->info("Set cluster iterations to {}", par.clusterSteps);
   }
 }
 

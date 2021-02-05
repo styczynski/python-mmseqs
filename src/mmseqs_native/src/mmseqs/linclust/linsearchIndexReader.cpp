@@ -197,7 +197,7 @@ void LinsearchIndexReader::writeIndex(mmseqs_output* out, DBWriter &dbw,
                                       size_t totalKmers, int alphSize,
                                       int kmerSize) {
   KmerIndex kmerIndex(out, alphSize - 1, kmerSize);
-  out->info("Write ENTRIES ({})\n", PrefilteringIndexReader::ENTRIES
+  out->info("Write ENTRIES ({})", PrefilteringIndexReader::ENTRIES
                     );
   // write entries
   dbw.writeStart(0);

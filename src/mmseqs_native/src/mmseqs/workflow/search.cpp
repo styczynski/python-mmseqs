@@ -32,15 +32,14 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
                  std::string blastp_out, std::string blastp_tmp,
                  std::string script_path, CommandCaller cmd) {
   if (false) {
-    std::cout << "[blastn.sh] Executing native script: " << script_path << "\n"
-              << std::flush;
+    out->info("[blastn.sh] Executing native script: {}", script_path);
     std::vector<std::string> args = {blastp_input, blastp_target, blastp_out,
                                      blastp_tmp};
     cmd.addVar("MMSEQS", "mmseqs");
     cmd.callProgram(script_path.c_str(), args);
-    std::cout << "[blastn.sh] Exit\n" << std::flush;
+    out->info("[blastn.sh] Exit");
   } else {
-    std::cout << "step_search L\n" << std::flush;
+    out->info("step_search L");
 
     // "$SEARCH" "${QUERY}" "${TARGET}" "$4/aln" "$4/search"
     int blastp_steps = no_steps;
@@ -50,16 +49,14 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
 
     std::string aln_res_merge = blastp_tmp + "/aln_0";
     while (current_step < blastp_steps) {
-      std::cout << "step_search K_1\n" << std::flush;
+      out->info("step_search K_1");
       const float sens = senses[current_step];
       std::string sens_str = std::to_string(((float)((int)(sens * 10))) / 10);
       // Call prefilter module
       std::string step_str = std::to_string(current_step);
       if (!FileUtil::fileExists(
               out, (blastp_tmp + "/pref_" + step_str + ".dbtype").c_str())) {
-        std::cout << "step_search K_2: prefilter " << blastp_input
-                  << blastp_target << (blastp_tmp + "/pref_" + step_str) << "\n"
-                  << std::flush;
+        out->info("step_search K_2: prefilter {} {} {}", blastp_input, blastp_target, (blastp_tmp + "/pref_" + step_str));
         Parameters prefilter_par(par);
         std::vector<std::string> prefilter_filenames = {
             blastp_input, blastp_target, (blastp_tmp + "/pref_" + step_str)};
@@ -95,7 +92,7 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
         prefilter_par.compressed = 0;
         prefilter_par.sensitivity = sens;
         subcall_mmseqs(out, "prefilter", prefilter_par);
-        std::cout << "step_search K_3\n" << std::flush;
+        out->info("step_search K_3");
       }
 
       // call alignment module
@@ -103,9 +100,9 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
       if (blastp_steps > 1) {
         align_path = blastp_tmp + "/aln_" + step_str;
       }
-      std::cout << "step_search K_4\n" << std::flush;
+      out->info("step_search K_4");
       if (!FileUtil::fileExists(out, (align_path + ".dbtype").c_str())) {
-        std::cout << "step_search K_5\n" << std::flush;
+        out->info("step_search K_5");
         Parameters align_par(par);
         std::vector<std::string> align_filenames = {
             blastp_input,
@@ -148,15 +145,15 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
         align_par.zdrop = 40;
 
         subcall_mmseqs(out, align_module, align_par);
-        std::cout << "step_search K_6\n" << std::flush;
+        out->info("step_search K_6");
       }
 
       // Only merge results after first step
-      std::cout << "step_search K_7\n" << std::flush;
+      out->info("step_search K_7");
       if (current_step > 0) {
         if (merged_senses.find(sens_str) == merged_senses.end()) {
           if (current_step < blastp_steps - 1) {
-            std::cout << "step_search K_8\n" << std::flush;
+            out->info("step_search K_8");
             Parameters mergedbs_par(par);
             std::vector<std::string> mergedbs_filenames = {
                 blastp_input,
@@ -180,9 +177,9 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
             mvdb_par.setDBFields(1, blastp_tmp + "/aln_merge_new");
             mvdb_par.setDBFields(2, blastp_tmp + "/aln_merge");
             subcall_mmseqs(out, "mvdb", mvdb_par);
-            std::cout << "step_search K_9\n" << std::flush;
+            out->info("step_search K_9");
           } else {
-            std::cout << "step_search K_10\n" << std::flush;
+            out->info("step_search K_10");
             Parameters mergedbs_par(par);
             std::vector<std::string> mergedbs_filenames = {
                 blastp_input, align_path, (blastp_tmp + "/pref_" + step_str),
@@ -194,18 +191,18 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
             mergedbs_par.setDBFields(4, align_path);
             mergedbs_par.compressed = 0;
             subcall_mmseqs(out, "mergedbs", mergedbs_par);
-            std::cout << "step_search K_11\n" << std::flush;
+            out->info("step_search K_11");
           }
           merged_senses.insert(sens_str);
         }
         aln_res_merge = blastp_tmp + "/aln_merge";
       }
-      std::cout << "step_search K_12\n" << std::flush;
+      out->info("step_search K_12");
 
       std::string next_input = blastp_tmp + "/input_" + step_str;
       // do not create subdb at last step
       if (current_step < blastp_steps - 1) {
-        std::cout << "step_search K_13\n" << std::flush;
+        out->info("step_search K_13");
         if (!FileUtil::fileExists(
                 out, (blastp_tmp + "/order_" + step_str + ".dbtype").c_str())) {
           // awk '$3 < 2 { print $1 }' "$TMP_PATH/aln_$STEP.index" >
@@ -213,7 +210,7 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
           // TODO: Implement this blastp code
           out->failure("Reached code branch that is yet uninmplemented (TODO: Implement this blastp code)");
         }
-        std::cout << "step_search K_14\n" << std::flush;
+        out->info("step_search K_14");
 
         if (!FileUtil::fileExistsAndIsNotEmpty(
                 out, (blastp_tmp + "/order_" + step_str).c_str())) {
@@ -223,7 +220,7 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
           mvdb_par.setDBFields(2, align_path);
           subcall_mmseqs(out, "mvdb", mvdb_par);
         }
-        std::cout << "step_search K_15\n" << std::flush;
+        out->info("step_search K_15");
 
         if (!FileUtil::fileExists(out, (next_input + ".dbtype").c_str())) {
           Parameters createsubdb_par(par);
@@ -239,14 +236,14 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
           createsubdb_par.subDbMode = 1;
           subcall_mmseqs(out, "createsubdb", createsubdb_par);
         }
-        std::cout << "step_search K_16\n" << std::flush;
+        out->info("step_search K_16");
       }
 
       blastp_input = next_input;
       current_step++;
-      std::cout << "step_search K_17\n" << std::flush;
+      out->info("step_search K_17");
     }
-    std::cout << "step_search K_18\n" << std::flush;
+    out->info("step_search K_18");
 
     if (par.removeTmpFiles) {
       for (int i = 0; i < blastp_steps; ++i) {
@@ -266,7 +263,7 @@ void call_blastp(mmseqs_output *out, Parameters &par, int no_steps,
       rmdb_par.setDBFields(1, blastp_tmp + "/aln_merge");
       subcall_mmseqs(out, "rmdb", rmdb_par);
     }
-    std::cout << "step_search K_19\n" << std::flush;
+    out->info("step_search K_19");
   }
 }
 
@@ -519,6 +516,8 @@ int search(mmseqs_output *out, Parameters &par) {
   //
   //    par.parseParameters(argc, argv, command, false, 0,
   //    MMseqsParameter::COMMAND_ALIGN | MMseqsParameter::COMMAND_PREFILTER);
+
+  out->info("Search: {} {}", par.db1, par.db2);
 
   std::string indexStr = PrefilteringIndexReader::searchForIndex(out, par.db2);
 
@@ -865,10 +864,10 @@ int search(mmseqs_output *out, Parameters &par) {
 
   //////////
 
-  std::cout << "step_search A\n" << std::flush;
+  out->info("step_search A");
   if (needTargetSplit) {
     if (!FileUtil::fileExists(out, (tmpDir + "/target_seqs_split.dbtype").c_str())) {
-      std::cout << "step_search B\n" << std::flush;
+      out->info("step_search B");
       Parameters splitsequence_par(par);
 
       // OFFSETALIGNMENT_PAR: [--chain-alignments 0 --merge-query 1
@@ -890,13 +889,13 @@ int search(mmseqs_output *out, Parameters &par) {
       subcall_mmseqs(out, "splitsequence", splitsequence_par);
     }
     target = tmpDir + "/target_seqs_split";
-    std::cout << "step_search C\n" << std::flush;
+    out->info("step_search C");
   }
 
-  std::cout << "step_search D\n" << std::flush;
+  out->info("step_search D");
   if (extract_frames) {
     if (!FileUtil::fileExists(out, (tmpDir + "/query_seqs.dbtype").c_str())) {
-      std::cout << "step_search E\n" << std::flush;
+      out->info("step_search E");
       Parameters extractframes_par(par);
       std::vector<std::string> extractframes_filenames = {
           query, tmpDir + "/query_seqs"};
@@ -912,21 +911,16 @@ int search(mmseqs_output *out, Parameters &par) {
       extractframes_par.compressed = 0;
 
       subcall_mmseqs(out, "extractframes", extractframes_par);
-      std::cout << "CALL EXTRACT FRAMES {" << query << "} {"
-                << (tmpDir + "/query_seqs") << "}\n"
-                << std::flush;
-      out->print();
+      out->info("Call extract frames [{}] [{}]", query, (tmpDir + "/query_seqs"));
     }
     query = tmpDir + "/query_seqs";
-    std::cout << "step_search F\n" << std::flush;
+    out->info("step_search F");
   }
 
-  std::cout << "step_search G\n" << std::flush;
+  out->info("step_search G");
   if (need_query_split) {
     if (!FileUtil::fileExists(out, (tmpDir + "/query_seqs_split.dbtype").c_str())) {
-      std::cout << "step_search H " << query << " "
-                << (tmpDir + "/query_seqs_split") << "\n"
-                << std::flush;
+      out->info("step_search H [{}] [{}]", query, (tmpDir + "/query_seqs_split"));
       Parameters splitsequence_par(par);
       splitsequence_par.setDBFields(1, query);
       splitsequence_par.setDBFields(2, tmpDir + "/query_seqs_split");
@@ -940,16 +934,16 @@ int search(mmseqs_output *out, Parameters &par) {
       subcall_mmseqs(out, "splitsequence", splitsequence_par);
     }
     query = tmpDir + "/query_seqs_split";
-    std::cout << "step_search I\n" << std::flush;
+    out->info("step_search I");
   }
 
-  std::cout << "step_search J\n" << std::flush;
+  out->info("step_search J");
   if (!FileUtil::fileExists(out, (tmpDir + "/aln.dbtype").c_str())) {
     call_blastp(out, par, no_steps, senses, align_module, query, target,
                 tmpDir + "/aln", searchTmpDir, "", cmd);
   }
 
-  std::cout << "step_search M\n" << std::flush;
+  out->info("step_search M");
   if (!FileUtil::fileExists(out, (result + ".dbtype").c_str())) {
     Parameters offsetalignment_par(par);
     std::vector<std::string> alignment_filenames = {
@@ -972,20 +966,13 @@ int search(mmseqs_output *out, Parameters &par) {
     //        offsetalignment_par.compressed = 0;
     //        offsetalignment_par.preloadMode = 0;
     subcall_mmseqs(out, "offsetalignment", offsetalignment_par);
-    out->print();
-    std::cout << "mmseqs offsetalignment " << par.filenames[0] << " ";
-    std::cout << query << " ";
-    std::cout << par.filenames[1] << " ";
-    std::cout << target << " ";
-    std::cout << tmpDir + "/aln"
-              << " ";
-    std::cout << result << "\n";
-    std::cout << "step_search O\n" << std::flush;
+    out->info("mmseqs offsetalignment {} {} {} {} {} {}", par.filenames[0], query, par.filenames[1], target, (tmpDir + "/aln"), result);
+    out->info("step_search O");
   }
 
-  std::cout << "step_search P\n" << std::flush;
+  out->info("step_search P");
   if (par.removeTmpFiles) {
-    std::cout << "step_search Q\n" << std::flush;
+    out->info("step_search Q");
     Parameters rmdb_par(par);
     rmdb_par.setDBFields(1, tmpDir + "/q_orfs");
     subcall_mmseqs(out, "rmdb", rmdb_par);
@@ -996,7 +983,7 @@ int search(mmseqs_output *out, Parameters &par) {
     rmdb_par.setDBFields(1, tmpDir + "/t_orfs_aa");
     subcall_mmseqs(out, "rmdb", rmdb_par);
   }
-  std::cout << "step_search R\n" << std::flush;
+  out->info("step_search R");
 
   // cmd.execProgram(program.c_str(), par.filenames);
   // Should never get here

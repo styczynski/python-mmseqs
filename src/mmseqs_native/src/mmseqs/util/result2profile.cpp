@@ -44,7 +44,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
 #ifdef HAVE_MPI
   resultReader.decomposeDomainByAminoAcid(MMseqsMPI::rank, MMseqsMPI::numProc,
                                           &dbFrom, &dbSize);
-  out->info("Compute split from {}\n", dbFrom << " to "
+  out->info("Compute split from {}", dbFrom << " to "
                      << dbFrom + dbSize);
   std::pair<std::string, std::string> tmpOutput =
       Util::createTmpFileNames(par.db4, par.db4Index, MMseqsMPI::rank);
@@ -138,7 +138,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
     return EXIT_FAILURE;
   }
 
-  out->info("Query database size: {} type: {}\nTarget database size: {} type: {}", qDbr->getSize(), qDbr->getDbTypeName(), tDbr->getSize(), Parameters::getDbTypeName(targetSeqType));
+  out->info("Query database size: {} type: {}. Target database size: {} type: {}", qDbr->getSize(), qDbr->getDbTypeName(), tDbr->getSize(), Parameters::getDbTypeName(targetSeqType));
 
   const bool isFiltering = par.filterMsa != 0 || returnAlnRes;
   Log::Progress progress(dbSize - dbFrom);
@@ -183,7 +183,7 @@ int result2profile(mmseqs_output *out, Parameters &par, bool returnAlnRes) {
       unsigned int queryKey = resultReader.getDbKey(id);
       size_t queryId = qDbr->getId(queryKey);
       if (queryId == UINT_MAX) {
-        out->warn("Invalid query sequence {}\n", queryKey);
+        out->warn("Invalid query sequence {}", queryKey);
         continue;
       }
       centerSequence.mapSequence(queryId, queryKey,

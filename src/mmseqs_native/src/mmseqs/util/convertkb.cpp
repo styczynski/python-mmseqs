@@ -121,10 +121,10 @@ int convertkb(mmseqs_output *out, Parameters &par) {
     }
 
     if (kbIn->fail()) {
-      out->failure("File {} not found\n", (*it) );
+      out->failure("File {} not found", (*it) );
     }
 
-    out->info("Extracting data from {}\n", (*it));
+    out->info("Extracting data from {}", (*it));
     std::string line;
     unsigned int i = 0;
     while (std::getline(*kbIn, line)) {

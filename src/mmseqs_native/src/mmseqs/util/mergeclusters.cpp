@@ -72,7 +72,7 @@ int mergeclusters(mmseqs_output *out, Parameters &par) {
   // merge later clustering steps into the initial clustering step
   int cnt = 2;
   while (!clusterings.empty()) {
-    out->info("Clustering step {}\n", cnt);
+    out->info("Clustering step {}", cnt);
 
     std::string cluStep = clusterings.front();
     std::string cluStepIndex = cluStep + ".index";

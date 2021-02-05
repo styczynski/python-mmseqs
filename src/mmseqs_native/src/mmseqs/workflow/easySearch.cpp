@@ -249,9 +249,9 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
     search_par.kmerSize = 15;
     search_par.maxSeqLen = 10000;
 
-    std::cout << "Call search\n" << std::flush;
+    out->info("Call search (subcall): {}", search_module);
     subcall_mmseqs(out, search_module, search_par);
-    std::cout << "Calling search doneA\n" << std::flush;
+    out->info("Call search terminted (subcall): {}", search_module);
   }
 
   /*
@@ -265,9 +265,8 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
       INTERMEDIATE="${TMP_PATH}/result_best"
   fi
   */
-  out->print();
   if (false) {
-    std::cout << "Call summarizeresult\n" << std::flush;
+    out->info("Call summarizeresult");
     Parameters summarizeresult_par(par);
     std::vector<std::string> summarizeresult_filenames = {
         tmpDir + "/result", tmpDir + "/result_best"};
@@ -275,13 +274,13 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
     summarizeresult_par.setDBFields(1, tmpDir + "/result");
     summarizeresult_par.setDBFields(2, tmpDir + "/result_best");
     subcall_mmseqs(out, "summarizeresult", summarizeresult_par);
-    std::cout << "Call summarizeresult ended\n" << std::flush;
+    out->info("Call summarizeresult ended");
   }
 
   // "$MMSEQS" convertalis "${TMP_PATH}/query" "${TARGET}${INDEXEXT}"
   // "${INTERMEDIATE}" "${RESULTS}" ${CONVERT_PAR}
   if (true) {
-    std::cout << "Call convertalis\n" << std::flush;
+    out->info("Call convertalis");
     //--db-output 0 --db-load-mode 0 --search-type 3 --threads 1 --compressed 0
     //-v 3 ]
     Parameters convertalis_par(par);
@@ -291,11 +290,7 @@ int doeasysearch(mmseqs_output *out, Parameters &par, bool linsearch) {
         intermediate,
         results,
     };
-    out->print();
-    std::cout << "convertalis " << (tmpDir + "/query") << " "
-              << (target + index_ext) << " " << intermediate << " " << results
-              << "\n"
-              << std::flush;
+    out->info("convertalis {} {} {} {}", (tmpDir + "/query"), (target + index_ext), intermediate, results);
     convertalis_par.filenames = convertalis_filenames;
     convertalis_par.setDBFields(1, tmpDir + "/query");
     convertalis_par.setDBFields(2, target + index_ext);

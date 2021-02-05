@@ -111,7 +111,7 @@ int filtertaxseqdb(mmseqs_output* out, Parameters& par) {
       }
     }
   };
-  out->info("\n");
+  out->info("");
 
   writer.close(true);
   if (par.subDbMode == Parameters::SUBDB_MODE_SOFT) {

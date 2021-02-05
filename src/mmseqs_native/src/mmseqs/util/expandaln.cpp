@@ -38,11 +38,11 @@ void rescoreResultByBacktrace(Matcher::result_t &result, Sequence &qSeq,
   //    for(int i = result.qStartPos; i < result.qEndPos; i++){
   //        printf("%c",subMat.num2aa[qSeq.sequence[i]]);
   //    }
-  //    out->info("\n");
+  //    out->info("");
   //    for(int i = result.dbStartPos; i < result.dbEndPos; i++){
   //        printf("%c",subMat.num2aa[tSeq.sequence[i]]);
   //    }
-  //    out->info("\n");
+  //    out->info("");
   for (size_t i = 0; i < result.backtrace.size(); ++i) {
     char state = result.backtrace[i];
     if (state == 'M') {

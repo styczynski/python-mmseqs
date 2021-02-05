@@ -171,7 +171,7 @@ Alignment::Alignment(mmseqs_output* output, const std::string &querySeqDB,
                                        Parameters::DBTYPE_PROFILE_STATE_SEQ)) {
     querySeqType = Parameters::DBTYPE_PROFILE_STATE_PROFILE;
   }
-  out->info("Query database size: {} type: {}\n. Target database size: {} type: {}", qdbr->getSize(), Parameters::getDbTypeName(querySeqType), tdbr->getSize(), Parameters::getDbTypeName(targetSeqType));
+  out->info("Query database size: {} type: {}. Target database size: {} type: {}", qdbr->getSize(), Parameters::getDbTypeName(querySeqType), tdbr->getSize(), Parameters::getDbTypeName(targetSeqType));
 
   prefdbr = new DBReader<unsigned int>(
       out, prefDB.c_str(), prefDBIndex.c_str(), threads,
@@ -608,7 +608,7 @@ void Alignment::run(const std::string &outDB, const std::string &outDBIndex,
     out->info(" ({} of overall calculated)", ((float)totalPassedNum / (float)alignmentsNum)
                       );
   }
-  out->info("\n");
+  out->info("");
   if (dbSize > 0) {
     size_t hits = totalPassedNum / dbSize;
     size_t hits_rest = totalPassedNum % dbSize;

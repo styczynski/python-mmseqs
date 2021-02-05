@@ -24,7 +24,7 @@ int createdb(mmseqs_output* out, Parameters& par) {
 
   for (size_t i = 0; i < filenames.size(); i++) {
     if (FileUtil::directoryExists(out, filenames[i].c_str()) == true) {
-      out->failure("File {} is a directory\n", filenames[i] );
+      out->failure("File {} is a directory", filenames[i] );
     }
   }
 
@@ -250,7 +250,7 @@ redoComputation:
       seqFileOffset += fileSize;
     }
   }
-  out->info("\n");
+  out->info("");
   if (fclose(source) != 0) {
     out->failure("Cannot close file {}", sourceFile);
   }
@@ -265,7 +265,7 @@ redoComputation:
     seqWriter.writeDbtypeFile(out, seqWriter.getDataFileName(), dbType,
                               par.compressed);
   }
-  out->info("Database type: {}\n", Parameters::getDbTypeName(dbType)
+  out->info("Database type: {}", Parameters::getDbTypeName(dbType)
                     );
   if (dbInput == true) {
     reader->close();

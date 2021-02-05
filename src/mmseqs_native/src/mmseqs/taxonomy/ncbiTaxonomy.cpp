@@ -153,7 +153,7 @@ size_t NcbiTaxonomy::loadNodes(std::vector<TaxonNode>& tmpNodes,
     }
   }
 
-  out->info(" Done, got {} nodes\n", tmpNodes.size());
+  out->info(" Done, got {} nodes", tmpNodes.size());
   return tmpNodes.size();
 }
 

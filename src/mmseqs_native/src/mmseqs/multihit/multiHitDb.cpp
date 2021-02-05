@@ -19,12 +19,12 @@ int multihitdb(mmseqs_output *out, Parameters &par) {
   par.filenames.pop_back();
 
   if (FileUtil::directoryExists(out, tmpDir.c_str()) == false) {
-    out->info("Tmp {} folder does not exist or is not a directory.\n", tmpDir
+    out->info("Tmp {} folder does not exist or is not a directory.", tmpDir
                       );
     if (FileUtil::makeDir(out, tmpDir.c_str()) == false) {
       out->failure("Can not create tmp folder {}.", tmpDir);
     } else {
-      out->info("Created dir {}\n", tmpDir);
+      out->info("Created dir {}", tmpDir);
     }
   }
   std::string hash = SSTR(

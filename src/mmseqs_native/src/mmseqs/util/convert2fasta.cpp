@@ -41,7 +41,7 @@ int convert2fasta(mmseqs_output* out, Parameters& par) {
     from = &db_header;
   }
 
-  out->info("Start writing file to {}\n", par.db2);
+  out->info("Start writing file to {}", par.db2);
   for (size_t i = 0; i < from->getSize(); i++) {
     unsigned int key = from->getDbKey(i);
     unsigned int headerKey = db_header.getId(key);
@@ -59,7 +59,7 @@ int convert2fasta(mmseqs_output* out, Parameters& par) {
     fwrite(newline, sizeof(char), 1, fastaFP);
   }
   if (fclose(fastaFP) != 0) {
-    out->failure("Cannot close file {}\n", par.db2 );
+    out->failure("Cannot close file {}", par.db2 );
   }
   db_header.close();
   db.close();

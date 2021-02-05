@@ -87,7 +87,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
   // memoryLimit in bytes
   size_t memoryLimit = Util::computeMemory(out, par.splitMemoryLimit);
 
-  out->info("\n");
+  out->info("");
 
   float kmersPerSequenceScale =
       (Parameters::isEqualDbtype(querySeqType, Parameters::DBTYPE_NUCLEOTIDES))
@@ -108,7 +108,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
   std::vector<std::pair<size_t, size_t>> hashRanges =
       setupKmerSplits<short>(out, par, subMat, seqDbr, totalKmersPerSplit, splits);
 
-  out->info("Process file into {} parts\n", hashRanges.size());
+  out->info("Process file into {} parts", hashRanges.size());
   std::vector<std::string> splitFiles;
   KmerPosition<short> *hashSeqPair = NULL;
 
@@ -172,7 +172,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
   }
 #else
   for (size_t split = 0; split < hashRanges.size(); split++) {
-    out->info("Generate k-mers list {}\n", split);
+    out->info("Generate k-mers list {}", split);
 
     std::string splitFileName = par.db2 + "_split_" + SSTR(split);
 
@@ -212,7 +212,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
                  par.compressed, Parameters::DBTYPE_INDEX_DB);
     dbw.open();
 
-    out->info("Write VERSION ({})\n", PrefilteringIndexReader::VERSION
+    out->info("Write VERSION ({})", PrefilteringIndexReader::VERSION
                       );
     dbw.writeData(
         (char *)PrefilteringIndexReader::CURRENT_VERSION,
@@ -220,7 +220,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
         PrefilteringIndexReader::VERSION, 0);
     dbw.alignToPageSize();
 
-    out->info("Write META ({})\n", PrefilteringIndexReader::META
+    out->info("Write META ({})", PrefilteringIndexReader::META
                       );
     const int mask = par.maskMode > 0;
     const int spacedKmer = (par.spacedKmer) ? 1 : 0;
@@ -411,7 +411,7 @@ int kmerindexdb(mmseqs_output *out, Parameters &par) {
                   0);
     dbw.alignToPageSize();
 
-    out->info("Time for fill: {}\n", timer.lap());
+    out->info("Time for fill: {}", timer.lap());
     // add missing entries to the result (needed for clustering)
     dbw.close();
   }

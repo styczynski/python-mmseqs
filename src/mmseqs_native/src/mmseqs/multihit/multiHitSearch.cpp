@@ -53,12 +53,12 @@ int multihitsearch(mmseqs_output *out, Parameters &par) {
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
   if (FileUtil::directoryExists(out, par.db4.c_str()) == false) {
-    out->info("Tmp {} folder does not exist or is not a directory.\n", par.db4
+    out->info("Tmp {} folder does not exist or is not a directory.", par.db4
                       );
     if (FileUtil::makeDir(out, par.db4.c_str()) == false) {
       out->failure("Can not create tmp folder {}", par.db4 );
     } else {
-      out->info("Created dir {}\n", par.db4);
+      out->info("Created dir {}", par.db4);
     }
   }
   size_t hash =

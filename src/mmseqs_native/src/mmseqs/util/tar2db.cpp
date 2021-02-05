@@ -95,14 +95,14 @@ int tar2db(mmseqs_output *out, Parameters &par) {
         Util::endsWith(".tgz", filenames[i])) {
 #ifdef HAVE_ZLIB
       if (mtar_gzopen(&tar, filenames[i].c_str()) != MTAR_ESUCCESS) {
-        out->failure("Cannot open file {}\n", filenames[i] );
+        out->failure("Cannot open file {}", filenames[i] );
       }
 #else
       out->failure("MMseqs2 was not compiled with zlib support. Cannot read compressed input");
 #endif
     } else {
       if (mtar_open(&tar, filenames[i].c_str()) != MTAR_ESUCCESS) {
-        out->failure("Cannot open file {}\n", filenames[i] );
+        out->failure("Cannot open file {}", filenames[i] );
       }
     }
 
@@ -154,7 +154,7 @@ int tar2db(mmseqs_output *out, Parameters &par) {
                 }
                 if (mtar_read_data(&tar, dataBuffer, header.size) !=
                     MTAR_ESUCCESS) {
-                  out->failure("Cannot read entry {}\n", header.name );
+                  out->failure("Cannot read entry {}", header.name );
                 }
                 proceed = true;
                 currentKey = __sync_fetch_and_add(&(globalKey), 1);

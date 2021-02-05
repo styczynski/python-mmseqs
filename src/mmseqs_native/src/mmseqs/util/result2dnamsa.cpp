@@ -57,7 +57,7 @@ int result2dnamsa(mmseqs_output *out, Parameters &par) {
                         par.compressed, Parameters::DBTYPE_MSA_DB);
   resultWriter.open();
 
-  out->info("Query database size: {} type: {}\nTarget database size: {} type: {}", qDbr.getSize(), qDbr.getDbTypeName(), tDbr->getSize(), tDbr->getDbTypeName());
+  out->info("Query database size: {} type: {}. Target database size: {} type: {}", qDbr.getSize(), qDbr.getDbTypeName(), tDbr->getSize(), tDbr->getDbTypeName());
   Log::Progress progress(resultReader.getSize());
 
 #pragma omp parallel

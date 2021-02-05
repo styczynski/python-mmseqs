@@ -39,7 +39,7 @@ int mergedbs(mmseqs_output *out, Parameters &par) {
                   filesToMerge[0]->getDbtype());
   writer.open();
 
-  out->info("Merging the results to {}\n", par.db2.c_str());
+  out->info("Merging the results to {}", par.db2.c_str());
   Log::Progress progress(qDbr.sequenceReader->getSize());
   for (size_t id = 0; id < qDbr.sequenceReader->getSize(); id++) {
     progress.updateProgress();
