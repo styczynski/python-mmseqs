@@ -1,9 +1,42 @@
 #ifndef API_H
 #define API_H
 
+#include <Python.h>
 #include <state/state.h>
 #include <mmseqs/rand.h>
 #include <mmseqs/commons/fileUtil.h>
+
+static std::vector<std::string> PARAM_SEARCH_COL_NAMES_DEFAULT = {
+  "query_sequence_id",
+  "target_sequence_id",
+  "sequence_identity",
+  "alignment_length",
+  "number_of_mismatches",
+  "number_of_gap_openings",
+  "domain_start_index_query",
+  "domain_end_index_query",
+  "domain_start_index_target",
+  "domain_end_index_target",
+  "e_value",
+  "bit_score"
+};
+
+static std::map<std::string, std::string> PARAM_SEARCH_COL_NAMES_MAPPING = {
+  {"query_sequence_id", "query"},
+  {"target_sequence_id", "target"},
+  {"query_sequence_content", "qseq"},
+  {"target_sequence_content", "tseq"},
+  {"sequence_identity", "fident"},
+  {"alignment_length", "alnlen"},
+  {"number_of_mismatches", "mismatch"},
+  {"number_of_gap_openings", "gapopen"},
+  {"domain_start_index_query", "qstart"},
+  {"domain_end_index_query", "qend"},
+  {"domain_start_index_target", "tstart"},
+  {"domain_end_index_target", "tend"},
+  {"e_value", "evalue"},
+  {"bit_score", "bits"}
+};
 
 static std::map<std::string, int> PARAM_DB_TYPE_MAPPING = {
     {"auto", 0},
@@ -29,15 +62,18 @@ class Database;
 class SearchResults {
 public:
 
+    std::vector<std::vector<mmseqs_blast_tab_record>> _records;
+    std::vector<std::string> _headers;
+
     SearchResults() {}
-    explicit SearchResults(const std::vector<std::vector<mmseqs_blast_tab_record>>& records): _records(records) {}
+    explicit SearchResults(
+        const std::vector<std::vector<mmseqs_blast_tab_record>>& records,
+        const std::vector<std::string>& headers
+    ): _records(records), _headers(headers) {}
 
     const std::vector<std::vector<mmseqs_blast_tab_record>> &getRecords() const {
         return _records;
     }
-
-private:
-    std::vector<std::vector<mmseqs_blast_tab_record>> _records;
 };
 
 class Databases {
@@ -154,10 +190,11 @@ public:
 
     SearchResults search(
         std::vector<std::string> sequences,
-        std::string search_type = "auto"
+        std::string search_type = "auto",
+        std::vector<std::string> headers = {}
     ) {
         auto path = write_temp_fasta(sequences, _parent->get_workdir_path());
-        auto search_results = search_file(path, search_type);
+        auto search_results = search_file(path, search_type, headers);
         mmseqs_output* out;
         FileUtil::remove(out, path.c_str());
         return search_results;
@@ -165,12 +202,17 @@ public:
 
     SearchResults search_file(
         std::string search_input_fasta = "nucleotides",
-        std::string search_type = "auto"
+        std::string search_type = "auto",
+        std::vector<std::string> headers = {}
     ) {
         _parent->prepare_to_execute_command();
         std::string tmp_dir = "tmp_" + get_uuid();
         std::string results_path = _parent->get_results_path(_state.name + get_uuid() + ".query_results.m8");
         std::string seq_db_path = _parent->get_storage_path(_state.name);
+
+        if (headers.size() == 0) {
+            headers = PARAM_SEARCH_COL_NAMES_DEFAULT;
+        }
 
         Parameters args;
         args.baseTmpPath = _parent->get_workdir_path();
@@ -184,7 +226,12 @@ public:
         args.sensitivity=5.7;
         args.removeTmpFiles=false;
         args.writeLookup=false;
-        args.outfmt="query,target,fident,alnlen,mismatch,gapopen,qstart,qend,tstart,tend,evalue,bits";
+        args.outfmt="";
+        for (auto& header_name: headers) {
+            args.outfmt += PARAM_SEARCH_COL_NAMES_MAPPING[header_name] + ",";
+        }
+        args.outfmt = args.outfmt.substr(0, args.outfmt.size()-1);
+
         args.searchType=PARAM_DB_SEARCH_TYPE_MAPPING[search_type];
         args.alignmentMode=3;
 
@@ -198,7 +245,7 @@ public:
             FileUtil::remove(out, tmp_dir.c_str());
         }
 
-        return SearchResults(search_output.blast_tab_records);
+        return SearchResults(search_output.blast_tab_records, headers);
     }
 
     mmseqs_output create_index(std::string search_type = "nucleotides") {

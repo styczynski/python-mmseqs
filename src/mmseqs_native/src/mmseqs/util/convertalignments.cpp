@@ -619,20 +619,16 @@ int convertalignments(mmseqs_output *out, Parameters &par) {
                     break;
                   case Parameters::OUTFMT_QSEQ:
                     if (queryProfile) {
-                      // results_row.push_back(std::string(queryProfData.c_str(),
-                      // res.qLen));
+                        record.query_sequence_content = std::string(queryProfData.c_str(), res.qLen);
                     } else {
-                      // results_row.push_back(std::string(querySeqData,
-                      // res.qLen));
+                        record.query_sequence_content = std::string(querySeqData, res.qLen);
                     }
                     break;
                   case Parameters::OUTFMT_TSEQ:
                     if (targetProfile) {
-                      // results_row.push_back(std::string(targetProfData.c_str(),
-                      // res.dbLen));
+                        record.target_sequence_content = std::string(targetProfData.c_str(), res.dbLen);
                     } else {
-                      // results_row.push_back(std::string(targetSeqData,
-                      // res.dbLen));
+                        record.target_sequence_content = std::string(targetSeqData, res.dbLen);
                     }
                     break;
                   case Parameters::OUTFMT_QHEADER:

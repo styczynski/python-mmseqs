@@ -57,6 +57,8 @@ std::string SSTR(float);
 struct mmseqs_blast_tab_record {
   std::string query_sequence_id;
   std::string target_sequence_id;
+  std::string query_sequence_content;
+  std::string target_sequence_content;
   float sequence_identity;
   int alignment_length;
   int number_of_mismatches;

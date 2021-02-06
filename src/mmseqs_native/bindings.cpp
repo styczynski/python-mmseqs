@@ -29,6 +29,8 @@ PYBIND11_MODULE(mmseqs_native, m) {
 
   pybind11::class_<SearchResults>(m, "SearchResults")
       .def(pybind11::init<>())
+      .def_readonly("_records", &SearchResults::_records)
+      .def_readonly("_headers", &SearchResults::_headers)
       .def_property_readonly("records", &SearchResults::getRecords);
 
   pybind11::class_<Database>(m, "Database")
@@ -40,10 +42,12 @@ PYBIND11_MODULE(mmseqs_native, m) {
             py::arg("search_input_fasta") = "")
       .def("search", &Database::search,
             py::arg("sequences"),
-            py::arg("search_type") = "auto")
+            py::arg("search_type") = "auto",
+            py::arg("headers") = std::vector<std::string>())
       .def("search_file", &Database::search_file,
             py::arg("search_input_fasta") = "nucleotides",
-            py::arg("search_type") = "auto")
+            py::arg("search_type") = "auto",
+            py::arg("headers") = std::vector<std::string>())
       .def("create_index", &Database::create_index,
             py::arg("search_type") = "nucleotides")
       .def_property("name", &Database::getName, &Database::setName)

@@ -142,34 +142,19 @@ class CMakeBuild(build_ext):
         copyfile(src_file, dest_file)
         copymode(src_file, dest_file)
 
-
-datafiles_root = [
-    os.path.join(d, f)
-    for d, folders, files in os.walk(os.path.join(".", "data"))
-    for f in files
-]
-datafiles_lib = [
-    os.path.join(d, f)
-    for d, folders, files in os.walk(os.path.join(".", "lib"))
-    for f in files
-]
-datafiles = [
-    *datafiles_root,
-    *datafiles_lib,
-    "README.md",
-    "example",
-    "CMakeLists.txt",
-    "Makefile",
-    "lib",
-    "lib/pybind11",
-    "src",
-]
-
 # read the contents of README file
 from os import path
 this_directory = path.abspath(path.dirname(__file__))
 with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
+
+datafiles = ["README.md", "CMakeLists.txt", "MANIFEST.in"]
+for folder in ["lib", "src", "util", "example", "data", "cmake", "tests"]:
+    datafiles = [*datafiles, *[
+        os.path.join(d, f)
+        for d, folders, files in os.walk(os.path.join(".", folder))
+        for f in files
+    ]]
 
 
 def build(setup_kwargs):

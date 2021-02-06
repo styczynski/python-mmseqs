@@ -1,10 +1,33 @@
 [tool.poetry]
 name = "mmseqs"
-version = "0.1.3"
-description = "Python bindings for UNAFold to determine hybridization energies / folding of RNA/DNA sequences."
-authors = ["Piotr Styczyński <piotrs@radcode.co>"]
+version = "1.0.0"
+description = "MMSEQS Python bindings"
+authors = ["Piotr Styczyński <piotr@styczynski.in>"]
 build = "build.py"
 readme = "README.md"
+include = [
+    "README.md",
+    "CMakeLists.txt",
+    "MANIFEST.in",
+    "src",
+    "src/*",
+    "src/**/*",
+    "lib",
+    "lib/*",
+    "lib/**/*",
+    "example",
+    "example/*",
+    "example/**/*",
+    "data",
+    "data/*",
+    "data/**/*",
+    "cmake",
+    "cmake/*",
+    "cmake/**/*",
+    "util",
+    "util/*",
+    "util/**/*"
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
