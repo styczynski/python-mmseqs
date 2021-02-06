@@ -1,32 +1,32 @@
 set(prefiltering_header_files
-        mmseqs/prefiltering/CacheFriendlyOperations.h
-        mmseqs/prefiltering/ExtendedSubstitutionMatrix.h
-        mmseqs/prefiltering/Indexer.h
-        mmseqs/prefiltering/IndexBuilder.h
-        mmseqs/prefiltering/IndexTable.h
-        mmseqs/prefiltering/KmerGenerator.h
-        mmseqs/prefiltering/Prefiltering.h
-        mmseqs/prefiltering/PrefilteringIndexReader.h
-        mmseqs/prefiltering/QueryMatcher.h
-        mmseqs/prefiltering/ReducedMatrix.h
-        mmseqs/prefiltering/SequenceLookup.h
-        mmseqs/prefiltering/UngappedAlignment.h
+        mmseqs/prefiltering/cacheFriendlyOperations.h
+        mmseqs/prefiltering/extendedSubstitutionMatrix.h
+        mmseqs/prefiltering/indexer.h
+        mmseqs/prefiltering/indexBuilder.h
+        mmseqs/prefiltering/indexTable.h
+        mmseqs/prefiltering/kmerGenerator.h
+        mmseqs/prefiltering/prefiltering.h
+        mmseqs/prefiltering/prefilteringIndexReader.h
+        mmseqs/prefiltering/queryMatcher.h
+        mmseqs/prefiltering/reducedMatrix.h
+        mmseqs/prefiltering/sequenceLookup.h
+        mmseqs/prefiltering/ungappedAlignment.h
         PARENT_SCOPE
         )
 
 set(prefiltering_source_files
-        mmseqs/prefiltering/CacheFriendlyOperations.cpp
-        mmseqs/prefiltering/ExtendedSubstitutionMatrix.cpp
-        mmseqs/prefiltering/Indexer.cpp
-        mmseqs/prefiltering/IndexBuilder.cpp
-        mmseqs/prefiltering/KmerGenerator.cpp
-        mmseqs/prefiltering/Main.cpp
-        mmseqs/prefiltering/Prefiltering.cpp
-        mmseqs/prefiltering/PrefilteringIndexReader.cpp
-        mmseqs/prefiltering/QueryMatcher.cpp
-        mmseqs/prefiltering/ReducedMatrix.cpp
-        mmseqs/prefiltering/SequenceLookup.cpp
-        mmseqs/prefiltering/UngappedAlignment.cpp
+        mmseqs/prefiltering/cacheFriendlyOperations.cpp
+        mmseqs/prefiltering/extendedSubstitutionMatrix.cpp
+        mmseqs/prefiltering/indexer.cpp
+        mmseqs/prefiltering/indexBuilder.cpp
+        mmseqs/prefiltering/kmerGenerator.cpp
+        mmseqs/prefiltering/main.cpp
+        mmseqs/prefiltering/prefiltering.cpp
+        mmseqs/prefiltering/prefilteringIndexReader.cpp
+        mmseqs/prefiltering/queryMatcher.cpp
+        mmseqs/prefiltering/reducedMatrix.cpp
+        mmseqs/prefiltering/sequenceLookup.cpp
+        mmseqs/prefiltering/ungappedAlignment.cpp
         mmseqs/prefiltering/ungappedprefilter.cpp
         PARENT_SCOPE
         )

@@ -5,7 +5,7 @@
 #ifndef MMSEQS_MSAFILTER_H
 #define MMSEQS_MSAFILTER_H
 
-#include <mmseqs/commons/SubstitutionMatrix.h>
+#include <mmseqs/commons/substitutionMatrix.h>
 #include <mmseqs/alignment/multipleAlignment.h>
 
 class MsaFilter {
