@@ -421,11 +421,12 @@ class IndexTable {
       if (entrySize > 0) {
         indexer->printKmer(i, kmerSize, num2aa);
 
-        out->info("Index table:");
-        IndexEntryLocal *e = &entries[offsets[i]];
-        for (unsigned int j = 0; j < entrySize; j++) {
-          out->info("   ({}, {})", e[j].seqId, e[j].position_j);
-        }
+// TODO: Implement correct printing
+//        out->info("Index table:");
+//        IndexEntryLocal *e = &entries[offsets[i]];
+//        for (unsigned int j = 0; j < entrySize; j++) {
+//          out->info("   ({}, {})", e[j].seqId, e[j].position_j);
+//        }
       }
     }
   };
