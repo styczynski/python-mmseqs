@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 #include <mmseqs/output.h>
-#include <mmseqs/alignment/Matcher.h>
+#include <mmseqs/alignment/matcher.h>
 #include <mmseqs/commons/dBReader.h>
 
 class Orf {

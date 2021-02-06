@@ -1,4 +1,4 @@
-#include "Aggregation.h"
+#include <mmseqs/multihit/aggregation.h>
 #include <mmseqs/output.h>
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/commons/util.h>

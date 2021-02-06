@@ -13,8 +13,8 @@
 #include <vector>
 #include <mmseqs/commons/itoa.h>
 
-#include <mmseqs/commons/BaseMatrix.h>
-#include <mmseqs/commons/Sequence.h>
+#include <mmseqs/commons/baseMatrix.h>
+#include <mmseqs/commons/sequence.h>
 
 #include "bandedNucleotideAligner.h"
 #include "evalueComputation.h"
