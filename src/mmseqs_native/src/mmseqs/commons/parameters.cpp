@@ -1,5 +1,5 @@
 #include <mmseqs/commons/parameters.h>
-#include "../alignment/DistanceCalculator.h"
+#include <mmseqs/alignment/distanceCalculator.h>
 #include <mmseqs/commons/byteParser.h>
 #include <mmseqs/commons/commandCaller.h>
 #include <mmseqs/output.h>

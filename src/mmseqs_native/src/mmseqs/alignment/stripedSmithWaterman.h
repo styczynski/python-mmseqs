@@ -42,9 +42,8 @@
 #endif
 
 #include <_simd/simd.h>
-#include "../commons/BaseMatrix.h"
-
-#include "../commons/Sequence.h"
+#include <mmseqs/commons/baseMatrix.h>
+#include <mmseqs/commons/sequence.h>
 #include <mmseqs/alignment/evalueComputation.h>
 typedef struct {
   short qStartPos;

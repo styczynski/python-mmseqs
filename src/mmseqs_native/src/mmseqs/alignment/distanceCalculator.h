@@ -6,9 +6,9 @@
 #include <vector>
 
 #include <_simd/simd.h>
-#include "../commons/BaseMatrix.h"
-#include "../commons/MathUtil.h"
-#include "../commons/Parameters.h"
+#include <mmseqs/commons/baseMatrix.h>
+#include <mmseqs/commons/mathUtil.h>
+#include <mmseqs/commons/parameters.h>
 
 class DistanceCalculator {
  public:
