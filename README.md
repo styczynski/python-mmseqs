@@ -1,6 +1,7 @@
 # MMseqs2 bindings for Python
 
-This project provides bidings for mmseqs.
+This project provides bidings for mmseqs. It's still work in progress.
+This is the base usage scenario:
 ```python
 import mmseqs
 
