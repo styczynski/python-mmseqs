@@ -15,8 +15,6 @@ client = mmseqs.MMSeqs()
 # (The input can also be a Seq/SeqRecord list/iterator/etc.)
 client.databases.create("test", "Test database", "a.fasta")
 print(client.databases[0].description)
-import sys
-sys.exit(0)
 
 # Perform search on a database
 # Note that the search queries can be a string with a patch to the FASTA file with queries
@@ -32,7 +30,7 @@ results = client.databases[0].search(
 
 # results.records is a list of lists. Each item contains alignments for each query.
 # Each list of alignments consists of single result
-print(results)
+print(results.records)
 
 # You can also get a pandas dataframe with the following columns:
 #  (Compatible with Blast M8 format - http://www.pangloss.com/wiki/Blast)

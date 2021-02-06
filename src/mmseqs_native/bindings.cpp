@@ -27,6 +27,10 @@ PYBIND11_MODULE(mmseqs_native, m) {
         }
     });
 
+  pybind11::class_<SearchResults>(m, "SearchResults")
+      .def(pybind11::init<>())
+      .def_property_readonly("records", &SearchResults::getRecords);
+
   pybind11::class_<Database>(m, "Database")
       .def(pybind11::init<>())
       .def("remove", &Database::remove)

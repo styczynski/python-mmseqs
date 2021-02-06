@@ -26,6 +26,20 @@ static std::map<std::string, int> PARAM_DB_SEARCH_TYPE_MAPPING = {
 
 class Database;
 
+class SearchResults {
+public:
+
+    SearchResults() {}
+    explicit SearchResults(const std::vector<std::vector<mmseqs_blast_tab_record>>& records): _records(records) {}
+
+    const std::vector<std::vector<mmseqs_blast_tab_record>> &getRecords() const {
+        return _records;
+    }
+
+private:
+    std::vector<std::vector<mmseqs_blast_tab_record>> _records;
+};
+
 class Databases {
 public:
 
@@ -138,7 +152,7 @@ public:
         return _state.name;
     }
 
-    std::vector<std::vector<mmseqs_blast_tab_record>> search(
+    SearchResults search(
         std::vector<std::string> sequences,
         std::string search_type = "auto"
     ) {
@@ -149,7 +163,7 @@ public:
         return search_results;
     }
 
-    std::vector<std::vector<mmseqs_blast_tab_record>> search_file(
+    SearchResults search_file(
         std::string search_input_fasta = "nucleotides",
         std::string search_type = "auto"
     ) {
@@ -184,7 +198,7 @@ public:
             FileUtil::remove(out, tmp_dir.c_str());
         }
 
-        return search_output.blast_tab_records;
+        return SearchResults(search_output.blast_tab_records);
     }
 
     mmseqs_output create_index(std::string search_type = "nucleotides") {

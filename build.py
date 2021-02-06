@@ -165,6 +165,12 @@ datafiles = [
     "src",
 ]
 
+# read the contents of README file
+from os import path
+this_directory = path.abspath(path.dirname(__file__))
+with open(path.join(this_directory, 'README.md'), encoding='utf-8') as f:
+    long_description = f.read()
+
 
 def build(setup_kwargs):
     """
@@ -173,6 +179,8 @@ def build(setup_kwargs):
 
     setup_kwargs.update(
         {
+            "long_description": long_description,
+            "long_description_content_type": 'text/markdown',
             "ext_modules": [CMakeExtension("mmseqs/mmseqs_native")],
             "cmdclass": {"build_ext": CMakeBuild},
             "zip_safe": False,
