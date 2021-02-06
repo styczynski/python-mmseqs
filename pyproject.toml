@@ -4,6 +4,7 @@ version = "0.1.3"
 description = "Python bindings for UNAFold to determine hybridization energies / folding of RNA/DNA sequences."
 authors = ["Piotr Styczyński <piotrs@radcode.co>"]
 build = "build.py"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.8"

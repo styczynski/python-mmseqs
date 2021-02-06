@@ -4,18 +4,13 @@
 /**
  * See lambda_calculator.h
  */
-#include <commons/alloc.h>
+#include <mmseqs/commons/alloc.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "nrutil.h"
+#include "cacode.h"
 
 int Alphsize;
-
-#include "lambda_calculator.h"
-#include "lubksb.cpp"
-#include "ludcmp.cpp"
-#include "nrutil.cpp"
 
 #define Epsilon 1.0e-36
 #define E_bound 1.0e-12

@@ -1,5 +1,7 @@
 // Public domain code from Yi-Kuo Yu & Stephen Altschul, NCBI
 
+#include "cacode.h"
+
 void lubksb(double **a, int n, int *indx, double b[]) {
   int i, ii = 0, ip, j;
   double sum;

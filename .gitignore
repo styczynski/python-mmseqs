@@ -11,3 +11,4 @@ mmseqs_storage/
 mmseqs_native.cpython-*/
 **/pydoc-markdown.yml
 *.dylib
+*.log

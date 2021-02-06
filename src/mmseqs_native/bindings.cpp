@@ -1,9 +1,11 @@
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
 
-#include "Application.h"
-#include "Parameters.h"
-#include "output.h"
+#include <mmseqs/commons/application.h>
+#include <mmseqs/commons/parameters.h>
+#include <mmseqs/commons/log.h>
+#include <mmseqs/output.h>
+#include <mmseqs/api.h>
 
 namespace py = pybind11;
 
@@ -14,6 +16,53 @@ mmseqs_output call_mmseqs_proxy(std::string command_name, Parameters args) {
 
 PYBIND11_MODULE(mmseqs_native, m) {
   m.doc() = "documentation string";  // optional
+
+    // make a new custom exception and use it as a translation target
+    static py::exception<FatalException> ex(m, "MMSEQException");
+    py::register_exception_translator([](std::exception_ptr p) {
+        try {
+            if (p) std::rethrow_exception(p);
+        } catch (const FatalException &e) {
+            ex(e.what());
+        }
+    });
+
+  pybind11::class_<SearchResults>(m, "SearchResults")
+      .def(pybind11::init<>())
+      .def_property_readonly("records", &SearchResults::getRecords);
+
+  pybind11::class_<Database>(m, "Database")
+      .def(pybind11::init<>())
+      .def("remove", &Database::remove)
+      .def("to_fasta", &Database::to_fasta,
+            py::arg("output_path") = "")
+      .def("copy", &Database::copy,
+            py::arg("search_input_fasta") = "")
+      .def("search", &Database::search,
+            py::arg("sequences"),
+            py::arg("search_type") = "auto")
+      .def("search_file", &Database::search_file,
+            py::arg("search_input_fasta") = "nucleotides",
+            py::arg("search_type") = "auto")
+      .def("create_index", &Database::create_index,
+            py::arg("search_type") = "nucleotides")
+      .def_property("name", &Database::getName, &Database::setName)
+      .def_property("description", &Database::getDescription, &Database::setDescription)
+      .def_property_readonly("type", &Database::getType);
+
+  pybind11::class_<Databases>(m, "Databases")
+      .def(pybind11::init<const std::string&, const std::string&>())
+      .def("create", &Databases::create,
+            py::arg("name"),
+            py::arg("description"),
+            py::arg("input_fasta"),
+            py::arg("mode") = "copy",
+            py::arg("database_type") = "auto",
+            py::arg("offset") = 0,
+            py::arg("shuffle") = false)
+      .def("list", &Databases::list)
+      .def("get", &Databases::get)
+      .def("__getitem__", &Databases::get);
 
   pybind11::class_<mmseqs_call_args>(m, "MMSeqsCallArgs")
       .def(pybind11::init<>())
@@ -62,6 +111,7 @@ PYBIND11_MODULE(mmseqs_native, m) {
 
   pybind11::class_<Parameters>(m, "MMSeqsCallConfig")
       .def(pybind11::init<>())
+      .def_readwrite("logFilePath", &Parameters::logFilePath)
       .def_readwrite("baseTmpPath", &Parameters::baseTmpPath)
       .def_readwrite("db1", &Parameters::db1)
       .def_readwrite("db1Index", &Parameters::db1Index)

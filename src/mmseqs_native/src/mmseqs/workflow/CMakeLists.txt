@@ -1,0 +1,19 @@
+set(workflow_source_files
+        mmseqs/workflow/Cluster.cpp
+        mmseqs/workflow/ClusterUpdate.cpp
+        mmseqs/workflow/Databases.cpp
+        mmseqs/workflow/Linclust.cpp
+        mmseqs/workflow/EasySearch.cpp
+        mmseqs/workflow/EasyRbh.cpp
+        mmseqs/workflow/EasyCluster.cpp
+        mmseqs/workflow/EasyLinclust.cpp
+        mmseqs/workflow/Enrich.cpp
+        mmseqs/workflow/Linsearch.cpp
+        mmseqs/workflow/Map.cpp
+        mmseqs/workflow/Rbh.cpp
+        mmseqs/workflow/Search.cpp
+        mmseqs/workflow/Taxonomy.cpp
+        mmseqs/workflow/EasyTaxonomy.cpp
+        mmseqs/workflow/CreateIndex.cpp
+        PARENT_SCOPE
+        )

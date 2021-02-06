@@ -12,6 +12,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
 
 set(CMAKE_BUILD_TYPE Debug)
 if (MSVC)
@@ -26,6 +27,7 @@ message("-- Source Directory: ${CMAKE_CURRENT_SOURCE_DIR}")
 message("-- Project Directory: ${PROJECT_SOURCE_DIR}")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/lib/cppfs/cmake")
 
+include(AppendTargetProperty)
 include(GenerateExportHeader)
 include(Custom)
 include(HealthCheck)
@@ -183,10 +185,10 @@ if (PPC64)
 endif ()
 
 set(MMSEQS_C_FLAGS "${MMSEQS_CXX_FLAGS}")
-set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} -std=c++1y")
+set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} -std=c++17")
 # Compiler-specific features
 if (CMAKE_COMPILER_IS_CLANG AND (NOT EMSCRIPTEN))
-    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+    set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++17")
     set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
     set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} -stdlib=libc++")
 endif ()
@@ -244,45 +246,81 @@ add_subdirectory(lib/cacode)
 add_subdirectory(lib/alp)
 add_subdirectory(lib/ksw2)
 add_subdirectory(data)
-add_subdirectory(src/mmseqs_native/src)
+
+add_subdirectory(src/mmseqs_native/src/mmseqs/alignment)
+add_subdirectory(src/mmseqs_native/src/mmseqs/clustering)
+add_subdirectory(src/mmseqs_native/src/mmseqs/commons)
+add_subdirectory(src/mmseqs_native/src/mmseqs/linclust)
+add_subdirectory(src/mmseqs_native/src/mmseqs/multihit)
+add_subdirectory(src/mmseqs_native/src/mmseqs/prefiltering)
+add_subdirectory(src/mmseqs_native/src/mmseqs/taxonomy)
+add_subdirectory(src/mmseqs_native/src/mmseqs/util)
+add_subdirectory(src/mmseqs_native/src/mmseqs/workflow)
+
 # if (NOT FRAMEWORK_ONLY AND INSTALL_UTIL)
 #     add_subdirectory(src/mmseqs_native/src/util)
 # endif ()
 
-
-file(GLOB BINDINGS_COMMON_SRCS "src/mmseqs_native/src/commons/*.cpp"
-                               "src/mmseqs_native/src/*.cpp")
+set(MMSEQ_FRAMEWORK_SOURCES
+    ${alignment_header_files}
+    ${alignment_source_files}
+    ${clustering_header_files}
+    ${clustering_source_files}
+    ${commons_header_files}
+    ${commons_source_files}
+    ${prefiltering_header_files}
+    ${prefiltering_source_files}
+    ${multihit_header_files}
+    ${multihit_source_files}
+    ${taxonomy_header_files}
+    ${taxonomy_source_files}
+    ${linclust_source_files}
+    ${util_header_files}
+    ${util_source_files}
+    ${workflow_source_files}
+)
+set(MMSEQ_TARGET_SOURCES
+    $<TARGET_OBJECTS:alp>
+    $<TARGET_OBJECTS:ksw2>
+    $<TARGET_OBJECTS:cacode>
+)
+list(TRANSFORM MMSEQ_FRAMEWORK_SOURCES PREPEND src/mmseqs_native/src/)
+set(BINDINGS_COMMON_SRCS
+    ${MMSEQ_FRAMEWORK_SOURCES}
+    ${MMSEQ_TARGET_SOURCES}
+)
 
 # Generate python module
+
+set(MMSEQ_TARGET_INCLUDES
+    ${CMAKE_BINARY_DIR}/generated
+    ${PROJECT_BINARY_DIR}/generated
+    "src/mmseqs_native/src)"
+    "lib/toml11"
+    "lib/spdlog/include"
+    "lib/cppfs/include"
+    "src"
+    .
+)
+
+set(MMSEQ_TARGET_DEPENDENCIES
+    "generated"
+)
+
+set(MMSEQ_TARGET_LINKS
+    "spdlog"
+    "cppfs"
+)
+
+ # this will probably break if you omit the "s
+string(REPLACE " " ";" MMSEQS_CXX_FLAGS_LIST "${MMSEQS_CXX_FLAGS}")
 
 add_subdirectory(lib/pybind11)
 pybind11_add_module(mmseqs_native ${SOURCES} "${SOURCE_DIR}/bindings.cpp" ${BINDINGS_COMMON_SRCS})
 #set_target_properties(mmseqs_native PROPERTIES LINK_FLAGS "-Wl,-undefined,error")
-target_include_directories(mmseqs_native PUBLIC ${CMAKE_BINARY_DIR}/generated)
-target_include_directories(mmseqs_native PUBLIC ${PROJECT_BINARY_DIR}/generated)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/alignment)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/clustering)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/commons)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/multihit)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/prefiltering)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/linclust)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/taxonomy)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src/util)
-target_include_directories(mmseqs_native PUBLIC src/mmseqs_native/src)
-target_include_directories(mmseqs_native PUBLIC lib/toml11)
-target_include_directories(mmseqs_native PUBLIC lib/spdlog/include)
-target_include_directories(mmseqs_native PUBLIC lib/cppfs/include)
-get_target_property(COMPILE_TMP mmseqs-framework COMPILE_FLAGS)
-get_target_property(LINK_TMP mmseqs-framework LINK_FLAGS)
-get_target_property(DEF_TMP mmseqs-framework COMPILE_DEFINITIONS)
-get_target_property(INCL_TMP mmseqs-framework INCLUDE_DIRECTORIES)
-target_link_libraries(mmseqs_native PRIVATE mmseqs-framework)
-target_link_libraries(mmseqs_native PRIVATE spdlog)
-append_target_property(mmseqs_native COMPILE_FLAGS ${COMPILE_TMP})
-append_target_property(mmseqs_native LINK_FLAGS ${LINK_TMP})
-set_property(TARGET mmseqs_native APPEND PROPERTY COMPILE_DEFINITIONS ${DEF_TMP})
-set_property(TARGET mmseqs_native APPEND PROPERTY INCLUDE_DIRECTORIES ${INCL_TMP})
-target_link_libraries(mmseqs_native PRIVATE cppfs)
+target_include_directories(mmseqs_native PUBLIC ${MMSEQ_TARGET_INCLUDES})
+add_dependencies(mmseqs_native ${MMSEQ_TARGET_DEPENDENCIES})
+target_link_libraries(mmseqs_native PRIVATE ${MMSEQ_TARGET_LINKS})
 
 # Pedantic
 if (MSVC)
@@ -292,5 +330,164 @@ else()
     # lots of warnings and all warnings as errors
     target_compile_options(mmseqs_native PRIVATE -Wall -Wextra -pedantic)
 endif()
+
+# needed for concat.h
+include(CheckCXXSourceCompiles)
+check_cxx_source_compiles("
+        #include <stdlib.h>
+        #include <fcntl.h>
+        #include <stdio.h>
+
+        int main() {
+          FILE* tmpf = tmpfile();
+          int input_desc = fileno(tmpf);
+          int test = posix_fadvise(input_desc, 0, 0, POSIX_FADV_SEQUENTIAL);
+          fclose(tmpf);
+          return 0;
+        }"
+        HAVE_POSIX_FADVISE)
+if (HAVE_POSIX_FADVISE)
+    target_compile_definitions(mmseqs_native PUBLIC -DHAVE_POSIX_FADVISE=1)
+endif ()
+
+check_cxx_source_compiles("
+        #include <stdlib.h>
+        #include <fcntl.h>
+        #include <stdio.h>
+        #include <sys/mman.h>
+
+        int main() {
+          FILE* tmpf = tmpfile();
+          void *tmp = mmap(NULL, 32, PROT_READ, MAP_SHARED, fileno(tmpf), 0);
+          int test = posix_madvise(tmp, 32, POSIX_MADV_SEQUENTIAL);
+          fclose(tmpf);
+          return 0;
+        }"
+        HAVE_POSIX_MADVISE)
+if (HAVE_POSIX_MADVISE)
+    target_compile_definitions(mmseqs_native PUBLIC -DHAVE_POSIX_MADVISE=1)
+endif ()
+
+if (NOT DISABLE_IPS4O)
+    find_package(Atomic)
+    if (ATOMIC_FOUND)
+        target_link_libraries(mmseqs_native PRIVATE ${ATOMIC_LIBRARIES})
+        target_compile_definitions(mmseqs_native PUBLIC -DENABLE_IPS4O=1)
+        message("-- IPS4O sorting works")
+    else ()
+        message("-- OMPTL sorting fallback")
+    endif ()
+else ()
+    message("-- OMPTL sorting fallback")
+endif ()
+
+target_link_libraries(mmseqs_native PRIVATE tinyexpr libzstd_static microtar)
+if (CYGWIN)
+    target_link_libraries(mmseqs_native PRIVATE nedmalloc)
+endif ()
+
+find_package(ZLIB QUIET)
+if (ZLIB_FOUND)
+    message("-- Found ZLIB")
+    set(OLD_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
+    set(OLD_CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES})
+    set(OLD_CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
+    set(CMAKE_REQUIRED_FLAGS -lz)
+    set(CMAKE_REQUIRED_INCLUDES ${ZLIB_INCLUDE_DIRS})
+    set(CMAKE_REQUIRED_LIBRARIES ${ZLIB_LIBRARIES})
+    check_cxx_source_compiles("
+        #include <zlib.h>
+        int main() { gzFile file; return 0; }"
+        HAVE_ZLIB_CHECK)
+    set(CMAKE_REQUIRED_FLAGS ${OLD_CMAKE_REQUIRED_FLAGS})
+    set(CMAKE_REQUIRED_INCLUDES ${OLD_CMAKE_REQUIRED_INCLUDES})
+    set(CMAKE_REQUIRED_LIBRARIES ${OLD_CMAKE_REQUIRED_LIBRARIES})
+    if(HAVE_ZLIB_CHECK)
+        message("-- ZLIB works")
+        target_include_directories(mmseqs_native PUBLIC ${ZLIB_INCLUDE_DIRS})
+        target_compile_definitions(mmseqs_native PUBLIC -DHAVE_ZLIB=1)
+        target_link_libraries(mmseqs_native PRIVATE ${ZLIB_LIBRARIES})
+    else ()
+        message("-- ZLIB does not work")
+    endif()
+else ()
+    message("-- Could not find ZLIB")
+endif ()
+
+find_package(BZip2 QUIET)
+if (BZIP2_FOUND)
+    message("-- Found BZLIB")
+    set(OLD_CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS})
+    set(OLD_CMAKE_REQUIRED_INCLUDES ${CMAKE_REQUIRED_INCLUDES})
+    set(OLD_CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES})
+    set(CMAKE_REQUIRED_FLAGS -lbz2)
+    set(CMAKE_REQUIRED_INCLUDES ${BZIP_INCLUDE_DIRS})
+    set(CMAKE_REQUIRED_LIBRARIES ${BZIP2_LIBRARIES})
+    check_cxx_source_compiles("
+        #include <bzlib.h>
+        int main() { bz_stream stream; return 0; }"
+        HAVE_BZLIB_CHECK)
+    set(CMAKE_REQUIRED_FLAGS ${OLD_CMAKE_REQUIRED_FLAGS})
+    set(CMAKE_REQUIRED_INCLUDES ${OLD_CMAKE_REQUIRED_INCLUDES})
+    set(CMAKE_REQUIRED_LIBRARIES ${OLD_CMAKE_REQUIRED_LIBRARIES})
+    if(HAVE_BZLIB_CHECK)
+        message("-- BZLIB works")
+        target_include_directories(mmseqs_native PUBLIC ${BZIP_INCLUDE_DIRS})
+        target_compile_definitions(mmseqs_native PUBLIC -DHAVE_BZLIB=1)
+        target_link_libraries(mmseqs_native PRIVATE ${BZIP2_LIBRARIES})
+    else ()
+        message("-- BZLIB does not work")
+    endif()
+else ()
+    message("-- Could not find BZLIB")
+endif ()
+
+# MPI
+if (HAVE_MPI)
+    find_package(MPI REQUIRED)
+    if (MPI_FOUND)
+        message("-- Found MPI")
+        target_include_directories(mmseqs_native PUBLIC ${MPI_INCLUDE_PATH})
+        #Hack (OMPI_SKIP_MPICXX=1): https://github.com/open-mpi/ompi/issues/5157#issuecomment-388495496
+        target_compile_definitions(mmseqs_native PUBLIC -DHAVE_MPI=1 -DOMPI_SKIP_MPICXX=1)
+        target_link_libraries(mmseqs_native ${MPI_LIBRARIES})
+        append_target_property(mmseqs_native COMPILE_FLAGS ${MPI_COMPILE_FLAGS})
+        append_target_property(mmseqs_native LINK_FLAGS ${MPI_LINK_FLAGS})
+    endif ()
+endif ()
+
+find_package(OpenMP QUIET)
+if (OPENMP_FOUND)
+    message("-- Found OpenMP")
+    target_compile_definitions(mmseqs_native PUBLIC -DOPENMP=1)
+    # For GCC we dont want to do this since it breaks macOS static builds
+    # It will link libgomp.a internally (through -fopenmp I guess)
+    # and also link libgomp.dylib thus breaking static builds
+    if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        target_link_libraries(mmseqs_native PRIVATE ${OpenMP_CXX_LIBRARIES})
+    endif()
+    append_target_property(mmseqs_native COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+    append_target_property(mmseqs_native LINK_FLAGS ${OpenMP_CXX_FLAGS})
+elseif (REQUIRE_OPENMP)
+    message("-- Could not find OpenMP.")
+endif ()
+
+if (HAVE_GPROF)
+    include(CheckCXXCompilerFlag)
+    check_cxx_compiler_flag(-pg GPROF_FOUND)
+    if (GPROF_FOUND)
+        append_target_property(mmseqs_native COMPILE_FLAGS -pg)
+        append_target_property(mmseqs_native LINK_FLAGS -pg)
+    else ()
+        message(FATAL_ERROR "-- Could not find GPROF")
+    endif ()
+endif ()
+
+###
+
+# add_executable(state_loader src/state/state_loader.cpp)
+# target_include_directories(state_loader PUBLIC ${MMSEQ_TARGET_INCLUDES})
+# add_dependencies(state_loader ${MMSEQ_TARGET_DEPENDENCIES})
+# target_link_libraries(state_loader PRIVATE ${MMSEQ_TARGET_LINKS})
 
 
