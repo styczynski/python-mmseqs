@@ -1,4 +1,4 @@
-from .mmseqs_native import Databases, SearchResults
+from .mmseqs_native import Client, SearchResults
 import pandas as pd
 
 VERSION = "1.0.0"
@@ -19,7 +19,7 @@ SearchResults.dataframe = property(search_results_get_dataframe)
 
 class MMSeqs:
     def __init__(self, storage_directory: str = "mmseqs_storage"):
-        self.databases = Databases(storage_directory, VERSION)
+        self.databases = Client(storage_directory, VERSION)
 
 
 __all__ = [

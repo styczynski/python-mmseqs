@@ -1,3 +1,6 @@
+#ifndef API_RAND_H
+#define API_RAND_H
+
 #include <algorithm>
 #include <array>
 #include <cstring>
@@ -7,7 +10,7 @@
 #include <string>
 
 template <typename T = std::mt19937>
-auto random_generator() -> T {
+static auto random_generator() -> T {
     auto constexpr seed_bits = sizeof(typename T::result_type) * T::state_size;
     auto constexpr seed_len = seed_bits / std::numeric_limits<std::seed_seq::result_type>::digits;
     auto seed = std::array<std::seed_seq::result_type, seed_len>{};
@@ -17,7 +20,7 @@ auto random_generator() -> T {
     return T{seed_seq};
 }
 
-auto generate_random_alphanumeric_string(std::size_t len) -> std::string {
+static auto generate_random_alphanumeric_string(std::size_t len) -> std::string {
     static constexpr auto chars =
         "0123456789"
         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
@@ -29,6 +32,8 @@ auto generate_random_alphanumeric_string(std::size_t len) -> std::string {
     return result;
 }
 
-std::string get_uuid() {
+static std::string get_uuid() {
     return generate_random_alphanumeric_string(25);
 }
+
+#endif

@@ -255,6 +255,7 @@ add_subdirectory(src/mmseqs_native/src/mmseqs/multihit)
 add_subdirectory(src/mmseqs_native/src/mmseqs/prefiltering)
 add_subdirectory(src/mmseqs_native/src/mmseqs/taxonomy)
 add_subdirectory(src/mmseqs_native/src/mmseqs/util)
+add_subdirectory(src/mmseqs_native/src/mmseqs/api)
 add_subdirectory(src/mmseqs_native/src/mmseqs/workflow)
 
 # if (NOT FRAMEWORK_ONLY AND INSTALL_UTIL)
@@ -266,6 +267,8 @@ set(MMSEQ_FRAMEWORK_SOURCES
     ${alignment_source_files}
     ${clustering_header_files}
     ${clustering_source_files}
+    ${api_header_files}
+    ${api_source_files}
     ${commons_header_files}
     ${commons_source_files}
     ${prefiltering_header_files}
