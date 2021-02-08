@@ -7,6 +7,7 @@
 #include <mmseqs/api/utils.h>
 #include <mmseqs/commons/fileUtil.h>
 
+
 Database::Database() {}
 Database::Database(StateDatabase state, Client* parent): _state(state), _parent(parent) {}
 
@@ -201,4 +202,76 @@ const std::string& Database::getDescription() const {
 
 const std::string& Database::getType() const {
     return _state.database_type;
+}
+
+Database::DBIterator::DBIterator(std::shared_ptr<DBReader<unsigned int>> db_reader, std::shared_ptr<DBReader<unsigned int>> header_reader, Database::DBIterator::pointer ptr): _db_reader(db_reader), _header_reader(header_reader), m_ptr(ptr) {}
+
+Database::DBIterator::reference Database::DBIterator::operator*() {
+    unsigned int key = _db_reader->getDbKey(m_ptr);
+    unsigned int headerKey = _header_reader->getId(key);
+    const char* headerData = _header_reader->getData(headerKey, 0);
+    const size_t headerLen = strlen(headerData);
+
+    unsigned int bodyKey = _db_reader->getId(key);
+    const char* bodyData = _db_reader->getData(bodyKey, 0);
+    const size_t bodyLen = _db_reader->getEntryLen(bodyKey);
+
+    return Record(bodyData, bodyLen-2, headerData, headerLen-1);
+}
+Database::DBIterator::pointer Database::DBIterator::operator->() { return m_ptr; }
+Database::DBIterator& Database::DBIterator::operator++() { m_ptr++; return *this; }
+Database::DBIterator Database::DBIterator::operator++(int) { Database::DBIterator tmp = *this; ++(*this); return tmp; }
+bool operator== (const Database::DBIterator& a, const Database::DBIterator& b) { return a.m_ptr == b.m_ptr; };
+bool operator!= (const Database::DBIterator& a, const Database::DBIterator& b) { return a.m_ptr != b.m_ptr; };
+Database::DBIterator Database::begin() {
+    _init_readers();
+    return Database::DBIterator(db_reader, header_reader, 0);
+}
+Database::DBIterator Database::end() {
+    _init_readers();
+    return Database::DBIterator(db_reader, header_reader, db_reader->getSize());
+}
+
+void Database::_init_readers() {
+    if (!db_reader) {
+        std::string db_path = _parent->get_storage_path(_state.name);
+        std::string db_index_path = _parent->get_storage_path(_state.name + ".index");
+        db_reader = std::make_shared<DBReader<unsigned int>>(&_out, db_path.c_str(), db_index_path.c_str(), 1, DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
+        db_reader->open(DBReader<unsigned int>::NOSORT);
+    }
+    if (!header_reader) {
+        std::string header_path = _parent->get_storage_path(_state.name + "_h");
+        std::string header_index_path = _parent->get_storage_path(_state.name + "_h.index");
+        header_reader = std::make_shared<DBReader<unsigned int>>(&_out, header_path.c_str(), header_index_path.c_str(), 1, DBReader<unsigned int>::USE_DATA | DBReader<unsigned int>::USE_INDEX);
+        header_reader->open(DBReader<unsigned int>::NOSORT);
+    }
+}
+
+const std::tuple<py::array, py::array, py::array> Database::getColumnData() {
+     _init_readers();
+
+     const int count = db_reader->getSize();
+     std::vector<std::string> headers;
+     std::vector<std::string> sequences;
+     std::vector<int> lengths;
+
+     headers.reserve(count);
+     sequences.reserve(count);
+     lengths.reserve(count);
+
+     for (size_t i=0; i<count; ++i) {
+        unsigned int key = db_reader->getDbKey(i);
+        unsigned int headerKey = header_reader->getId(key);
+        const char* headerData = header_reader->getData(headerKey, 0);
+        const size_t headerLen = strlen(headerData);
+
+        unsigned int bodyKey = db_reader->getId(key);
+        const char* bodyData = db_reader->getData(bodyKey, 0);
+        const size_t bodyLen = db_reader->getEntryLen(bodyKey);
+
+        headers.push_back(std::string(headerData, headerLen-1));
+        sequences.push_back(std::string(bodyData, bodyLen-2));
+        lengths.push_back(bodyLen-2);
+     }
+     return std::make_tuple(py::array(py::cast(headers)), py::array(py::cast(sequences)), py::array(py::cast(lengths)));
 }

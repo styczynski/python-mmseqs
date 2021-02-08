@@ -64,7 +64,14 @@ PYBIND11_MODULE(mmseqs_native, m) {
             )
       .def_property("name", &Database::getName, &Database::setName)
       .def_property("description", &Database::getDescription, &Database::setDescription)
-      .def_property_readonly("type", &Database::getType);
+      .def_property_readonly("type", &Database::getType)
+      .def_property_readonly("columns_data", &Database::getColumnData)
+      .def("__iter__", [](Database &db) { return py::make_iterator(db.begin(), db.end()); }, py::keep_alive<0, 1>());
+
+  pybind11::class_<Database::Record>(m, "Record")
+      .def(pybind11::init<>())
+      .def_readwrite("seq", &Database::Record::_sequence)
+      .def_readwrite("id", &Database::Record::_header);
 
   pybind11::class_<Client>(m, "Client")
       .def(pybind11::init<const std::string&, const std::string&>())
@@ -79,8 +86,7 @@ PYBIND11_MODULE(mmseqs_native, m) {
       .def("list", &Client::list)
       .def("get", &Client::get)
       .def("__getitem__", &Client::get)
-      .def("__iter__", [](Client &c) { return py::make_iterator(c.begin(), c.end()); },
-                         py::keep_alive<0, 1>());
+      .def("__iter__", [](Client &c) { return py::make_iterator(c.begin(), c.end()); }, py::keep_alive<0, 1>());
 
   pybind11::class_<mmseqs_call_args>(m, "MMSeqsCallArgs")
       .def(pybind11::init<>())
