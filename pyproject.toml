@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "mmseqs"
-version = "1.0.0"
+version = "1.0.1"
 description = "MMSEQS Python bindings"
 authors = ["Piotr Styczyński <piotr@styczynski.in>"]
 build = "build.py"
