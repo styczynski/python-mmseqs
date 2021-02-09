@@ -7,6 +7,8 @@ import sys
 from distutils.version import LooseVersion
 from shutil import copyfile, copymode
 
+import distutils.sysconfig as sysconfig
+
 from setuptools import Extension
 from setuptools.command.build_ext import build_ext
 
@@ -46,6 +48,8 @@ class CMakeBuild(build_ext):
             "-DPYTHON_EXECUTABLE=" + sys.executable,
             "-DREQUIRE_OPENMP=0",
             "-DCMAKE_BUILD_TYPE=Debug",
+            f"-DPYTHON_INCLUDE_DIR={sysconfig.get_python_inc()}",
+            f"-DPYTHON_LIBRARY={sysconfig.get_config_var('LIBDIR')}",
         ]
 
         cfg = "Debug" if self.debug else "Release"
