@@ -1,0 +1,67 @@
+name: Build and release
+
+#on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build_wheels:
+    name: Build wheels on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, ubuntu-18.04, ubuntu-16.04, macos-11.0, macOS-10.15]
+    steps:
+      - name: Checkout the project
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        name: Install Python
+        with:
+          python-version: '3.8'
+          architecture: 'x64'
+      - name: Install cibuildwheel
+        run: python -m pip install cibuildwheel==1.8.0
+      - name: Build wheels
+        run: python -m cibuildwheel --output-dir wheelhouse
+        env:
+          CIBW_SKIP: "cp27-* pp27-* cp35-* pp35-* cp36-* pp36-* cp37-* pp37-*"  # skip Python 2.7 wheels
+      - name: Upload prebuild wheels
+        uses: actions/upload-artifact@v2
+        with:
+          name: build_wheels
+          path: ./wheelhouse/*.whl
+
+  release:
+    name: Publish release
+    needs: build_wheels
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the project
+        uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        name: Install Python
+        with:
+          python-version: '3.8'
+          architecture: 'x64'
+      - name: Install Poetry
+        uses: snok/install-poetry@v1.1.1
+      - name: Download prebuilt wheels
+        uses: actions/download-artifact@v2
+        with:
+          name: build_wheels
+      - name: Temporarily store all prebuild wheels
+        shell: bash
+        run: mkdir _build_wheels && cp ./*.whl _build_wheels
+      - name: Run poetry build
+        shell: bash
+        run: poetry build
+      - name: Copy all prebuilt wheels
+        shell: bash
+        run: cp ./_build_wheels/* dist
+      - name: Publish a Python distribution to PyPI
+        uses: pypa/gh-action-pypi-publish@master
+        with:
+          user: styczynski
+          password: ${{ secrets.PYPI_API_TOKEN }}
