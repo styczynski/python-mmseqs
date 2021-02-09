@@ -17,6 +17,8 @@ sys.path.append(str(Path(__file__).parents[1]))
 
 import os, sys
 sys.path.insert(0, os.path.abspath('../src'))
+sys.path.insert(0, os.path.abspath('_ext'))
+sys.path.insert(0, os.path.abspath('.'))
 #sys.path.insert(0, os.path.abspath('../src/mmseqs_native'))
 
 # -- Project information -----------------------------------------------------
@@ -35,8 +37,12 @@ version = project_poetry_conf["version"]
 
 extensions = [
     #'numpydoc',
+    'add_links',
     'sphinx_pyreverse',
+    'sphinx_sitemap',
     #'sphinxcontrib.apidoc',
+    'sphinx_gitstamp',
+    'sphinx_last_updated_by_git',
     'sphinx.ext.autodoc',
     'sphinx_git',
     'sphinx_autodoc_typehints',
@@ -54,6 +60,9 @@ extensions = [
     'sphinx_click',
     'sphinx.ext.graphviz',
     'sphinx.ext.inheritance_diagram',
+    'sphinxcontrib.needs',
+    'sphinxcontrib.test_reports',
+    'sphinxcontrib.plantuml'
 ]
 
 master_doc = 'index'
@@ -84,6 +93,10 @@ apidoc_excluded_paths = ['tests']
 apidoc_separate_modules = True
 
 autosummary_generate = True
+
+html_baseurl = 'https://my-site.com/docs/'
+
+gitstamp_fmt = "%b %d, %Y"
 
 #
 # -- Options for the theme ----------------------------------------------------
@@ -131,6 +144,9 @@ add_module_names = False
 from recommonmark.parser import CommonMarkParser
 
 def setup(app):
+    from utils.import_coverage import import_coverage_report
+    import_coverage_report()
+    #os.system(f'cd {os.path.abspath("..")} && make test')
     from shutil import copyfile
     from pathlib import Path
     Path("./_sphinx_resources").mkdir(parents=True, exist_ok=True)
@@ -145,3 +161,46 @@ def setup(app):
         'enable_inline_math': True,
         'enable_math': True,
     }, True)
+
+
+# --------
+
+# conf.py
+# srclink settings
+srclink_project = 'https://github.com/styczynski/python-mmseqs'
+#srclink_project = 'https://bitbucket.org/westurner/sphinxcontrib-srclinks'
+#srclink_project = 'hg@bitbucket.org/westurner/sphinxcontrib-srclinks'
+#srclink_project = 'git@bitbucket.org/westurner/sphinxcontrib-srclinks'
+srclink_src_path = '.doc/'
+#srclink_src_path = ''
+srclink_branch = 'master'
+#srclink_branch = 'develop'
+
+# Custom sidebar templates, maps document names to template names.
+html_sidebars = {
+    '**': [
+        "sidebar/scroll-start.html",
+        "sidebar/brand.html",
+        "sidebar/search.html",
+        "sidebar/navigation.html",
+        "sidebar/ethical-ads.html",
+        "sidebar/scroll-end.html",
+        'srclinks.html',
+    ]
+}
+
+# plant uml
+on_rtd = os.environ.get('READTHEDOCS') == 'True'
+if on_rtd:
+    plantuml = 'java -Djava.awt.headless=true -jar /usr/share/plantuml/plantuml.jar'
+else:
+    cwd = os.getcwd()
+    plantuml = 'java -jar %s' % os.path.join(cwd, "utils/plantuml_beta.jar")
+
+# If we are running on windows, we need to manipulate the path,
+# otherwise plantuml will have problems.
+if os.name == "nt":
+    plantuml = plantuml.replace("/", "\\")
+    plantuml = plantuml.replace("\\", "\\\\")
+
+plantuml_output_format = 'png'

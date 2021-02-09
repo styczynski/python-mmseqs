@@ -13,3 +13,5 @@ MMSeqs Documentation
 
    mmseqs
 
+.. gitstamp::
+

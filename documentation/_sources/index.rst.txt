@@ -8,6 +8,8 @@ Contents:
 
    _sphinx_resources/README.md
    reference/modules
+   tests
+   _sphinx_resources/coverage_index.rst
 
 .. git_changelog::
 
@@ -20,3 +22,5 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
+
+.. gitstamp::

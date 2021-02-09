@@ -15,3 +15,9 @@ mmseqs_native.cpython-*/
 .doc/_build/
 .doc/_reference/
 .doc/_sphinx_resources/
+.doc/_static/
+test_reports/
+.coverage
+coverage.xml
+htmlcov/
+.doc/uml_images

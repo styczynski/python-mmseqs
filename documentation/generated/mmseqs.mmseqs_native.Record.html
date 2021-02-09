@@ -1,7 +1,8 @@
 <!doctype html>
 <html class="no-js">
   <head><meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta property="article:modified_time" content="2021-02-09T13:56:07+01:00" /><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" />
 
     <meta name="generator" content="sphinx-3.4.3, furo 2020.12.30.beta24"/>
         <title>mmseqs.mmseqs_native.Record - mmseqs Documentation</title>
@@ -38,12 +39,21 @@
   }
 </style><link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
     <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-needs/libs/html/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-needs/common.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-needs/styles.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-needs/modern.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-needs/layouts.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/sphinx-test-results/common.css" />
     <link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
     <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
     <script defer="defer" src="../_static/jquery.js"></script>
     <script defer="defer" src="../_static/underscore.js"></script>
     <script defer="defer" src="../_static/doctools.js"></script>
     <script defer="defer" src="../_static/tabs.js"></script>
+    <script defer="defer" src="../_static/sphinx-needs/libs/html/datatables.min.js"></script>
+    <script defer="defer" src="../_static/sphinx-needs/libs/html/datatables_loader.js"></script>
+    <script defer="defer" src="../_static/sphinx-needs/libs/html/sphinx_needs_collapse.js"></script>
     <script defer src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></head>
   <body dir="">
     
@@ -104,7 +114,7 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+      <div class="sidebar-sticky"><div class="sidebar-scroll"><a class="sidebar-brand" href="../index.html">
   
   
   <span class="sidebar-brand-text">mmseqs Documentation</span>
@@ -113,7 +123,7 @@
   <input class="sidebar-search" placeholder=Search name="q">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
-</form><div class="sidebar-scroll"><div class="sidebar-tree">
+</form><div class="sidebar-tree">
   <ul>
 <li class="toctree-l1"><a class="reference internal" href="../_sphinx_resources/README.html">MMseqs2 bindings for Python</a></li>
 <li class="toctree-l1 has-children"><a class="reference internal" href="../reference/generated/mmseqs.mmseqs_native.html">mmseqs.mmseqs_native</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
@@ -130,9 +140,45 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../reference/mmseqs.html">mmseqs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tests.html">Tests report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../_sphinx_resources/coverage_index.html">Coverage coverage_index</a></li>
 </ul>
 
 </div>
+</div>
+<div class="widget navlinks">
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="../_sources/generated/mmseqs.mmseqs_native.Record.rst.txt"
+            rel="nofollow"
+            target="_blank">Source RST</a></li>
+    <li><a href="https://github.com/styczynski/python-mmseqs/blob/master/.doc/generated/mmseqs.mmseqs_native.Record.rst"
+            rel="nofollow"
+            target="_blank">Source</a></li>
+    <li><a href="https://github.com/styczynski/python-mmseqs/edit/master/.doc/generated/mmseqs.mmseqs_native.Record.rst"
+            rel="nofollow"
+            target="_blank">Edit</a></li>
+     <li><a href="https://github.com/styczynski/python-mmseqs/commits/master/.doc/generated/mmseqs.mmseqs_native.Record.rst"
+             rel="nofollow"
+             target="_blank">History</a></li>
+     <li><a href="https://github.com/styczynski/python-mmseqs/blame/master/.doc/generated/mmseqs.mmseqs_native.Record.rst"
+             rel="nofollow"
+             target="_blank">Annotate</a></li>
+  </ul>
+</div>
+<div class="widget srclinks">
+  <h3>Source</h3>
+  <h5><a href="https://github.com/styczynski/python-mmseqs">github.com/styczynski/python-mmseqs</a>
+      / <a href="https://github.com/styczynski/python-mmseqs/tree/master"
+                rel="nofollow"
+                target="_blank"
+                font="monospace">master</a>
+  </h5>
+  <ul>
+    <li><pre>git clone https://github.com/styczynski/python-mmseqs</pre></li>
+    <li><pre>git clone ssh://git@github.com/styczynski/python-mmseqs</pre></li>
+    <li><pre>git clone git://github.com/styczynski/python-mmseqs</pre></li>
+  </ul>
 </div>
       </div>
       
@@ -193,6 +239,8 @@
 
         <div class="related-information">
               Copyright &#169; Piotr Styczyński &lt;piotr@styczynski.in&gt;
+            |
+            Last updated on Feb 09, 2021.
             |
             Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
               and
