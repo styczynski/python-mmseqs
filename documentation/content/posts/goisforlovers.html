@@ -1,0 +1,582 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta property="article:modified_time" content="2021-01-22T18:50:51+01:00" /><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+
+    <meta name="generator" content="sphinx-3.4.3, furo 2020.12.30.beta24"/>
+        <title>Introduction to Go Templates - mmseqs Documentation</title>
+      <link rel="stylesheet" href="../../_static/styles/furo.css?digest=33d2fc4f3f180ec1ffc6524e273e21d7d58cbe49">
+    <link rel="stylesheet" href="../../_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../../_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" type="text/css" href="../../_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/libs/html/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/styles.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/modern.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/layouts.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-test-results/common.css" />
+    <link rel="stylesheet" href="../../_static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script defer="defer" src="../../_static/jquery.js"></script>
+    <script defer="defer" src="../../_static/underscore.js"></script>
+    <script defer="defer" src="../../_static/doctools.js"></script>
+    <script defer="defer" src="../../_static/tabs.js"></script>
+    <script defer="defer" src="../../_static/js/cleaner_navigation.js"></script>
+    <script defer="defer" src="../../_static/sphinx-needs/libs/html/datatables.min.js"></script>
+    <script defer="defer" src="../../_static/sphinx-needs/libs/html/datatables_loader.js"></script>
+    <script defer="defer" src="../../_static/sphinx-needs/libs/html/sphinx_needs_collapse.js"></script>
+    <script defer src="../../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">mmseqs Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><div class="sidebar-scroll"><a class="sidebar-brand centered" href="../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">mmseqs Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_sphinx_resources/README.html">MMseqs2 bindings for Python</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.html">mmseqs.mmseqs_native</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.Client.html">mmseqs.mmseqs_native.Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.Database.html">mmseqs.mmseqs_native.Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsCallArgs.html">mmseqs.mmseqs_native.MMSeqsCallArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsCallConfig.html">mmseqs.mmseqs_native.MMSeqsCallConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsCallOutput.html">mmseqs.mmseqs_native.MMSeqsCallOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsMultiParamInt.html">mmseqs.mmseqs_native.MMSeqsMultiParamInt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsMultiParamString.html">mmseqs.mmseqs_native.MMSeqsMultiParamString</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsSearchRecord.html">mmseqs.mmseqs_native.MMSeqsSearchRecord</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.Record.html">mmseqs.mmseqs_native.Record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.SearchResults.html">mmseqs.mmseqs_native.SearchResults</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/mmseqs.html">mmseqs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">Tests report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_sphinx_resources/coverage_index.html">Coverage coverage_index</a></li>
+</ul>
+
+</div>
+</div>
+<!-- Place this tag in your head or just before your close body tag. -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;color:#000000;font-size:14px;">
+    <div class="widget navlinks" style="bottom: 10px;background: #f8f9fb;border: solid 2px #eeebee;left: 86vw;padding-left: 15px;position: absolute;padding-right: 15px;">
+      <ul class="this-page-menu">
+        <li><a href="../../_sources/content/posts/goisforlovers.md.txt"
+                rel="nofollow"
+                style="color:#000000;font-size:14px;"
+                target="_blank">Source RST</a></li>
+        <li><a href="https://github.com/styczynski/python-mmseqs/blob/master/.doc/content/posts/goisforlovers.md"
+                rel="nofollow"
+                style="color:#000000;font-size:14px;"
+                target="_blank">Source</a></li>
+        <li><a href="https://github.com/styczynski/python-mmseqs/edit/master/.doc/content/posts/goisforlovers.md"
+                rel="nofollow"
+                style="color:#000000;font-size:14px;"
+                target="_blank">Edit</a></li>
+         <li><a href="https://github.com/styczynski/python-mmseqs/commits/master/.doc/content/posts/goisforlovers.md"
+                 rel="nofollow"
+                 style="color:#000000;font-size:14px;"
+                 target="_blank">History</a></li>
+         <li><a href="https://github.com/styczynski/python-mmseqs/blame/master/.doc/content/posts/goisforlovers.md"
+                 rel="nofollow"
+                 style="color:#000000;font-size:14px;"
+                 target="_blank">Annotate</a></li>
+      </ul>
+    </div>
+    <div class="widget srclinks">
+      <div style="padding-top:16px;border-top: 2px solid lightgray;margin-bottom:10px;"><a href="https://github.com/styczynski/python-mmseqs">/styczynski/python-mmseqs</a>
+      </div>
+      <div>
+          <div style="display:inline-block">
+              <a class="github-button" href="https://github.com/styczynski/python-mmseqs" data-icon="octicon-star" data-size="large" aria-label="Star styczynski/python-mmseqs on GitHub">Star</a>
+          </div>
+          <div style="display:inline-block">
+              <a class="github-button" href="https://github.com/styczynski/python-mmseqs/archive/master.zip" data-icon="octicon-download" data-size="large" aria-label="Download styczynski/python-mmseqs on GitHub">Download</a>
+          </div>
+      </div>
+      <div style="display:inline-block">
+          <a class="github-button" href="https://github.com/styczynski" data-size="large" data-show-count="true" aria-label="Follow @styczynski on GitHub">Follow @styczynski</a>
+      </div>
+    </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <p>+++
+title = “(Hu)go Template Primer”
+description = “”
+tags = [
+“go”,
+“golang”,
+“templates”,
+“themes”,
+“development”,
+]
+date = “2014-04-02”
+categories = [
+“Development”,
+“golang”,
+]
+menu = “main”
++++</p>
+<p>Hugo uses the excellent <a class="reference external" href="https://golang.org/">Go</a> <a class="reference external" href="https://golang.org/pkg/html/template/">html/template</a> library for
+its template engine. It is an extremely lightweight engine that provides a very
+small amount of logic. In our experience that it is just the right amount of
+logic to be able to create a good static website. If you have used other
+template systems from different languages or frameworks you will find a lot of
+similarities in Go templates.</p>
+<p>This document is a brief primer on using Go templates. The <a class="reference external" href="https://golang.org/pkg/html/template/">Go docs</a>
+provide more details.</p>
+<div class="section" id="introduction-to-go-templates">
+<h1>Introduction to Go Templates<a class="headerlink" href="#introduction-to-go-templates" title="Permalink to this headline">¶</a></h1>
+<p>Go templates provide an extremely simple template language. It adheres to the
+belief that only the most basic of logic belongs in the template or view layer.
+One consequence of this simplicity is that Go templates parse very quickly.</p>
+<p>A unique characteristic of Go templates is they are content aware. Variables and
+content will be sanitized depending on the context of where they are used. More
+details can be found in the <a class="reference external" href="https://golang.org/pkg/html/template/">Go docs</a>.</p>
+</div>
+<div class="section" id="basic-syntax">
+<h1>Basic Syntax<a class="headerlink" href="#basic-syntax" title="Permalink to this headline">¶</a></h1>
+<p>Golang templates are HTML files with the addition of variables and
+functions.</p>
+<p><strong>Go variables and functions are accessible within {{ }}</strong></p>
+<p>Accessing a predefined variable “foo”:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="n">foo</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p><strong>Parameters are separated using spaces</strong></p>
+<p>Calling the add function with input of 1, 2:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="n">add</span> <span class="mi">1</span> <span class="mi">2</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p><strong>Methods and fields are accessed via dot notation</strong></p>
+<p>Accessing the Page Parameter “bar”</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="o">.</span><span class="n">Params</span><span class="o">.</span><span class="n">bar</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p><strong>Parentheses can be used to group items together</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="k">if</span> <span class="ow">or</span> <span class="p">(</span><span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"alt"</span><span class="p">)</span> <span class="p">(</span><span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"caption"</span><span class="p">)</span> <span class="p">}}</span> <span class="n">Caption</span> <span class="p">{{</span> <span class="n">end</span> <span class="p">}}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="variables">
+<h1>Variables<a class="headerlink" href="#variables" title="Permalink to this headline">¶</a></h1>
+<p>Each Go template has a struct (object) made available to it. In hugo each
+template is passed either a page or a node struct depending on which type of
+page you are rendering. More details are available on the
+<a class="reference external" href="/layout/variables">variables</a> page.</p>
+<p>A variable is accessed by referencing the variable name.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">title</span><span class="o">&gt;</span><span class="p">{{</span> <span class="o">.</span><span class="n">Title</span> <span class="p">}}</span><span class="o">&lt;/</span><span class="n">title</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+<p>Variables can also be defined and referenced.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{{ $address := "123 Main St."}}
+{{ $address }}
+</pre></div>
+</div>
+</div>
+<div class="section" id="functions">
+<h1>Functions<a class="headerlink" href="#functions" title="Permalink to this headline">¶</a></h1>
+<p>Go template ship with a few functions which provide basic functionality. The Go
+template system also provides a mechanism for applications to extend the
+available functions with their own. <a class="reference external" href="/layout/functions">Hugo template
+functions</a> provide some additional functionality we believe
+are useful for building websites. Functions are called by using their name
+followed by the required parameters separated by spaces. Template
+functions cannot be added without recompiling hugo.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="n">add</span> <span class="mi">1</span> <span class="mi">2</span> <span class="p">}}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="includes">
+<h1>Includes<a class="headerlink" href="#includes" title="Permalink to this headline">¶</a></h1>
+<p>When including another template you will pass to it the data it will be
+able to access. To pass along the current context please remember to
+include a trailing dot. The templates location will always be starting at
+the /layout/ directory within Hugo.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="n">template</span> <span class="s2">"chrome/header.html"</span> <span class="o">.</span> <span class="p">}}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="logic">
+<h1>Logic<a class="headerlink" href="#logic" title="Permalink to this headline">¶</a></h1>
+<p>Go templates provide the most basic iteration and conditional logic.</p>
+<div class="section" id="iteration">
+<h2>Iteration<a class="headerlink" href="#iteration" title="Permalink to this headline">¶</a></h2>
+<p>Just like in Go, the Go templates make heavy use of range to iterate over
+a map, array or slice. The following are different examples of how to use
+range.</p>
+<p><strong>Example 1: Using Context</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="nb">range</span> <span class="n">array</span> <span class="p">}}</span>
+    <span class="p">{{</span> <span class="o">.</span> <span class="p">}}</span>
+<span class="p">{{</span> <span class="n">end</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p><strong>Example 2: Declaring value variable name</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{{range $element := array}}
+    {{ $element }}
+{{ end }}
+</pre></div>
+</div>
+<p><strong>Example 2: Declaring key and value variable name</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{{range $index, $element := array}}
+    {{ $index }}
+    {{ $element }}
+{{ end }}
+</pre></div>
+</div>
+</div>
+<div class="section" id="conditionals">
+<h2>Conditionals<a class="headerlink" href="#conditionals" title="Permalink to this headline">¶</a></h2>
+<p>If, else, with, or, &amp; and provide the framework for handling conditional
+logic in Go Templates. Like range, each statement is closed with <code class="docutils literal notranslate"><span class="pre">end</span></code>.</p>
+<p>Go Templates treat the following values as false:</p>
+<ul class="simple">
+<li><p>false</p></li>
+<li><p>0</p></li>
+<li><p>any array, slice, map, or string of length zero</p></li>
+</ul>
+<p><strong>Example 1: If</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="k">if</span> <span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"title"</span> <span class="p">}}</span><span class="o">&lt;</span><span class="n">h4</span><span class="o">&gt;</span><span class="p">{{</span> <span class="n">index</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"title"</span> <span class="p">}}</span><span class="o">&lt;/</span><span class="n">h4</span><span class="o">&gt;</span><span class="p">{{</span> <span class="n">end</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p><strong>Example 2: If -&gt; Else</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="k">if</span> <span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"alt"</span> <span class="p">}}</span>
+    <span class="p">{{</span> <span class="n">index</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"alt"</span> <span class="p">}}</span>
+<span class="p">{{</span><span class="k">else</span><span class="p">}}</span>
+    <span class="p">{{</span> <span class="n">index</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"caption"</span> <span class="p">}}</span>
+<span class="p">{{</span> <span class="n">end</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p><strong>Example 3: And &amp; Or</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="k">if</span> <span class="ow">and</span> <span class="p">(</span><span class="ow">or</span> <span class="p">(</span><span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"title"</span><span class="p">)</span> <span class="p">(</span><span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"caption"</span><span class="p">))</span> <span class="p">(</span><span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"attr"</span><span class="p">)}}</span>
+</pre></div>
+</div>
+<p><strong>Example 4: With</strong></p>
+<p>An alternative way of writing “if” and then referencing the same value
+is to use “with” instead. With rebinds the context <code class="docutils literal notranslate"><span class="pre">.</span></code> within its scope,
+and skips the block if the variable is absent.</p>
+<p>The first example above could be simplified as:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="k">with</span> <span class="o">.</span><span class="n">Params</span><span class="o">.</span><span class="n">title</span> <span class="p">}}</span><span class="o">&lt;</span><span class="n">h4</span><span class="o">&gt;</span><span class="p">{{</span> <span class="o">.</span> <span class="p">}}</span><span class="o">&lt;/</span><span class="n">h4</span><span class="o">&gt;</span><span class="p">{{</span> <span class="n">end</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p><strong>Example 5: If -&gt; Else If</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="k">if</span> <span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"alt"</span> <span class="p">}}</span>
+    <span class="p">{{</span> <span class="n">index</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"alt"</span> <span class="p">}}</span>
+<span class="p">{{</span> <span class="k">else</span> <span class="k">if</span> <span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"caption"</span> <span class="p">}}</span>
+    <span class="p">{{</span> <span class="n">index</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"caption"</span> <span class="p">}}</span>
+<span class="p">{{</span> <span class="n">end</span> <span class="p">}}</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="pipes">
+<h1>Pipes<a class="headerlink" href="#pipes" title="Permalink to this headline">¶</a></h1>
+<p>One of the most powerful components of Go templates is the ability to
+stack actions one after another. This is done by using pipes. Borrowed
+from unix pipes, the concept is simple, each pipeline’s output becomes the
+input of the following pipe.</p>
+<p>Because of the very simple syntax of Go templates, the pipe is essential
+to being able to chain together function calls. One limitation of the
+pipes is that they only can work with a single value and that value
+becomes the last parameter of the next pipeline.</p>
+<p>A few simple examples should help convey how to use the pipe.</p>
+<p><strong>Example 1 :</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="k">if</span> <span class="n">eq</span> <span class="mi">1</span> <span class="mi">1</span> <span class="p">}}</span> <span class="n">Same</span> <span class="p">{{</span> <span class="n">end</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p>is the same as</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="n">eq</span> <span class="mi">1</span> <span class="mi">1</span> <span class="o">|</span> <span class="k">if</span> <span class="p">}}</span> <span class="n">Same</span> <span class="p">{{</span> <span class="n">end</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p>It does look odd to place the if at the end, but it does provide a good
+illustration of how to use the pipes.</p>
+<p><strong>Example 2 :</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="n">index</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"disqus_url"</span> <span class="o">|</span> <span class="n">html</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p>Access the page parameter called “disqus_url” and escape the HTML.</p>
+<p><strong>Example 3 :</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span> <span class="k">if</span> <span class="ow">or</span> <span class="p">(</span><span class="ow">or</span> <span class="p">(</span><span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"title"</span><span class="p">)</span> <span class="p">(</span><span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"caption"</span><span class="p">))</span> <span class="p">(</span><span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"attr"</span><span class="p">)}}</span>
+<span class="n">Stuff</span> <span class="n">Here</span>
+<span class="p">{{</span> <span class="n">end</span> <span class="p">}}</span>
+</pre></div>
+</div>
+<p>Could be rewritten as</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span>  <span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"caption"</span> <span class="o">|</span> <span class="ow">or</span> <span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"title"</span> <span class="o">|</span> <span class="ow">or</span> <span class="n">isset</span> <span class="o">.</span><span class="n">Params</span> <span class="s2">"attr"</span> <span class="o">|</span> <span class="k">if</span> <span class="p">}}</span>
+<span class="n">Stuff</span> <span class="n">Here</span>
+<span class="p">{{</span> <span class="n">end</span> <span class="p">}}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="context-aka-the-dot">
+<h1>Context (aka. the dot)<a class="headerlink" href="#context-aka-the-dot" title="Permalink to this headline">¶</a></h1>
+<p>The most easily overlooked concept to understand about Go templates is that {{ . }}
+always refers to the current context. In the top level of your template this
+will be the data set made available to it. Inside of a iteration it will have
+the value of the current item. When inside of a loop the context has changed. .
+will no longer refer to the data available to the entire page. If you need to
+access this from within the loop you will likely want to set it to a variable
+instead of depending on the context.</p>
+<p><strong>Example:</strong></p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  {{ $title := .Site.Title }}
+  {{ range .Params.tags }}
+    &lt;li&gt; &lt;a href="{{ $baseurl }}/tags/{{ . | urlize }}"&gt;{{ . }}&lt;/a&gt; - {{ $title }} &lt;/li&gt;
+  {{ end }}
+</pre></div>
+</div>
+<p>Notice how once we have entered the loop the value of {{ . }} has changed. We
+have defined a variable outside of the loop so we have access to it from within
+the loop.</p>
+</div>
+<div class="section" id="hugo-parameters">
+<h1>Hugo Parameters<a class="headerlink" href="#hugo-parameters" title="Permalink to this headline">¶</a></h1>
+<p>Hugo provides the option of passing values to the template language
+through the site configuration (for sitewide values), or through the meta
+data of each specific piece of content. You can define any values of any
+type (supported by your front matter/config format) and use them however
+you want to inside of your templates.</p>
+<div class="section" id="using-content-page-parameters">
+<h2>Using Content (page) Parameters<a class="headerlink" href="#using-content-page-parameters" title="Permalink to this headline">¶</a></h2>
+<p>In each piece of content you can provide variables to be used by the
+templates. This happens in the <a class="reference external" href="/content/front-matter">front matter</a>.</p>
+<p>An example of this is used in this documentation site. Most of the pages
+benefit from having the table of contents provided. Sometimes the TOC just
+doesn’t make a lot of sense. We’ve defined a variable in our front matter
+of some pages to turn off the TOC from being displayed.</p>
+<p>Here is the example front matter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">---</span>
+<span class="n">title</span><span class="p">:</span> <span class="s2">"Permalinks"</span>
+<span class="n">date</span><span class="p">:</span> <span class="s2">"2013-11-18"</span>
+<span class="n">aliases</span><span class="p">:</span>
+  <span class="o">-</span> <span class="s2">"/doc/permalinks/"</span>
+<span class="n">groups</span><span class="p">:</span> <span class="p">[</span><span class="s2">"extras"</span><span class="p">]</span>
+<span class="n">groups_weight</span><span class="p">:</span> <span class="mi">30</span>
+<span class="n">notoc</span><span class="p">:</span> <span class="n">true</span>
+<span class="o">---</span>
+</pre></div>
+</div>
+<p>Here is the corresponding code inside of the template:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>  <span class="p">{{</span> <span class="k">if</span> <span class="ow">not</span> <span class="o">.</span><span class="n">Params</span><span class="o">.</span><span class="n">notoc</span> <span class="p">}}</span>
+    <span class="o">&lt;</span><span class="n">div</span> <span class="nb">id</span><span class="o">=</span><span class="s2">"toc"</span> <span class="n">class</span><span class="o">=</span><span class="s2">"well col-md-4 col-sm-6"</span><span class="o">&gt;</span>
+    <span class="p">{{</span> <span class="o">.</span><span class="n">TableOfContents</span> <span class="p">}}</span>
+    <span class="o">&lt;/</span><span class="n">div</span><span class="o">&gt;</span>
+  <span class="p">{{</span> <span class="n">end</span> <span class="p">}}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-site-config-parameters">
+<h2>Using Site (config) Parameters<a class="headerlink" href="#using-site-config-parameters" title="Permalink to this headline">¶</a></h2>
+<p>In your top-level configuration file (eg, <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code>) you can define site
+parameters, which are values which will be available to you in chrome.</p>
+<p>For instance, you might declare:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">params</span><span class="p">:</span>
+  <span class="nt">CopyrightHTML</span><span class="p">:</span> <span class="s">"Copyright</span><span class="nv"> </span><span class="s">&amp;#xA9;</span><span class="nv"> </span><span class="s">2013</span><span class="nv"> </span><span class="s">John</span><span class="nv"> </span><span class="s">Doe.</span><span class="nv"> </span><span class="s">All</span><span class="nv"> </span><span class="s">Rights</span><span class="nv"> </span><span class="s">Reserved."</span>
+  <span class="nt">TwitterUser</span><span class="p">:</span> <span class="s">"spf13"</span>
+  <span class="nt">SidebarRecentLimit</span><span class="p">:</span> <span class="l l-Scalar l-Scalar-Plain">5</span>
+</pre></div>
+</div>
+<p>Within a footer layout, you might then declare a <code class="docutils literal notranslate"><span class="pre">&lt;footer&gt;</span></code> which is only
+provided if the <code class="docutils literal notranslate"><span class="pre">CopyrightHTML</span></code> parameter is provided, and if it is given,
+you would declare it to be HTML-safe, so that the HTML entity is not escaped
+again.  This would let you easily update just your top-level config file each
+January 1st, instead of hunting through your templates.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="k">if</span> <span class="o">.</span><span class="n">Site</span><span class="o">.</span><span class="n">Params</span><span class="o">.</span><span class="n">CopyrightHTML</span><span class="p">}}</span><span class="o">&lt;</span><span class="n">footer</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">div</span> <span class="n">class</span><span class="o">=</span><span class="s2">"text-center"</span><span class="o">&gt;</span><span class="p">{{</span><span class="o">.</span><span class="n">Site</span><span class="o">.</span><span class="n">Params</span><span class="o">.</span><span class="n">CopyrightHTML</span> <span class="o">|</span> <span class="n">safeHtml</span><span class="p">}}</span><span class="o">&lt;/</span><span class="n">div</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">footer</span><span class="o">&gt;</span><span class="p">{{</span><span class="n">end</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>An alternative way of writing the “if” and then referencing the same value
+is to use “with” instead. With rebinds the context <code class="docutils literal notranslate"><span class="pre">.</span></code> within its scope,
+and skips the block if the variable is absent:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="k">with</span> <span class="o">.</span><span class="n">Site</span><span class="o">.</span><span class="n">Params</span><span class="o">.</span><span class="n">TwitterUser</span><span class="p">}}</span><span class="o">&lt;</span><span class="n">span</span> <span class="n">class</span><span class="o">=</span><span class="s2">"twitter"</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s2">"https://twitter.com/{{.}}"</span> <span class="n">rel</span><span class="o">=</span><span class="s2">"author"</span><span class="o">&gt;</span>
+<span class="o">&lt;</span><span class="n">img</span> <span class="n">src</span><span class="o">=</span><span class="s2">"/images/twitter.png"</span> <span class="n">width</span><span class="o">=</span><span class="s2">"48"</span> <span class="n">height</span><span class="o">=</span><span class="s2">"48"</span> <span class="n">title</span><span class="o">=</span><span class="s2">"Twitter: {{.}}"</span>
+ <span class="n">alt</span><span class="o">=</span><span class="s2">"Twitter"</span><span class="o">&gt;&lt;/</span><span class="n">a</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">span</span><span class="o">&gt;</span><span class="p">{{</span><span class="n">end</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>Finally, if you want to pull “magic constants” out of your layouts, you can do
+so, such as in this example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">&lt;</span><span class="n">nav</span> <span class="n">class</span><span class="o">=</span><span class="s2">"recent"</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">h1</span><span class="o">&gt;</span><span class="n">Recent</span> <span class="n">Posts</span><span class="o">&lt;/</span><span class="n">h1</span><span class="o">&gt;</span>
+  <span class="o">&lt;</span><span class="n">ul</span><span class="o">&gt;</span><span class="p">{{</span><span class="nb">range</span> <span class="n">first</span> <span class="o">.</span><span class="n">Site</span><span class="o">.</span><span class="n">Params</span><span class="o">.</span><span class="n">SidebarRecentLimit</span> <span class="o">.</span><span class="n">Site</span><span class="o">.</span><span class="n">Recent</span><span class="p">}}</span>
+    <span class="o">&lt;</span><span class="n">li</span><span class="o">&gt;&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s2">"{{.RelPermalink}}"</span><span class="o">&gt;</span><span class="p">{{</span><span class="o">.</span><span class="n">Title</span><span class="p">}}</span><span class="o">&lt;/</span><span class="n">a</span><span class="o">&gt;&lt;/</span><span class="n">li</span><span class="o">&gt;</span>
+  <span class="p">{{</span><span class="n">end</span><span class="p">}}</span><span class="o">&lt;/</span><span class="n">ul</span><span class="o">&gt;</span>
+<span class="o">&lt;/</span><span class="n">nav</span><span class="o">&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; Piotr Styczyński &lt;piotr@styczynski.in&gt;
+            |
+            Last updated on Jan 22, 2021.
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            |
+            <a class="muted-link" href="../../_sources/content/posts/goisforlovers.md.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Introduction to Go Templates</a></li>
+<li><a class="reference internal" href="#basic-syntax">Basic Syntax</a></li>
+<li><a class="reference internal" href="#variables">Variables</a></li>
+<li><a class="reference internal" href="#functions">Functions</a></li>
+<li><a class="reference internal" href="#includes">Includes</a></li>
+<li><a class="reference internal" href="#logic">Logic</a><ul>
+<li><a class="reference internal" href="#iteration">Iteration</a></li>
+<li><a class="reference internal" href="#conditionals">Conditionals</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#pipes">Pipes</a></li>
+<li><a class="reference internal" href="#context-aka-the-dot">Context (aka. the dot)</a></li>
+<li><a class="reference internal" href="#hugo-parameters">Hugo Parameters</a><ul>
+<li><a class="reference internal" href="#using-content-page-parameters">Using Content (page) Parameters</a></li>
+<li><a class="reference internal" href="#using-site-config-parameters">Using Site (config) Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+  </body>
+</html>

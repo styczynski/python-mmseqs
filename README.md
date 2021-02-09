@@ -1,5 +1,10 @@
 # MMseqs2 bindings for Python
 
+![Top language](https://img.shields.io/github/languages/top/styczynski/python-mmseqs)
+![PyPI](https://img.shields.io/pypi/v/mmseqs?style=flat)
+![Build status](https://github.com/styczynski/python-mmseqs/workflows/Build/badge.svg)
+![Last commit](https://img.shields.io/github/last-commit/styczynski/python-mmseqs)
+
 This project provides bidings for mmseqs. It's still work in progress.
 This is the base usage scenario:
 ```python

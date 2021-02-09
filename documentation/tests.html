@@ -1,0 +1,436 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta property="article:modified_time" content="2021-02-09T17:22:41+01:00" /><link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Coverage coverage_index" href="_sphinx_resources/coverage_index.html" /><link rel="prev" title="mmseqs package" href="reference/mmseqs.html" />
+
+    <meta name="generator" content="sphinx-3.4.3, furo 2020.12.30.beta24"/>
+        <title>Tests report - mmseqs Documentation</title>
+      <link rel="stylesheet" href="_static/styles/furo.css?digest=33d2fc4f3f180ec1ffc6524e273e21d7d58cbe49">
+    <link rel="stylesheet" href="_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" type="text/css" href="_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-needs/libs/html/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-needs/common.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-needs/styles.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-needs/modern.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-needs/layouts.css" />
+    <link rel="stylesheet" type="text/css" href="_static/sphinx-test-results/common.css" />
+    <link rel="stylesheet" href="_static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script defer="defer" src="_static/jquery.js"></script>
+    <script defer="defer" src="_static/underscore.js"></script>
+    <script defer="defer" src="_static/doctools.js"></script>
+    <script defer="defer" src="_static/tabs.js"></script>
+    <script defer="defer" src="_static/js/cleaner_navigation.js"></script>
+    <script defer="defer" src="_static/sphinx-needs/libs/html/datatables.min.js"></script>
+    <script defer="defer" src="_static/sphinx-needs/libs/html/datatables_loader.js"></script>
+    <script defer="defer" src="_static/sphinx-needs/libs/html/sphinx_needs_collapse.js"></script>
+    <script defer src="_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="index.html"><div class="brand">mmseqs Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><div class="sidebar-scroll"><a class="sidebar-brand centered" href="index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="_static/logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">mmseqs Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="_sphinx_resources/README.html">MMseqs2 bindings for Python</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="reference/generated/mmseqs.mmseqs_native.html">mmseqs.mmseqs_native</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="reference/generated/mmseqs.mmseqs_native.Client.html">mmseqs.mmseqs_native.Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/generated/mmseqs.mmseqs_native.Database.html">mmseqs.mmseqs_native.Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/generated/mmseqs.mmseqs_native.MMSeqsCallArgs.html">mmseqs.mmseqs_native.MMSeqsCallArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/generated/mmseqs.mmseqs_native.MMSeqsCallConfig.html">mmseqs.mmseqs_native.MMSeqsCallConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/generated/mmseqs.mmseqs_native.MMSeqsCallOutput.html">mmseqs.mmseqs_native.MMSeqsCallOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/generated/mmseqs.mmseqs_native.MMSeqsMultiParamInt.html">mmseqs.mmseqs_native.MMSeqsMultiParamInt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/generated/mmseqs.mmseqs_native.MMSeqsMultiParamString.html">mmseqs.mmseqs_native.MMSeqsMultiParamString</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/generated/mmseqs.mmseqs_native.MMSeqsSearchRecord.html">mmseqs.mmseqs_native.MMSeqsSearchRecord</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/generated/mmseqs.mmseqs_native.Record.html">mmseqs.mmseqs_native.Record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference/generated/mmseqs.mmseqs_native.SearchResults.html">mmseqs.mmseqs_native.SearchResults</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="reference/mmseqs.html">mmseqs package</a></li>
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">Tests report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="_sphinx_resources/coverage_index.html">Coverage coverage_index</a></li>
+</ul>
+
+</div>
+</div>
+<!-- Place this tag in your head or just before your close body tag. -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;color:#000000;font-size:14px;">
+    <div class="widget navlinks" style="bottom: 10px;background: #f8f9fb;border: solid 2px #eeebee;left: 86vw;padding-left: 15px;position: absolute;padding-right: 15px;">
+      <ul class="this-page-menu">
+        <li><a href="_sources/tests.rst.txt"
+                rel="nofollow"
+                style="color:#000000;font-size:14px;"
+                target="_blank">Source RST</a></li>
+        <li><a href="https://github.com/styczynski/python-mmseqs/blob/master/.doc/tests.rst"
+                rel="nofollow"
+                style="color:#000000;font-size:14px;"
+                target="_blank">Source</a></li>
+        <li><a href="https://github.com/styczynski/python-mmseqs/edit/master/.doc/tests.rst"
+                rel="nofollow"
+                style="color:#000000;font-size:14px;"
+                target="_blank">Edit</a></li>
+         <li><a href="https://github.com/styczynski/python-mmseqs/commits/master/.doc/tests.rst"
+                 rel="nofollow"
+                 style="color:#000000;font-size:14px;"
+                 target="_blank">History</a></li>
+         <li><a href="https://github.com/styczynski/python-mmseqs/blame/master/.doc/tests.rst"
+                 rel="nofollow"
+                 style="color:#000000;font-size:14px;"
+                 target="_blank">Annotate</a></li>
+      </ul>
+    </div>
+    <div class="widget srclinks">
+      <div style="padding-top:16px;border-top: 2px solid lightgray;margin-bottom:10px;"><a href="https://github.com/styczynski/python-mmseqs">/styczynski/python-mmseqs</a>
+      </div>
+      <div>
+          <div style="display:inline-block">
+              <a class="github-button" href="https://github.com/styczynski/python-mmseqs" data-icon="octicon-star" data-size="large" aria-label="Star styczynski/python-mmseqs on GitHub">Star</a>
+          </div>
+          <div style="display:inline-block">
+              <a class="github-button" href="https://github.com/styczynski/python-mmseqs/archive/master.zip" data-icon="octicon-download" data-size="large" aria-label="Download styczynski/python-mmseqs on GitHub">Download</a>
+          </div>
+      </div>
+      <div style="display:inline-block">
+          <a class="github-button" href="https://github.com/styczynski" data-size="large" data-show-count="true" aria-label="Follow @styczynski on GitHub">Follow @styczynski</a>
+      </div>
+    </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="tests-report">
+<h1>Tests report<a class="headerlink" href="#tests-report" title="Permalink to this headline">¶</a></h1>
+<p><strong>Test file</strong>: /Users/personal/python-mmseqs/.doc/../test_reports/latest.xml</p>
+<p><strong>Statistics</strong></p>
+<div class="line-block">
+<div class="line">Test suites: 1</div>
+<div class="line">Test cases: 1</div>
+<div class="line">Failed test cases: 0</div>
+<div class="line">Skipped test cases: 0</div>
+</div>
+<p><strong>Test cases</strong>:</p>
+<div class="table-wrapper"><table class="NEEDS_DATATABLES docutils" id="needtable-tests-0">
+<colgroup>
+<col style="width: 20%"/>
+<col style="width: 60%"/>
+<col style="width: 20%"/>
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Title</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="need tr_passed row-even"><td class="needs_id"><p><a class="reference external" href="#REPORT_0EA_B2583">REPORT_0EA_B2583</a></p></td>
+<td class="needs_title"><p>test_empty</p></td>
+<td class="needs_result"><p>passed</p></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Failed test cases</strong>:</p>
+<div class="table-wrapper"><table class="NEEDS_DATATABLES docutils" id="needtable-tests-1">
+<colgroup>
+<col style="width: 20%"/>
+<col style="width: 60%"/>
+<col style="width: 20%"/>
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Title</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+<p>No needs passed the filters</p>
+</table></div>
+<p><strong>Skipped test cases</strong>:</p>
+<div class="table-wrapper"><table class="NEEDS_DATATABLES docutils" id="needtable-tests-2">
+<colgroup>
+<col style="width: 20%"/>
+<col style="width: 60%"/>
+<col style="width: 20%"/>
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>ID</p></th>
+<th class="head"><p>Title</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+<p>No needs passed the filters</p>
+</table></div>
+<p><strong>Imported data</strong></p>
+<div class="table-wrapper"><table class="need needs_grid_simple needs_layout_clean needs_style_none needs_type_testfile docutils" id="REPORT">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="need head row-odd"><td class="need head"><div class="needs_head line-block">
+<div class="line"><span><span class="needs_type_name"><span class="needs_data">Test-File</span></span>: </span><strong><span><span class="needs_title"><span class="needs_data">My Report</span></span></span></strong><span> <span class="needs-id"><a class="reference internal" href="#REPORT" title="REPORT">REPORT</a></span> <span class="needs collapse" id="target__hide__meta"><span class="needs collapsed"><a class="no_link reference external" href="#"><img alt="_images/arrow-down-circle.svg" class="needs_image" src="_images/arrow-down-circle.svg" width="17px"/></a></span><span class="needs visible"><a class="no_link reference external" href="#"><img alt="_images/arrow-right-circle.svg" class="needs_image" src="_images/arrow-right-circle.svg" width="17px"/></a></span></span> </span></div>
+</div>
+</td>
+</tr>
+<tr class="need meta row-even"><td class="need meta"><div class="needs_meta line-block">
+<div class="line"><span><span><div class="line"><span class="needs_tags"><span class="needs_label">tags: </span><span class="needs_data_container"><span class="needs_data">my_report</span><span class="needs_spacer">, </span><span class="needs_data">awesome</span><span class="needs_spacer">, </span><span class="needs_data">REPORT</span></span></span></div>
+<div class="line"><span class="needs_file"><span class="needs_label">file: </span><span class="needs_data">/Users/personal/python-mmseqs/.doc/../test_reports/latest.xml</span></span></div>
+<div class="line"><span class="needs_suites"><span class="needs_label">suites: </span><span class="needs_data">1</span></span></div>
+<div class="line"><span class="needs_cases"><span class="needs_label">cases: </span><span class="needs_data">1</span></span></div>
+<div class="line"><span class="needs_passed"><span class="needs_label">passed: </span><span class="needs_data">1</span></span></div>
+<div class="line"><span class="needs_skipped"><span class="needs_label">skipped: </span><span class="needs_data">-1</span></span></div>
+<div class="line"><span class="needs_failed"><span class="needs_label">failed: </span><span class="needs_data">0</span></span></div>
+<div class="line"><span class="needs_errors"><span class="needs_label">errors: </span><span class="needs_data">0</span></span></div>
+</span></span></div>
+<div class="line"><span><div class="line">links outgoing: <span class="links"><span><a class="reference internal" href="#SPEC_001" title="REPORT">SPEC_001</a></span></span></div>
+<div class="line">links incoming: <span class="links"><span><a class="reference internal" href="#REPORT_0EA" title="REPORT">REPORT_0EA</a>, <a class="reference internal" href="#REPORT_0EA_B2583" title="REPORT">REPORT_0EA_B2583</a></span></span></div>
+</span></div>
+</div>
+</td>
+</tr>
+<tr class="need content row-odd"><td class="need content" colspan="1"><p>[]</p></td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrapper"><table class="need needs_grid_simple needs_layout_clean needs_style_none needs_type_testsuite docutils" id="REPORT_0EA">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="need head row-odd"><td class="need head"><div class="needs_head line-block">
+<div class="line"><span><span class="needs_type_name"><span class="needs_data">Test-Suite</span></span>: </span><strong><span><span class="needs_title"><span class="needs_data">pytest</span></span></span></strong><span> <span class="needs-id"><a class="reference internal" href="#REPORT_0EA" title="REPORT_0EA">REPORT_0EA</a></span> <span class="needs collapse" id="target__hide__meta"><span class="needs collapsed"><a class="no_link reference external" href="#"><img alt="_images/arrow-down-circle.svg" class="needs_image" src="_images/arrow-down-circle.svg" width="17px"/></a></span><span class="needs visible"><a class="no_link reference external" href="#"><img alt="_images/arrow-right-circle.svg" class="needs_image" src="_images/arrow-right-circle.svg" width="17px"/></a></span></span> </span></div>
+</div>
+</td>
+</tr>
+<tr class="need meta row-even"><td class="need meta"><div class="needs_meta line-block">
+<div class="line"><span><span><div class="line"><span class="needs_tags"><span class="needs_label">tags: </span><span class="needs_data_container"><span class="needs_data">my_report</span><span class="needs_spacer">, </span><span class="needs_data">awesome</span><span class="needs_spacer">, </span><span class="needs_data">REPORT</span></span></span></div>
+<div class="line"><span class="needs_file"><span class="needs_label">file: </span><span class="needs_data">/Users/personal/python-mmseqs/.doc/../test_reports/latest.xml</span></span></div>
+<div class="line"><span class="needs_suite"><span class="needs_label">suite: </span><span class="needs_data">pytest</span></span></div>
+<div class="line"><span class="needs_cases"><span class="needs_label">cases: </span><span class="needs_data">1</span></span></div>
+<div class="line"><span class="needs_passed"><span class="needs_label">passed: </span><span class="needs_data">1</span></span></div>
+<div class="line"><span class="needs_skipped"><span class="needs_label">skipped: </span><span class="needs_data">-1</span></span></div>
+<div class="line"><span class="needs_failed"><span class="needs_label">failed: </span><span class="needs_data">0</span></span></div>
+<div class="line"><span class="needs_errors"><span class="needs_label">errors: </span><span class="needs_data">0</span></span></div>
+</span></span></div>
+<div class="line"><span><div class="line">links outgoing: <span class="links"><span><a class="reference internal" href="#SPEC_001" title="REPORT_0EA">SPEC_001</a>, <a class="reference internal" href="#REPORT" title="REPORT_0EA">REPORT</a></span></span></div>
+<div class="line">links incoming: <span class="links"><span><a class="reference internal" href="#REPORT_0EA_B2583" title="REPORT_0EA">REPORT_0EA_B2583</a></span></span></div>
+</span></div>
+</div>
+</td>
+</tr>
+<tr class="need content row-odd"><td class="need content" colspan="1"></td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrapper"><table class="need needs_grid_simple needs_layout_clean needs_style_tr_passed needs_type_testcase docutils" id="REPORT_0EA_B2583">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="need head row-odd"><td class="need head"><div class="needs_head line-block">
+<div class="line"><span><span class="needs_type_name"><span class="needs_data">Test-Case</span></span>: </span><strong><span><span class="needs_title"><span class="needs_data">test_empty</span></span></span></strong><span> <span class="needs-id"><a class="reference internal" href="#REPORT_0EA_B2583" title="REPORT_0EA_B2583">REPORT_0EA_B2583</a></span> <span class="needs collapse" id="target__hide__meta"><span class="needs collapsed"><a class="no_link reference external" href="#"><img alt="_images/arrow-down-circle.svg" class="needs_image" src="_images/arrow-down-circle.svg" width="17px"/></a></span><span class="needs visible"><a class="no_link reference external" href="#"><img alt="_images/arrow-right-circle.svg" class="needs_image" src="_images/arrow-right-circle.svg" width="17px"/></a></span></span> </span></div>
+</div>
+</td>
+</tr>
+<tr class="need meta row-even"><td class="need meta"><div class="needs_meta line-block">
+<div class="line"><span><span><div class="line"><span class="needs_tags"><span class="needs_label">tags: </span><span class="needs_data_container"><span class="needs_data">my_report</span><span class="needs_spacer">, </span><span class="needs_data">awesome</span><span class="needs_spacer">, </span><span class="needs_data">REPORT</span></span></span></div>
+<div class="line"><span class="needs_style"><span class="needs_label">style: </span><span class="needs_data">tr_passed</span></span></div>
+<div class="line"><span class="needs_file"><span class="needs_label">file: </span><span class="needs_data">/Users/personal/python-mmseqs/.doc/../test_reports/latest.xml</span></span></div>
+<div class="line"><span class="needs_suite"><span class="needs_label">suite: </span><span class="needs_data">pytest</span></span></div>
+<div class="line"><span class="needs_case"><span class="needs_label">case: </span><span class="needs_data">test_empty</span></span></div>
+<div class="line"><span class="needs_case_name"><span class="needs_label">case_name: </span><span class="needs_data">test_empty</span></span></div>
+<div class="line"><span class="needs_classname"><span class="needs_label">classname: </span><span class="needs_data">tests.test_simple</span></span></div>
+<div class="line"><span class="needs_time"><span class="needs_label">time: </span><span class="needs_data">0.014</span></span></div>
+<div class="line"><span class="needs_result"><span class="needs_label">result: </span><span class="needs_data">passed</span></span></div>
+</span></span></div>
+<div class="line"><span><div class="line">links outgoing: <span class="links"><span><a class="reference internal" href="#SPEC_001" title="REPORT_0EA_B2583">SPEC_001</a>, <a class="reference internal" href="#REPORT" title="REPORT_0EA_B2583">REPORT</a>, <a class="reference internal" href="#REPORT_0EA" title="REPORT_0EA_B2583">REPORT_0EA</a></span></span></div>
+</span></div>
+</div>
+</td>
+</tr>
+<tr class="need content row-odd"><td class="need content" colspan="1"></td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrapper"><table class="need needs_grid_simple needs_layout_clean needs_style_none needs_type_spec docutils" id="SPEC_001">
+<colgroup>
+<col style="width: 100%"/>
+</colgroup>
+<tbody>
+<tr class="need head row-odd"><td class="need head"><div class="needs_head line-block">
+<div class="line"><span><span class="needs_type_name"><span class="needs_data">Specification</span></span>: </span><strong><span><span class="needs_title"><span class="needs_data">Example specification</span></span></span></strong><span> <span class="needs-id"><a class="reference internal" href="#SPEC_001" title="SPEC_001">SPEC_001</a></span> <span class="needs collapse" id="target__show__meta"><span class="needs collapsed"><a class="no_link reference external" href="#"><img alt="_images/arrow-down-circle.svg" class="needs_image" src="_images/arrow-down-circle.svg" width="17px"/></a></span><span class="needs visible"><a class="no_link reference external" href="#"><img alt="_images/arrow-right-circle.svg" class="needs_image" src="_images/arrow-right-circle.svg" width="17px"/></a></span></span> </span></div>
+</div>
+</td>
+</tr>
+<tr class="need meta row-even"><td class="need meta"><div class="needs_meta line-block">
+<div class="line"><span><span></span></span></div>
+<div class="line"><span><div class="line">links incoming: <span class="links"><span><a class="reference internal" href="#REPORT" title="SPEC_001">REPORT</a>, <a class="reference internal" href="#REPORT_0EA" title="SPEC_001">REPORT_0EA</a>, <a class="reference internal" href="#REPORT_0EA_B2583" title="SPEC_001">REPORT_0EA_B2583</a></span></span></div>
+</span></div>
+</div>
+</td>
+</tr>
+<tr class="need content row-odd"><td class="need content" colspan="1"><p>Used as simple link target. See Sphinx-Needs for details.</p></td>
+</tr>
+</tbody>
+</table></div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="_sphinx_resources/coverage_index.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">Coverage coverage_index</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="reference/mmseqs.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">mmseqs package</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; Piotr Styczyński &lt;piotr@styczynski.in&gt;
+            |
+            Last updated on Feb 09, 2021.
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            |
+            <a class="muted-link" href="_sources/tests.rst.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </main>
+</div>
+  </body>
+</html>

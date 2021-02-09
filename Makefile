@@ -12,7 +12,7 @@ update:
 	poetry update
 
 test:
-	poetry run pytest -n 4 --ignore lib
+	mkdir -p test_reports && poetry run pytest -n 4 --ignore lib --junitxml=test_reports/latest.xml --cov=mmseqs --cov-report html && mv htmlcov test_reports/coverage_latest_html
 
 publish:
 	poetry build && poetry run s3pypi --bucket pypi.covidgenomics.com --private --region eu-west-1 --dist-path dist
@@ -21,7 +21,4 @@ format: lint
 	docker run -it -v "$(CURDIR)":/workdir -w /workdir unibeautify/clang-format -style=Google -i $(ALL_SOURCES)
 
 documentation:
-	rm -rf pydoc-markdown.yml > /dev/null 2> /dev/null
-	rm -rf build/docs > /dev/null 2> /dev/null
-	poetry run pydoc-markdown --bootstrap hugo
-	poetry run pydoc-markdown
+	rm -rfd documentation && cd .doc && rm -rfd _build && poetry run make html && mv _build/html ../documentation

@@ -5,7 +5,7 @@
 #include <mmseqs/commons/parameters.h>
 #include <mmseqs/commons/log.h>
 #include <mmseqs/output.h>
-#include <mmseqs/api.h>
+#include <mmseqs/api/api.h>
 
 namespace py = pybind11;
 
@@ -42,21 +42,40 @@ PYBIND11_MODULE(mmseqs_native, m) {
             py::arg("search_input_fasta") = "")
       .def("search", &Database::search,
             py::arg("sequences"),
-            py::arg("search_type") = "auto",
-            py::arg("headers") = std::vector<std::string>())
+            py::arg("search_type") = DEFAULT_SEARCH_TYPE,
+            py::arg("headers") = std::vector<std::string>(),
+            py::arg("sensitivity") = DEFAULT_SENSITIVITY,
+            py::arg("max_sequence_length") = DEFAULT_MAX_SEQUENCE_LENGTH
+            )
       .def("search_file", &Database::search_file,
-            py::arg("search_input_fasta") = "nucleotides",
-            py::arg("search_type") = "auto",
-            py::arg("headers") = std::vector<std::string>())
+            py::arg("search_input_fasta"),
+            py::arg("search_type") = DEFAULT_SEARCH_TYPE,
+            py::arg("headers") = std::vector<std::string>(),
+            py::arg("sensitivity") = DEFAULT_SENSITIVITY,
+            py::arg("max_sequence_length") = DEFAULT_MAX_SEQUENCE_LENGTH
+            )
       .def("create_index", &Database::create_index,
-            py::arg("search_type") = "nucleotides")
+            py::arg("search_type") = DEFAULT_SEARCH_TYPE,
+            py::arg("sensitivity") = DEFAULT_SENSITIVITY,
+            py::arg("max_sequence_length") = DEFAULT_MAX_SEQUENCE_LENGTH,
+            py::arg("max_orf_length") = DEFAULT_MAX_ORF_LENGTH,
+            py::arg("min_orf_length") = DEFAULT_MIN_ORF_LENGTH,
+            py::arg("orf_start_mode") = DEFAULT_ORF_START_MODE
+            )
       .def_property("name", &Database::getName, &Database::setName)
       .def_property("description", &Database::getDescription, &Database::setDescription)
-      .def_property_readonly("type", &Database::getType);
+      .def_property_readonly("type", &Database::getType)
+      .def_property_readonly("columns_data", &Database::getColumnData)
+      .def("__iter__", [](Database &db) { return py::make_iterator(db.begin(), db.end()); }, py::keep_alive<0, 1>());
 
-  pybind11::class_<Databases>(m, "Databases")
+  pybind11::class_<Database::Record>(m, "Record")
+      .def(pybind11::init<>())
+      .def_readwrite("seq", &Database::Record::_sequence)
+      .def_readwrite("id", &Database::Record::_header);
+
+  pybind11::class_<Client>(m, "Client")
       .def(pybind11::init<const std::string&, const std::string&>())
-      .def("create", &Databases::create,
+      .def("create", &Client::create,
             py::arg("name"),
             py::arg("description"),
             py::arg("input_fasta"),
@@ -64,9 +83,10 @@ PYBIND11_MODULE(mmseqs_native, m) {
             py::arg("database_type") = "auto",
             py::arg("offset") = 0,
             py::arg("shuffle") = false)
-      .def("list", &Databases::list)
-      .def("get", &Databases::get)
-      .def("__getitem__", &Databases::get);
+      .def("list", &Client::list)
+      .def("get", &Client::get)
+      .def("__getitem__", &Client::get)
+      .def("__iter__", [](Client &c) { return py::make_iterator(c.begin(), c.end()); }, py::keep_alive<0, 1>());
 
   pybind11::class_<mmseqs_call_args>(m, "MMSeqsCallArgs")
       .def(pybind11::init<>())

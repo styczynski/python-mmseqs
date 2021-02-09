@@ -54,6 +54,20 @@ public:
 
     explicit State(std::string arg_version): version(arg_version) {}
 
+    StateDatabase set_database_description(std::string name, std::string description) {
+        databases[name].description = description;
+        return databases[name];
+    }
+
+    StateDatabase rename_database(std::string name, std::string new_name) {
+        StateDatabase db_state = databases[name];
+        remove_database(name);
+        db_state.name = new_name;
+        databases[new_name] = db_state;
+        databases_ids.push_back(new_name);
+        return db_state;
+    }
+
     void remove_database(std::string name) {
         databases.erase(name);
         databases_ids.erase(std::remove(databases_ids.begin(), databases_ids.end(), name), databases_ids.end());

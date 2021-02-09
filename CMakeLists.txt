@@ -45,6 +45,13 @@ set(HAVE_POWER8 0 CACHE BOOL "Have POWER8 CPU")
 set(HAVE_ARM8 0 CACHE BOOL "Have ARMv8 CPU")
 set(NATIVE_ARCH 1 CACHE BOOL "Assume native architecture for SIMD. Use one of the HAVE_* options or set CMAKE_CXX_FLAGS to the appropriate flags if you disable this.")
 
+find_package(Python3 REQUIRED COMPONENTS NumPy)
+if (Python3_NumPy_FOUND)
+    message("-- Detected NumPy installation")
+else ()
+    message("-- No NumPy")
+endif ()
+
 if (HAVE_SANITIZER)
     include(FindUBSan)
     include(FindASan)
@@ -255,6 +262,7 @@ add_subdirectory(src/mmseqs_native/src/mmseqs/multihit)
 add_subdirectory(src/mmseqs_native/src/mmseqs/prefiltering)
 add_subdirectory(src/mmseqs_native/src/mmseqs/taxonomy)
 add_subdirectory(src/mmseqs_native/src/mmseqs/util)
+add_subdirectory(src/mmseqs_native/src/mmseqs/api)
 add_subdirectory(src/mmseqs_native/src/mmseqs/workflow)
 
 # if (NOT FRAMEWORK_ONLY AND INSTALL_UTIL)
@@ -266,6 +274,8 @@ set(MMSEQ_FRAMEWORK_SOURCES
     ${alignment_source_files}
     ${clustering_header_files}
     ${clustering_source_files}
+    ${api_header_files}
+    ${api_source_files}
     ${commons_header_files}
     ${commons_source_files}
     ${prefiltering_header_files}
@@ -293,6 +303,7 @@ set(BINDINGS_COMMON_SRCS
 # Generate python module
 
 set(MMSEQ_TARGET_INCLUDES
+    ${Python3_NumPy_INCLUDE_DIRS}
     ${CMAKE_BINARY_DIR}/generated
     ${PROJECT_BINARY_DIR}/generated
     "src/mmseqs_native/src)"
@@ -310,6 +321,7 @@ set(MMSEQ_TARGET_DEPENDENCIES
 set(MMSEQ_TARGET_LINKS
     "spdlog"
     "cppfs"
+    "Python3::NumPy"
 )
 
  # this will probably break if you omit the "s

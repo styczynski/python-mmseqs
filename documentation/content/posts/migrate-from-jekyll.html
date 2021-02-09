@@ -1,0 +1,451 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <meta property="article:modified_time" content="2021-01-22T18:50:51+01:00" /><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+
+    <meta name="generator" content="sphinx-3.4.3, furo 2020.12.30.beta24"/>
+        <title>date: 2014-03-10 linktitle: Migrating from Jekyll menu: main: parent: tutorials prev: /tutorials/mathjax title: Migrate to Hugo from Jekyll weight: 10 - mmseqs Documentation</title>
+      <link rel="stylesheet" href="../../_static/styles/furo.css?digest=33d2fc4f3f180ec1ffc6524e273e21d7d58cbe49">
+    <link rel="stylesheet" href="../../_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../../_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" type="text/css" href="../../_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/libs/html/datatables.min.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/common.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/styles.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/modern.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-needs/layouts.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/sphinx-test-results/common.css" />
+    <link rel="stylesheet" href="../../_static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script defer="defer" src="../../_static/jquery.js"></script>
+    <script defer="defer" src="../../_static/underscore.js"></script>
+    <script defer="defer" src="../../_static/doctools.js"></script>
+    <script defer="defer" src="../../_static/tabs.js"></script>
+    <script defer="defer" src="../../_static/js/cleaner_navigation.js"></script>
+    <script defer="defer" src="../../_static/sphinx-needs/libs/html/datatables.min.js"></script>
+    <script defer="defer" src="../../_static/sphinx-needs/libs/html/datatables_loader.js"></script>
+    <script defer="defer" src="../../_static/sphinx-needs/libs/html/sphinx_needs_collapse.js"></script>
+    <script defer src="../../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">mmseqs Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><div class="sidebar-scroll"><a class="sidebar-brand centered" href="../../index.html">
+  
+  <div class="sidebar-logo-container">
+    <img class="sidebar-logo" src="../../_static/logo.png" alt="Logo"/>
+  </div>
+  
+  <span class="sidebar-brand-text">mmseqs Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_sphinx_resources/README.html">MMseqs2 bindings for Python</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.html">mmseqs.mmseqs_native</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.Client.html">mmseqs.mmseqs_native.Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.Database.html">mmseqs.mmseqs_native.Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsCallArgs.html">mmseqs.mmseqs_native.MMSeqsCallArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsCallConfig.html">mmseqs.mmseqs_native.MMSeqsCallConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsCallOutput.html">mmseqs.mmseqs_native.MMSeqsCallOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsMultiParamInt.html">mmseqs.mmseqs_native.MMSeqsMultiParamInt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsMultiParamString.html">mmseqs.mmseqs_native.MMSeqsMultiParamString</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsSearchRecord.html">mmseqs.mmseqs_native.MMSeqsSearchRecord</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.Record.html">mmseqs.mmseqs_native.Record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.SearchResults.html">mmseqs.mmseqs_native.SearchResults</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/mmseqs.html">mmseqs package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tests.html">Tests report</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../_sphinx_resources/coverage_index.html">Coverage coverage_index</a></li>
+</ul>
+
+</div>
+</div>
+<!-- Place this tag in your head or just before your close body tag. -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;color:#000000;font-size:14px;">
+    <div class="widget navlinks" style="bottom: 10px;background: #f8f9fb;border: solid 2px #eeebee;left: 86vw;padding-left: 15px;position: absolute;padding-right: 15px;">
+      <ul class="this-page-menu">
+        <li><a href="../../_sources/content/posts/migrate-from-jekyll.md.txt"
+                rel="nofollow"
+                style="color:#000000;font-size:14px;"
+                target="_blank">Source RST</a></li>
+        <li><a href="https://github.com/styczynski/python-mmseqs/blob/master/.doc/content/posts/migrate-from-jekyll.md"
+                rel="nofollow"
+                style="color:#000000;font-size:14px;"
+                target="_blank">Source</a></li>
+        <li><a href="https://github.com/styczynski/python-mmseqs/edit/master/.doc/content/posts/migrate-from-jekyll.md"
+                rel="nofollow"
+                style="color:#000000;font-size:14px;"
+                target="_blank">Edit</a></li>
+         <li><a href="https://github.com/styczynski/python-mmseqs/commits/master/.doc/content/posts/migrate-from-jekyll.md"
+                 rel="nofollow"
+                 style="color:#000000;font-size:14px;"
+                 target="_blank">History</a></li>
+         <li><a href="https://github.com/styczynski/python-mmseqs/blame/master/.doc/content/posts/migrate-from-jekyll.md"
+                 rel="nofollow"
+                 style="color:#000000;font-size:14px;"
+                 target="_blank">Annotate</a></li>
+      </ul>
+    </div>
+    <div class="widget srclinks">
+      <div style="padding-top:16px;border-top: 2px solid lightgray;margin-bottom:10px;"><a href="https://github.com/styczynski/python-mmseqs">/styczynski/python-mmseqs</a>
+      </div>
+      <div>
+          <div style="display:inline-block">
+              <a class="github-button" href="https://github.com/styczynski/python-mmseqs" data-icon="octicon-star" data-size="large" aria-label="Star styczynski/python-mmseqs on GitHub">Star</a>
+          </div>
+          <div style="display:inline-block">
+              <a class="github-button" href="https://github.com/styczynski/python-mmseqs/archive/master.zip" data-icon="octicon-download" data-size="large" aria-label="Download styczynski/python-mmseqs on GitHub">Download</a>
+          </div>
+      </div>
+      <div style="display:inline-block">
+          <a class="github-button" href="https://github.com/styczynski" data-size="large" data-show-count="true" aria-label="Follow @styczynski on GitHub">Follow @styczynski</a>
+      </div>
+    </div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <hr class="docutils"/>
+<div class="section" id="date-2014-03-10-linktitle-migrating-from-jekyll-menu-main-parent-tutorials-prev-tutorials-mathjax-title-migrate-to-hugo-from-jekyll-weight-10">
+<h1>date: 2014-03-10
+linktitle: Migrating from Jekyll
+menu:
+main:
+parent: tutorials
+prev: /tutorials/mathjax
+title: Migrate to Hugo from Jekyll
+weight: 10<a class="headerlink" href="#date-2014-03-10-linktitle-migrating-from-jekyll-menu-main-parent-tutorials-prev-tutorials-mathjax-title-migrate-to-hugo-from-jekyll-weight-10" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="move-static-content-to-static">
+<h1>Move static content to <code class="docutils literal notranslate"><span class="pre">static</span></code><a class="headerlink" href="#move-static-content-to-static" title="Permalink to this headline">¶</a></h1>
+<p>Jekyll has a rule that any directory not starting with <code class="docutils literal notranslate"><span class="pre">_</span></code> will be copied as-is to the <code class="docutils literal notranslate"><span class="pre">_site</span></code> output. Hugo keeps all static content under <code class="docutils literal notranslate"><span class="pre">static</span></code>. You should therefore move it all there.
+With Jekyll, something that looked like</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>▾ &lt;root&gt;/
+    ▾ images/
+        logo.png
+</pre></div>
+</div>
+<p>should become</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>▾ &lt;root&gt;/
+    ▾ static/
+        ▾ images/
+            logo.png
+</pre></div>
+</div>
+<p>Additionally, you’ll want any files that should reside at the root (such as <code class="docutils literal notranslate"><span class="pre">CNAME</span></code>) to be moved to <code class="docutils literal notranslate"><span class="pre">static</span></code>.</p>
+</div>
+<div class="section" id="create-your-hugo-configuration-file">
+<h1>Create your Hugo configuration file<a class="headerlink" href="#create-your-hugo-configuration-file" title="Permalink to this headline">¶</a></h1>
+<p>Hugo can read your configuration as JSON, YAML or TOML. Hugo supports parameters custom configuration too. Refer to the <a class="reference external" href="/overview/configuration/">Hugo configuration documentation</a> for details.</p>
+</div>
+<div class="section" id="set-your-configuration-publish-folder-to-site">
+<h1>Set your configuration publish folder to <code class="docutils literal notranslate"><span class="pre">_site</span></code><a class="headerlink" href="#set-your-configuration-publish-folder-to-site" title="Permalink to this headline">¶</a></h1>
+<p>The default is for Jekyll to publish to <code class="docutils literal notranslate"><span class="pre">_site</span></code> and for Hugo to publish to <code class="docutils literal notranslate"><span class="pre">public</span></code>. If, like me, you have <a class="reference external" href="http://blog.blindgaenger.net/generate_github_pages_in_a_submodule.html"><code class="docutils literal notranslate"><span class="pre">_site</span></code> mapped to a git submodule on the <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> branch</a>, you’ll want to do one of two alternatives:</p>
+<ol>
+<li><p>Change your submodule to point to map <code class="docutils literal notranslate"><span class="pre">gh-pages</span></code> to public instead of <code class="docutils literal notranslate"><span class="pre">_site</span></code> (recommended).</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="n">git</span> <span class="n">submodule</span> <span class="n">deinit</span> <span class="n">_site</span>
+ <span class="n">git</span> <span class="n">rm</span> <span class="n">_site</span>
+ <span class="n">git</span> <span class="n">submodule</span> <span class="n">add</span> <span class="o">-</span><span class="n">b</span> <span class="n">gh</span><span class="o">-</span><span class="n">pages</span> <span class="n">git</span><span class="nd">@github</span><span class="o">.</span><span class="n">com</span><span class="p">:</span><span class="n">your</span><span class="o">-</span><span class="n">username</span><span class="o">/</span><span class="n">your</span><span class="o">-</span><span class="n">repo</span><span class="o">.</span><span class="n">git</span> <span class="n">public</span>
+</pre></div>
+</div>
+</li>
+<li><p>Or, change the Hugo configuration to use <code class="docutils literal notranslate"><span class="pre">_site</span></code> instead of <code class="docutils literal notranslate"><span class="pre">public</span></code>.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span> <span class="p">{</span>
+     <span class="o">..</span>
+     <span class="s2">"publishdir"</span><span class="p">:</span> <span class="s2">"_site"</span><span class="p">,</span>
+     <span class="o">..</span>
+ <span class="p">}</span>
+</pre></div>
+</div>
+</li>
+</ol>
+</div>
+<div class="section" id="convert-jekyll-templates-to-hugo-templates">
+<h1>Convert Jekyll templates to Hugo templates<a class="headerlink" href="#convert-jekyll-templates-to-hugo-templates" title="Permalink to this headline">¶</a></h1>
+<p>That’s the bulk of the work right here. The documentation is your friend. You should refer to <a class="reference external" href="http://jekyllrb.com/docs/templates/">Jekyll’s template documentation</a> if you need to refresh your memory on how you built your blog and <a class="reference external" href="/layout/templates/">Hugo’s template</a> to learn Hugo’s way.</p>
+<p>As a single reference data point, converting my templates for <a class="reference external" href="http://heyitsalex.net/">heyitsalex.net</a> took me no more than a few hours.</p>
+</div>
+<div class="section" id="convert-jekyll-plugins-to-hugo-shortcodes">
+<h1>Convert Jekyll plugins to Hugo shortcodes<a class="headerlink" href="#convert-jekyll-plugins-to-hugo-shortcodes" title="Permalink to this headline">¶</a></h1>
+<p>Jekyll has <a class="reference external" href="http://jekyllrb.com/docs/plugins/">plugins</a>; Hugo has <a class="reference external" href="/doc/shortcodes/">shortcodes</a>. It’s fairly trivial to do a port.</p>
+<div class="section" id="implementation">
+<h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline">¶</a></h2>
+<p>As an example, I was using a custom <a class="reference external" href="https://github.com/alexandre-normand/alexandre-normand/blob/74bb12036a71334fdb7dba84e073382fc06908ec/_plugins/image_tag.rb"><code class="docutils literal notranslate"><span class="pre">image_tag</span></code></a> plugin to generate figures with caption when running Jekyll. As I read about shortcodes, I found Hugo had a nice built-in shortcode that does exactly the same thing.</p>
+<p>Jekyll’s plugin:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>module Jekyll
+  class ImageTag &lt; Liquid::Tag
+    @url = nil
+    @caption = nil
+    @class = nil
+    @link = nil
+    // Patterns
+    IMAGE_URL_WITH_CLASS_AND_CAPTION =
+    IMAGE_URL_WITH_CLASS_AND_CAPTION_AND_LINK = /(\w+)(\s+)((https?:\/\/|\/)(\S+))(\s+)"(.*?)"(\s+)-&gt;((https?:\/\/|\/)(\S+))(\s*)/i
+    IMAGE_URL_WITH_CAPTION = /((https?:\/\/|\/)(\S+))(\s+)"(.*?)"/i
+    IMAGE_URL_WITH_CLASS = /(\w+)(\s+)((https?:\/\/|\/)(\S+))/i
+    IMAGE_URL = /((https?:\/\/|\/)(\S+))/i
+    def initialize(tag_name, markup, tokens)
+      super
+      if markup =~ IMAGE_URL_WITH_CLASS_AND_CAPTION_AND_LINK
+        @class   = $1
+        @url     = $3
+        @caption = $7
+        @link = $9
+      elsif markup =~ IMAGE_URL_WITH_CLASS_AND_CAPTION
+        @class   = $1
+        @url     = $3
+        @caption = $7
+      elsif markup =~ IMAGE_URL_WITH_CAPTION
+        @url     = $1
+        @caption = $5
+      elsif markup =~ IMAGE_URL_WITH_CLASS
+        @class = $1
+        @url   = $3
+      elsif markup =~ IMAGE_URL
+        @url = $1
+      end
+    end
+    def render(context)
+      if @class
+        source = "&lt;figure class='#{@class}'&gt;"
+      else
+        source = "&lt;figure&gt;"
+      end
+      if @link
+        source += "&lt;a href=\"#{@link}\"&gt;"
+      end
+      source += "&lt;img src=\"#{@url}\"&gt;"
+      if @link
+        source += "&lt;/a&gt;"
+      end
+      source += "&lt;figcaption&gt;#{@caption}&lt;/figcaption&gt;" if @caption
+      source += "&lt;/figure&gt;"
+      source
+    end
+  end
+end
+Liquid::Template.register_tag('image', Jekyll::ImageTag)
+</pre></div>
+</div>
+<p>is written as this Hugo shortcode:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>&lt;!-- image --&gt;
+&lt;figure {{ with .Get "class" }}class="{{.}}"{{ end }}&gt;
+    {{ with .Get "link"}}&lt;a href="{{.}}"&gt;{{ end }}
+        &lt;img src="{{ .Get "src" }}" {{ if or (.Get "alt") (.Get "caption") }}alt="{{ with .Get "alt"}}{{.}}{{else}}{{ .Get "caption" }}{{ end }}"{{ end }} /&gt;
+    {{ if .Get "link"}}&lt;/a&gt;{{ end }}
+    {{ if or (or (.Get "title") (.Get "caption")) (.Get "attr")}}
+    &lt;figcaption&gt;{{ if isset .Params "title" }}
+        {{ .Get "title" }}{{ end }}
+        {{ if or (.Get "caption") (.Get "attr")}}&lt;p&gt;
+        {{ .Get "caption" }}
+        {{ with .Get "attrlink"}}&lt;a href="{{.}}"&gt; {{ end }}
+            {{ .Get "attr" }}
+        {{ if .Get "attrlink"}}&lt;/a&gt; {{ end }}
+        &lt;/p&gt; {{ end }}
+    &lt;/figcaption&gt;
+    {{ end }}
+&lt;/figure&gt;
+&lt;!-- image --&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>I simply changed:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="o">%</span> <span class="n">image</span> <span class="n">full</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">farm5</span><span class="o">.</span><span class="n">staticflickr</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="mi">4136</span><span class="o">/</span><span class="mf">4829260124_57712e570</span><span class="n">a_o_d</span><span class="o">.</span><span class="n">jpg</span> <span class="s2">"One of my favorite touristy-type photos. I secretly waited for the good light while we were "</span><span class="n">having</span> <span class="n">fun</span><span class="s2">" and took this. Only regret: a stupid pole in the top-left corner of the frame I had to clumsily get rid of at post-processing."</span> <span class="o">-&gt;</span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">www</span><span class="o">.</span><span class="n">flickr</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">photos</span><span class="o">/</span><span class="n">alexnormand</span><span class="o">/</span><span class="mi">4829260124</span><span class="o">/</span><span class="ow">in</span><span class="o">/</span><span class="nb">set</span><span class="o">-</span><span class="mi">72157624547713078</span><span class="o">/</span> <span class="o">%</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>to this (this example uses a slightly extended version named <code class="docutils literal notranslate"><span class="pre">fig</span></code>, different than the built-in <code class="docutils literal notranslate"><span class="pre">figure</span></code>):</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{{</span><span class="o">%/*</span> <span class="n">fig</span> <span class="n">class</span><span class="o">=</span><span class="s2">"full"</span> <span class="n">src</span><span class="o">=</span><span class="s2">"http://farm5.staticflickr.com/4136/4829260124_57712e570a_o_d.jpg"</span> <span class="n">title</span><span class="o">=</span><span class="s2">"One of my favorite touristy-type photos. I secretly waited for the good light while we were having fun and took this. Only regret: a stupid pole in the top-left corner of the frame I had to clumsily get rid of at post-processing."</span> <span class="n">link</span><span class="o">=</span><span class="s2">"http://www.flickr.com/photos/alexnormand/4829260124/in/set-72157624547713078/"</span> <span class="o">*/%</span><span class="p">}}</span>
+</pre></div>
+</div>
+<p>As a bonus, the shortcode named parameters are, arguably, more readable.</p>
+</div>
+</div>
+<div class="section" id="finishing-touches">
+<h1>Finishing touches<a class="headerlink" href="#finishing-touches" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="fix-content">
+<h2>Fix content<a class="headerlink" href="#fix-content" title="Permalink to this headline">¶</a></h2>
+<p>Depending on the amount of customization that was done with each post with Jekyll, this step will require more or less effort. There are no hard and fast rules here except that <code class="docutils literal notranslate"><span class="pre">hugo</span> <span class="pre">server</span> <span class="pre">--watch</span></code> is your friend. Test your changes and fix errors as needed.</p>
+</div>
+<div class="section" id="clean-up">
+<h2>Clean up<a class="headerlink" href="#clean-up" title="Permalink to this headline">¶</a></h2>
+<p>You’ll want to remove the Jekyll configuration at this point. If you have anything else that isn’t used, delete it.</p>
+</div>
+</div>
+<div class="section" id="a-practical-example-in-a-diff">
+<h1>A practical example in a diff<a class="headerlink" href="#a-practical-example-in-a-diff" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="http://heyitsalex.net/">Hey, it’s Alex</a> was migrated in less than a <em>father-with-kids day</em> from Jekyll to Hugo. You can see all the changes (and screw-ups) by looking at this <a class="reference external" href="https://github.com/alexandre-normand/alexandre-normand/compare/869d69435bd2665c3fbf5b5c78d4c22759d7613a...b7f6605b1265e83b4b81495423294208cc74d610">diff</a>.</p>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; Piotr Styczyński &lt;piotr@styczynski.in&gt;
+            |
+            Last updated on Jan 22, 2021.
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            |
+            <a class="muted-link" href="../../_sources/content/posts/migrate-from-jekyll.md.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">date: 2014-03-10
+linktitle: Migrating from Jekyll
+menu:
+main:
+parent: tutorials
+prev: /tutorials/mathjax
+title: Migrate to Hugo from Jekyll
+weight: 10</a></li>
+<li><a class="reference internal" href="#move-static-content-to-static">Move static content to <code class="docutils literal notranslate"><span class="pre">static</span></code></a></li>
+<li><a class="reference internal" href="#create-your-hugo-configuration-file">Create your Hugo configuration file</a></li>
+<li><a class="reference internal" href="#set-your-configuration-publish-folder-to-site">Set your configuration publish folder to <code class="docutils literal notranslate"><span class="pre">_site</span></code></a></li>
+<li><a class="reference internal" href="#convert-jekyll-templates-to-hugo-templates">Convert Jekyll templates to Hugo templates</a></li>
+<li><a class="reference internal" href="#convert-jekyll-plugins-to-hugo-shortcodes">Convert Jekyll plugins to Hugo shortcodes</a><ul>
+<li><a class="reference internal" href="#implementation">Implementation</a></li>
+<li><a class="reference internal" href="#usage">Usage</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#finishing-touches">Finishing touches</a><ul>
+<li><a class="reference internal" href="#fix-content">Fix content</a></li>
+<li><a class="reference internal" href="#clean-up">Clean up</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#a-practical-example-in-a-diff">A practical example in a diff</a></li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+  </body>
+</html>
