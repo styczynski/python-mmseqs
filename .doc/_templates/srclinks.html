@@ -1,55 +1,56 @@
 {%- if show_source and has_source and sourcename %}
-<div class="widget navlinks">
-  <h3>{{ _('This Page') }}</h3>
-  <ul class="this-page-menu">
-    <li><a href="{{ pathto('_sources/' + sourcename, true)|e }}"
-            rel="nofollow"
-            target="_blank">{{ _('Source RST') }}</a></li>
-   {%- if show_srclink_url %}
-    <li><a href="{{ show_srclink_url }}"
-            rel="nofollow"
-            target="_blank">{{ _('Source') }}</a></li>
-   {%- endif %}
-   {%- if edit_srclink_url %}
-    <li><a href="{{ edit_srclink_url }}"
-            rel="nofollow"
-            target="_blank">{{ _('Edit') }}</a></li>
-   {%- endif %}
-   {%- if history_srclink_url %}
-     <li><a href="{{ history_srclink_url }}"
-             rel="nofollow"
-             target="_blank">{{ _('History') }}</a></li>
-   {%- endif %}
-   {%- if annotate_srclink_url %}
-     <li><a href="{{ annotate_srclink_url }}"
-             rel="nofollow"
-             target="_blank">{{ _('Annotate') }}</a></li>
-   {%- endif %}
-  </ul>
-</div>
-<div class="widget srclinks">
-  <h3>Source</h3>
-  {%- if srclink_src_url %}
-  <h5><a href="{{ srclink_src_url }}">{{
-          srclink_src_url.lstrip('https://').lstrip('http://') }}</a>
-      {%- if srclink_src_rev_url %}
-      / <a href="{{ srclink_src_rev_url }}"
+<!-- Place this tag in your head or just before your close body tag. -->
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+<div style="font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Helvetica,Arial,sans-serif,Apple Color Emoji,Segoe UI Emoji;color:#000000;font-size:14px;">
+    <div class="widget navlinks" style="bottom: 10px;background: #f8f9fb;border: solid 2px #eeebee;left: 86vw;padding-left: 15px;position: absolute;padding-right: 15px;">
+      <ul class="this-page-menu">
+        <li><a href="{{ pathto('_sources/' + sourcename, true)|e }}"
                 rel="nofollow"
-                target="_blank"
-                font="monospace">{{ srclink_src_rev }}</a>
+                style="color:#000000;font-size:14px;"
+                target="_blank">{{ _('Source RST') }}</a></li>
+       {%- if show_srclink_url %}
+        <li><a href="{{ show_srclink_url }}"
+                rel="nofollow"
+                style="color:#000000;font-size:14px;"
+                target="_blank">{{ _('Source') }}</a></li>
+       {%- endif %}
+       {%- if edit_srclink_url %}
+        <li><a href="{{ edit_srclink_url }}"
+                rel="nofollow"
+                style="color:#000000;font-size:14px;"
+                target="_blank">{{ _('Edit') }}</a></li>
+       {%- endif %}
+       {%- if history_srclink_url %}
+         <li><a href="{{ history_srclink_url }}"
+                 rel="nofollow"
+                 style="color:#000000;font-size:14px;"
+                 target="_blank">{{ _('History') }}</a></li>
+       {%- endif %}
+       {%- if annotate_srclink_url %}
+         <li><a href="{{ annotate_srclink_url }}"
+                 rel="nofollow"
+                 style="color:#000000;font-size:14px;"
+                 target="_blank">{{ _('Annotate') }}</a></li>
+       {%- endif %}
+      </ul>
+    </div>
+    <div class="widget srclinks">
+      {%- if srclink_src_url %}
+      <div style="padding-top:16px;border-top: 2px solid lightgray;margin-bottom:10px;"><a href="{{ srclink_src_url }}">{{
+              srclink_src_url.lstrip('https://').lstrip('http://').lstrip('github.com') }}</a>
+      </div>
       {%- endif %}
-  </h5>
-  {%- endif %}
-  <ul>
-  {%- if srclink_src_https_url %}
-    <li><pre>{{ srclink_src_clone_cmd }} {{ srclink_src_https_url }}</pre></li>
-  {%- endif %}
-  {%- if srclink_src_ssh_url %}
-    <li><pre>{{ srclink_src_clone_cmd }} {{ srclink_src_ssh_url }}</pre></li>
-  {%- endif %}
-  {%- if srclink_src_native_url %}
-    <li><pre>{{ srclink_src_clone_cmd }} {{ srclink_src_native_url }}</pre></li>
-  {%- endif %}
-  </ul>
+      <div>
+          <div style="display:inline-block">
+              <a class="github-button" href="https://github.com/styczynski/python-mmseqs" data-icon="octicon-star" data-size="large" aria-label="Star styczynski/python-mmseqs on GitHub">Star</a>
+          </div>
+          <div style="display:inline-block">
+              <a class="github-button" href="https://github.com/styczynski/python-mmseqs/archive/master.zip" data-icon="octicon-download" data-size="large" aria-label="Download styczynski/python-mmseqs on GitHub">Download</a>
+          </div>
+      </div>
+      <div style="display:inline-block">
+          <a class="github-button" href="https://github.com/styczynski" data-size="large" data-show-count="true" aria-label="Follow @styczynski on GitHub">Follow @styczynski</a>
+      </div>
+    </div>
 </div>
 {%- endif %}

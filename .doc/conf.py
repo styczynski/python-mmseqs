@@ -8,14 +8,25 @@
 # -- Path preparation/config loading ----------------------------------------------------
 #
 
-import sys
+import sys, os
+import shutil
 import toml
 from pathlib import Path
+def copytree(src, dst, symlinks=False, ignore=None):
+    if not os.path.exists(dst):
+        os.makedirs(dst)
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            copytree(s, d, symlinks, ignore)
+        else:
+            if not os.path.exists(d) or os.stat(s).st_mtime - os.stat(d).st_mtime > 1:
+                shutil.copy2(s, d)
 
 pyproject = toml.load(Path(__file__).parents[1].joinpath('pyproject.toml'))
 sys.path.append(str(Path(__file__).parents[1]))
 
-import os, sys
 sys.path.insert(0, os.path.abspath('../src'))
 sys.path.insert(0, os.path.abspath('_ext'))
 sys.path.insert(0, os.path.abspath('.'))
@@ -102,6 +113,7 @@ gitstamp_fmt = "%b %d, %Y"
 # -- Options for the theme ----------------------------------------------------
 #
 
+html_logo = "logo.png"
 html_theme = "furo"
 html_theme_options = {
     "style_external_links": True,
@@ -146,11 +158,11 @@ from recommonmark.parser import CommonMarkParser
 def setup(app):
     from utils.import_coverage import import_coverage_report
     import_coverage_report()
-    #os.system(f'cd {os.path.abspath("..")} && make test')
     from shutil import copyfile
     from pathlib import Path
     Path("./_sphinx_resources").mkdir(parents=True, exist_ok=True)
     copyfile('../README.md', './_sphinx_resources/README.md')
+    copytree('js', './_static/js')
     app.add_source_suffix('.md', 'markdown')
     app.add_source_parser(CommonMarkParser)
     app.add_config_value('markdown_parser_config', {
@@ -188,6 +200,10 @@ html_sidebars = {
         'srclinks.html',
     ]
 }
+
+html_js_files = [
+    'js/cleaner_navigation.js',
+]
 
 # plant uml
 on_rtd = os.environ.get('READTHEDOCS') == 'True'

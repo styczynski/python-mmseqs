@@ -1,5 +1,5 @@
-MMSeqs Documentation
-===
+Python Documentation
+====================
 
 .. rubric:: Modules
 

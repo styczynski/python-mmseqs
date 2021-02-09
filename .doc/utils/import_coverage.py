@@ -18,6 +18,17 @@ def import_coverage_report():
             html_contents = html_contents.replace('<body>', '').replace('</body>', '').replace('<head>', '').replace('</head>', '')
             html_contents = html_contents.replace('<!DOCTYPE html>', '').replace('<html>', '').replace('</html>', '')
 
+        html_contents = f"""
+<style>
+    #keyboard_icon {{
+        width: 55px;
+        margin-left: 170px !important;
+        position: relative;
+        top: 27px;
+    }}
+</style>
+{html_contents}"""
+
         name = 'coverage_'+os.path.basename(html_file).replace('.html', '')
         replacements[os.path.basename(html_file)] = f'{name}.html'
         out_rst_path = f'_sphinx_resources/{name}.rst'
