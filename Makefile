@@ -21,7 +21,4 @@ format: lint
 	docker run -it -v "$(CURDIR)":/workdir -w /workdir unibeautify/clang-format -style=Google -i $(ALL_SOURCES)
 
 documentation:
-	rm -rf pydoc-markdown.yml > /dev/null 2> /dev/null
-	rm -rf build/docs > /dev/null 2> /dev/null
-	poetry run pydoc-markdown --bootstrap hugo
-	poetry run pydoc-markdown
+	rm -rfd documentation && cd .doc && rm -rfd _build && make html && mv _build/html ../documentation

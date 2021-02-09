@@ -12,3 +12,6 @@ mmseqs_native.cpython-*/
 **/pydoc-markdown.yml
 *.dylib
 *.log
+.doc/_build/
+.doc/_reference/
+.doc/_sphinx_resources/

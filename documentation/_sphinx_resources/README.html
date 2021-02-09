@@ -1,0 +1,270 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="next" title="&lt;no title&gt;" href="../reference/modules.html" /><link rel="prev" title="python_example Documentation" href="../index.html" />
+
+    <meta name="generator" content="sphinx-3.4.3, furo 2020.12.30.beta24"/>
+        <title>MMseqs2 bindings for Python - mmseqs Documentation</title>
+      <link rel="stylesheet" href="../_static/styles/furo.css?digest=33d2fc4f3f180ec1ffc6524e273e21d7d58cbe49">
+    <link rel="stylesheet" href="../_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" type="text/css" href="../_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/graphviz.css" />
+    <link rel="stylesheet" href="../_static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script defer="defer" src="../_static/jquery.js"></script>
+    <script defer="defer" src="../_static/underscore.js"></script>
+    <script defer="defer" src="../_static/doctools.js"></script>
+    <script defer="defer" src="../_static/tabs.js"></script>
+    <script defer src="../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../index.html"><div class="brand">mmseqs Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon no-toc" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
+  
+  
+  <span class="sidebar-brand-text">mmseqs Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul class="current">
+<li class="toctree-l1 current current-page"><a class="current reference internal" href="#">MMseqs2 bindings for Python</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../reference/generated/mmseqs.mmseqs_native.html">mmseqs.mmseqs_native</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../reference/generated/mmseqs.mmseqs_native.Client.html">mmseqs.mmseqs_native.Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/generated/mmseqs.mmseqs_native.Database.html">mmseqs.mmseqs_native.Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/generated/mmseqs.mmseqs_native.MMSeqsCallArgs.html">mmseqs.mmseqs_native.MMSeqsCallArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/generated/mmseqs.mmseqs_native.MMSeqsCallConfig.html">mmseqs.mmseqs_native.MMSeqsCallConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/generated/mmseqs.mmseqs_native.MMSeqsCallOutput.html">mmseqs.mmseqs_native.MMSeqsCallOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/generated/mmseqs.mmseqs_native.MMSeqsMultiParamInt.html">mmseqs.mmseqs_native.MMSeqsMultiParamInt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/generated/mmseqs.mmseqs_native.MMSeqsMultiParamString.html">mmseqs.mmseqs_native.MMSeqsMultiParamString</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/generated/mmseqs.mmseqs_native.MMSeqsSearchRecord.html">mmseqs.mmseqs_native.MMSeqsSearchRecord</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/generated/mmseqs.mmseqs_native.Record.html">mmseqs.mmseqs_native.Record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../reference/generated/mmseqs.mmseqs_native.SearchResults.html">mmseqs.mmseqs_native.SearchResults</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../reference/mmseqs.html">mmseqs package</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon no-toc" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="mmseqs2-bindings-for-python">
+<h1>MMseqs2 bindings for Python<a class="headerlink" href="#mmseqs2-bindings-for-python" title="Permalink to this headline">¶</a></h1>
+<p>This project provides bidings for mmseqs. It’s still work in progress.
+This is the base usage scenario:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">mmseqs</span>
+
+<span class="c1">#</span>
+<span class="c1"># Demonstration of basic mmseqs2 operations</span>
+<span class="c1">#</span>
+
+<span class="c1"># Create a client</span>
+<span class="n">client</span> <span class="o">=</span> <span class="n">mmseqs</span><span class="o">.</span><span class="n">MMSeqs</span><span class="p">()</span>
+
+<span class="c1"># Create a database from fasta file</span>
+<span class="c1"># Here we specify name of the database, description and input file</span>
+<span class="c1"># (The input can also be a Seq/SeqRecord list/iterator/etc.)</span>
+<span class="n">client</span><span class="o">.</span><span class="n">databases</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="s2">"test"</span><span class="p">,</span> <span class="s2">"Test database"</span><span class="p">,</span> <span class="s2">"example/a.fasta"</span><span class="p">)</span>
+
+<span class="c1"># Get description of the database</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">description</span><span class="p">)</span>
+
+<span class="c1"># Perform search on a database</span>
+<span class="c1"># Note that the search queries can be a string with a patch to the FASTA file with queries</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">databases</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">search</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="s2">"ACTAGCTCAGTCAACTAGCTCAGTCCTCAGTCAACTAGCTCAGTCTATATATATACAAC"</span><span class="p">,</span>
+        <span class="s2">"ACTAGCTCAGTCAACTAGCTCAGTCCTCAGTCAACTAGCT"</span><span class="p">,</span>
+        <span class="s2">"ACTAGCTCAGTCAACTAGCT"</span><span class="p">,</span>
+        <span class="s2">"ACTAGCTCAGT"</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="n">search_type</span><span class="o">=</span><span class="s2">"nucleotides"</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Load queries from file:</span>
+<span class="c1"># results = client.databases[0].search_file("input.fasta", search_type="nucleotides")</span>
+
+<span class="c1"># You can pass list of headers to get:</span>
+<span class="c1">#   query_sequence_id</span>
+<span class="c1">#   target_sequence_id</span>
+<span class="c1">#   query_sequence_content</span>
+<span class="c1">#   target_sequence_content</span>
+<span class="c1">#   sequence_identity</span>
+<span class="c1">#   alignment_length</span>
+<span class="c1">#   number_of_mismatches</span>
+<span class="c1">#   number_of_gap_openings</span>
+<span class="c1">#   domain_start_index_query</span>
+<span class="c1">#   domain_end_index_query</span>
+<span class="c1">#   domain_start_index_target</span>
+<span class="c1">#   domain_end_index_target</span>
+<span class="c1">#   e_value</span>
+<span class="c1">#   bit_score</span>
+<span class="c1"># For example:</span>
+<span class="c1"># results2 = client.databases[0].search(</span>
+<span class="c1">#     [</span>
+<span class="c1">#         "ACTAGCTCAGTCAACTAGCTCAGTCCTCAGTCAACTAGCTCAGTCTATATATATACAAC",</span>
+<span class="c1">#         "ACTAGCTCAGTCAACTAGCTCAGTCCTCAGTCAACTAGCT",</span>
+<span class="c1">#         "ACTAGCTCAGTCAACTAGCT",</span>
+<span class="c1">#         "ACTAGCTCAGT",</span>
+<span class="c1">#     ],</span>
+<span class="c1">#     search_type="nucleotides",</span>
+<span class="c1">#     headers=["query_sequence_id", "target_sequence_id", "sequence_identity", "alignment_length", "number_of_mismatches"]</span>
+<span class="c1"># )</span>
+
+<span class="c1"># results.records is a list of lists. Each item contains alignments for each query.</span>
+<span class="c1"># Each list of alignments consists of single result</span>
+<span class="c1"># print(results.records)</span>
+
+<span class="c1"># You can also get a pandas dataframe</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">dataframe</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          <a class="next-page" href="../reference/modules.html">
+              <div class="page-info">
+                <div class="context">
+                  <span>Next</span>
+                </div>
+                <div class="title">&lt;no title&gt;</div>
+              </div>
+              <svg><use href="#svg-arrow-right"></use></svg>
+            </a>
+          <a class="prev-page" href="../index.html">
+              <svg><use href="#svg-arrow-right"></use></svg>
+              <div class="page-info">
+                <div class="context">
+                  <span>Previous</span>
+                </div>
+                
+                <div class="title">Home</div>
+                
+              </div>
+            </a>
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; Piotr Styczyński &lt;piotr@styczynski.in&gt;
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            |
+            <a class="muted-link" href="../_sources/_sphinx_resources/README.md.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer no-toc">
+      
+      
+      
+    </aside>
+  </main>
+</div>
+  </body>
+</html>

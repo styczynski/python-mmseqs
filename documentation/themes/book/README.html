@@ -1,0 +1,528 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
+
+    <meta name="generator" content="sphinx-3.4.3, furo 2020.12.30.beta24"/>
+        <title>Hugo Book Theme - mmseqs Documentation</title>
+      <link rel="stylesheet" href="../../_static/styles/furo.css?digest=33d2fc4f3f180ec1ffc6524e273e21d7d58cbe49">
+    <link rel="stylesheet" href="../../_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../../_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" type="text/css" href="../../_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css" />
+    <link rel="stylesheet" href="../../_static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script defer="defer" src="../../_static/jquery.js"></script>
+    <script defer="defer" src="../../_static/underscore.js"></script>
+    <script defer="defer" src="../../_static/doctools.js"></script>
+    <script defer="defer" src="../../_static/tabs.js"></script>
+    <script defer src="../../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../index.html"><div class="brand">mmseqs Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
+  
+  
+  <span class="sidebar-brand-text">mmseqs Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../_sphinx_resources/README.html">MMseqs2 bindings for Python</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.html">mmseqs.mmseqs_native</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.Client.html">mmseqs.mmseqs_native.Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.Database.html">mmseqs.mmseqs_native.Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsCallArgs.html">mmseqs.mmseqs_native.MMSeqsCallArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsCallConfig.html">mmseqs.mmseqs_native.MMSeqsCallConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsCallOutput.html">mmseqs.mmseqs_native.MMSeqsCallOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsMultiParamInt.html">mmseqs.mmseqs_native.MMSeqsMultiParamInt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsMultiParamString.html">mmseqs.mmseqs_native.MMSeqsMultiParamString</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.MMSeqsSearchRecord.html">mmseqs.mmseqs_native.MMSeqsSearchRecord</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.Record.html">mmseqs.mmseqs_native.Record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../reference/generated/mmseqs.mmseqs_native.SearchResults.html">mmseqs.mmseqs_native.SearchResults</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../reference/mmseqs.html">mmseqs package</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <div class="section" id="hugo-book-theme">
+<h1>Hugo Book Theme<a class="headerlink" href="#hugo-book-theme" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://gohugo.io"><img alt="Hugo" src="https://img.shields.io/badge/hugo-0.68-blue.svg"/></a>
+<a class="reference external" href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"/></a>
+<img alt="Build with Hugo" src="https://github.com/alex-shpak/hugo-book/workflows/Build%20with%20Hugo/badge.svg"/></p>
+<div class="section" id="hugo-documentation-theme-as-simple-as-plain-book">
+<h2><a class="reference external" href="https://gohugo.io">Hugo</a> documentation theme as simple as plain book<a class="headerlink" href="#hugo-documentation-theme-as-simple-as-plain-book" title="Permalink to this headline">¶</a></h2>
+<p><img alt="Screenshot" src="https://github.com/alex-shpak/hugo-book/blob/master/images/screenshot.png"/></p>
+<ul class="simple">
+<li><p><a class="reference external" href="#features">Features</a></p></li>
+<li><p><a class="reference external" href="#requirements">Requirements</a></p></li>
+<li><p><a class="reference external" href="#installation">Installation</a></p></li>
+<li><p><a class="reference external" href="#menu">Menu</a></p></li>
+<li><p><a class="reference external" href="#blog">Blog</a></p></li>
+<li><p><a class="reference external" href="#configuration">Configuration</a></p></li>
+<li><p><a class="reference external" href="#shortcodes">Shortcodes</a></p></li>
+<li><p><a class="reference external" href="#versioning">Versioning</a></p></li>
+<li><p><a class="reference external" href="#contributing">Contributing</a></p></li>
+</ul>
+</div>
+<div class="section" id="features">
+<h2>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Clean simple design</p></li>
+<li><p>Light and Mobile-Friendly</p></li>
+<li><p>Multi-language support</p></li>
+<li><p>Customisable</p></li>
+<li><p>Zero initial configuration</p></li>
+<li><p>Handy shortcodes</p></li>
+<li><p>Comments support</p></li>
+<li><p>Simple blog and taxonomy</p></li>
+<li><p>Primary features work without JavaScript</p></li>
+<li><p>Dark Mode</p></li>
+</ul>
+</div>
+<div class="section" id="requirements">
+<h2>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Hugo 0.68 or higher</p></li>
+<li><p>Hugo extended version, read more <a class="reference external" href="https://gohugo.io/news/0.48-relnotes/">here</a></p></li>
+</ul>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>Navigate to your hugo project root and run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">submodule</span> <span class="n">add</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">alex</span><span class="o">-</span><span class="n">shpak</span><span class="o">/</span><span class="n">hugo</span><span class="o">-</span><span class="n">book</span> <span class="n">themes</span><span class="o">/</span><span class="n">book</span>
+</pre></div>
+</div>
+<p>Then run hugo (or set <code class="docutils literal notranslate"><span class="pre">theme</span> <span class="pre">=</span> <span class="pre">"book"</span></code>/<code class="docutils literal notranslate"><span class="pre">theme:</span> <span class="pre">book</span></code> in configuration file)</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">hugo</span> <span class="n">server</span> <span class="o">--</span><span class="n">minify</span> <span class="o">--</span><span class="n">theme</span> <span class="n">book</span>
+</pre></div>
+</div>
+<div class="section" id="creating-site-from-scratch">
+<h3>Creating site from scratch<a class="headerlink" href="#creating-site-from-scratch" title="Permalink to this headline">¶</a></h3>
+<p>Below is an example on how to create a new site from scratch:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>hugo new site mydocs<span class="p">;</span> <span class="nb">cd</span> mydocs
+git init
+git submodule add https://github.com/alex-shpak/hugo-book themes/book
+cp -R themes/book/exampleSite/content .
+</pre></div>
+</div>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>hugo server --minify --theme book
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="menu">
+<h2>Menu<a class="headerlink" href="#menu" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="file-tree-menu-default">
+<h3>File tree menu (default)<a class="headerlink" href="#file-tree-menu-default" title="Permalink to this headline">¶</a></h3>
+<p>By default, the theme will render pages from the <code class="docutils literal notranslate"><span class="pre">content/docs</span></code> section as a menu in a tree structure.<br/>You can set <code class="docutils literal notranslate"><span class="pre">title</span></code> and <code class="docutils literal notranslate"><span class="pre">weight</span></code> in the front matter of pages to adjust the order and titles in the menu.</p>
+</div>
+<div class="section" id="leaf-bundle-menu">
+<h3>Leaf bundle menu<a class="headerlink" href="#leaf-bundle-menu" title="Permalink to this headline">¶</a></h3>
+<p>You can also use leaf bundle and the content of its <code class="docutils literal notranslate"><span class="pre">index.md</span></code> file as menu.<br/>Given you have the following file structure:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>├── content
+│   ├── docs
+│   │   ├── page-one.md
+│   │   └── page-two.md
+│   └── posts
+│       ├── post-one.md
+│       └── post-two.md
+</pre></div>
+</div>
+<p>Create a file <code class="docutils literal notranslate"><span class="pre">content/menu/index.md</span></code> with the content:</p>
+<div class="highlight-md notranslate"><div class="highlight"><pre><span></span>+++
+headless = true
++++
+
+<span class="k">-</span> [<span class="nt">Book Example</span>](<span class="na">{{&lt; relref "/docs/" &gt;}}</span>)
+  <span class="k">-</span> [<span class="nt">Page One</span>](<span class="na">{{&lt; relref "/docs/page-one" &gt;}}</span>)
+  <span class="k">-</span> [<span class="nt">Page Two</span>](<span class="na">{{&lt; relref "/docs/page-two" &gt;}}</span>)
+<span class="k">-</span> [<span class="nt">Blog</span>](<span class="na">{{&lt; relref "/posts" &gt;}}</span>)
+</pre></div>
+</div>
+<p>And Enable it by setting <code class="docutils literal notranslate"><span class="pre">BookMenuBundle:</span> <span class="pre">/menu</span></code> in Site configuration.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/alex-shpak/hugo-book/blob/master/exampleSite/content/menu/index.md">Example menu</a></p></li>
+<li><p><a class="reference external" href="https://github.com/alex-shpak/hugo-book/blob/master/exampleSite/config.yaml">Example config file</a></p></li>
+<li><p><a class="reference external" href="https://gohugo.io/content-management/page-bundles/">Leaf bundles</a></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="blog">
+<h2>Blog<a class="headerlink" href="#blog" title="Permalink to this headline">¶</a></h2>
+<p>A simple blog is supported in the section <code class="docutils literal notranslate"><span class="pre">posts</span></code>.<br/>A blog is not the primary usecase of this theme, so it has only minimal features.</p>
+</div>
+<div class="section" id="configuration">
+<h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="site-configuration">
+<h3>Site Configuration<a class="headerlink" href="#site-configuration" title="Permalink to this headline">¶</a></h3>
+<p>There are a few configuration options that you can add to your <code class="docutils literal notranslate"><span class="pre">config.toml</span></code> file.<br/>You can also see the <code class="docutils literal notranslate"><span class="pre">yaml</span></code> example <a class="reference external" href="https://github.com/alex-shpak/hugo-book/blob/master/exampleSite/config.yaml">here</a>.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># (Optional) Set Google Analytics if you use it to track your website.</span>
+<span class="c1"># Always put it on the top of the configuration file, otherwise it won't work</span>
+<span class="n">googleAnalytics</span> <span class="o">=</span> <span class="s">"UA-XXXXXXXXX-X"</span>
+
+<span class="c1"># (Optional) If you provide a Disqus shortname, comments will be enabled on</span>
+<span class="c1"># all pages.</span>
+<span class="n">disqusShortname</span> <span class="o">=</span> <span class="s">"my-site"</span>
+
+<span class="c1"># (Optional) Set this to true if you use capital letters in file names</span>
+<span class="n">disablePathToLower</span> <span class="o">=</span> <span class="kc">true</span>
+
+<span class="c1"># (Optional) Set this to true to enable 'Last Modified by' date and git author</span>
+<span class="c1">#  information on 'doc' type pages.</span>
+<span class="n">enableGitInfo</span> <span class="o">=</span> <span class="kc">true</span>
+
+<span class="c1"># (Optional) Theme is intended for documentation use, therefore it doesn't render taxonomy.</span>
+<span class="c1"># You can remove related files with config below</span>
+<span class="n">disableKinds</span> <span class="o">=</span> <span class="k">['taxonomy', 'taxonomyTerm']</span>
+
+<span class="k">[params]</span>
+  <span class="c1"># (Optional, default light) Sets color theme: light, dark or auto.</span>
+  <span class="c1"># Theme 'auto' switches between dark and light modes based on browser/os preferences</span>
+  <span class="n">BookTheme</span> <span class="o">=</span> <span class="s">'light'</span>
+
+  <span class="c1"># (Optional, default true) Controls table of contents visibility on right side of pages.</span>
+  <span class="c1"># Start and end levels can be controlled with markup.tableOfContents setting.</span>
+  <span class="c1"># You can also specify this parameter per page in front matter.</span>
+  <span class="n">BookToC</span> <span class="o">=</span> <span class="kc">true</span>
+
+  <span class="c1"># (Optional, default none) Set the path to a logo for the book. If the logo is</span>
+  <span class="c1"># /static/logo.png then the path would be 'logo.png'</span>
+  <span class="n">BookLogo</span> <span class="o">=</span> <span class="s">'logo.png'</span>
+
+  <span class="c1"># (Optional, default none) Set leaf bundle to render as side menu</span>
+  <span class="c1"># When not specified file structure and weights will be used</span>
+  <span class="n">BookMenuBundle</span> <span class="o">=</span> <span class="s">'/menu'</span>
+
+  <span class="c1"># (Optional, default docs) Specify section of content to render as menu</span>
+  <span class="c1"># You can also set value to "*" to render all sections to menu</span>
+  <span class="n">BookSection</span> <span class="o">=</span> <span class="s">'docs'</span>
+
+  <span class="c1"># Set source repository location.</span>
+  <span class="c1"># Used for 'Last Modified' and 'Edit this page' links.</span>
+  <span class="n">BookRepo</span> <span class="o">=</span> <span class="s">'https://github.com/alex-shpak/hugo-book'</span>
+
+  <span class="c1"># Enable 'Edit this page' links for 'doc' page type.</span>
+  <span class="c1"># Disabled by default. Uncomment to enable. Requires 'BookRepo' param.</span>
+  <span class="c1"># Path must point to the site directory.</span>
+  <span class="n">BookEditPath</span> <span class="o">=</span> <span class="s">'edit/master/exampleSite'</span>
+
+  <span class="c1"># (Optional, default January 2, 2006) Configure the date format used on the pages</span>
+  <span class="c1"># - In git information</span>
+  <span class="c1"># - In blog posts</span>
+  <span class="n">BookDateFormat</span> <span class="o">=</span> <span class="s">'Jan 2, 2006'</span>
+
+  <span class="c1"># (Optional, default true) Enables search function with flexsearch,</span>
+  <span class="c1"># Index is built on fly, therefore it might slowdown your website.</span>
+  <span class="c1"># Configuration for indexing can be adjusted in i18n folder per language.</span>
+  <span class="n">BookSearch</span> <span class="o">=</span> <span class="kc">true</span>
+
+  <span class="c1"># (Optional, default true) Enables comments template on pages</span>
+  <span class="c1"># By default partials/docs/comments.html includes Disqus template</span>
+  <span class="c1"># See https://gohugo.io/content-management/comments/#configure-disqus</span>
+  <span class="c1"># Can be overwritten by same param in page frontmatter</span>
+  <span class="n">BookComments</span> <span class="o">=</span> <span class="kc">true</span>
+
+  <span class="c1"># /!\ This is an experimental feature, might be removed or changed at any time</span>
+  <span class="c1"># (Optional, experimental, default false) Enables portable links and link checks in markdown pages.</span>
+  <span class="c1"># Portable links meant to work with text editors and let you write markdown without {{&lt; relref &gt;}} shortcode</span>
+  <span class="c1"># Theme will print warning if page referenced in markdown does not exists.</span>
+  <span class="n">BookPortableLinks</span> <span class="o">=</span> <span class="kc">true</span>
+
+  <span class="c1"># /!\ This is an experimental feature, might be removed or changed at any time</span>
+  <span class="c1"># (Optional, experimental, default false) Enables service worker that caches visited pages and resources for offline use.</span>
+  <span class="n">BookServiceWorker</span> <span class="o">=</span> <span class="kc">true</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="multi-language-support">
+<h3>Multi-Language Support<a class="headerlink" href="#multi-language-support" title="Permalink to this headline">¶</a></h3>
+<p>Theme supports Hugo’s <a class="reference external" href="https://gohugo.io/content-management/multilingual/">multilingual mode</a>, just follow configuration guide there. You can also tweak search indexing configuration per language in <code class="docutils literal notranslate"><span class="pre">i18n</span></code> folder.</p>
+</div>
+<div class="section" id="page-configuration">
+<h3>Page Configuration<a class="headerlink" href="#page-configuration" title="Permalink to this headline">¶</a></h3>
+<p>You can specify additional params in the front matter of individual pages:</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set type to 'docs' if you want to render page outside of configured section or if you render section other than 'docs'</span>
+<span class="n">type</span> <span class="o">=</span> <span class="s">'docs'</span>
+
+<span class="c1"># Set page weight to re-arrange items in file-tree menu (if BookMenuBundle not set)</span>
+<span class="n">weight</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="c1"># (Optional) Set to 'true' to mark page as flat section in file-tree menu (if BookMenuBundle not set)</span>
+<span class="n">bookFlatSection</span> <span class="o">=</span> <span class="kc">false</span>
+
+<span class="c1"># (Optional) Set to hide nested sections or pages at that level. Works only with file-tree menu mode</span>
+<span class="n">bookCollapseSection</span> <span class="o">=</span> <span class="kc">true</span>
+
+<span class="c1"># (Optional) Set true to hide page or section from side menu (if BookMenuBundle not set)</span>
+<span class="n">bookHidden</span> <span class="o">=</span> <span class="kc">false</span>
+
+<span class="c1"># (Optional) Set 'false' to hide ToC from page</span>
+<span class="n">bookToC</span> <span class="o">=</span> <span class="kc">true</span>
+
+<span class="c1"># (Optional) If you have enabled BookComments for the site, you can disable it for specific pages.</span>
+<span class="n">bookComments</span> <span class="o">=</span> <span class="kc">true</span>
+
+<span class="c1"># (Optional) Set to 'false' to exclude page from search index.</span>
+<span class="n">bookSearchExclude</span> <span class="o">=</span> <span class="kc">true</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="partials">
+<h3>Partials<a class="headerlink" href="#partials" title="Permalink to this headline">¶</a></h3>
+<p>There are few empty partials you can override in <code class="docutils literal notranslate"><span class="pre">layouts/partials/</span></code></p>
+<p>| Partial                                            | Placement                              |
+| ————————————————– | ————————————– |
+| <code class="docutils literal notranslate"><span class="pre">layouts/partials/docs/inject/head.html</span></code>           | Before closing <code class="docutils literal notranslate"><span class="pre">&lt;head&gt;</span></code> tag            |
+| <code class="docutils literal notranslate"><span class="pre">layouts/partials/docs/inject/body.html</span></code>           | Before closing <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code> tag            |
+| <code class="docutils literal notranslate"><span class="pre">layouts/partials/docs/inject/footer.html</span></code>         | After page footer content              |
+| <code class="docutils literal notranslate"><span class="pre">layouts/partials/docs/inject/menu-before.html</span></code>    | At the beginning of <code class="docutils literal notranslate"><span class="pre">&lt;nav&gt;</span></code> menu block |
+| <code class="docutils literal notranslate"><span class="pre">layouts/partials/docs/inject/menu-after.html</span></code>     | At the end of <code class="docutils literal notranslate"><span class="pre">&lt;nav&gt;</span></code> menu block       |
+| <code class="docutils literal notranslate"><span class="pre">layouts/partials/docs/inject/content-before.html</span></code> | Before page content                    |
+| <code class="docutils literal notranslate"><span class="pre">layouts/partials/docs/inject/content-after.html</span></code>  | After page content                     |</p>
+</div>
+<div class="section" id="extra-customisation">
+<h3>Extra Customisation<a class="headerlink" href="#extra-customisation" title="Permalink to this headline">¶</a></h3>
+<p>| File                     | Description                                                                           |
+| ———————— | ————————————————————————————- |
+| <code class="docutils literal notranslate"><span class="pre">static/favicon.png</span></code>     | Override default favicon                                                              |
+| <code class="docutils literal notranslate"><span class="pre">assets/_custom.scss</span></code>    | Customise or override scss styles                                                     |
+| <code class="docutils literal notranslate"><span class="pre">assets/_variables.scss</span></code> | Override default SCSS variables                                                       |
+| <code class="docutils literal notranslate"><span class="pre">assets/_fonts.scss</span></code>     | Replace default font with custom fonts (e.g. local files or remote like google fonts) |</p>
+</div>
+<div class="section" id="plugins">
+<h3>Plugins<a class="headerlink" href="#plugins" title="Permalink to this headline">¶</a></h3>
+<p>There are a few features implemented as plugable <code class="docutils literal notranslate"><span class="pre">scss</span></code> styles. Usually these are features that don’t make it to the core but can still be useful.</p>
+<p>| Plugin                            | Description                                                 |
+| ——————————— | ———————————————————– |
+| <code class="docutils literal notranslate"><span class="pre">assets/plugins/_numbered.scss</span></code>   | Makes headings in markdown numbered, e.g. <code class="docutils literal notranslate"><span class="pre">1.1</span></code>, <code class="docutils literal notranslate"><span class="pre">1.2</span></code>      |
+| <code class="docutils literal notranslate"><span class="pre">assets/plugins/_scrollbars.scss</span></code> | Overrides scrollbar styles to look similar across platforms |</p>
+<p>To enable plugins, add <code class="docutils literal notranslate"><span class="pre">@import</span> <span class="pre">"plugins/{name}";</span></code> to <code class="docutils literal notranslate"><span class="pre">assets/_custom.scss</span></code> in your website root.</p>
+</div>
+<div class="section" id="hugo-internal-templates">
+<h3>Hugo Internal Templates<a class="headerlink" href="#hugo-internal-templates" title="Permalink to this headline">¶</a></h3>
+<p>There are a few hugo templates inserted in <code class="docutils literal notranslate"><span class="pre">&lt;head&gt;</span></code></p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://gohugo.io/templates/internal/#google-analytics">Google Analytics</a></p></li>
+<li><p><a class="reference external" href="https://gohugo.io/templates/internal/#open-graph">Open Graph</a></p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="shortcodes">
+<h2>Shortcodes<a class="headerlink" href="#shortcodes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference external" href="https://themes.gohugo.io/theme/hugo-book/docs/shortcodes/buttons/">Buttons</a></p></li>
+<li><p><a class="reference external" href="https://themes.gohugo.io/theme/hugo-book/docs/shortcodes/columns/">Columns</a></p></li>
+<li><p><a class="reference external" href="https://themes.gohugo.io/theme/hugo-book/docs/shortcodes/expand/">Expand</a></p></li>
+<li><p><a class="reference external" href="https://themes.gohugo.io/theme/hugo-book/docs/shortcodes/hints/">Hints</a></p></li>
+<li><p><a class="reference external" href="https://themes.gohugo.io/theme/hugo-book/docs/shortcodes/katex/">KaTeX</a></p></li>
+<li><p><a class="reference external" href="https://themes.gohugo.io/theme/hugo-book/docs/shortcodes/mermaid/">Mermaid</a></p></li>
+<li><p><a class="reference external" href="https://themes.gohugo.io/theme/hugo-book/docs/shortcodes/tabs/">Tabs</a></p></li>
+</ul>
+<p>By default, Goldmark trims unsafe outputs which might prevent some shortcodes from rendering. It is recommended to set <code class="docutils literal notranslate"><span class="pre">markup.goldmark.renderer.unsafe=true</span></code> if you encounter problems.</p>
+<div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[markup.goldmark.renderer]</span>
+  <span class="n">unsafe</span> <span class="o">=</span> <span class="kc">true</span>
+</pre></div>
+</div>
+<p>If you are using <code class="docutils literal notranslate"><span class="pre">config.yaml</span></code> or <code class="docutils literal notranslate"><span class="pre">config.json</span></code>, consult the <a class="reference external" href="https://gohugo.io/getting-started/configuration-markup/">configuration markup</a></p>
+</div>
+<div class="section" id="versioning">
+<h2>Versioning<a class="headerlink" href="#versioning" title="Permalink to this headline">¶</a></h2>
+<p>This theme follows a simple incremental versioning. e.g. <code class="docutils literal notranslate"><span class="pre">v1</span></code>, <code class="docutils literal notranslate"><span class="pre">v2</span></code> and so on. There might be breaking changes between versions.</p>
+<p>If you want lower maintenance, use one of the released versions. If you want to live on the bleeding edge of changes, you can use the <code class="docutils literal notranslate"><span class="pre">master</span></code> branch and update your website when needed.</p>
+</div>
+<div class="section" id="contributing">
+<h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="extra-credits-to-contributors">
+<h3><a class="reference external" href="https://github.com/alex-shpak/hugo-book/graphs/contributors">Extra credits to contributors</a><a class="headerlink" href="#extra-credits-to-contributors" title="Permalink to this headline">¶</a></h3>
+<p>Contributions are welcome and I will review and consider pull requests.<br/>Primary goals are:</p>
+<ul class="simple">
+<li><p>Keep it simple.</p></li>
+<li><p>Keep minimal (or zero) default configuration.</p></li>
+<li><p>Avoid interference with user-defined layouts.</p></li>
+<li><p>Avoid using JS if it can be solved by CSS.</p></li>
+</ul>
+<p>Feel free to open issues if you find missing configuration or customisation options.</p>
+</div>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; Piotr Styczyński &lt;piotr@styczynski.in&gt;
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            |
+            <a class="muted-link" href="../../_sources/themes/book/README.md.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">Hugo Book Theme</a><ul>
+<li><a class="reference internal" href="#hugo-documentation-theme-as-simple-as-plain-book">Hugo documentation theme as simple as plain book</a></li>
+<li><a class="reference internal" href="#features">Features</a></li>
+<li><a class="reference internal" href="#requirements">Requirements</a></li>
+<li><a class="reference internal" href="#installation">Installation</a><ul>
+<li><a class="reference internal" href="#creating-site-from-scratch">Creating site from scratch</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#menu">Menu</a><ul>
+<li><a class="reference internal" href="#file-tree-menu-default">File tree menu (default)</a></li>
+<li><a class="reference internal" href="#leaf-bundle-menu">Leaf bundle menu</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#blog">Blog</a></li>
+<li><a class="reference internal" href="#configuration">Configuration</a><ul>
+<li><a class="reference internal" href="#site-configuration">Site Configuration</a></li>
+<li><a class="reference internal" href="#multi-language-support">Multi-Language Support</a></li>
+<li><a class="reference internal" href="#page-configuration">Page Configuration</a></li>
+<li><a class="reference internal" href="#partials">Partials</a></li>
+<li><a class="reference internal" href="#extra-customisation">Extra Customisation</a></li>
+<li><a class="reference internal" href="#plugins">Plugins</a></li>
+<li><a class="reference internal" href="#hugo-internal-templates">Hugo Internal Templates</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#shortcodes">Shortcodes</a></li>
+<li><a class="reference internal" href="#versioning">Versioning</a></li>
+<li><a class="reference internal" href="#contributing">Contributing</a><ul>
+<li><a class="reference internal" href="#extra-credits-to-contributors">Extra credits to contributors</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+  </body>
+</html>

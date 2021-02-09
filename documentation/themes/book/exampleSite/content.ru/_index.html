@@ -1,0 +1,286 @@
+<!doctype html>
+<html class="no-js">
+  <head><meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/><link rel="index" title="Index" href="../../../../genindex.html" /><link rel="search" title="Search" href="../../../../search.html" />
+
+    <meta name="generator" content="sphinx-3.4.3, furo 2020.12.30.beta24"/>
+        <title>title: Введение type: docs - mmseqs Documentation</title>
+      <link rel="stylesheet" href="../../../../_static/styles/furo.css?digest=33d2fc4f3f180ec1ffc6524e273e21d7d58cbe49">
+    <link rel="stylesheet" href="../../../../_static/pygments.css">
+    <link media="(prefers-color-scheme: dark)" rel="stylesheet" href="../../../../_static/pygments_dark.css">
+    
+
+
+<style>
+  :root {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+    }
+  }
+
+  /* For allowing end-user-specific overrides */
+  .override-light {
+    --color-code-background: #f8f8f8;
+  --color-code-foreground: black;
+  
+  }
+  .override-dark {
+    --color-code-background: #202020;
+  --color-code-foreground: #d0d0d0;
+  
+  }
+</style><link rel="stylesheet" type="text/css" href="../../../../_static/tabs.css" />
+    <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css" />
+    <link rel="stylesheet" href="../../../../_static/styles/furo-extensions.css?digest=26485485040e7aaf717c13fd0188a5ad2c2deb60">
+    <script id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+    <script defer="defer" src="../../../../_static/jquery.js"></script>
+    <script defer="defer" src="../../../../_static/underscore.js"></script>
+    <script defer="defer" src="../../../../_static/doctools.js"></script>
+    <script defer="defer" src="../../../../_static/tabs.js"></script>
+    <script defer src="../../../../_static/scripts/main.js?digest=e931d09b2a40c1bb82b542effe772014573baf67"></script></head>
+  <body dir="">
+    
+<svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
+  <symbol id="svg-toc" viewBox="0 0 24 24">
+    <title>Contents</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke-width="1.5" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z"/>
+      <line x1="4" y1="6" x2="20" y2="6" />
+      <line x1="10" y1="12" x2="20" y2="12" />
+      <line x1="6" y1="18" x2="20" y2="18" />
+    </svg>
+  </symbol>
+  <symbol id="svg-menu" viewBox="0 0 24 24">
+    <title>Menu</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-menu">
+      <line x1="3" y1="12" x2="21" y2="12"></line>
+      <line x1="3" y1="6" x2="21" y2="6"></line>
+      <line x1="3" y1="18" x2="21" y2="18"></line>
+    </svg>
+  </symbol>
+  <symbol id="svg-arrow-right" viewBox="0 0 24 24">
+    <title>Expand</title>
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+      stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+      class="feather feather-chevron-right">
+      <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+  </symbol>
+</svg>
+
+<input type="checkbox" class="sidebar-toggle" name="__navigation" id="__navigation">
+<input type="checkbox" class="sidebar-toggle" name="__toc" id="__toc">
+<label class="overlay sidebar-overlay" for="__navigation"></label>
+<label class="overlay toc-overlay" for="__toc"></label>
+
+
+
+<div class="page">
+  <header class="mobile-header">
+    <div class="header-left">
+      <label class="nav-overlay-icon" for="__navigation">
+        <i class="icon"><svg><use href="#svg-menu"></use></svg></i>
+      </label>
+    </div>
+    <div class="header-center">
+      <a href="../../../../index.html"><div class="brand">mmseqs Documentation</div></a>
+    </div>
+    <div class="header-right">
+      <label class="toc-overlay-icon toc-header-icon" for="__toc">
+        <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+      </label>
+    </div>
+  </header>
+  <aside class="sidebar-drawer">
+    <div class="sidebar-container">
+      
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../../../index.html">
+  
+  
+  <span class="sidebar-brand-text">mmseqs Documentation</span>
+  
+</a><form class="sidebar-search-container" method="get" action="../../../../search.html">
+  <input class="sidebar-search" placeholder=Search name="q">
+  <input type="hidden" name="check_keywords" value="yes">
+  <input type="hidden" name="area" value="default">
+</form><div class="sidebar-scroll"><div class="sidebar-tree">
+  <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../_sphinx_resources/README.html">MMseqs2 bindings for Python</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../../../reference/generated/mmseqs.mmseqs_native.html">mmseqs.mmseqs_native</a><input class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" type="checkbox"/><label for="toctree-checkbox-1"><i class="icon"><svg><use href="#svg-arrow-right"></use></svg></i></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference/generated/mmseqs.mmseqs_native.Client.html">mmseqs.mmseqs_native.Client</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference/generated/mmseqs.mmseqs_native.Database.html">mmseqs.mmseqs_native.Database</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference/generated/mmseqs.mmseqs_native.MMSeqsCallArgs.html">mmseqs.mmseqs_native.MMSeqsCallArgs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference/generated/mmseqs.mmseqs_native.MMSeqsCallConfig.html">mmseqs.mmseqs_native.MMSeqsCallConfig</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference/generated/mmseqs.mmseqs_native.MMSeqsCallOutput.html">mmseqs.mmseqs_native.MMSeqsCallOutput</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference/generated/mmseqs.mmseqs_native.MMSeqsMultiParamInt.html">mmseqs.mmseqs_native.MMSeqsMultiParamInt</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference/generated/mmseqs.mmseqs_native.MMSeqsMultiParamString.html">mmseqs.mmseqs_native.MMSeqsMultiParamString</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference/generated/mmseqs.mmseqs_native.MMSeqsSearchRecord.html">mmseqs.mmseqs_native.MMSeqsSearchRecord</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference/generated/mmseqs.mmseqs_native.Record.html">mmseqs.mmseqs_native.Record</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../../reference/generated/mmseqs.mmseqs_native.SearchResults.html">mmseqs.mmseqs_native.SearchResults</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../reference/mmseqs.html">mmseqs package</a></li>
+</ul>
+
+</div>
+</div>
+      </div>
+      
+    </div>
+  </aside>
+  <main class="main">
+    <div class="content">
+      <article role="main">
+        <label class="toc-overlay-icon toc-content-icon" for="__toc">
+          <i class="icon"><svg><use href="#svg-toc"></use></svg></i>
+        </label>
+        <hr class="docutils"/>
+<div class="section" id="title-type-docs">
+<h1>title: Введение
+type: docs<a class="headerlink" href="#title-type-docs" title="Permalink to this headline">¶</a></h1>
+</div>
+<div class="section" id="id1">
+<h1>Стартовая страница на русском языке<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h1>
+<p>{{&lt; columns &gt;}}</p>
+<div class="section" id="astris-ipse-furtiva">
+<h2>Astris ipse furtiva<a class="headerlink" href="#astris-ipse-furtiva" title="Permalink to this headline">¶</a></h2>
+<p>Est in vagis et Pittheus tu arge accipiter regia iram vocatur nurus. Omnes ut
+olivae sensit <strong>arma sorori</strong> deducit, inesset <strong>crudus</strong>, ego vetuere aliis,
+modo arsit? Utinam rapta fiducia valuere litora <em>adicit cursu</em>, ad facies</p>
+<p>&lt;—&gt;</p>
+</div>
+<div class="section" id="suis-quot-vota">
+<h2>Suis quot vota<a class="headerlink" href="#suis-quot-vota" title="Permalink to this headline">¶</a></h2>
+<p>Ea <em>furtique</em> risere fratres edidit terrae magis. Colla tam mihi tenebat:
+miseram excita suadent es pecudes iam. Concilio <em>quam</em> velatus posset ait quod
+nunc! Fragosis suae dextra geruntur functus vulgata.
+{{&lt; /columns &gt;}}</p>
+</div>
+<div class="section" id="tempora-nisi-nunc">
+<h2>Tempora nisi nunc<a class="headerlink" href="#tempora-nisi-nunc" title="Permalink to this headline">¶</a></h2>
+<p>Lorem <strong>markdownum</strong> emicat gestu. Cannis sol pressit ducta. <strong>Est</strong> Idaei,
+tremens ausim se tutaeque, illi ulnis hausit, sed, lumina cutem. Quae avis
+sequens!</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">var</span> <span class="n">panel</span> <span class="o">=</span> <span class="n">ram_design</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">backup</span> <span class="o">+</span> <span class="n">system</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">file</span><span class="o">.</span><span class="n">readPoint</span> <span class="o">=</span> <span class="n">network_native</span><span class="p">;</span>
+    <span class="n">sidebar_engine_device</span><span class="p">(</span><span class="n">cell_tftp_raster</span><span class="p">,</span>
+            <span class="n">dual_login_paper</span><span class="o">.</span><span class="n">adf_vci</span><span class="o">.</span><span class="n">application_reader_design</span><span class="p">(</span>
+            <span class="n">graphicsNvramCdma</span><span class="p">,</span> <span class="n">lpi_footer_snmp</span><span class="p">,</span> <span class="n">integer_model</span><span class="p">));</span>
+<span class="p">}</span>
+<span class="n">public_keyboard_docking</span> <span class="o">+=</span> <span class="n">error</span><span class="o">.</span><span class="n">controller_gibibyte_plug</span><span class="o">.</span><span class="n">ip</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">asciiPetaflops</span><span class="p">,</span> <span class="n">software</span><span class="p">(</span><span class="n">supercomputer_compatible_status</span> <span class="o">+</span> <span class="mi">4</span><span class="p">));</span>
+<span class="n">dynamic_disk</span><span class="o">.</span><span class="n">indexModeLaptop</span> <span class="o">=</span> <span class="n">bufferTftpReality</span><span class="p">;</span>
+<span class="n">var</span> <span class="n">export_vlog_sequence</span> <span class="o">=</span> <span class="n">trinitron_flowchart</span> <span class="o">+</span> <span class="n">supercomputer_cluster_rj</span><span class="p">(</span>
+        <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">toolbar_powerpoint_query</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span> <span class="o">/</span> <span class="n">multiprocessing_impression</span><span class="p">);</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="locis-suis-novi-cum-suoque-decidit-eadem">
+<h2>Locis suis novi cum suoque decidit eadem<a class="headerlink" href="#locis-suis-novi-cum-suoque-decidit-eadem" title="Permalink to this headline">¶</a></h2>
+<p>Idmoniae ripis, at aves, ali missa adest, ut <em>et autem</em>, et ab? Venit spes
+versus finis sermonibus patefecit murum nec est sine oculis. <em>Ille</em> inmota
+macies domoque caelestia cadit tantummodo scelus procul, corde!</p>
+<ol class="simple">
+<li><p>Dolentem capi parte rostro alvum habentem pudor</p></li>
+<li><p>Fulgentia sanguine paret</p></li>
+<li><p>E punior consurgit lentus</p></li>
+<li><p>Vox hasta eras micantes</p></li>
+</ol>
+</div>
+<div class="section" id="facibus-pharetrae-indetonsusque-indulsit-sic-incurrite-foliis">
+<h2>Facibus pharetrae indetonsusque indulsit sic incurrite foliis<a class="headerlink" href="#facibus-pharetrae-indetonsusque-indulsit-sic-incurrite-foliis" title="Permalink to this headline">¶</a></h2>
+<p>Nefandam et prisci palmas! Blandita cutis flectitur montis macies, te <em>nati</em>
+Latiis; turbaque inferias. Virginis tibi peracta avidusque facies caper nec, e
+at ademptae, mira.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">direct</span> <span class="o">*=</span> <span class="n">font</span><span class="p">(</span><span class="n">inputScareware</span><span class="p">(</span><span class="n">sliHome</span><span class="p">),</span> <span class="n">crossplatform</span><span class="o">.</span><span class="n">byte</span><span class="p">(</span>
+        <span class="n">ppl_encryption</span><span class="o">.</span><span class="n">excel_e_rte</span><span class="p">(</span><span class="n">integratedModelModifier</span><span class="p">),</span> <span class="n">timeVirtual</span><span class="p">,</span>
+        <span class="n">floating_speakers</span><span class="o">.</span><span class="n">media_printer</span><span class="p">(</span><span class="n">us</span><span class="p">,</span> <span class="n">yahoo</span><span class="p">,</span> <span class="n">primaryPhp</span><span class="p">)));</span>
+<span class="n">friendly_metal_flatbed</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="n">isoPrimaryStorage</span><span class="p">(</span><span class="n">reader</span><span class="p">),</span> <span class="n">dmaMirrored</span><span class="p">);</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">parse_flash_cron</span><span class="o">.</span><span class="n">metalGif</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">adServiceDevice</span><span class="p">,</span> <span class="n">utility</span><span class="p">))</span> <span class="p">{</span>
+    <span class="n">adf</span> <span class="o">-=</span> <span class="n">operation_cdma_samba</span><span class="p">;</span>
+    <span class="n">imapGif</span><span class="o">.</span><span class="n">switch</span> <span class="o">+=</span> <span class="n">torrent</span><span class="p">;</span>
+<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="n">pmu</span><span class="o">.</span><span class="n">disk_captcha</span> <span class="o">=</span> <span class="n">digital_ppp_pci</span> <span class="o">+</span> <span class="n">recursionTransistor</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">dram</span><span class="p">);</span>
+    <span class="n">ajax_service</span> <span class="o">+=</span> <span class="n">grayscalePythonLock</span><span class="p">;</span>
+    <span class="n">google_scroll_capacity</span> <span class="o">=</span> <span class="n">ftp</span> <span class="o">+</span> <span class="n">engine_dslam_sidebar</span> <span class="o">/</span> <span class="n">tape</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">drive_rw</span> <span class="o">=</span> <span class="n">zipTftp</span><span class="p">;</span>
+<span class="n">var</span> <span class="n">suffix</span> <span class="o">=</span> <span class="n">software_router_extension</span><span class="o">.</span><span class="n">dimm_ddr</span><span class="p">(</span><span class="o">-</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">kernel_digital_minisite</span><span class="p">);</span>
+</pre></div>
+</div>
+<p>Vocavit toto; alas <strong>mitis</strong> maestus in liquidarum ab legi finitimosque dominam
+tibi subitus; Orionis vertitur nota. Currere alti etiam seroque cernitis
+innumeris miraturus amplectique collo sustinet quemque! Litora ante turba?</p>
+</div>
+</div>
+
+      </article>
+      <footer>
+        
+        <div class="related-pages">
+          
+          
+        </div>
+
+        <div class="related-information">
+              Copyright &#169; Piotr Styczyński &lt;piotr@styczynski.in&gt;
+            |
+            Built with <a href="https://www.sphinx-doc.org/">Sphinx</a>
+              and
+              <a class="muted-link" href="https://pradyunsg.me">@pradyunsg</a>'s
+              <a href="https://github.com/pradyunsg/furo">Furo theme</a>.
+            |
+            <a class="muted-link" href="../../../../_sources/themes/book/exampleSite/content.ru/_index.md.txt"
+               rel="nofollow">
+              Show Source
+            </a>
+        </div>
+        
+      </footer>
+    </div>
+    <aside class="toc-drawer">
+      
+      
+      <div class="toc-sticky toc-scroll">
+        <div class="toc-title-container">
+          <span class="toc-title">
+            Contents
+          </span>
+        </div>
+        <div class="toc-tree-container">
+          <div class="toc-tree">
+            <ul>
+<li><a class="reference internal" href="#">title: Введение
+type: docs</a></li>
+<li><a class="reference internal" href="#id1">Стартовая страница на русском языке</a><ul>
+<li><a class="reference internal" href="#astris-ipse-furtiva">Astris ipse furtiva</a></li>
+<li><a class="reference internal" href="#suis-quot-vota">Suis quot vota</a></li>
+<li><a class="reference internal" href="#tempora-nisi-nunc">Tempora nisi nunc</a></li>
+<li><a class="reference internal" href="#locis-suis-novi-cum-suoque-decidit-eadem">Locis suis novi cum suoque decidit eadem</a></li>
+<li><a class="reference internal" href="#facibus-pharetrae-indetonsusque-indulsit-sic-incurrite-foliis">Facibus pharetrae indetonsusque indulsit sic incurrite foliis</a></li>
+</ul>
+</li>
+</ul>
+
+          </div>
+        </div>
+      </div>
+      
+      
+    </aside>
+  </main>
+</div>
+  </body>
+</html>
