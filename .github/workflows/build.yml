@@ -3,7 +3,7 @@ name: Build
 on: [push, pull_request]
 
 jobs:
-  build_wheels:
+  build:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -12,6 +12,10 @@ jobs:
     steps:
       - name: Checkout the project
         uses: actions/checkout@v2
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.7
+        with:
+          cmake-version: '3.19.x'
       - uses: actions/setup-python@v2
         name: Install Python
         with:
@@ -35,5 +39,5 @@ jobs:
       - name: Upload prebuild wheels
         uses: actions/upload-artifact@v2
         with:
-          name: build_wheels
+          name: build
           path: ./wheelhouse/*.whl

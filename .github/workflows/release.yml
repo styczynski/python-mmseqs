@@ -7,7 +7,7 @@ on:
       - master
 
 jobs:
-  build_wheels:
+  build_and_release:
     name: Build wheels on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
@@ -16,6 +16,10 @@ jobs:
     steps:
       - name: Checkout the project
         uses: actions/checkout@v2
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v1.7
+        with:
+          cmake-version: '3.19.x'
       - uses: actions/setup-python@v2
         name: Install Python
         with:
@@ -30,12 +34,12 @@ jobs:
       - name: Upload prebuild wheels
         uses: actions/upload-artifact@v2
         with:
-          name: build_wheels
+          name: build_and_release
           path: ./wheelhouse/*.whl
 
   release:
     name: Publish release
-    needs: build_wheels
+    needs: build_and_release
     runs-on: ubuntu-latest
     steps:
       - name: Checkout the project
@@ -50,16 +54,16 @@ jobs:
       - name: Download prebuilt wheels
         uses: actions/download-artifact@v2
         with:
-          name: build_wheels
+          name: build_and_release
       - name: Temporarily store all prebuild wheels
         shell: bash
-        run: mkdir _build_wheels && cp ./*.whl _build_wheels
+        run: mkdir _build_and_release && cp ./*.whl _build_and_release
       - name: Run poetry build
         shell: bash
         run: poetry build
       - name: Copy all prebuilt wheels
         shell: bash
-        run: cp ./_build_wheels/* dist
+        run: cp ./_build_and_release/* dist
       - name: Publish a Python distribution to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
