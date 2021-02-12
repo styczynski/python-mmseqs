@@ -14,18 +14,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.15)
 
-set(Python_ADDITIONAL_VERSIONS
-    3.8 3.8.0 3.8.1 3.8.2 3.8.3 3.8.4 3.8.5 3.8.6 3.8.7
-    3.9 3.9.0 3.9.1
-    3.7 3.7.0 3.7.1 3.7.2 3.7.3 3.7.4 3.7.5 3.7.6 3.7.7 3.7.8 3.7.9
-    3.6 3.6.0 3.6.1 3.6.2 3.6.3 3.6.4 3.6.5 3.6.6 3.6.7 3.6.8 3.6.9 3.6.10 3.6.11 3.6.12
-    3.5 3.5.0 3.5.1 3.5.2 3.5.3 3.5.4 3.5.5 3.5.6 3.5.7 3.5.8 3.5.9 3.5.10
-    3.4 3.4.0 3.4.1 3.4.2 3.4.3 3.4.4 3.4.5 3.4.6 3.4.7 3.4.8 3.4.9 3.4.10 3.3.0
-    3.3 3.3.1 3.3.2 3.3.3 3.3.4 3.3.5 3.3.6 3.3.7
-    3.2 3.2.0 3.2.1 3.2.2 3.2.3 3.2.4 3.2.5 3.2.6
-    3.1 3.1.0 3.1.1 3.1.2 3.1.3 3.1.4 3.1.5
-    3.0 3.0.0 3.0.1)
-
 set(CMAKE_BUILD_TYPE Debug)
 if (MSVC)
     add_compile_options(/DEBUG:FULL)
@@ -57,8 +45,6 @@ set(HAVE_POWER8 0 CACHE BOOL "Have POWER8 CPU")
 set(HAVE_ARM8 0 CACHE BOOL "Have ARMv8 CPU")
 set(NATIVE_ARCH 1 CACHE BOOL "Assume native architecture for SIMD. Use one of the HAVE_* options or set CMAKE_CXX_FLAGS to the appropriate flags if you disable this.")
 
-set(PYTHON_BINDING_PYTHON_VERSION "" CACHE STRING "Python version PYTHON_BINDING will use.")
-set_property(CACHE PYTHON_BINDING_PYTHON_VERSION PROPERTY STRINGS ${Python_ADDITIONAL_VERSIONS})
 set(Python3_FIND_STRATEGY LOCATION)
 if(defined $ENV{pythonVersion})
     message("-- Detected pythonVersion env variable. Looking for python ${pythonVersion}")
@@ -66,7 +52,7 @@ if(defined $ENV{pythonVersion})
     find_package(Python3 ${pythonVersion} REQUIRED COMPONENTS Interpreter NumPy)
 else ()
     message("-- Looking for Python3")
-    find_package(Python3 ${PYTHON_BINDING_PYTHON_VERSION} REQUIRED COMPONENTS Interpreter Development NumPy)
+    find_package(Python3 "3.8" REQUIRED COMPONENTS Interpreter Development NumPy)
     if (Python3_NumPy_FOUND)
         message("-- Detected NumPy installation")
     else ()
