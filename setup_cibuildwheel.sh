@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "Install Python devel"
-yum install python3-devel
+yum install -y python3-devel.x86_64 || exit 1
 
 echo "Install Poetry..."
 curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
