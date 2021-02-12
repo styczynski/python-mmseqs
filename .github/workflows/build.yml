@@ -16,11 +16,15 @@ jobs:
         uses: jwlawson/actions-setup-cmake@v1.7
         with:
           cmake-version: '3.19.x'
-      - uses: actions/setup-python@v2
-        name: Install Python
-        with:
-          python-version: '3.8'
-          architecture: 'x64'
+      - name: Install Python
+        run: |
+          sudo add-apt-repository ppa:deadsnakes/ppa
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends python3.8-dev python3.8-distutils python3.8-venv python3-numpy
+          python3.8 -m pip install --upgrade pip setuptools
+          python3.8 -m venv $HOME/venv-python3.8
+          echo "::set-env name=VIRTUAL_ENV::$HOME/venv-python3.8"
+          echo "::add-path::$HOME/venv-python3.8/bin"
       - name: Install cibuildwheel and numpy
         run: python3.8 -m pip install cibuildwheel==1.8.0 numpy==1.20.1
       - name: Cache multiple paths
