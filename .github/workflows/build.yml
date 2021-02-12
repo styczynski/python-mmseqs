@@ -17,7 +17,7 @@ jobs:
         with:
           cmake-version: '3.19.x'
       - name: Install Python dev packages
-        run: apt-get install python3 python3-setuptools python3-pkg-resources python3-pip python3-dev libffi-dev build-essential git
+        run: sudo apt-get install python3 python3-setuptools python3-pkg-resources python3-pip python3-dev libffi-dev build-essential git
       - name: Install python
         uses: gabrielfalcao/pyenv-action@v5
         with:
