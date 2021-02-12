@@ -16,19 +16,13 @@ jobs:
         uses: jwlawson/actions-setup-cmake@v1.7
         with:
           cmake-version: '3.19.x'
-      - name: Install Python
-        run: sudo apt-get install python3 python3-setuptools python3-pkg-resources python3-pip python3-dev libffi-dev build-essential git
-      - name: Install Python packages
-        run: pip install -U pip numpy==1.20.1 cibuildwheel==1.8.0
-      - name: Check Python versions
-        run: |
-          printf "> Python version (cli):\n    " && python --version && \
-          printf "> Pip version:\n    " && pip --version && \
-          printf "> Numpy version:\n    " && python -c "import numpy; print(numpy.version.version)" && \
-          printf "> Python include path:\n    " && python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_python_inc())" && \
-          printf "> Python libraries path:\n    " && python -c "import distutils.sysconfig as sysconfig; print(sysconfig.get_config_var('LIBDIR'))" && \
-          printf "> Python interpreter executable:\n    " && python -c "import sys; print(sys.executable)" && \
-          printf "> Python version (platform):\n    " && python -c "import platform; print(platform.python_version())"
+      - uses: actions/setup-python@v2
+          name: Install Python
+          with:
+            python-version: '3.8'
+            architecture: 'x64'
+      - name: Install cibuildwheel
+        run: python3.8 -m pip install cibuildwheel==1.8.0
       - name: Cache multiple paths
         uses: actions/cache@v2
         with:
@@ -39,8 +33,9 @@ jobs:
             .pytest_cache
           key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
       - name: Build wheels
-        run: python3.8 -m cibuildwheel --output-dir wheelhouse
+        run: python -m cibuildwheel --output-dir wheelhouse
         env:
+          CIBW_BEFORE_ALL: bash ./setup_cibuildwheel.sh
           CIBW_SKIP: "cp27-* pp27-* cp35-* pp35-* cp36-* pp36-* cp37-* pp37-*"  # skip Python 2.7 wheels
       - name: Upload prebuild wheels
         uses: actions/upload-artifact@v2
