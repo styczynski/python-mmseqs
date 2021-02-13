@@ -1,5 +1,8 @@
 #!/bin/bash
 
+echo "Activate EPEL repository"
+yum install https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+
 echo "Install Python devel"
 yum install -y python3-devel.x86_64 || exit 1
 
