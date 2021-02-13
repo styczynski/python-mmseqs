@@ -179,7 +179,7 @@ def setup(app):
 
 # conf.py
 # srclink settings
-srclink_project = 'https://github.com/styczynski/python-biosnake'
+srclink_project = 'https://github.com/styczynski/biosnake'
 #srclink_project = 'https://bitbucket.org/westurner/sphinxcontrib-srclinks'
 #srclink_project = 'hg@bitbucket.org/westurner/sphinxcontrib-srclinks'
 #srclink_project = 'git@bitbucket.org/westurner/sphinxcontrib-srclinks'

@@ -1,9 +1,9 @@
 # Biosnake
 
-![Top language](https://img.shields.io/github/languages/top/styczynski/python-biosnake)
+![Top language](https://img.shields.io/github/languages/top/styczynski/biosnake)
 ![PyPI](https://img.shields.io/pypi/v/biosnake?style=flat)
-![Build status](https://github.com/styczynski/python-biosnake/workflows/Build/badge.svg)
-![Last commit](https://img.shields.io/github/last-commit/styczynski/python-biosnake)
+![Build status](https://github.com/styczynski/biosnake/workflows/Build/badge.svg)
+![Last commit](https://img.shields.io/github/last-commit/styczynski/biosnake)
 
 ## Project description
 
