@@ -1,5 +1,5 @@
-import mmseqs
+import biosnake
 
 def test_empty():
-    client = mmseqs.MMSeqs()
+    client = biosnake.Biosnake()
     client.databases.create("test", "Test database", "./example/a.fasta")

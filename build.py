@@ -171,7 +171,7 @@ def build(setup_kwargs):
         {
             "long_description": long_description,
             "long_description_content_type": 'text/markdown',
-            "ext_modules": [CMakeExtension("mmseqs/mmseqs_native")],
+            "ext_modules": [CMakeExtension("biosnake/biosnake_native")],
             "cmdclass": {"build_ext": CMakeBuild},
             "zip_safe": False,
             "include_package_data": True,

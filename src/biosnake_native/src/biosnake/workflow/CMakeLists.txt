@@ -1,0 +1,19 @@
+set(workflow_source_files
+        biosnake/workflow/cluster.cpp
+        biosnake/workflow/clusterUpdate.cpp
+        biosnake/workflow/databases.cpp
+        biosnake/workflow/linclust.cpp
+        biosnake/workflow/easySearch.cpp
+        biosnake/workflow/easyRbh.cpp
+        biosnake/workflow/easyCluster.cpp
+        biosnake/workflow/easyLinclust.cpp
+        biosnake/workflow/enrich.cpp
+        biosnake/workflow/linsearch.cpp
+        biosnake/workflow/map.cpp
+        biosnake/workflow/rbh.cpp
+        biosnake/workflow/search.cpp
+        biosnake/workflow/taxonomy.cpp
+        biosnake/workflow/easyTaxonomy.cpp
+        biosnake/workflow/createIndex.cpp
+        PARENT_SCOPE
+        )

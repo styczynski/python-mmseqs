@@ -13,7 +13,7 @@ Contents:
 
 .. git_changelog::
 
-.. uml:: mmseqs
+.. uml:: biosnake
     :classes:
     :packages:
 

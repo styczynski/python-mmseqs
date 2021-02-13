@@ -257,7 +257,7 @@ case "${INPUT_TYPE}" in
     "FASTA_LIST")
         eval "set -- $ARR"
         # shellcheck disable=SC2086
-        "${MMSEQS}" createdb "${@}" "${OUTDB}" ${COMP_PAR} \
+        "${BIOSNAKE}" createdb "${@}" "${OUTDB}" ${COMP_PAR} \
             || fail "createdb died"
         for i in "${@}"; do
             rm -f -- "$i"
@@ -265,54 +265,54 @@ case "${INPUT_TYPE}" in
     ;;
     "FSA")
         # shellcheck disable=SC2086
-        "${MMSEQS}" createdb "${TMP_PATH}/"*.fsa "${OUTDB}" ${COMP_PAR} \
+        "${BIOSNAKE}" createdb "${TMP_PATH}/"*.fsa "${OUTDB}" ${COMP_PAR} \
             || fail "createdb died"
         rm -f -- "${TMP_PATH}/"*.fsa
     ;;
     "A3M")
         # shellcheck disable=SC2086
-        "${MMSEQS}" msa2profile "${TMP_PATH}/msa" "${OUTDB}" --match-mode 1 --match-ratio 0.5 --msa-type 1 ${THREADS_PAR} \
+        "${BIOSNAKE}" msa2profile "${TMP_PATH}/msa" "${OUTDB}" --match-mode 1 --match-ratio 0.5 --msa-type 1 ${THREADS_PAR} \
             || fail "msa2profile died"
     ;;
     "STOCKHOLM_MSA")
         # shellcheck disable=SC2086
-        "${MMSEQS}" convertmsa "${TMP_PATH}/db.msa.gz" "${TMP_PATH}/msa" ${VERB_PAR} \
+        "${BIOSNAKE}" convertmsa "${TMP_PATH}/db.msa.gz" "${TMP_PATH}/msa" ${VERB_PAR} \
             || fail "convertmsa died"
         rm -f "${TMP_PATH}/db.msa.gz"
         # shellcheck disable=SC2086
-        "${MMSEQS}" msa2profile "${TMP_PATH}/msa" "${OUTDB}" --match-mode 1 --match-ratio 0.5 ${THREADS_PAR} \
+        "${BIOSNAKE}" msa2profile "${TMP_PATH}/msa" "${OUTDB}" --match-mode 1 --match-ratio 0.5 ${THREADS_PAR} \
             || fail "msa2profile died"
         if [ -n "${REMOVE_TMP}" ]; then
-          "${MMSEQS}" rmdb "${TMP_PATH}/msa" \
+          "${BIOSNAKE}" rmdb "${TMP_PATH}/msa" \
               || fail "rmdb died"
         fi
     ;;
     "FASTA_MSA")
         # shellcheck disable=SC2086
-        "${MMSEQS}" tar2db "${TMP_PATH}/msa.tar.gz" "${TMP_PATH}/msa" ${VERB_PAR} --output-dbtype 11 \
+        "${BIOSNAKE}" tar2db "${TMP_PATH}/msa.tar.gz" "${TMP_PATH}/msa" ${VERB_PAR} --output-dbtype 11 \
             || fail "tar2db died"
         rm -f "${TMP_PATH}/msa.tar.gz"
         # shellcheck disable=SC2086
-        "${MMSEQS}" msa2profile "${TMP_PATH}/msa" "${OUTDB}" --match-mode 1 --match-ratio 0.5 ${THREADS_PAR} \
+        "${BIOSNAKE}" msa2profile "${TMP_PATH}/msa" "${OUTDB}" --match-mode 1 --match-ratio 0.5 ${THREADS_PAR} \
             || fail "msa2profile died"
         if [ -n "${REMOVE_TMP}" ]; then
-            "${MMSEQS}" rmdb "${TMP_PATH}/msa" \
+            "${BIOSNAKE}" rmdb "${TMP_PATH}/msa" \
                 || fail "rmdb died"
         fi
     ;;
     "eggNOG")
         # shellcheck disable=SC2086
-        "${MMSEQS}" tar2db "${TMP_PATH}/bacteria" "${TMP_PATH}/archea" "${TMP_PATH}/eukaryota" "${TMP_PATH}/viruses" "${TMP_PATH}/msa" --output-dbtype 11 --tar-include '\.raw_alg\.faa\.gz$' ${COMP_PAR} \
+        "${BIOSNAKE}" tar2db "${TMP_PATH}/bacteria" "${TMP_PATH}/archea" "${TMP_PATH}/eukaryota" "${TMP_PATH}/viruses" "${TMP_PATH}/msa" --output-dbtype 11 --tar-include '\.raw_alg\.faa\.gz$' ${COMP_PAR} \
             || fail "msa2profile died"
         rm -f "${TMP_PATH}/bacteria.tar" "${TMP_PATH}/archea.tar" "${TMP_PATH}/eukaryota.tar" "${TMP_PATH}/viruses.tar"
         sed 's|\.raw_alg\.faa\.gz||g' "${TMP_PATH}/msa.lookup" > "${TMP_PATH}/msa.lookup.tmp"
         mv -f "${TMP_PATH}/msa.lookup.tmp" "${TMP_PATH}/msa.lookup"
         # shellcheck disable=SC2086
-        "${MMSEQS}" msa2profile "${TMP_PATH}/msa" "${OUTDB}" --match-mode 1 --match-ratio 0.5 ${THREADS_PAR} \
+        "${BIOSNAKE}" msa2profile "${TMP_PATH}/msa" "${OUTDB}" --match-mode 1 --match-ratio 0.5 ${THREADS_PAR} \
             || fail "msa2profile died"
         mv -f "${TMP_PATH}/msa.lookup" "${OUTDB}.lookup"
         mv -f "${TMP_PATH}/msa.source" "${OUTDB}.source"
-        "${MMSEQS}" rmdb "${TMP_PATH}/msa" \
+        "${BIOSNAKE}" rmdb "${TMP_PATH}/msa" \
             || fail "rmdb died"
     ;;
 esac
@@ -345,26 +345,26 @@ if [ -n "${TAXONOMY}" ] && notExists "${OUTDB}_mapping"; then
         touch "${TMP_PATH}/taxonomy/merged.dmp"
         touch "${TMP_PATH}/taxonomy/delnodes.dmp"
         # shellcheck disable=SC2086
-        "${MMSEQS}" createtaxdb "${OUTDB}" "${TMP_PATH}/taxdb" --ncbi-tax-dump "${TMP_PATH}/taxonomy" --tax-mapping-file "${TMP_PATH}/silva.acc_taxid" ${THREADS_PAR}
+        "${BIOSNAKE}" createtaxdb "${OUTDB}" "${TMP_PATH}/taxdb" --ncbi-tax-dump "${TMP_PATH}/taxonomy" --tax-mapping-file "${TMP_PATH}/silva.acc_taxid" ${THREADS_PAR}
        ;;
      "NR")
         touch "${OUTDB}_mapping"
         # shellcheck disable=SC2086
-        "${MMSEQS}" createtaxdb "${OUTDB}" "${TMP_PATH}/taxonomy" ${THREADS_PAR} \
+        "${BIOSNAKE}" createtaxdb "${OUTDB}" "${TMP_PATH}/taxonomy" ${THREADS_PAR} \
             || fail "createtaxdb died"
         # shellcheck disable=SC2086
-        "${MMSEQS}" nrtotaxmapping "${TMP_PATH}/pdb.accession2taxid" "${TMP_PATH}/prot.accession2taxid" "${OUTDB}" "${OUTDB}_mapping" ${THREADS_PAR} \
+        "${BIOSNAKE}" nrtotaxmapping "${TMP_PATH}/pdb.accession2taxid" "${TMP_PATH}/prot.accession2taxid" "${OUTDB}" "${OUTDB}_mapping" ${THREADS_PAR} \
             || fail "nrtotaxmapping died"
        ;;
      *)
        # shellcheck disable=SC2086
-       "${MMSEQS}" prefixid "${OUTDB}_h" "${TMP_PATH}/header_pref.tsv" --tsv ${THREADS_PAR} \
+       "${BIOSNAKE}" prefixid "${OUTDB}_h" "${TMP_PATH}/header_pref.tsv" --tsv ${THREADS_PAR} \
            || fail "prefixid died"
        awk '{ match($0, / OX=[0-9]+ /); if (RLENGTH != -1) { print $1"\t"substr($0, RSTART+4, RLENGTH-5); next; } match($0, / TaxID=[0-9]+ /); print $1"\t"substr($0, RSTART+7, RLENGTH-8); }' "${TMP_PATH}/header_pref.tsv" \
            | LC_ALL=C sort -n > "${OUTDB}_mapping"
        rm -f "${TMP_PATH}/header_pref.tsv"
        # shellcheck disable=SC2086
-       "${MMSEQS}" createtaxdb "${OUTDB}" "${TMP_PATH}/taxonomy" ${THREADS_PAR} \
+       "${BIOSNAKE}" createtaxdb "${OUTDB}" "${TMP_PATH}/taxonomy" ${THREADS_PAR} \
            || fail "createtaxdb died"
        ;;
      esac

@@ -9,7 +9,7 @@ notExists() {
 }
 
 #pre processing
-[ -z "$MMSEQS" ] && echo "Please set the environment variable \$MMSEQS to your MMSEQS binary." && exit 1;
+[ -z "$BIOSNAKE" ] && echo "Please set the environment variable \$BIOSNAKE to your BIOSNAKE binary." && exit 1;
 # check number of input variables
 [ "$#" -ne 4 ] && echo "Please provide <queryDB> <targetDB> <outputDB> <tmpDir>" && exit 1;
 # check if files exist
@@ -24,29 +24,29 @@ TMP_PATH="$4"
 
 if notExists "${TMP_PATH}/result.index"; then
     # shellcheck disable=SC2086
-    "${MMSEQS}" search "${QUERY}" "${TARGET}" "${TMP_PATH}/result" "${TMP_PATH}/search" ${SEARCH_PAR} \
+    "${BIOSNAKE}" search "${QUERY}" "${TARGET}" "${TMP_PATH}/result" "${TMP_PATH}/search" ${SEARCH_PAR} \
         || fail "search failed"
 fi
 
 if notExists "${TMP_PATH}/aggregate.index"; then
     # aggregation: take for each target set the best hit
     # shellcheck disable=SC2086
-    "${MMSEQS}" besthitperset "${QUERY}" "${TARGET}" "${TMP_PATH}/result" "${TMP_PATH}/aggregate" ${BESTHITBYSET_PAR} \
+    "${BIOSNAKE}" besthitperset "${QUERY}" "${TARGET}" "${TMP_PATH}/result" "${TMP_PATH}/aggregate" ${BESTHITBYSET_PAR} \
         || fail "aggregate best hit failed"
 fi
 
 if notExists "${OUTPUT}.index"; then
     # shellcheck disable=SC2086
-    "${MMSEQS}" mergeresultsbyset "${QUERY}_set_to_member" "${TMP_PATH}/aggregate" "${OUTPUT}" ${THREADS_PAR} \
+    "${BIOSNAKE}" mergeresultsbyset "${QUERY}_set_to_member" "${TMP_PATH}/aggregate" "${OUTPUT}" ${THREADS_PAR} \
         || fail "mergesetresults failed"
 fi
 
 if [ -n "${REMOVE_TMP}" ]; then
     rmdir "${TMP_PATH}/search"
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/result" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/result" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/aggregate" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/aggregate" ${VERBOSITY}
     rm -f "${TMP_PATH}/multihitsearch.sh"
 fi
 

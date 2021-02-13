@@ -1,11 +1,11 @@
-import mmseqs
+import biosnake
 
 #
-# Demonstration of basic mmseqs2 operations
+# Demonstration of basic biosnake2 operations
 #
 
 # Create a client
-client = mmseqs.MMSeqs()
+client = biosnake.Biosnake()
 
 # Create a database from fasta file
 # Here we specify name of the database, description and input file

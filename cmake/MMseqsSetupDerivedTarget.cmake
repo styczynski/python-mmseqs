@@ -1,12 +1,12 @@
 include(AppendTargetProperty)
 
-function (mmseqs_setup_derived_target TARGET)
-    get_target_property(COMPILE_TMP mmseqs-framework COMPILE_FLAGS)
-    get_target_property(LINK_TMP mmseqs-framework LINK_FLAGS)
-    get_target_property(DEF_TMP mmseqs-framework COMPILE_DEFINITIONS)
-    get_target_property(INCL_TMP mmseqs-framework INCLUDE_DIRECTORIES)
+function (biosnake_setup_derived_target TARGET)
+    get_target_property(COMPILE_TMP biosnake-framework COMPILE_FLAGS)
+    get_target_property(LINK_TMP biosnake-framework LINK_FLAGS)
+    get_target_property(DEF_TMP biosnake-framework COMPILE_DEFINITIONS)
+    get_target_property(INCL_TMP biosnake-framework INCLUDE_DIRECTORIES)
 
-    target_link_libraries(${TARGET} mmseqs-framework)
+    target_link_libraries(${TARGET} biosnake-framework)
     append_target_property(${TARGET} COMPILE_FLAGS ${COMPILE_TMP})
     append_target_property(${TARGET} LINK_FLAGS ${LINK_TMP})
     set_property(TARGET ${TARGET} APPEND PROPERTY COMPILE_DEFINITIONS ${DEF_TMP})

@@ -68,7 +68,7 @@ if { [ "${DBMODE}" = "1" ] && notExists "${TAXDBNAME}_taxonomy"; } || { [ "${DBM
     fi
     if [ "${DBMODE}" = "1" ]; then
         # shellcheck disable=SC2086
-        "${MMSEQS}" createbintaxonomy "${NCBITAXINFO}/names.dmp" "${NCBITAXINFO}/nodes.dmp" "${NCBITAXINFO}/merged.dmp" "${TAXDBNAME}_taxonomy" ${VERBOSITY_PAR} \
+        "${BIOSNAKE}" createbintaxonomy "${NCBITAXINFO}/names.dmp" "${NCBITAXINFO}/nodes.dmp" "${NCBITAXINFO}/merged.dmp" "${TAXDBNAME}_taxonomy" ${VERBOSITY_PAR} \
             || fail "createbintaxonomy failed"
     else
         cp -f "${NCBITAXINFO}/names.dmp"    "${TAXDBNAME}_names.dmp"

@@ -1,7 +1,7 @@
-﻿mmseqs.mmseqs\_native
+﻿biosnake.biosnake\_native
 =====================
 
-.. automodule:: mmseqs.mmseqs_native
+.. automodule:: biosnake.biosnake_native
 
    
    
@@ -19,12 +19,12 @@
    
       Client
       Database
-      MMSeqsCallArgs
-      MMSeqsCallConfig
-      MMSeqsCallOutput
-      MMSeqsMultiParamInt
-      MMSeqsMultiParamString
-      MMSeqsSearchRecord
+      BiosnakeCallArgs
+      BiosnakeCallConfig
+      BiosnakeCallOutput
+      BiosnakeMultiParamInt
+      BiosnakeMultiParamString
+      BiosnakeSearchRecord
       Record
       SearchResults
    

@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "mmseqs"
+name = "biosnake"
 version = "1.0.1"
-description = "MMSEQS Python bindings"
+description = "Biosnake - most comprehensive and fastest Python framework for biological data"
 authors = ["Piotr Styczyński <piotr@styczynski.in>"]
 build = "build.py"
 readme = "README.md"

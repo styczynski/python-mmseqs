@@ -1,7 +1,7 @@
-mmseqs.mmseqs\_native.Client
+biosnake.biosnake\_native.Client
 ============================
 
-.. currentmodule:: mmseqs.mmseqs_native
+.. currentmodule:: biosnake.biosnake_native
 
 .. autoclass:: Client
 

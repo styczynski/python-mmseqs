@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.12)
-project(mmseqs_native)
+project(biosnake_native)
 
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
@@ -21,7 +21,7 @@ else ()
     add_compile_options(-g)
 endif ()
 
-SET(SOURCE_DIR "src/mmseqs_native")
+SET(SOURCE_DIR "src/biosnake_native")
 
 message("-- Source Directory: ${CMAKE_CURRENT_SOURCE_DIR}")
 message("-- Project Directory: ${PROJECT_SOURCE_DIR}")
@@ -32,7 +32,7 @@ include(GenerateExportHeader)
 include(Custom)
 include(HealthCheck)
 
-set(FRAMEWORK_ONLY 0 CACHE BOOL "Framework mode (don't create mmseqs executable)")
+set(FRAMEWORK_ONLY 0 CACHE BOOL "Framework mode (don't create biosnake executable)")
 set(HAVE_SANITIZER 0 CACHE BOOL "Have sanitizers")
 set(INSTALL_UTIL 1 CACHE BOOL "Install utility scripts")
 set(VERSION_OVERRIDE "" CACHE STRING "Override version string in help and usage messages")
@@ -86,36 +86,36 @@ elseif (CMAKE_CXX_COMPILER_ID MATCHES "Intel")
 endif ()
 
 # see https://wiki.debian.org/ArchitectureSpecificsMemo for char signedness
-set(MMSEQS_CXX_FLAGS "-fsigned-char")
+set(BIOSNAKE_CXX_FLAGS "-fsigned-char")
 
 # SIMD instruction sets support
-set(MMSEQS_ARCH "")
+set(BIOSNAKE_ARCH "")
 if (HAVE_AVX2)
     if (CMAKE_COMPILER_IS_CLANG)
-        set(MMSEQS_ARCH "${MMSEQS_ARCH} -mavx2 -mcx16")
+        set(BIOSNAKE_ARCH "${BIOSNAKE_ARCH} -mavx2 -mcx16")
     else ()
-        set(MMSEQS_ARCH "${MMSEQS_ARCH} -mavx2 -mcx16 -Wa,-q")
+        set(BIOSNAKE_ARCH "${BIOSNAKE_ARCH} -mavx2 -mcx16 -Wa,-q")
     endif ()
     set(X64 1)
 elseif (HAVE_SSE4_1)
-    set(MMSEQS_ARCH "${MMSEQS_ARCH} -msse4.1 -mcx16")
+    set(BIOSNAKE_ARCH "${BIOSNAKE_ARCH} -msse4.1 -mcx16")
     set(X64 1)
 elseif (HAVE_SSE2)
-    set(MMSEQS_ARCH "${MMSEQS_ARCH} -msse2")
+    set(BIOSNAKE_ARCH "${BIOSNAKE_ARCH} -msse2")
     set(DISABLE_IPS4O 1)
     set(X64 1)
 elseif (HAVE_POWER9)
-    set(MMSEQS_ARCH "${MMSEQS_ARCH} -mcpu=power9 -mvsx")
+    set(BIOSNAKE_ARCH "${BIOSNAKE_ARCH} -mcpu=power9 -mvsx")
     set(PPC64 1)
 elseif (HAVE_POWER8)
-    set(MMSEQS_ARCH "${MMSEQS_ARCH} -mcpu=power8 -mvsx")
+    set(BIOSNAKE_ARCH "${BIOSNAKE_ARCH} -mcpu=power8 -mvsx")
     set(PPC64 1)
 elseif (HAVE_ARM8)
-    set(MMSEQS_ARCH "${MMSEQS_ARCH} -march=armv8-a+simd")
+    set(BIOSNAKE_ARCH "${BIOSNAKE_ARCH} -march=armv8-a+simd")
     set(ARM 1)
 endif ()
 
-if (NATIVE_ARCH AND (MMSEQS_ARCH STREQUAL ""))
+if (NATIVE_ARCH AND (BIOSNAKE_ARCH STREQUAL ""))
     if (CMAKE_SYSTEM_PROCESSOR MATCHES "^(arm.*|ARM.*|aarch64.*|AARCH64.*)")
         set(ARM 1)
     elseif (CMAKE_SYSTEM_PROCESSOR MATCHES "PPC64*|ppc64*|powerpc64*")
@@ -128,7 +128,7 @@ if (NATIVE_ARCH AND (MMSEQS_ARCH STREQUAL ""))
         message(WARNING "CPU without native SIMD instructions. Performance will be bad.")
     endif ()
     if (EMSCRIPTEN)
-        set(MMSEQS_ARCH "-msimd128 -s WASM=1 -s ASSERTIONS=1")
+        set(BIOSNAKE_ARCH "-msimd128 -s WASM=1 -s ASSERTIONS=1")
     elseif (X86 OR X64)
         include(CheckSSEFeatures)
         if (NOT HAVE_SSE4_1_EXTENSIONS)
@@ -138,35 +138,35 @@ if (NATIVE_ARCH AND (MMSEQS_ARCH STREQUAL ""))
             message(WARNING "At least SSE4.1 is needed for best performance")
         endif ()
         if (PPC64)
-            set(MMSEQS_ARCH "-mcpu=native")
+            set(BIOSNAKE_ARCH "-mcpu=native")
         else ()
             # clang has a problem with march=native on travis
             if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.0.0")
-                set(MMSEQS_ARCH "${SSE_FLAGS}")
+                set(BIOSNAKE_ARCH "${SSE_FLAGS}")
             else()
-                set(MMSEQS_ARCH "-march=native")
+                set(BIOSNAKE_ARCH "-march=native")
             endif()
         endif ()
     else ()
         if (PPC64)
-            set(MMSEQS_ARCH "-mcpu=native")
+            set(BIOSNAKE_ARCH "-mcpu=native")
         else ()
-            set(MMSEQS_ARCH "-march=native")
+            set(BIOSNAKE_ARCH "-march=native")
         endif ()
     endif ()
 endif ()
 
-if (NOT (MMSEQS_ARCH STREQUAL ""))
-    set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} ${MMSEQS_ARCH}")
+if (NOT (BIOSNAKE_ARCH STREQUAL ""))
+    set(BIOSNAKE_CXX_FLAGS "${BIOSNAKE_CXX_FLAGS} ${BIOSNAKE_ARCH}")
 endif ()
 
 if (CYGWIN OR ARM OR PPC64)
-    set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} -D_GNU_SOURCE=1")
+    set(BIOSNAKE_CXX_FLAGS "${BIOSNAKE_CXX_FLAGS} -D_GNU_SOURCE=1")
 endif ()
 
 if (CMAKE_COMPILER_IS_ICC)
     # default -fp-model results in inconsistent results in profile search
-    set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} -fp-model precise")
+    set(BIOSNAKE_CXX_FLAGS "${BIOSNAKE_CXX_FLAGS} -fp-model precise")
 endif ()
 
 # Apple specific features
@@ -174,11 +174,11 @@ if (APPLE)
     # macOS SDK started using _Atomic (in ucred.h) which g++ does not support
     # __APPLE_API_STRICT_CONFORMANCE makes sysctl.h not include apis like ucred.h
     # See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=89864
-    set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} -D__APPLE_API_STRICT_CONFORMANCE")
+    set(BIOSNAKE_CXX_FLAGS "${BIOSNAKE_CXX_FLAGS} -D__APPLE_API_STRICT_CONFORMANCE")
 endif ()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD")
-    set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} -D_WITH_GETLINE")
+    set(BIOSNAKE_CXX_FLAGS "${BIOSNAKE_CXX_FLAGS} -D_WITH_GETLINE")
 endif ()
 
 if (CYGWIN)
@@ -199,13 +199,13 @@ if (PPC64)
     set(DISABLE_IPS4O 1)
 endif ()
 
-set(MMSEQS_C_FLAGS "${MMSEQS_CXX_FLAGS}")
-set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} -std=c++17")
+set(BIOSNAKE_C_FLAGS "${BIOSNAKE_CXX_FLAGS}")
+set(BIOSNAKE_CXX_FLAGS "${BIOSNAKE_CXX_FLAGS} -std=c++17")
 # Compiler-specific features
 if (CMAKE_COMPILER_IS_CLANG AND (NOT EMSCRIPTEN))
     set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++17")
     set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-    set(MMSEQS_CXX_FLAGS "${MMSEQS_CXX_FLAGS} -stdlib=libc++")
+    set(BIOSNAKE_CXX_FLAGS "${BIOSNAKE_CXX_FLAGS} -stdlib=libc++")
 endif ()
 
 
@@ -224,10 +224,10 @@ option(ZSTD_BUILD_CONTRIB "BUILD CONTRIB" OFF)
 option(ZSTD_BUILD_TESTS "BUILD TESTS" OFF)
 include_directories(lib/zstd/lib)
 add_subdirectory(lib/zstd/build_utils/cmake/lib EXCLUDE_FROM_ALL)
-set_target_properties(libzstd_static PROPERTIES COMPILE_FLAGS "${MMSEQS_C_FLAGS}" LINK_FLAGS "${MMSEQS_C_FLAGS}")
+set_target_properties(libzstd_static PROPERTIES COMPILE_FLAGS "${BIOSNAKE_C_FLAGS}" LINK_FLAGS "${BIOSNAKE_C_FLAGS}")
 
 # global utils
-include_directories(src/mmseqs_native/src)
+include_directories(src/biosnake_native/src)
 
 # cppfs
 add_subdirectory(lib/cppfs)
@@ -262,19 +262,19 @@ add_subdirectory(lib/alp)
 add_subdirectory(lib/ksw2)
 add_subdirectory(data)
 
-add_subdirectory(src/mmseqs_native/src/mmseqs/alignment)
-add_subdirectory(src/mmseqs_native/src/mmseqs/clustering)
-add_subdirectory(src/mmseqs_native/src/mmseqs/commons)
-add_subdirectory(src/mmseqs_native/src/mmseqs/linclust)
-add_subdirectory(src/mmseqs_native/src/mmseqs/multihit)
-add_subdirectory(src/mmseqs_native/src/mmseqs/prefiltering)
-add_subdirectory(src/mmseqs_native/src/mmseqs/taxonomy)
-add_subdirectory(src/mmseqs_native/src/mmseqs/util)
-add_subdirectory(src/mmseqs_native/src/mmseqs/api)
-add_subdirectory(src/mmseqs_native/src/mmseqs/workflow)
+add_subdirectory(src/biosnake_native/src/biosnake/alignment)
+add_subdirectory(src/biosnake_native/src/biosnake/clustering)
+add_subdirectory(src/biosnake_native/src/biosnake/commons)
+add_subdirectory(src/biosnake_native/src/biosnake/linclust)
+add_subdirectory(src/biosnake_native/src/biosnake/multihit)
+add_subdirectory(src/biosnake_native/src/biosnake/prefiltering)
+add_subdirectory(src/biosnake_native/src/biosnake/taxonomy)
+add_subdirectory(src/biosnake_native/src/biosnake/util)
+add_subdirectory(src/biosnake_native/src/biosnake/api)
+add_subdirectory(src/biosnake_native/src/biosnake/workflow)
 
 # if (NOT FRAMEWORK_ONLY AND INSTALL_UTIL)
-#     add_subdirectory(src/mmseqs_native/src/util)
+#     add_subdirectory(src/biosnake_native/src/util)
 # endif ()
 
 set(MMSEQ_FRAMEWORK_SOURCES
@@ -302,7 +302,7 @@ set(MMSEQ_TARGET_SOURCES
     $<TARGET_OBJECTS:ksw2>
     $<TARGET_OBJECTS:cacode>
 )
-list(TRANSFORM MMSEQ_FRAMEWORK_SOURCES PREPEND src/mmseqs_native/src/)
+list(TRANSFORM MMSEQ_FRAMEWORK_SOURCES PREPEND src/biosnake_native/src/)
 set(BINDINGS_COMMON_SRCS
     ${MMSEQ_FRAMEWORK_SOURCES}
     ${MMSEQ_TARGET_SOURCES}
@@ -314,7 +314,7 @@ set(MMSEQ_TARGET_INCLUDES
     ${Python3_NumPy_INCLUDE_DIRS}
     ${CMAKE_BINARY_DIR}/generated
     ${PROJECT_BINARY_DIR}/generated
-    "src/mmseqs_native/src)"
+    "src/biosnake_native/src)"
     "lib/toml11"
     "lib/spdlog/include"
     "lib/cppfs/include"
@@ -333,22 +333,22 @@ set(MMSEQ_TARGET_LINKS
 )
 
  # this will probably break if you omit the "s
-string(REPLACE " " ";" MMSEQS_CXX_FLAGS_LIST "${MMSEQS_CXX_FLAGS}")
+string(REPLACE " " ";" BIOSNAKE_CXX_FLAGS_LIST "${BIOSNAKE_CXX_FLAGS}")
 
 add_subdirectory(lib/pybind11)
-pybind11_add_module(mmseqs_native ${SOURCES} "${SOURCE_DIR}/bindings.cpp" ${BINDINGS_COMMON_SRCS})
-#set_target_properties(mmseqs_native PROPERTIES LINK_FLAGS "-Wl,-undefined,error")
-target_include_directories(mmseqs_native PUBLIC ${MMSEQ_TARGET_INCLUDES})
-add_dependencies(mmseqs_native ${MMSEQ_TARGET_DEPENDENCIES})
-target_link_libraries(mmseqs_native PRIVATE ${MMSEQ_TARGET_LINKS})
+pybind11_add_module(biosnake_native ${SOURCES} "${SOURCE_DIR}/bindings.cpp" ${BINDINGS_COMMON_SRCS})
+#set_target_properties(biosnake_native PROPERTIES LINK_FLAGS "-Wl,-undefined,error")
+target_include_directories(biosnake_native PUBLIC ${MMSEQ_TARGET_INCLUDES})
+add_dependencies(biosnake_native ${MMSEQ_TARGET_DEPENDENCIES})
+target_link_libraries(biosnake_native PRIVATE ${MMSEQ_TARGET_LINKS})
 
 # Pedantic
 if (MSVC)
     # warning level 4 and all warnings as errors
-    target_compile_options(mmseqs_native PRIVATE /W4 /WX)
+    target_compile_options(biosnake_native PRIVATE /W4 /WX)
 else()
     # lots of warnings and all warnings as errors
-    target_compile_options(mmseqs_native PRIVATE -Wall -Wextra -pedantic)
+    target_compile_options(biosnake_native PRIVATE -Wall -Wextra -pedantic)
 endif()
 
 # needed for concat.h
@@ -367,7 +367,7 @@ check_cxx_source_compiles("
         }"
         HAVE_POSIX_FADVISE)
 if (HAVE_POSIX_FADVISE)
-    target_compile_definitions(mmseqs_native PUBLIC -DHAVE_POSIX_FADVISE=1)
+    target_compile_definitions(biosnake_native PUBLIC -DHAVE_POSIX_FADVISE=1)
 endif ()
 
 check_cxx_source_compiles("
@@ -385,14 +385,14 @@ check_cxx_source_compiles("
         }"
         HAVE_POSIX_MADVISE)
 if (HAVE_POSIX_MADVISE)
-    target_compile_definitions(mmseqs_native PUBLIC -DHAVE_POSIX_MADVISE=1)
+    target_compile_definitions(biosnake_native PUBLIC -DHAVE_POSIX_MADVISE=1)
 endif ()
 
 if (NOT DISABLE_IPS4O)
     find_package(Atomic)
     if (ATOMIC_FOUND)
-        target_link_libraries(mmseqs_native PRIVATE ${ATOMIC_LIBRARIES})
-        target_compile_definitions(mmseqs_native PUBLIC -DENABLE_IPS4O=1)
+        target_link_libraries(biosnake_native PRIVATE ${ATOMIC_LIBRARIES})
+        target_compile_definitions(biosnake_native PUBLIC -DENABLE_IPS4O=1)
         message("-- IPS4O sorting works")
     else ()
         message("-- OMPTL sorting fallback")
@@ -401,9 +401,9 @@ else ()
     message("-- OMPTL sorting fallback")
 endif ()
 
-target_link_libraries(mmseqs_native PRIVATE tinyexpr libzstd_static microtar)
+target_link_libraries(biosnake_native PRIVATE tinyexpr libzstd_static microtar)
 if (CYGWIN)
-    target_link_libraries(mmseqs_native PRIVATE nedmalloc)
+    target_link_libraries(biosnake_native PRIVATE nedmalloc)
 endif ()
 
 find_package(ZLIB QUIET)
@@ -424,9 +424,9 @@ if (ZLIB_FOUND)
     set(CMAKE_REQUIRED_LIBRARIES ${OLD_CMAKE_REQUIRED_LIBRARIES})
     if(HAVE_ZLIB_CHECK)
         message("-- ZLIB works")
-        target_include_directories(mmseqs_native PUBLIC ${ZLIB_INCLUDE_DIRS})
-        target_compile_definitions(mmseqs_native PUBLIC -DHAVE_ZLIB=1)
-        target_link_libraries(mmseqs_native PRIVATE ${ZLIB_LIBRARIES})
+        target_include_directories(biosnake_native PUBLIC ${ZLIB_INCLUDE_DIRS})
+        target_compile_definitions(biosnake_native PUBLIC -DHAVE_ZLIB=1)
+        target_link_libraries(biosnake_native PRIVATE ${ZLIB_LIBRARIES})
     else ()
         message("-- ZLIB does not work")
     endif()
@@ -452,9 +452,9 @@ if (BZIP2_FOUND)
     set(CMAKE_REQUIRED_LIBRARIES ${OLD_CMAKE_REQUIRED_LIBRARIES})
     if(HAVE_BZLIB_CHECK)
         message("-- BZLIB works")
-        target_include_directories(mmseqs_native PUBLIC ${BZIP_INCLUDE_DIRS})
-        target_compile_definitions(mmseqs_native PUBLIC -DHAVE_BZLIB=1)
-        target_link_libraries(mmseqs_native PRIVATE ${BZIP2_LIBRARIES})
+        target_include_directories(biosnake_native PUBLIC ${BZIP_INCLUDE_DIRS})
+        target_compile_definitions(biosnake_native PUBLIC -DHAVE_BZLIB=1)
+        target_link_libraries(biosnake_native PRIVATE ${BZIP2_LIBRARIES})
     else ()
         message("-- BZLIB does not work")
     endif()
@@ -467,27 +467,27 @@ if (HAVE_MPI)
     find_package(MPI REQUIRED)
     if (MPI_FOUND)
         message("-- Found MPI")
-        target_include_directories(mmseqs_native PUBLIC ${MPI_INCLUDE_PATH})
+        target_include_directories(biosnake_native PUBLIC ${MPI_INCLUDE_PATH})
         #Hack (OMPI_SKIP_MPICXX=1): https://github.com/open-mpi/ompi/issues/5157#issuecomment-388495496
-        target_compile_definitions(mmseqs_native PUBLIC -DHAVE_MPI=1 -DOMPI_SKIP_MPICXX=1)
-        target_link_libraries(mmseqs_native ${MPI_LIBRARIES})
-        append_target_property(mmseqs_native COMPILE_FLAGS ${MPI_COMPILE_FLAGS})
-        append_target_property(mmseqs_native LINK_FLAGS ${MPI_LINK_FLAGS})
+        target_compile_definitions(biosnake_native PUBLIC -DHAVE_MPI=1 -DOMPI_SKIP_MPICXX=1)
+        target_link_libraries(biosnake_native ${MPI_LIBRARIES})
+        append_target_property(biosnake_native COMPILE_FLAGS ${MPI_COMPILE_FLAGS})
+        append_target_property(biosnake_native LINK_FLAGS ${MPI_LINK_FLAGS})
     endif ()
 endif ()
 
 find_package(OpenMP QUIET)
 if (OPENMP_FOUND)
     message("-- Found OpenMP")
-    target_compile_definitions(mmseqs_native PUBLIC -DOPENMP=1)
+    target_compile_definitions(biosnake_native PUBLIC -DOPENMP=1)
     # For GCC we dont want to do this since it breaks macOS static builds
     # It will link libgomp.a internally (through -fopenmp I guess)
     # and also link libgomp.dylib thus breaking static builds
     if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        target_link_libraries(mmseqs_native PRIVATE ${OpenMP_CXX_LIBRARIES})
+        target_link_libraries(biosnake_native PRIVATE ${OpenMP_CXX_LIBRARIES})
     endif()
-    append_target_property(mmseqs_native COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
-    append_target_property(mmseqs_native LINK_FLAGS ${OpenMP_CXX_FLAGS})
+    append_target_property(biosnake_native COMPILE_FLAGS ${OpenMP_CXX_FLAGS})
+    append_target_property(biosnake_native LINK_FLAGS ${OpenMP_CXX_FLAGS})
 elseif (REQUIRE_OPENMP)
     message("-- Could not find OpenMP.")
 endif ()
@@ -496,8 +496,8 @@ if (HAVE_GPROF)
     include(CheckCXXCompilerFlag)
     check_cxx_compiler_flag(-pg GPROF_FOUND)
     if (GPROF_FOUND)
-        append_target_property(mmseqs_native COMPILE_FLAGS -pg)
-        append_target_property(mmseqs_native LINK_FLAGS -pg)
+        append_target_property(biosnake_native COMPILE_FLAGS -pg)
+        append_target_property(biosnake_native LINK_FLAGS -pg)
     else ()
         message(FATAL_ERROR "-- Could not find GPROF")
     endif ()

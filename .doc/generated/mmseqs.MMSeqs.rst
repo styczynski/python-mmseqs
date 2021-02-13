@@ -1,9 +1,9 @@
-mmseqs.MMSeqs
+biosnake.Biosnake
 =============
 
-.. currentmodule:: mmseqs
+.. currentmodule:: biosnake
 
-.. autoclass:: MMSeqs
+.. autoclass:: Biosnake
 
    
    .. automethod:: __init__
@@ -13,7 +13,7 @@ mmseqs.MMSeqs
 
    .. autosummary::
    
-      ~MMSeqs.__init__
+      ~Biosnake.__init__
    
    
 

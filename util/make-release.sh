@@ -18,12 +18,12 @@ hasCommand date
 hasCommand wget
 
 # download CI builds
-wget -O "mmseqs-linux-sse41.tar.gz" "https://mmseqs.com/archive/${COMMIT}/mmseqs-linux-sse41.tar.gz" 
-wget -O "mmseqs-linux-avx2.tar.gz" "https://mmseqs.com/archive/${COMMIT}/mmseqs-linux-avx2.tar.gz"
-wget -O "mmseqs-win64.zip" "https://mmseqs.com/archive/${COMMIT}/mmseqs-win64.zip"
-wget -O "mmseqs-osx-sse41.tar.gz" "https://mmseqs.com/archive/${COMMIT}/mmseqs-osx-sse41.tar.gz"
-wget -O "mmseqs-osx-avx2.tar.gz" "https://mmseqs.com/archive/${COMMIT}/mmseqs-osx-avx2.tar.gz"
-wget -O "userguide.pdf" "https://mmseqs.com/archive/${COMMIT}/userguide.pdf"
+wget -O "biosnake-linux-sse41.tar.gz" "https://biosnake.com/archive/${COMMIT}/biosnake-linux-sse41.tar.gz"
+wget -O "biosnake-linux-avx2.tar.gz" "https://biosnake.com/archive/${COMMIT}/biosnake-linux-avx2.tar.gz"
+wget -O "biosnake-win64.zip" "https://biosnake.com/archive/${COMMIT}/biosnake-win64.zip"
+wget -O "biosnake-osx-sse41.tar.gz" "https://biosnake.com/archive/${COMMIT}/biosnake-osx-sse41.tar.gz"
+wget -O "biosnake-osx-avx2.tar.gz" "https://biosnake.com/archive/${COMMIT}/biosnake-osx-avx2.tar.gz"
+wget -O "userguide.pdf" "https://biosnake.com/archive/${COMMIT}/userguide.pdf"
 
 # create release tag 
 git tag  "${RELEASE_ID}" && git push --tags
@@ -31,58 +31,58 @@ git tag  "${RELEASE_ID}" && git push --tags
 # create a formal release
 github-release release \
     --user soedinglab \
-    --repo mmseqs2 \
+    --repo biosnake2 \
     --tag "${RELEASE_ID}" \
-    --name "MMseqs2 Release $RELEASE_ID" \
+    --name "Biosnake2 Release $RELEASE_ID" \
     --description "$RELEASE_MSG" \
     --pre-release
 
 # upload AVX2 static binary
 github-release upload \
     --user soedinglab \
-    --repo mmseqs2 \
+    --repo biosnake2 \
     --tag "${RELEASE_ID}" \
-    --name "MMseqs2-Linux-SSE4_1.tar.gz" \
-    --file mmseqs-linux-sse41.tar.gz
+    --name "Biosnake2-Linux-SSE4_1.tar.gz" \
+    --file biosnake-linux-sse41.tar.gz
 
 # upload SSE4.1 static binary
 github-release upload \
     --user soedinglab \
-    --repo mmseqs2 \
+    --repo biosnake2 \
     --tag "${RELEASE_ID}" \
-    --name "MMseqs2-Linux-AVX2.tar.gz" \
-    --file mmseqs-linux-avx2.tar.gz
+    --name "Biosnake2-Linux-AVX2.tar.gz" \
+    --file biosnake-linux-avx2.tar.gz
 
 # upload Windows build
 github-release upload \
     --user soedinglab \
-    --repo mmseqs2 \
+    --repo biosnake2 \
     --tag "${RELEASE_ID}" \
-    --name "MMseqs2-Windows-Unified.zip" \
-    --file mmseqs-win64.zip
+    --name "Biosnake2-Windows-Unified.zip" \
+    --file biosnake-win64.zip
 
 # upload SSE4.1 static binary
 github-release upload \
     --user soedinglab \
-    --repo mmseqs2 \
+    --repo biosnake2 \
     --tag "${RELEASE_ID}" \
-    --name "MMseqs2-MacOS-SSE4_1.tar.gz" \
-    --file mmseqs-osx-sse41.tar.gz
+    --name "Biosnake2-MacOS-SSE4_1.tar.gz" \
+    --file biosnake-osx-sse41.tar.gz
 
 # upload AVX2 static binary
 github-release upload \
     --user soedinglab \
-    --repo mmseqs2 \
+    --repo biosnake2 \
     --tag "${RELEASE_ID}" \
-    --name "MMseqs2-MacOS-AVX2.tar.gz" \
-    --file mmseqs-osx-avx2.tar.gz
+    --name "Biosnake2-MacOS-AVX2.tar.gz" \
+    --file biosnake-osx-avx2.tar.gz
 
 # upload Windows build
 github-release upload \
     --user soedinglab \
-    --repo mmseqs2 \
+    --repo biosnake2 \
     --tag "${RELEASE_ID}" \
-    --name "MMseqs2-Userguide.pdf" \
+    --name "Biosnake2-Userguide.pdf" \
     --file userguide.pdf
 
 

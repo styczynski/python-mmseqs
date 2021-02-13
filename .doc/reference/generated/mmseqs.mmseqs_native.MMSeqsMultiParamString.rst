@@ -1,9 +1,9 @@
-mmseqs.mmseqs\_native.MMSeqsMultiParamString
+biosnake.biosnake\_native.BiosnakeMultiParamString
 ============================================
 
-.. currentmodule:: mmseqs.mmseqs_native
+.. currentmodule:: biosnake.biosnake_native
 
-.. autoclass:: MMSeqsMultiParamString
+.. autoclass:: BiosnakeMultiParamString
 
    
    .. automethod:: __init__
@@ -13,7 +13,7 @@ mmseqs.mmseqs\_native.MMSeqsMultiParamString
 
    .. autosummary::
    
-      ~MMSeqsMultiParamString.__init__
+      ~BiosnakeMultiParamString.__init__
    
    
 
@@ -23,7 +23,7 @@ mmseqs.mmseqs\_native.MMSeqsMultiParamString
 
    .. autosummary::
    
-      ~MMSeqsMultiParamString.aminoacids
-      ~MMSeqsMultiParamString.nucleotides
+      ~BiosnakeMultiParamString.aminoacids
+      ~BiosnakeMultiParamString.nucleotides
    
    

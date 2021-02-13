@@ -1,11 +1,11 @@
-﻿mmseqs.mmseqs\_native
+﻿biosnake.biosnake\_native
 =====================
 
 .. rubric:: Description
 
-.. automodule:: mmseqs.mmseqs_native
+.. automodule:: biosnake.biosnake_native
 
-.. currentmodule:: mmseqs.mmseqs_native
+.. currentmodule:: biosnake.biosnake_native
 
 
 .. rubric:: Classes
@@ -17,17 +17,17 @@
     
     Database
     
-    MMSeqsCallArgs
+    BiosnakeCallArgs
     
-    MMSeqsCallConfig
+    BiosnakeCallConfig
     
-    MMSeqsCallOutput
+    BiosnakeCallOutput
     
-    MMSeqsMultiParamInt
+    BiosnakeMultiParamInt
     
-    MMSeqsMultiParamString
+    BiosnakeMultiParamString
     
-    MMSeqsSearchRecord
+    BiosnakeSearchRecord
     
     Record
     
