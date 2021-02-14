@@ -48,9 +48,9 @@ class CMakeBuild(build_ext):
             "-DPYTHON_EXECUTABLE=" + sys.executable,
             "-DREQUIRE_OPENMP=0",
             "-DCMAKE_BUILD_TYPE=Debug",
-            f"-DBUILD_PYTHON_VERSION={platform.python_version()}",
-            f"-DPYTHON_INCLUDE_DIR={sysconfig.get_python_inc()}",
-            f"-DPYTHON_LIBRARY={sysconfig.get_config_var('LIBDIR')}",
+            #f"-DBUILD_PYTHON_VERSION={platform.python_version()}",
+            #f"-DPYTHON_INCLUDE_DIR={sysconfig.get_python_inc()}",
+            #f"-DPYTHON_LIBRARY={sysconfig.get_config_var('LIBDIR')}",
         ]
 
         cfg = "Debug" if self.debug else "Release"
