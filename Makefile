@@ -21,6 +21,6 @@ format: lint
 	docker run -it -v "$(CURDIR)":/workdir -w /workdir unibeautify/clang-format -style=Google -i $(ALL_SOURCES)
 
 docs:
-	rm -rfd docs && cd .doc && rm -rfd _build && poetry run make html && mv _build/html ../docs && cp CNAME ../docs
+	rm -rfd docs && cd .doc && rm -rfd _build && poetry run make html && mv _build/html ../docs && cp CNAME ../docs && touch ../docs/.nojekyll
 
 .PHONY: docs
