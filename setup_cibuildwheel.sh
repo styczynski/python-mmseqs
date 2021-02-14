@@ -4,7 +4,7 @@ echo "Activate EPEL repository"
 yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
 
 echo "Install Python devel"
-yum install -y python3-devel.x86_64 || exit 1
+yum install -y rh-python36-python-devel.x86_64 rh-python36-numpy.x86_64 || exit 1
 
 echo "Install Poetry..."
 curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
