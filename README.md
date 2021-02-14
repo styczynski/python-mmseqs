@@ -1,9 +1,10 @@
 # Biosnake
 
-![Top language](https://img.shields.io/github/languages/top/styczynski/biosnake)
-![PyPI](https://img.shields.io/pypi/v/biosnake?style=flat)
-![Build status](https://github.com/styczynski/biosnake/workflows/Build/badge.svg)
-![Last commit](https://img.shields.io/github/last-commit/styczynski/biosnake)
+![PyPi version](https://img.shields.io/pypi/v/biosnake?style=flat-square)
+![Build status](https://img.shields.io/github/workflow/status/covid-genomics/biosnake/Build?style=flat-square)
+![Supported Python versions](https://img.shields.io/pypi/pyversions/biosnake?style=flat-square)
+![Python implementation](https://img.shields.io/pypi/implementation/biosnake?style=flat-square)
+![Commit activity](https://img.shields.io/github/commit-activity/w/covid-genomics/biosnake?style=flat-square)
 
 ## Project description
 
