@@ -6,12 +6,12 @@ Python Documentation
 .. autosummary::
    :toctree: generated
 
-   mmseqs.mmseqs_native
+   biosnake.biosnake_native
 
 .. toctree::
    :maxdepth: 4
 
-   mmseqs
+   biosnake
 
 .. gitstamp::
 

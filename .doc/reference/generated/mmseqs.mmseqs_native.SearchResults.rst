@@ -1,7 +1,7 @@
-﻿mmseqs.mmseqs\_native.SearchResults
+﻿biosnake.biosnake\_native.SearchResults
 ===================================
 
-.. currentmodule:: mmseqs.mmseqs_native
+.. currentmodule:: biosnake.biosnake_native
 
 .. autoclass:: SearchResults
 

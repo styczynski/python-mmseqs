@@ -1,9 +1,9 @@
-mmseqs.mmseqs\_native.MMSeqsCallOutput
+biosnake.biosnake\_native.BiosnakeCallOutput
 ======================================
 
-.. currentmodule:: mmseqs.mmseqs_native
+.. currentmodule:: biosnake.biosnake_native
 
-.. autoclass:: MMSeqsCallOutput
+.. autoclass:: BiosnakeCallOutput
 
    
    .. automethod:: __init__
@@ -13,7 +13,7 @@ mmseqs.mmseqs\_native.MMSeqsCallOutput
 
    .. autosummary::
    
-      ~MMSeqsCallOutput.__init__
+      ~BiosnakeCallOutput.__init__
    
    
 
@@ -23,7 +23,7 @@ mmseqs.mmseqs\_native.MMSeqsCallOutput
 
    .. autosummary::
    
-      ~MMSeqsCallOutput.blast_tab_records
-      ~MMSeqsCallOutput.vars_str
+      ~BiosnakeCallOutput.blast_tab_records
+      ~BiosnakeCallOutput.vars_str
    
    

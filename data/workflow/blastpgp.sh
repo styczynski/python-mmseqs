@@ -10,7 +10,7 @@ notExists() {
 }
 
 #pre processing
-[ -z "$MMSEQS" ] && echo "Please set the environment variable \$MMSEQS to your MMSEQS binary." && exit 1;
+[ -z "$BIOSNAKE" ] && echo "Please set the environment variable \$BIOSNAKE to your BIOSNAKE binary." && exit 1;
 # check number of input variables
 [ "$#" -ne 4 ] && echo "Please provide <queryDB> <targetDB> <outDB> <tmp>" && exit 1;
 # check if files exist
@@ -32,11 +32,11 @@ while [ $STEP -lt $NUM_IT ]; do
         eval TMP="\$$PARAM"
         if [ $STEP -eq 0 ]; then
             # shellcheck disable=SC2086
-            $RUNNER "$MMSEQS" prefilter "$QUERYDB" "$2" "$TMP_PATH/pref_$STEP" ${TMP} \
+            $RUNNER "$BIOSNAKE" prefilter "$QUERYDB" "$2" "$TMP_PATH/pref_$STEP" ${TMP} \
                 || fail "Prefilter died"
         else
             # shellcheck disable=SC2086
-            $RUNNER "$MMSEQS" prefilter "$QUERYDB" "$2" "$TMP_PATH/pref_tmp_$STEP" ${TMP} \
+            $RUNNER "$BIOSNAKE" prefilter "$QUERYDB" "$2" "$TMP_PATH/pref_tmp_$STEP" ${TMP} \
                 || fail "Prefilter died"
         fi
     fi
@@ -45,10 +45,10 @@ while [ $STEP -lt $NUM_IT ]; do
         if notExists "$TMP_PATH/pref_$STEP.dbtype"; then
             STEPONE=$((STEP-1))
             # shellcheck disable=SC2086
-            "$MMSEQS" subtractdbs "$TMP_PATH/pref_tmp_$STEP" "$TMP_PATH/aln_$STEPONE" "$TMP_PATH/pref_$STEP" $SUBSTRACT_PAR \
+            "$BIOSNAKE" subtractdbs "$TMP_PATH/pref_tmp_$STEP" "$TMP_PATH/aln_$STEPONE" "$TMP_PATH/pref_$STEP" $SUBSTRACT_PAR \
             || fail "Substract died"
 
-            "$MMSEQS" rmdb "$TMP_PATH/pref_tmp_$STEP"
+            "$BIOSNAKE" rmdb "$TMP_PATH/pref_tmp_$STEP"
 
             #mv -f "$TMP_PATH/pref_next_$STEP" "$TMP_PATH/pref_$STEP"
             #mv -f "$TMP_PATH/pref_next_$STEP.index" "$TMP_PATH/pref_$STEP.index"
@@ -62,11 +62,11 @@ while [ $STEP -lt $NUM_IT ]; do
 
         if [ $STEP -eq 0 ]; then
             # shellcheck disable=SC2086
-            $RUNNER "$MMSEQS" "${ALIGN_MODULE}" "$QUERYDB" "$2" "$TMP_PATH/pref_$STEP" "$TMP_PATH/aln_$STEP" ${TMP} \
+            $RUNNER "$BIOSNAKE" "${ALIGN_MODULE}" "$QUERYDB" "$2" "$TMP_PATH/pref_$STEP" "$TMP_PATH/aln_$STEP" ${TMP} \
                 || fail "Alignment died"
         else
             # shellcheck disable=SC2086
-            $RUNNER "$MMSEQS" "${ALIGN_MODULE}" "$QUERYDB" "$2" "$TMP_PATH/pref_$STEP" "$TMP_PATH/aln_tmp_$STEP" ${TMP} \
+            $RUNNER "$BIOSNAKE" "${ALIGN_MODULE}" "$QUERYDB" "$2" "$TMP_PATH/pref_$STEP" "$TMP_PATH/aln_tmp_$STEP" ${TMP} \
                 || fail "Alignment died"
         fi
     fi
@@ -76,14 +76,14 @@ while [ $STEP -lt $NUM_IT ]; do
             STEPONE=$((STEP-1))
 
             if [ $STEP -ne $((NUM_IT  - 1)) ]; then
-                "$MMSEQS" mergedbs "$QUERYDB" "$TMP_PATH/aln_$STEP" "$TMP_PATH/aln_$STEPONE" "$TMP_PATH/aln_tmp_$STEP" \
+                "$BIOSNAKE" mergedbs "$QUERYDB" "$TMP_PATH/aln_$STEP" "$TMP_PATH/aln_$STEPONE" "$TMP_PATH/aln_tmp_$STEP" \
                     || fail "Alignment died"
             else
-                "$MMSEQS" mergedbs "$QUERYDB" "$3" "$TMP_PATH/aln_$STEPONE" "$TMP_PATH/aln_tmp_$STEP" \
+                "$BIOSNAKE" mergedbs "$QUERYDB" "$3" "$TMP_PATH/aln_$STEPONE" "$TMP_PATH/aln_tmp_$STEP" \
                         || fail "Alignment died"
             fi
-            "$MMSEQS" rmdb "$TMP_PATH/aln_$STEPONE"
-            "$MMSEQS" rmdb "$TMP_PATH/aln_tmp_$STEP"
+            "$BIOSNAKE" rmdb "$TMP_PATH/aln_$STEPONE"
+            "$BIOSNAKE" rmdb "$TMP_PATH/aln_tmp_$STEP"
         fi
     fi
 
@@ -93,7 +93,7 @@ while [ $STEP -lt $NUM_IT ]; do
             PARAM="PROFILE_PAR_$STEP"
             eval TMP="\$$PARAM"
             # shellcheck disable=SC2086
-            $RUNNER "$MMSEQS" result2profile "$QUERYDB" "$2" "$TMP_PATH/aln_$STEP" "$TMP_PATH/profile_$STEP" ${TMP} \
+            $RUNNER "$BIOSNAKE" result2profile "$QUERYDB" "$2" "$TMP_PATH/aln_$STEP" "$TMP_PATH/profile_$STEP" ${TMP} \
             || fail "Create profile died"
         fi
     fi
@@ -105,11 +105,11 @@ if [ -n "$REMOVE_TMP" ]; then
     STEP=0
     while [ "$STEP" -lt "$NUM_IT" ]; do
         # shellcheck disable=SC2086
-        "$MMSEQS" rmdb "${TMP_PATH}/pref_$STEP" ${VERBOSITY}
+        "$BIOSNAKE" rmdb "${TMP_PATH}/pref_$STEP" ${VERBOSITY}
         # shellcheck disable=SC2086
-        "$MMSEQS" rmdb "${TMP_PATH}/aln_$STEP" ${VERBOSITY}
+        "$BIOSNAKE" rmdb "${TMP_PATH}/aln_$STEP" ${VERBOSITY}
         # shellcheck disable=SC2086
-        "$MMSEQS" rmdb "${TMP_PATH}/profile_$STEP" ${VERBOSITY}
+        "$BIOSNAKE" rmdb "${TMP_PATH}/profile_$STEP" ${VERBOSITY}
         STEP=$((STEP+1))
     done
     rm -f "$TMP_PATH/blastpgp.sh"

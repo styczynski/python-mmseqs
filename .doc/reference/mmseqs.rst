@@ -1,10 +1,10 @@
-mmseqs package
+biosnake package
 ==============
 
 Module contents
 ---------------
 
-.. automodule:: mmseqs
+.. automodule:: biosnake
    :members:
    :undoc-members:
    :show-inheritance:

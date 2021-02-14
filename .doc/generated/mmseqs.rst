@@ -1,7 +1,7 @@
-﻿mmseqs
+﻿biosnake
 ======
 
-.. automodule:: mmseqs
+.. automodule:: biosnake
 
    
    
@@ -17,7 +17,7 @@
 
    .. autosummary::
    
-      MMSeqs
+      Biosnake
    
    
 

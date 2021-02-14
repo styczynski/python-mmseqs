@@ -15,7 +15,7 @@ abspath() {
 
 REPO="$(abspath "$1")"
 BUILD="$(abspath "$2")"
-BINARY_NAME="${3:-mmseqs}"
+BINARY_NAME="${3:-biosnake}"
 CPUS=${4:-$(nproc --all 2>/dev/null || sysctl -n hw.ncpu)}
 
 if [ ! -d "$REPO" ]; then

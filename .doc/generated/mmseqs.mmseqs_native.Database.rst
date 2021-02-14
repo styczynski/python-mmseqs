@@ -1,7 +1,7 @@
-mmseqs.mmseqs\_native.Database
+biosnake.biosnake\_native.Database
 ==============================
 
-.. currentmodule:: mmseqs.mmseqs_native
+.. currentmodule:: biosnake.biosnake_native
 
 .. autoclass:: Database
 

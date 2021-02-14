@@ -1,0 +1,10 @@
+function(biosnake_setup_test NAME)
+    include(BiosnakeSetupDerivedTarget)
+    string(TOLOWER ${NAME} BASE_NAME)
+    string(REGEX REPLACE "\\.[^.]*$" "" BASE_NAME ${BASE_NAME})
+    string(REGEX REPLACE "^test" "test_" BASE_NAME ${BASE_NAME})
+    add_executable(${BASE_NAME} ${NAME})
+
+    biosnake_setup_derived_target(${BASE_NAME})
+    target_link_libraries(${BASE_NAME} version)
+endfunction()

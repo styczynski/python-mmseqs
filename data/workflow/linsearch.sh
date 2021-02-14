@@ -10,7 +10,7 @@ notExists() {
 
 
 #pre processing
-[ -z "$MMSEQS" ] && echo "Please set the environment variable \$MMSEQS to your MMSEQS binary." && exit 1;
+[ -z "$BIOSNAKE" ] && echo "Please set the environment variable \$BIOSNAKE to your BIOSNAKE binary." && exit 1;
 # check number of input variables
 [ "$#" -ne 4 ] && echo "Please provide <queryDB> <targetDB> <outDB> <tmp>" && exit 1;
 # check if files exist
@@ -26,7 +26,7 @@ TMP_PATH="$4"
 # 1. Finding exact $k$-mer matches.
 if notExists "${TMP_PATH}/pref.dbtype"; then
     # shellcheck disable=SC2086
-    $RUNNER "$MMSEQS" kmersearch "$QUERY" "$TARGET" "${TMP_PATH}/pref" ${KMERSEARCH_PAR} \
+    $RUNNER "$BIOSNAKE" kmersearch "$QUERY" "$TARGET" "${TMP_PATH}/pref" ${KMERSEARCH_PAR} \
         || fail "kmermatcher died"
 fi
 
@@ -35,12 +35,12 @@ RESULTDB="${TMP_PATH}/pref"
 if [ -n "$FILTER" ]; then
     if notExists "${TMP_PATH}/reverse_ungapaln.dbtype"; then
         # shellcheck disable=SC2086
-        $RUNNER "$MMSEQS" rescorediagonal "$TARGET" "$QUERY" "${RESULTDB}" "${TMP_PATH}/reverse_ungapaln" ${RESCORE_FILTER_PAR} \
+        $RUNNER "$BIOSNAKE" rescorediagonal "$TARGET" "$QUERY" "${RESULTDB}" "${TMP_PATH}/reverse_ungapaln" ${RESCORE_FILTER_PAR} \
         || fail "Rescorediagonal step died"
     fi
 
     if notExists "${TMP_PATH}/pref_filter.dbtype"; then
-        "$MMSEQS" filterdb "${TMP_PATH}/pref" "${TMP_PATH}/pref_filter" --filter-file "${TMP_PATH}/reverse_ungapaln" --positive-filter 0 \
+        "$BIOSNAKE" filterdb "${TMP_PATH}/pref" "${TMP_PATH}/pref_filter" --filter-file "${TMP_PATH}/reverse_ungapaln" --positive-filter 0 \
             || fail "Filterdb step died"
     fi
     RESULTDB="${TMP_PATH}/pref_filter"
@@ -50,7 +50,7 @@ fi
 # 2. Local gapped sequence alignment.
 if notExists "${TMP_PATH}/reverse_aln.dbtype"; then
     # shellcheck disable=SC2086
-    $RUNNER "$MMSEQS" "${ALIGN_MODULE}" "$TARGET" "$QUERY" "${RESULTDB}" "${TMP_PATH}/reverse_aln" ${ALIGNMENT_PAR} \
+    $RUNNER "$BIOSNAKE" "${ALIGN_MODULE}" "$TARGET" "$QUERY" "${RESULTDB}" "${TMP_PATH}/reverse_aln" ${ALIGNMENT_PAR} \
         || fail "Alignment step died"
 fi
 
@@ -60,18 +60,18 @@ if [ -n "$NUCL" ]; then
 
     if notExists "${TMP_PATH}/aln.dbtype"; then
         # shellcheck disable=SC2086
-        "$MMSEQS" swapresults "$TARGET" "$QUERY" "${TMP_PATH}/reverse_aln" "${TMP_PATH}/aln" ${SWAPRESULT_PAR} \
+        "$BIOSNAKE" swapresults "$TARGET" "$QUERY" "${TMP_PATH}/reverse_aln" "${TMP_PATH}/aln" ${SWAPRESULT_PAR} \
             || fail "Alignment step died"
     fi
 
     if [ -n "$FILTER" ]; then
         if notExists "${TMP_PATH}/reverse_ungapaln_swap.dbtype"; then
-             "$MMSEQS" swapresults "$TARGET" "$QUERY" "${TMP_PATH}/reverse_ungapaln" "${TMP_PATH}/ungap_aln" \
+             "$BIOSNAKE" swapresults "$TARGET" "$QUERY" "${TMP_PATH}/reverse_ungapaln" "${TMP_PATH}/ungap_aln" \
               || fail "Mergedbs died"
         fi
 
         if notExists "${TMP_PATH}/aln_merged.dbtype"; then
-             "$MMSEQS" concatdbs "${TMP_PATH}/ungap_aln" "${TMP_PATH}/aln" "${TMP_PATH}/aln_merged" --preserve-keys --take-larger-entry\
+             "$BIOSNAKE" concatdbs "${TMP_PATH}/ungap_aln" "${TMP_PATH}/aln" "${TMP_PATH}/aln_merged" --preserve-keys --take-larger-entry\
               || fail "Mergedbs died"
         fi
         RESULT="${TMP_PATH}/aln_merged"
@@ -80,14 +80,14 @@ if [ -n "$NUCL" ]; then
 
     if notExists "$3.dbtype"; then
         # shellcheck disable=SC2086
-        "$MMSEQS" offsetalignment "$QUERY" "${QUERY}" "${TARGET}" "${TARGET}" ${RESULT} "$3" ${OFFSETALIGNMENT_PAR} \
+        "$BIOSNAKE" offsetalignment "$QUERY" "${QUERY}" "${TARGET}" "${TARGET}" ${RESULT} "$3" ${OFFSETALIGNMENT_PAR} \
             || fail "Offset step died"
     fi
 else
     # 3. Local gapped sequence alignment.
     if notExists "$3.dbtype"; then
         # shellcheck disable=SC2086
-       "$MMSEQS" swapresults "$TARGET" "$QUERY" "${TMP_PATH}/reverse_aln" "$3" ${SWAPRESULT_PAR} \
+       "$BIOSNAKE" swapresults "$TARGET" "$QUERY" "${TMP_PATH}/reverse_aln" "$3" ${SWAPRESULT_PAR} \
             || fail "Alignment step died"
     fi
 fi
@@ -96,8 +96,8 @@ fi
 
 if [ -n "$REMOVE_TMP" ]; then
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/pref" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/pref" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/reverse_aln" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/reverse_aln" ${VERBOSITY}
     rm -f "${TMP_PATH}/linsearch.sh"
 fi

@@ -23,36 +23,36 @@ TMP_PATH="$4"
 # call prefilter module
 if notExists "${TMP_PATH}/pref.dbtype"; then
      # shellcheck disable=SC2086
-    $RUNNER "$MMSEQS" prefilter "${INPUT}" "${2}" "${TMP_PATH}/pref" ${PREFILTER_PAR} \
+    $RUNNER "$BIOSNAKE" prefilter "${INPUT}" "${2}" "${TMP_PATH}/pref" ${PREFILTER_PAR} \
         || fail "Prefilter died"
 fi
 
 if notExists "${TMP_PATH}/pref_swapped.dbtype"; then
      # shellcheck disable=SC2086
-    "$MMSEQS" swapresults "${INPUT}" "${2}" "${TMP_PATH}/pref" "${TMP_PATH}/pref_swapped" ${SWAP_PAR} \
+    "$BIOSNAKE" swapresults "${INPUT}" "${2}" "${TMP_PATH}/pref" "${TMP_PATH}/pref_swapped" ${SWAP_PAR} \
         || fail "Swapresults pref died"
 fi
 
 # call alignment module
 if notExists "$TMP_PATH/aln_swapped.dbtype"; then
     # shellcheck disable=SC2086
-    $RUNNER "$MMSEQS" "${ALIGN_MODULE}" "${2}" "${INPUT}" "${TMP_PATH}/pref_swapped" "${TMP_PATH}/aln_swapped" ${ALIGNMENT_PAR} \
+    $RUNNER "$BIOSNAKE" "${ALIGN_MODULE}" "${2}" "${INPUT}" "${TMP_PATH}/pref_swapped" "${TMP_PATH}/aln_swapped" ${ALIGNMENT_PAR} \
         || fail "Alignment died"
 fi
 
 if notExists "${RESULTS}.dbtype"; then
     # shellcheck disable=SC2086
-    "$MMSEQS" swapresults "${2}" "${INPUT}" "${TMP_PATH}/aln_swapped"  "${RESULTS}" ${SWAP_PAR} \
+    "$BIOSNAKE" swapresults "${2}" "${INPUT}" "${TMP_PATH}/aln_swapped"  "${RESULTS}" ${SWAP_PAR} \
         || fail "Swapresults aln died"
 fi
 
 
 if [ -n "${REMOVE_TMP}" ]; then
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/pref" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/pref" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/pref_swapped" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/pref_swapped" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/aln_swapped" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/aln_swapped" ${VERBOSITY}
     rm -f "${TMP_PATH}/searchtargetprofile.sh"
 fi

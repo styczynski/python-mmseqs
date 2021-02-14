@@ -1,77 +1,37 @@
-# MMseqs2 bindings for Python
+# Biosnake
 
-![Top language](https://img.shields.io/github/languages/top/styczynski/python-mmseqs)
-![PyPI](https://img.shields.io/pypi/v/mmseqs?style=flat)
-![Build status](https://github.com/styczynski/python-mmseqs/workflows/Build/badge.svg)
-![Last commit](https://img.shields.io/github/last-commit/styczynski/python-mmseqs)
+![Top language](https://img.shields.io/github/languages/top/styczynski/biosnake)
+![PyPI](https://img.shields.io/pypi/v/biosnake?style=flat)
+![Build status](https://github.com/styczynski/biosnake/workflows/Build/badge.svg)
+![Last commit](https://img.shields.io/github/last-commit/styczynski/biosnake)
 
-This project provides bidings for mmseqs. It's still work in progress.
-This is the base usage scenario:
-```python
-import mmseqs
+## Project description
 
-#
-# Demonstration of basic mmseqs2 operations
-#
+This project aims at providing unified biological Python processing framework.
+The main idea is that the bio-datascience sector lacks an efficient, modern framework that can effectively and easily process large volumes of data.
+Biopython is slow, but Biotite solves that problem. Nevertheless both tools do not provide tools to common problems that can be solved only using external legacy programs.
 
-# Create a client
-client = mmseqs.MMSeqs()
+## Project roadmap
 
-# Create a database from fasta file
-# Here we specify name of the database, description and input file
-# (The input can also be a Seq/SeqRecord list/iterator/etc.)
-client.databases.create("test", "Test database", "example/a.fasta")
+- Create a Biosnake2 PoC Python bindings
+- Provide bindings for all Biosnake2 functionalities with pandas/numpy compatibility
+- Provide visualizations that use custom components or Plotly (similar to those of Biotite)
+- Incorporate [Phylip](https://evolution.genetics.washington.edu/phylip/progs.data.prot.html)
+- Incorporate protein [algorithms](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC6394400/) - or similar to [this](https://pypi.org/project/seqfold/)
 
-# Get description of the database
-print(client.databases[0].description)
+## Current project status
 
-# Perform search on a database
-# Note that the search queries can be a string with a patch to the FASTA file with queries
-results = client.databases[0].search(
-    [
-        "ACTAGCTCAGTCAACTAGCTCAGTCCTCAGTCAACTAGCTCAGTCTATATATATACAAC",
-        "ACTAGCTCAGTCAACTAGCTCAGTCCTCAGTCAACTAGCT",
-        "ACTAGCTCAGTCAACTAGCT",
-        "ACTAGCTCAGT",
-    ],
-    search_type="nucleotides",
-)
+Currently the project in state of heavy development. The API is not stable and can change daily. It's rather RnD state of project than actually production verified quality.
+* Currently Biosnake2 bindings are implemented
 
-# Load queries from file:
-# results = client.databases[0].search_file("input.fasta", search_type="nucleotides")
+## Building
 
-# You can pass list of headers to get:
-#   query_sequence_id
-#   target_sequence_id
-#   query_sequence_content
-#   target_sequence_content
-#   sequence_identity
-#   alignment_length
-#   number_of_mismatches
-#   number_of_gap_openings
-#   domain_start_index_query
-#   domain_end_index_query
-#   domain_start_index_target
-#   domain_end_index_target
-#   e_value
-#   bit_score
-# For example:
-# results2 = client.databases[0].search(
-#     [
-#         "ACTAGCTCAGTCAACTAGCTCAGTCCTCAGTCAACTAGCTCAGTCTATATATATACAAC",
-#         "ACTAGCTCAGTCAACTAGCTCAGTCCTCAGTCAACTAGCT",
-#         "ACTAGCTCAGTCAACTAGCT",
-#         "ACTAGCTCAGT",
-#     ],
-#     search_type="nucleotides",
-#     headers=["query_sequence_id", "target_sequence_id", "sequence_identity", "alignment_length", "number_of_mismatches"]
-# )
-
-# results.records is a list of lists. Each item contains alignments for each query.
-# Each list of alignments consists of single result
-# print(results.records)
-
-# You can also get a pandas dataframe
-print(results.dataframe)
-
+You can build the project by calling:
+```bash
+    $ poetry install
 ```
+You need to install [Poetry](https://python-poetry.org/docs/#installation) to execute that.
+
+## Usage
+
+Please see `example/` folder to see usages of the library.

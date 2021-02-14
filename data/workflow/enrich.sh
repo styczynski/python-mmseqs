@@ -10,7 +10,7 @@ notExists() {
 }
 
 #pre processing
-[ -z "${MMSEQS}" ] && echo "Please set the environment variable \$MMSEQS to your MMSEQS binary." && exit 1;
+[ -z "${BIOSNAKE}" ] && echo "Please set the environment variable \$BIOSNAKE to your BIOSNAKE binary." && exit 1;
 # check number of input variables
 [ "$#" -ne 6 ] && echo "Please provide <queryDB> <targetDB> <targetProf> <targetRes> <outDB> <tmp>" && exit 1;
 # check if files exist
@@ -30,13 +30,13 @@ TMP_PATH="$6"
 
 if notExists "${TMP_PATH}/search_slice"; then
     # shellcheck disable=SC2086
-    "${MMSEQS}" search "${QUERYDB}" "${TARGETPROF}" "${TMP_PATH}/search_slice" "${TMP_PATH}/slice_tmp" ${PROF_SEARCH_PAR} \
+    "${BIOSNAKE}" search "${QUERYDB}" "${TARGETPROF}" "${TMP_PATH}/search_slice" "${TMP_PATH}/slice_tmp" ${PROF_SEARCH_PAR} \
         || fail "search died"
 fi
 
 if notExists "${TMP_PATH}/prof_slice"; then
     # shellcheck disable=SC2086
-    ${RUNNER} "${MMSEQS}" result2profile "${QUERYDB}" "${TARGETPROF}" "${TMP_PATH}/search_slice" "${TMP_PATH}/prof_slice" ${PROF_PROF_PAR} \
+    ${RUNNER} "${BIOSNAKE}" result2profile "${QUERYDB}" "${TARGETPROF}" "${TMP_PATH}/search_slice" "${TMP_PATH}/prof_slice" ${PROF_PROF_PAR} \
         || fail "result2profile died"
 fi
 
@@ -48,14 +48,14 @@ while [ "${STEP}" -lt "${NUM_IT}" ]; do
         PARAM="PREFILTER_PAR_${STEP}"
         eval TMP="\$$PARAM"
         # shellcheck disable=SC2086
-        ${RUNNER} "${MMSEQS}" prefilter "${INPUT}" "${TARGETPROF}_consensus" "${TMP_PATH}/pref_${STEP}" ${TMP} \
+        ${RUNNER} "${BIOSNAKE}" prefilter "${INPUT}" "${TARGETPROF}_consensus" "${TMP_PATH}/pref_${STEP}" ${TMP} \
             || fail "prefilter died"
     fi
 
     if [ ${STEP} -ge 1 ]; then
         if notExists "${TMP_PATH}/pref_${STEP}.hasnext"; then
             # shellcheck disable=SC2086
-            "${MMSEQS}" subtractdbs "${TMP_PATH}/pref_${STEP}" "${TMP_PATH}/aln_0" "${TMP_PATH}/pref_next_${STEP}" ${SUBSTRACT_PAR} \
+            "${BIOSNAKE}" subtractdbs "${TMP_PATH}/pref_${STEP}" "${TMP_PATH}/aln_0" "${TMP_PATH}/pref_next_${STEP}" ${SUBSTRACT_PAR} \
                 || fail "subtractdbs died"
             mv -f "${TMP_PATH}/pref_next_${STEP}" "${TMP_PATH}/pref_${STEP}"
             mv -f "${TMP_PATH}/pref_next_${STEP}.index" "${TMP_PATH}/pref_${STEP}.index"
@@ -69,7 +69,7 @@ while [ "${STEP}" -lt "${NUM_IT}" ]; do
 	    PARAM="ALIGNMENT_PAR_${STEP}"
         eval TMP="\$$PARAM"
         # shellcheck disable=SC2086
-        ${RUNNER} "${MMSEQS}" "${ALIGN_MODULE}" "${INPUT}" "${TARGETPROF}_consensus" "${TMP_PATH}/pref_${STEP}" "${TMP_PATH}/aln_${STEP}" ${TMP} \
+        ${RUNNER} "${BIOSNAKE}" "${ALIGN_MODULE}" "${INPUT}" "${TARGETPROF}_consensus" "${TMP_PATH}/pref_${STEP}" "${TMP_PATH}/aln_${STEP}" ${TMP} \
             || fail "${ALIGN_MODULE} died"
     fi
 
@@ -78,7 +78,7 @@ while [ "${STEP}" -lt "${NUM_IT}" ]; do
         PARAM="EXPAND_PAR_${STEP}"
         eval TMP="\$$PARAM"
         # shellcheck disable=SC2086
-        "${MMSEQS}" expandaln "${INPUT}" "${PROFTARGETSEQ}" "${TMP_PATH}/aln_${STEP}" "${PROFRESULT}" "${TMP_PATH}/aln_exp_${STEP}" ${TMP} \
+        "${BIOSNAKE}" expandaln "${INPUT}" "${PROFTARGETSEQ}" "${TMP_PATH}/aln_${STEP}" "${PROFRESULT}" "${TMP_PATH}/aln_exp_${STEP}" ${TMP} \
             || fail "expandaln died"
         mv -f "${TMP_PATH}/aln_exp_${STEP}" "${TMP_PATH}/aln_${STEP}"
         mv -f "${TMP_PATH}/aln_exp_${STEP}.index" "${TMP_PATH}/aln_${STEP}.index"
@@ -89,7 +89,7 @@ while [ "${STEP}" -lt "${NUM_IT}" ]; do
     if [ ${STEP} -gt 0 ]; then
         if notExists "${TMP_PATH}/aln_${STEP}.hasmerge"; then
             # shellcheck disable=SC2086
-            "${MMSEQS}" mergedbs "${INPUT}" "${TMP_PATH}/aln_new" "${TMP_PATH}/aln_0" "${TMP_PATH}/aln_${STEP}" ${VERBOSITY_PAR} \
+            "${BIOSNAKE}" mergedbs "${INPUT}" "${TMP_PATH}/aln_new" "${TMP_PATH}/aln_0" "${TMP_PATH}/aln_${STEP}" ${VERBOSITY_PAR} \
                 || fail "mergedbs died"
             mv -f "${TMP_PATH}/aln_new" "${TMP_PATH}/aln_0"
             mv -f "${TMP_PATH}/aln_new.index" "${TMP_PATH}/aln_0.index"
@@ -104,7 +104,7 @@ while [ "${STEP}" -lt "${NUM_IT}" ]; do
             PARAM="PROFILE_PAR_${STEP}"
             eval TMP="\$$PARAM"
             # shellcheck disable=SC2086
-            ${RUNNER} "${MMSEQS}" result2profile "${QUERYDB}" "${PROFTARGETSEQ}" "${TMP_PATH}/aln_0" "${TMP_PATH}/profile_${STEP}" ${TMP} \
+            ${RUNNER} "${BIOSNAKE}" result2profile "${QUERYDB}" "${PROFTARGETSEQ}" "${TMP_PATH}/aln_0" "${TMP_PATH}/profile_${STEP}" ${TMP} \
                 || fail "result2profile died"
         fi
         INPUT="${TMP_PATH}/profile_${STEP}"

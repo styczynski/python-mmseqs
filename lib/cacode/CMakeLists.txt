@@ -5,4 +5,4 @@ add_library(cacode OBJECT
         nrutil.cpp
         cacode.h
         )
-set_target_properties(cacode PROPERTIES COMPILE_FLAGS "${MMSEQS_CXX_FLAGS}" LINK_FLAGS "${MMSEQS_CXX_FLAGS}")
+set_target_properties(cacode PROPERTIES COMPILE_FLAGS "${BIOSNAKE_CXX_FLAGS}" LINK_FLAGS "${BIOSNAKE_CXX_FLAGS}")

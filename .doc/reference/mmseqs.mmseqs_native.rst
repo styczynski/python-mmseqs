@@ -1,7 +1,7 @@
-mmseqs.mmseqs\_native module
+biosnake.biosnake\_native module
 ============================
 
-.. automodule:: mmseqs.mmseqs_native
+.. automodule:: biosnake.biosnake_native
    :members:
    :undoc-members:
    :show-inheritance:

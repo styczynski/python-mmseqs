@@ -30,7 +30,7 @@ sys.path.append(str(Path(__file__).parents[1]))
 sys.path.insert(0, os.path.abspath('../src'))
 sys.path.insert(0, os.path.abspath('_ext'))
 sys.path.insert(0, os.path.abspath('.'))
-#sys.path.insert(0, os.path.abspath('../src/mmseqs_native'))
+#sys.path.insert(0, os.path.abspath('../src/biosnake_native'))
 
 # -- Project information -----------------------------------------------------
 
@@ -125,7 +125,7 @@ html_theme_options = {
 #
 
 html_title = full_title
-htmlhelp_basename = "MMseqshandbookdoc"
+htmlhelp_basename = "Biosnakehandbookdoc"
 html_static_path = ['_static']
 
 source_suffix = ['.rst']
@@ -179,7 +179,7 @@ def setup(app):
 
 # conf.py
 # srclink settings
-srclink_project = 'https://github.com/styczynski/python-mmseqs'
+srclink_project = 'https://github.com/styczynski/biosnake'
 #srclink_project = 'https://bitbucket.org/westurner/sphinxcontrib-srclinks'
 #srclink_project = 'hg@bitbucket.org/westurner/sphinxcontrib-srclinks'
 #srclink_project = 'git@bitbucket.org/westurner/sphinxcontrib-srclinks'

@@ -1,0 +1,32 @@
+set(prefiltering_header_files
+        biosnake/prefiltering/cacheFriendlyOperations.h
+        biosnake/prefiltering/extendedSubstitutionMatrix.h
+        biosnake/prefiltering/indexer.h
+        biosnake/prefiltering/indexBuilder.h
+        biosnake/prefiltering/indexTable.h
+        biosnake/prefiltering/kmerGenerator.h
+        biosnake/prefiltering/prefiltering.h
+        biosnake/prefiltering/prefilteringIndexReader.h
+        biosnake/prefiltering/queryMatcher.h
+        biosnake/prefiltering/reducedMatrix.h
+        biosnake/prefiltering/sequenceLookup.h
+        biosnake/prefiltering/ungappedAlignment.h
+        PARENT_SCOPE
+        )
+
+set(prefiltering_source_files
+        biosnake/prefiltering/cacheFriendlyOperations.cpp
+        biosnake/prefiltering/extendedSubstitutionMatrix.cpp
+        biosnake/prefiltering/indexer.cpp
+        biosnake/prefiltering/indexBuilder.cpp
+        biosnake/prefiltering/kmerGenerator.cpp
+        biosnake/prefiltering/main.cpp
+        biosnake/prefiltering/prefiltering.cpp
+        biosnake/prefiltering/prefilteringIndexReader.cpp
+        biosnake/prefiltering/queryMatcher.cpp
+        biosnake/prefiltering/reducedMatrix.cpp
+        biosnake/prefiltering/sequenceLookup.cpp
+        biosnake/prefiltering/ungappedAlignment.cpp
+        biosnake/prefiltering/ungappedprefilter.cpp
+        PARENT_SCOPE
+        )

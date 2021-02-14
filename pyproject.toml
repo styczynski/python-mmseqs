@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "mmseqs"
+name = "biosnake"
 version = "1.0.1"
-description = "MMSEQS Python bindings"
+description = "Biosnake - most comprehensive and fastest Python framework for biological data"
 authors = ["Piotr Styczyński <piotr@styczynski.in>"]
 build = "build.py"
 readme = "README.md"
@@ -115,5 +115,12 @@ pyflakes = ["+*", "-E203"]
 pylint = ["+*", "-E203"]
 
 [build-system]
-requires = ["setuptools", "poetry-core>=1.0.0", "wheel", "cmake>=3.12", "pybind11>=2.6.0"]
+requires = [
+    "setuptools",
+    "poetry-core>=1.0.0",
+    "wheel",
+    "cmake>=3.12",
+    "pybind11>=2.6.0",
+    "oldest-supported-numpy"  # https://github.com/scipy/oldest-supported-numpy
+]
 build-backend = "poetry.core.masonry.api"

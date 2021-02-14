@@ -1,9 +1,9 @@
-mmseqs.mmseqs\_native.MMSeqsSearchRecord
+biosnake.biosnake\_native.BiosnakeSearchRecord
 ========================================
 
-.. currentmodule:: mmseqs.mmseqs_native
+.. currentmodule:: biosnake.biosnake_native
 
-.. autoclass:: MMSeqsSearchRecord
+.. autoclass:: BiosnakeSearchRecord
 
    
    .. automethod:: __init__
@@ -13,7 +13,7 @@ mmseqs.mmseqs\_native.MMSeqsSearchRecord
 
    .. autosummary::
    
-      ~MMSeqsSearchRecord.__init__
+      ~BiosnakeSearchRecord.__init__
    
    
 
@@ -23,17 +23,17 @@ mmseqs.mmseqs\_native.MMSeqsSearchRecord
 
    .. autosummary::
    
-      ~MMSeqsSearchRecord.alignment_length
-      ~MMSeqsSearchRecord.bit_score
-      ~MMSeqsSearchRecord.domain_end_index_query
-      ~MMSeqsSearchRecord.domain_end_index_target
-      ~MMSeqsSearchRecord.domain_start_index_query
-      ~MMSeqsSearchRecord.domain_start_index_target
-      ~MMSeqsSearchRecord.e_value
-      ~MMSeqsSearchRecord.number_of_gap_openings
-      ~MMSeqsSearchRecord.number_of_mismatches
-      ~MMSeqsSearchRecord.query_sequence_id
-      ~MMSeqsSearchRecord.sequence_identity
-      ~MMSeqsSearchRecord.target_sequence_id
+      ~BiosnakeSearchRecord.alignment_length
+      ~BiosnakeSearchRecord.bit_score
+      ~BiosnakeSearchRecord.domain_end_index_query
+      ~BiosnakeSearchRecord.domain_end_index_target
+      ~BiosnakeSearchRecord.domain_start_index_query
+      ~BiosnakeSearchRecord.domain_start_index_target
+      ~BiosnakeSearchRecord.e_value
+      ~BiosnakeSearchRecord.number_of_gap_openings
+      ~BiosnakeSearchRecord.number_of_mismatches
+      ~BiosnakeSearchRecord.query_sequence_id
+      ~BiosnakeSearchRecord.sequence_identity
+      ~BiosnakeSearchRecord.target_sequence_id
    
    

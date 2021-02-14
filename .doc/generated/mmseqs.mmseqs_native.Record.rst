@@ -1,7 +1,7 @@
-mmseqs.mmseqs\_native.Record
+biosnake.biosnake\_native.Record
 ============================
 
-.. currentmodule:: mmseqs.mmseqs_native
+.. currentmodule:: biosnake.biosnake_native
 
 .. autoclass:: Record
 

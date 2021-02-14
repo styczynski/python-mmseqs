@@ -1,10 +1,10 @@
-import mmseqs
+import biosnake
 
 #
-# Demonstration of basic mmseqs2 operations
+# Demonstration of basic biosnake2 operations
 #
 
 # Create a client
-client = mmseqs.MMSeqs()
+client = biosnake.Biosnake()
 a = client.databases.create("testa", "Test database A", "a.fasta")
 print(a.name)

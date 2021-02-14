@@ -48,9 +48,9 @@ class CMakeBuild(build_ext):
             "-DPYTHON_EXECUTABLE=" + sys.executable,
             "-DREQUIRE_OPENMP=0",
             "-DCMAKE_BUILD_TYPE=Debug",
-            f"-DBUILD_PYTHON_VERSION={platform.python_version()}",
-            f"-DPYTHON_INCLUDE_DIR={sysconfig.get_python_inc()}",
-            f"-DPYTHON_LIBRARY={sysconfig.get_config_var('LIBDIR')}",
+            #f"-DBUILD_PYTHON_VERSION={platform.python_version()}",
+            #f"-DPYTHON_INCLUDE_DIR={sysconfig.get_python_inc()}",
+            #f"-DPYTHON_LIBRARY={sysconfig.get_config_var('LIBDIR')}",
         ]
 
         cfg = "Debug" if self.debug else "Release"
@@ -76,14 +76,14 @@ class CMakeBuild(build_ext):
             cmake_args += ["-DCMAKE_BUILD_TYPE=" + cfg]
             build_args += ["--", "-j2"]
 
-        if "MMSEQ_CMAKE_GENERATOR" in os.environ:
-            if len(os.environ["MMSEQ_CMAKE_GENERATOR"]) > 0:
-                cmake_args += ["-G", os.environ["MMSEQ_CMAKE_GENERATOR"]]
+        if "BIOSNAKE_CMAKE_GENERATOR" in os.environ:
+            if len(os.environ["BIOSNAKE_CMAKE_GENERATOR"]) > 0:
+                cmake_args += ["-G", os.environ["BIOSNAKE_CMAKE_GENERATOR"]]
                 arch = None
 
-        if "MMSEQ_CMAKE_ARCH" in os.environ:
-            if len(os.environ["MMSEQ_CMAKE_ARCH"]) > 0:
-                arch = os.environ["MMSEQ_CMAKE_ARCH"]
+        if "BIOSNAKE_CMAKE_ARCH" in os.environ:
+            if len(os.environ["BIOSNAKE_CMAKE_ARCH"]) > 0:
+                arch = os.environ["BIOSNAKE_CMAKE_ARCH"]
                 if arch == "x86":
                     force_x86 = True
 
@@ -171,7 +171,7 @@ def build(setup_kwargs):
         {
             "long_description": long_description,
             "long_description_content_type": 'text/markdown',
-            "ext_modules": [CMakeExtension("mmseqs/mmseqs_native")],
+            "ext_modules": [CMakeExtension("biosnake/biosnake_native")],
             "cmdclass": {"build_ext": CMakeBuild},
             "zip_safe": False,
             "include_package_data": True,

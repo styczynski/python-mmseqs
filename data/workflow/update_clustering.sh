@@ -47,7 +47,7 @@ TMP_PATH="$(abspath "$6")"
 
 if notExists "${TMP_PATH}/removedSeqs"; then
     # shellcheck disable=SC2086
-    "$MMSEQS" diffseqdbs "$OLDDB" "$NEWDB" "${TMP_PATH}/removedSeqs" "${TMP_PATH}/mappingSeqs" "${TMP_PATH}/newSeqs" ${DIFF_PAR} \
+    "$BIOSNAKE" diffseqdbs "$OLDDB" "$NEWDB" "${TMP_PATH}/removedSeqs" "${TMP_PATH}/mappingSeqs" "${TMP_PATH}/newSeqs" ${DIFF_PAR} \
         || fail "Diff died"
 fi
 
@@ -56,9 +56,9 @@ if [ ! -s "${TMP_PATH}/mappingSeqs" ]; then
 WARNING: There are no common sequences between $OLDDB and $NEWDB.
 If you aim to add the sequences of $NEWDB to your previous clustering $OLDCLUST, you can run:
 
-mmseqs concatdbs \"$OLDDB\" \"$NEWDB\" \"${OLDDB}.withNewSequences\"
-mmseqs concatdbs \"${OLDDB}_h\" \"${NEWDB}_h\" \"${OLDDB}.withNewSequences_h\"
-mmseqs clusterupdate \"$OLDDB\" \"${OLDDB}.withNewSequences\" \"$OLDCLUST\" \"$NEWCLUST\" \"${TMP_PATH}\"
+biosnake concatdbs \"$OLDDB\" \"$NEWDB\" \"${OLDDB}.withNewSequences\"
+biosnake concatdbs \"${OLDDB}_h\" \"${NEWDB}_h\" \"${OLDDB}.withNewSequences_h\"
+biosnake clusterupdate \"$OLDDB\" \"${OLDDB}.withNewSequences\" \"$OLDCLUST\" \"$NEWCLUST\" \"${TMP_PATH}\"
 WARN
     rm -f "${TMP_PATH}/removedSeqs" "${TMP_PATH}/mappingSeqs" "${TMP_PATH}/newSeqs"
     exit 1
@@ -76,13 +76,13 @@ if [ -s "${TMP_PATH}/removedSeqs" ]; then
 
         if notExists "${TMP_PATH}/NEWDB.withOld.dbtype"; then
             # shellcheck disable=SC2086
-            "$MMSEQS" renamedbkeys "${TMP_PATH}/OLDDB.removedMapping" "${OLDDB}" "${TMP_PATH}/OLDDB.removedDb" --subdb-mode 1 ${VERBOSITY} \
+            "$BIOSNAKE" renamedbkeys "${TMP_PATH}/OLDDB.removedMapping" "${OLDDB}" "${TMP_PATH}/OLDDB.removedDb" --subdb-mode 1 ${VERBOSITY} \
                 || fail "renamedbkeys died"
             # shellcheck disable=SC2086
-            "$MMSEQS" concatdbs "$NEWDB" "${TMP_PATH}/OLDDB.removedDb" "${TMP_PATH}/NEWDB.withOld" --preserve-keys --threads 1 ${VERBOSITY} \
+            "$BIOSNAKE" concatdbs "$NEWDB" "${TMP_PATH}/OLDDB.removedDb" "${TMP_PATH}/NEWDB.withOld" --preserve-keys --threads 1 ${VERBOSITY} \
                 || fail "concatdbs died"
             # shellcheck disable=SC2086
-            "$MMSEQS" concatdbs "${NEWDB}_h" "${TMP_PATH}/OLDDB.removedDb_h" "${TMP_PATH}/NEWDB.withOld_h" --preserve-keys --threads 1 ${VERBOSITY} \
+            "$BIOSNAKE" concatdbs "${NEWDB}_h" "${TMP_PATH}/OLDDB.removedDb_h" "${TMP_PATH}/NEWDB.withOld_h" --preserve-keys --threads 1 ${VERBOSITY} \
                 || fail "concatdbs died"
         fi
         NEWDB="${TMP_PATH}/NEWDB.withOld"
@@ -91,17 +91,17 @@ if [ -s "${TMP_PATH}/removedSeqs" ]; then
             echo "Remove temporary files 1/3"
             rm -f "${TMP_PATH}/OLDDB.removedMapping"
             # shellcheck disable=SC2086
-            "$MMSEQS" rmdb "${TMP_PATH}/OLDDB.removedDb" ${VERBOSITY}
+            "$BIOSNAKE" rmdb "${TMP_PATH}/OLDDB.removedDb" ${VERBOSITY}
         fi
     else
         if notExists "${TMP_PATH}/OLCLUST.withoutDeletedKeys.dbtype"; then
             # shellcheck disable=SC2086
-            "$MMSEQS" createsubdb "${TMP_PATH}/mappingSeqs" "${OLDCLUST}" "${TMP_PATH}/OLCLUST.withoutDeletedKeys" --subdb-mode 1 ${VERBOSITY} \
+            "$BIOSNAKE" createsubdb "${TMP_PATH}/mappingSeqs" "${OLDCLUST}" "${TMP_PATH}/OLCLUST.withoutDeletedKeys" --subdb-mode 1 ${VERBOSITY} \
                 || fail "createsubdb died"
         fi
         if notExists "${TMP_PATH}/OLCLUST.withoutDeleted.dbtype"; then
             # shellcheck disable=SC2086
-            "$MMSEQS" filterdb "${TMP_PATH}/OLCLUST.withoutDeletedKeys" "${TMP_PATH}/OLCLUST.withoutDeleted" --filter-file "${TMP_PATH}/removedSeqs" --positive-filter ${THREADS_PAR} \
+            "$BIOSNAKE" filterdb "${TMP_PATH}/OLCLUST.withoutDeletedKeys" "${TMP_PATH}/OLCLUST.withoutDeleted" --filter-file "${TMP_PATH}/removedSeqs" --positive-filter ${THREADS_PAR} \
                 || fail "filterdb died"
         fi
         OLDCLUST="${TMP_PATH}/OLCLUST.withoutDeleted"
@@ -120,7 +120,7 @@ fi
 
 if notExists "${NEWMAPDB}.dbtype"; then
     # shellcheck disable=SC2086
-    "$MMSEQS" renamedbkeys "${TMP_PATH}/newMappingSeqs" "${NEWDB}" "${NEWMAPDB}" ${VERBOSITY} \
+    "$BIOSNAKE" renamedbkeys "${TMP_PATH}/newMappingSeqs" "${NEWDB}" "${NEWMAPDB}" ${VERBOSITY} \
         || fail "renamedbkeys died"
 fi
 NEWDB="${NEWMAPDB}"
@@ -128,34 +128,34 @@ NEWDB="${NEWMAPDB}"
 if notExists "${TMP_PATH}/NEWDB.newSeqs.dbtype"; then
     log "=== Filter out new from old sequences"
     # shellcheck disable=SC2086
-    "$MMSEQS" createsubdb "${TMP_PATH}/newSeqs" "$NEWDB" "${TMP_PATH}/NEWDB.newSeqs" ${VERBOSITY} --subdb-mode 1 \
+    "$BIOSNAKE" createsubdb "${TMP_PATH}/newSeqs" "$NEWDB" "${TMP_PATH}/NEWDB.newSeqs" ${VERBOSITY} --subdb-mode 1 \
         || fail "createsubdb died"
 fi
 
 if notExists "${TMP_PATH}/OLDDB.repSeq.dbtype"; then
     log "=== Extract representative sequences"
     # shellcheck disable=SC2086
-    "$MMSEQS" result2repseq "$OLDDB" "$OLDCLUST" "${TMP_PATH}/OLDDB.repSeq" ${RESULT2REPSEQ_PAR} \
+    "$BIOSNAKE" result2repseq "$OLDDB" "$OLDCLUST" "${TMP_PATH}/OLDDB.repSeq" ${RESULT2REPSEQ_PAR} \
         || fail "result2repseq died"
 fi
 
 if notExists "${TMP_PATH}/newSeqsHits.dbtype"; then
     log "=== Search new sequences against representatives"
     # shellcheck disable=SC2086
-    "$MMSEQS" search "${TMP_PATH}/NEWDB.newSeqs" "${TMP_PATH}/OLDDB.repSeq" "${TMP_PATH}/newSeqsHits" "${TMP_PATH}/search" ${SEARCH_PAR} \
+    "$BIOSNAKE" search "${TMP_PATH}/NEWDB.newSeqs" "${TMP_PATH}/OLDDB.repSeq" "${TMP_PATH}/newSeqsHits" "${TMP_PATH}/search" ${SEARCH_PAR} \
         || fail "search died"
 fi
 
 if notExists "${TMP_PATH}/newSeqsHits.swapped.all.dbtype"; then
     # shellcheck disable=SC2086
-    "$MMSEQS" swapdb "${TMP_PATH}/newSeqsHits" "${TMP_PATH}/newSeqsHits.swapped.all" ${THREADS_PAR} \
+    "$BIOSNAKE" swapdb "${TMP_PATH}/newSeqsHits" "${TMP_PATH}/newSeqsHits.swapped.all" ${THREADS_PAR} \
         || fail "swapdb died"
     awk '$3 > 1 { print 1; exit; }' "${TMP_PATH}/newSeqsHits.swapped.all.index" > "${TMP_PATH}/newSeqsHits.swapped.hasHits"
 fi
 
 if [ -s "${TMP_PATH}/newSeqsHits.swapped.hasHits" ] && notExists "${TMP_PATH}/newSeqsHits.swapped.dbtype"; then
     # shellcheck disable=SC2086
-    "$MMSEQS" filterdb "${TMP_PATH}/newSeqsHits.swapped.all" "${TMP_PATH}/newSeqsHits.swapped" --trim-to-one-column ${THREADS_PAR} \
+    "$BIOSNAKE" filterdb "${TMP_PATH}/newSeqsHits.swapped.all" "${TMP_PATH}/newSeqsHits.swapped" --trim-to-one-column ${THREADS_PAR} \
         || fail "filterdb died"
 fi
 
@@ -164,7 +164,7 @@ if [ -f "${TMP_PATH}/newSeqsHits.swapped.dbtype" ]; then
     if notExists "${TMP_PATH}/updatedClust.dbtype"; then
         log "=== Merge found sequences with previous clustering"
         # shellcheck disable=SC2086
-        "$MMSEQS" mergedbs "$OLDCLUST" "${TMP_PATH}/updatedClust" "$OLDCLUST" "${TMP_PATH}/newSeqsHits.swapped" ${VERBOSITY} \
+        "$BIOSNAKE" mergedbs "$OLDCLUST" "${TMP_PATH}/updatedClust" "$OLDCLUST" "${TMP_PATH}/newSeqsHits.swapped" ${VERBOSITY} \
             || fail "mergedbs died"
     fi
 else
@@ -175,14 +175,14 @@ if notExists "${TMP_PATH}/toBeClusteredSeparately.dbtype"; then
     log "=== Extract unmapped sequences"
     awk '$3 == 1 {print $1}' "${TMP_PATH}/newSeqsHits.index" > "${TMP_PATH}/noHitSeqList"
     # shellcheck disable=SC2086
-    "$MMSEQS" createsubdb "${TMP_PATH}/noHitSeqList" "$NEWDB" "${TMP_PATH}/toBeClusteredSeparately" ${VERBOSITY} --subdb-mode 1 \
+    "$BIOSNAKE" createsubdb "${TMP_PATH}/noHitSeqList" "$NEWDB" "${TMP_PATH}/toBeClusteredSeparately" ${VERBOSITY} --subdb-mode 1 \
         || fail "createsubdb of not hit seq. died"
 fi
 
 if notExists "${TMP_PATH}/newClusters.dbtype" && [ -s "${TMP_PATH}/toBeClusteredSeparately.index" ]; then
     log "=== Cluster separately the singleton sequences"
     # shellcheck disable=SC2086
-    "$MMSEQS" cluster "${TMP_PATH}/toBeClusteredSeparately" "${TMP_PATH}/newClusters" "${TMP_PATH}/cluster" ${CLUST_PAR} \
+    "$BIOSNAKE" cluster "${TMP_PATH}/toBeClusteredSeparately" "${TMP_PATH}/newClusters" "${TMP_PATH}/cluster" ${CLUST_PAR} \
         || fail "cluster of new seq. died"
 fi
 
@@ -190,12 +190,12 @@ if [ -f "${TMP_PATH}/newClusters.dbtype" ]; then
     if notExists "$NEWCLUST"; then
         log "=== Merge updated clustering with new clusters"
         # shellcheck disable=SC2086
-        "$MMSEQS" concatdbs "${UPDATEDCLUST}" "${TMP_PATH}/newClusters" "$NEWCLUST" --preserve-keys ${THREADS_PAR} \
+        "$BIOSNAKE" concatdbs "${UPDATEDCLUST}" "${TMP_PATH}/newClusters" "$NEWCLUST" --preserve-keys ${THREADS_PAR} \
             || fail "concatdbs died"
     fi
 else
     # shellcheck disable=SC2086
-    "$MMSEQS" mvdb "${UPDATEDCLUST}" "$NEWCLUST" ${VERBOSITY}
+    "$BIOSNAKE" mvdb "${UPDATEDCLUST}" "$NEWCLUST" ${VERBOSITY}
 fi
 
 if [ -n "$REMOVE_TMP" ]; then
@@ -205,32 +205,32 @@ if [ -n "$REMOVE_TMP" ]; then
 
     if [ -n "${RECOVER_DELETED}" ]; then
         # shellcheck disable=SC2086
-        "$MMSEQS" rmdb "${TMP_PATH}/NEWDB.withOld" ${VERBOSITY}
+        "$BIOSNAKE" rmdb "${TMP_PATH}/NEWDB.withOld" ${VERBOSITY}
         # shellcheck disable=SC2086
-        "$MMSEQS" rmdb "${TMP_PATH}/NEWDB.withOld_h" ${VERBOSITY}
+        "$BIOSNAKE" rmdb "${TMP_PATH}/NEWDB.withOld_h" ${VERBOSITY}
     else
         # shellcheck disable=SC2086
-        "$MMSEQS" rmdb "${TMP_PATH}/OLCLUST.withoutDeletedKeys" ${VERBOSITY}
+        "$BIOSNAKE" rmdb "${TMP_PATH}/OLCLUST.withoutDeletedKeys" ${VERBOSITY}
         # shellcheck disable=SC2086
-        "$MMSEQS" rmdb "${TMP_PATH}/OLCLUST.withoutDeleted" ${VERBOSITY}
+        "$BIOSNAKE" rmdb "${TMP_PATH}/OLCLUST.withoutDeleted" ${VERBOSITY}
     fi
 
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/newSeqsHits.swapped" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/newSeqsHits.swapped" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/newClusters" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/newClusters" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/newSeqsHits" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/newSeqsHits" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/toBeClusteredSeparately" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/toBeClusteredSeparately" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/NEWDB.newSeqs" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/NEWDB.newSeqs" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/newSeqsHits.swapped.all" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/newSeqsHits.swapped.all" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/OLDDB.repSeq" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/OLDDB.repSeq" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "${TMP_PATH}/updatedClust" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "${TMP_PATH}/updatedClust" ${VERBOSITY}
 
     rm -rf "${TMP_PATH}/search" "${TMP_PATH}/cluster"
     rm -f "${TMP_PATH}/update_clustering.sh"

@@ -7,8 +7,8 @@ unafold/.DS_Store
 **/.DS_Store
 .idea/
 **/*.so
-mmseqs_storage/
-mmseqs_native.cpython-*/
+biosnake_storage/
+biosnake_native.cpython-*/
 **/pydoc-markdown.yml
 *.dylib
 *.log

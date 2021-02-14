@@ -1,4 +1,4 @@
-include(MMseqsResourceCompiler)
+include(BiosnakeResourceCompiler)
 
 
 add_subdirectory(resources)

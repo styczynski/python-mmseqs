@@ -1,0 +1,28 @@
+set(alignment_header_files
+        biosnake/alignment/alignment.h
+        biosnake/alignment/compressedA3M.h
+        biosnake/alignment/evalueComputation.h
+        biosnake/alignment/matcher.h
+        biosnake/alignment/msaFilter.h
+        biosnake/alignment/multipleAlignment.h
+        biosnake/alignment/pSSMCalculator.h
+        biosnake/alignment/pSSMMasker.h
+        biosnake/alignment/stripedSmithWaterman.h
+        biosnake/alignment/bandedNucleotideAligner.h
+        biosnake/alignment/distanceCalculator.h
+        PARENT_SCOPE
+        )
+
+set(alignment_source_files
+        biosnake/alignment/alignment.cpp
+        biosnake/alignment/compressedA3M.cpp
+        biosnake/alignment/main.cpp
+        biosnake/alignment/matcher.cpp
+        biosnake/alignment/msaFilter.cpp
+        biosnake/alignment/multipleAlignment.cpp
+        biosnake/alignment/pSSMCalculator.cpp
+        biosnake/alignment/stripedSmithWaterman.cpp
+        biosnake/alignment/bandedNucleotideAligner.cpp
+        biosnake/alignment/rescorediagonal.cpp
+        PARENT_SCOPE
+        )

@@ -10,7 +10,7 @@ notExists() {
 }
 
 #pre processing
-[ -z "$MMSEQS" ] && echo "Please set the environment variable \$MMSEQS to your MMSEQS binary." && exit 1;
+[ -z "$BIOSNAKE" ] && echo "Please set the environment variable \$BIOSNAKE to your BIOSNAKE binary." && exit 1;
 # check number of input variables
 [ "$#" -ne 4 ] && echo "Please provide <queryDB> <targetDB> <outDB> <tmp>" && exit 1;
 # check if files exist
@@ -27,7 +27,7 @@ TMP_PATH="$4"
 if [ -n "$NEEDTARGETSPLIT" ]; then
     if notExists "$TMP_PATH/target_seqs_split.dbtype"; then
         # shellcheck disable=SC2086
-        "$MMSEQS" splitsequence "$TARGET" "$TMP_PATH/target_seqs_split" ${SPLITSEQUENCE_PAR}  \
+        "$BIOSNAKE" splitsequence "$TARGET" "$TMP_PATH/target_seqs_split" ${SPLITSEQUENCE_PAR}  \
             || fail "Split sequence died"
     fi
     TARGET="$TMP_PATH/target_seqs_split"
@@ -36,7 +36,7 @@ fi
 if [ -n "$EXTRACTFRAMES" ]; then
     if notExists "$TMP_PATH/query_seqs.dbtype"; then
         # shellcheck disable=SC2086
-        "$MMSEQS" extractframes "$QUERY" "$TMP_PATH/query_seqs" ${EXTRACT_FRAMES_PAR}  \
+        "$BIOSNAKE" extractframes "$QUERY" "$TMP_PATH/query_seqs" ${EXTRACT_FRAMES_PAR}  \
             || fail "Extractframes died"
     fi
     QUERY="$TMP_PATH/query_seqs"
@@ -45,7 +45,7 @@ fi
 if [ -n "$NEEDQUERYSPLIT" ]; then
     if notExists "$TMP_PATH/query_seqs_split.dbtype"; then
         # shellcheck disable=SC2086
-        "$MMSEQS" splitsequence "$QUERY" "$TMP_PATH/query_seqs_split" ${SPLITSEQUENCE_PAR}  \
+        "$BIOSNAKE" splitsequence "$QUERY" "$TMP_PATH/query_seqs_split" ${SPLITSEQUENCE_PAR}  \
         || fail "Split sequence died"
     fi
     QUERY="$TMP_PATH/query_seqs_split"
@@ -61,19 +61,19 @@ fi
 
 if notExists "$3.dbtype"; then
     # shellcheck disable=SC2086
-    "$MMSEQS" offsetalignment "$1" "${QUERY}" "$2" "${TARGET}" "$4/aln"  "$3" ${OFFSETALIGNMENT_PAR} \
+    "$BIOSNAKE" offsetalignment "$1" "${QUERY}" "$2" "${TARGET}" "$4/aln"  "$3" ${OFFSETALIGNMENT_PAR} \
         || fail "Offset step died"
 fi
 
 
 if [ -n "$REMOVE_TMP" ]; then
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "$4/q_orfs" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "$4/q_orfs" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "$4/q_orfs_aa" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "$4/q_orfs_aa" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "$4/t_orfs" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "$4/t_orfs" ${VERBOSITY}
     # shellcheck disable=SC2086
-    "$MMSEQS" rmdb "$4/t_orfs_aa" ${VERBOSITY}
+    "$BIOSNAKE" rmdb "$4/t_orfs_aa" ${VERBOSITY}
 fi
 

@@ -1,7 +1,7 @@
 #!/bin/bash -e
 REPO="$(readlink -f $1)"
 BUILD="$(readlink -f $2)"
-BINARY_NAME="${3:-mmseqs}"
+BINARY_NAME="${3:-biosnake}"
 
 if [ ! -d "$REPO" ]; then
     echo "${BINARY_NAME} repository missing"
