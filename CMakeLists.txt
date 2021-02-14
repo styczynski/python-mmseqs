@@ -277,7 +277,7 @@ add_subdirectory(src/biosnake_native/src/biosnake/workflow)
 #     add_subdirectory(src/biosnake_native/src/util)
 # endif ()
 
-set(MMSEQ_FRAMEWORK_SOURCES
+set(BIOSNAKE_FRAMEWORK_SOURCES
     ${alignment_header_files}
     ${alignment_source_files}
     ${clustering_header_files}
@@ -297,20 +297,20 @@ set(MMSEQ_FRAMEWORK_SOURCES
     ${util_source_files}
     ${workflow_source_files}
 )
-set(MMSEQ_TARGET_SOURCES
+set(BIOSNAKE_TARGET_SOURCES
     $<TARGET_OBJECTS:alp>
     $<TARGET_OBJECTS:ksw2>
     $<TARGET_OBJECTS:cacode>
 )
-list(TRANSFORM MMSEQ_FRAMEWORK_SOURCES PREPEND src/biosnake_native/src/)
+list(TRANSFORM BIOSNAKE_FRAMEWORK_SOURCES PREPEND src/biosnake_native/src/)
 set(BINDINGS_COMMON_SRCS
-    ${MMSEQ_FRAMEWORK_SOURCES}
-    ${MMSEQ_TARGET_SOURCES}
+    ${BIOSNAKE_FRAMEWORK_SOURCES}
+    ${BIOSNAKE_TARGET_SOURCES}
 )
 
 # Generate python module
 
-set(MMSEQ_TARGET_INCLUDES
+set(BIOSNAKE_TARGET_INCLUDES
     ${Python3_NumPy_INCLUDE_DIRS}
     ${CMAKE_BINARY_DIR}/generated
     ${PROJECT_BINARY_DIR}/generated
@@ -322,11 +322,11 @@ set(MMSEQ_TARGET_INCLUDES
     .
 )
 
-set(MMSEQ_TARGET_DEPENDENCIES
+set(BIOSNAKE_TARGET_DEPENDENCIES
     "generated"
 )
 
-set(MMSEQ_TARGET_LINKS
+set(BIOSNAKE_TARGET_LINKS
     "spdlog"
     "cppfs"
     "Python3::NumPy"
@@ -338,9 +338,9 @@ string(REPLACE " " ";" BIOSNAKE_CXX_FLAGS_LIST "${BIOSNAKE_CXX_FLAGS}")
 add_subdirectory(lib/pybind11)
 pybind11_add_module(biosnake_native ${SOURCES} "${SOURCE_DIR}/bindings.cpp" ${BINDINGS_COMMON_SRCS})
 #set_target_properties(biosnake_native PROPERTIES LINK_FLAGS "-Wl,-undefined,error")
-target_include_directories(biosnake_native PUBLIC ${MMSEQ_TARGET_INCLUDES})
-add_dependencies(biosnake_native ${MMSEQ_TARGET_DEPENDENCIES})
-target_link_libraries(biosnake_native PRIVATE ${MMSEQ_TARGET_LINKS})
+target_include_directories(biosnake_native PUBLIC ${BIOSNAKE_TARGET_INCLUDES})
+add_dependencies(biosnake_native ${BIOSNAKE_TARGET_DEPENDENCIES})
+target_link_libraries(biosnake_native PRIVATE ${BIOSNAKE_TARGET_LINKS})
 
 # Pedantic
 if (MSVC)
@@ -506,8 +506,8 @@ endif ()
 ###
 
 # add_executable(state_loader src/state/state_loader.cpp)
-# target_include_directories(state_loader PUBLIC ${MMSEQ_TARGET_INCLUDES})
-# add_dependencies(state_loader ${MMSEQ_TARGET_DEPENDENCIES})
-# target_link_libraries(state_loader PRIVATE ${MMSEQ_TARGET_LINKS})
+# target_include_directories(state_loader PUBLIC ${BIOSNAKE_TARGET_INCLUDES})
+# add_dependencies(state_loader ${BIOSNAKE_TARGET_DEPENDENCIES})
+# target_link_libraries(state_loader PRIVATE ${BIOSNAKE_TARGET_LINKS})
 
 

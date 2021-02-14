@@ -76,14 +76,14 @@ class CMakeBuild(build_ext):
             cmake_args += ["-DCMAKE_BUILD_TYPE=" + cfg]
             build_args += ["--", "-j2"]
 
-        if "MMSEQ_CMAKE_GENERATOR" in os.environ:
-            if len(os.environ["MMSEQ_CMAKE_GENERATOR"]) > 0:
-                cmake_args += ["-G", os.environ["MMSEQ_CMAKE_GENERATOR"]]
+        if "BIOSNAKE_CMAKE_GENERATOR" in os.environ:
+            if len(os.environ["BIOSNAKE_CMAKE_GENERATOR"]) > 0:
+                cmake_args += ["-G", os.environ["BIOSNAKE_CMAKE_GENERATOR"]]
                 arch = None
 
-        if "MMSEQ_CMAKE_ARCH" in os.environ:
-            if len(os.environ["MMSEQ_CMAKE_ARCH"]) > 0:
-                arch = os.environ["MMSEQ_CMAKE_ARCH"]
+        if "BIOSNAKE_CMAKE_ARCH" in os.environ:
+            if len(os.environ["BIOSNAKE_CMAKE_ARCH"]) > 0:
+                arch = os.environ["BIOSNAKE_CMAKE_ARCH"]
                 if arch == "x86":
                     force_x86 = True
 
