@@ -1,0 +1,256 @@
+biosnake.biosnake\_native.BiosnakeCallConfig
+======================================
+
+.. currentmodule:: biosnake.biosnake_native
+
+.. autoclass:: BiosnakeCallConfig
+
+   
+   .. automethod:: __init__
+
+   
+   .. rubric:: Methods
+
+   .. autosummary::
+   
+      ~BiosnakeCallConfig.__init__
+   
+   
+
+   
+   
+   .. rubric:: Attributes
+
+   .. autosummary::
+   
+      ~BiosnakeCallConfig.Ndiff
+      ~BiosnakeCallConfig.addBacktrace
+      ~BiosnakeCallConfig.addOrfStop
+      ~BiosnakeCallConfig.adjustKmerLength
+      ~BiosnakeCallConfig.aggregationMode
+      ~BiosnakeCallConfig.alignmentMode
+      ~BiosnakeCallConfig.allowDeletion
+      ~BiosnakeCallConfig.alnLenThr
+      ~BiosnakeCallConfig.alpha
+      ~BiosnakeCallConfig.alphabetSize
+      ~BiosnakeCallConfig.altAlignment
+      ~BiosnakeCallConfig.baseTmpPath
+      ~BiosnakeCallConfig.beatsFirst
+      ~BiosnakeCallConfig.blacklist
+      ~BiosnakeCallConfig.chainAlignment
+      ~BiosnakeCallConfig.checkCompatible
+      ~BiosnakeCallConfig.citations
+      ~BiosnakeCallConfig.clusterReassignment
+      ~BiosnakeCallConfig.clusterSteps
+      ~BiosnakeCallConfig.clusteringMode
+      ~BiosnakeCallConfig.columnToTake
+      ~BiosnakeCallConfig.compBiasCorrection
+      ~BiosnakeCallConfig.compOperator
+      ~BiosnakeCallConfig.compValue
+      ~BiosnakeCallConfig.compressed
+      ~BiosnakeCallConfig.contigEndMode
+      ~BiosnakeCallConfig.contigStartMode
+      ~BiosnakeCallConfig.covMSAThr
+      ~BiosnakeCallConfig.covMode
+      ~BiosnakeCallConfig.covThr
+      ~BiosnakeCallConfig.createLookup
+      ~BiosnakeCallConfig.createdbMode
+      ~BiosnakeCallConfig.db1
+      ~BiosnakeCallConfig.db1Index
+      ~BiosnakeCallConfig.db1dbtype
+      ~BiosnakeCallConfig.db2
+      ~BiosnakeCallConfig.db2Index
+      ~BiosnakeCallConfig.db2dbtype
+      ~BiosnakeCallConfig.db3
+      ~BiosnakeCallConfig.db3Index
+      ~BiosnakeCallConfig.db3dbtype
+      ~BiosnakeCallConfig.db4
+      ~BiosnakeCallConfig.db4Index
+      ~BiosnakeCallConfig.db4dbtype
+      ~BiosnakeCallConfig.db5
+      ~BiosnakeCallConfig.db5Index
+      ~BiosnakeCallConfig.db5dbtype
+      ~BiosnakeCallConfig.db6
+      ~BiosnakeCallConfig.db6Index
+      ~BiosnakeCallConfig.db6dbtype
+      ~BiosnakeCallConfig.dbOut
+      ~BiosnakeCallConfig.dbType
+      ~BiosnakeCallConfig.diagonalScoring
+      ~BiosnakeCallConfig.diskSpaceLimit
+      ~BiosnakeCallConfig.evalProfile
+      ~BiosnakeCallConfig.evalThr
+      ~BiosnakeCallConfig.exactKmerMatching
+      ~BiosnakeCallConfig.expansionMode
+      ~BiosnakeCallConfig.extractLines
+      ~BiosnakeCallConfig.extractMode
+      ~BiosnakeCallConfig.filenames
+      ~BiosnakeCallConfig.filterColumn
+      ~BiosnakeCallConfig.filterColumnRegex
+      ~BiosnakeCallConfig.filterExpression
+      ~BiosnakeCallConfig.filterHits
+      ~BiosnakeCallConfig.filterMaxSeqId
+      ~BiosnakeCallConfig.filterMsa
+      ~BiosnakeCallConfig.filteringFile
+      ~BiosnakeCallConfig.firstSeqRepr
+      ~BiosnakeCallConfig.formatAlignmentMode
+      ~BiosnakeCallConfig.forwardFrames
+      ~BiosnakeCallConfig.fullHeader
+      ~BiosnakeCallConfig.gapExtend
+      ~BiosnakeCallConfig.gapOpen
+      ~BiosnakeCallConfig.gffType
+      ~BiosnakeCallConfig.globalAlignment
+      ~BiosnakeCallConfig.greedyBestHits
+      ~BiosnakeCallConfig.hashShift
+      ~BiosnakeCallConfig.hdr1
+      ~BiosnakeCallConfig.hdr1Index
+      ~BiosnakeCallConfig.hdr1dbtype
+      ~BiosnakeCallConfig.hdr2
+      ~BiosnakeCallConfig.hdr2Index
+      ~BiosnakeCallConfig.hdr2dbtype
+      ~BiosnakeCallConfig.hdr3
+      ~BiosnakeCallConfig.hdr3Index
+      ~BiosnakeCallConfig.hdr3dbtype
+      ~BiosnakeCallConfig.hdr4
+      ~BiosnakeCallConfig.hdr4Index
+      ~BiosnakeCallConfig.hdr4dbtype
+      ~BiosnakeCallConfig.hdr5
+      ~BiosnakeCallConfig.hdr5Index
+      ~BiosnakeCallConfig.hdr5dbtype
+      ~BiosnakeCallConfig.hdr6
+      ~BiosnakeCallConfig.hdr6Index
+      ~BiosnakeCallConfig.hdr6dbtype
+      ~BiosnakeCallConfig.headerSplitMode
+      ~BiosnakeCallConfig.headerType
+      ~BiosnakeCallConfig.help
+      ~BiosnakeCallConfig.hhFormat
+      ~BiosnakeCallConfig.idList
+      ~BiosnakeCallConfig.identifierField
+      ~BiosnakeCallConfig.identifierOffset
+      ~BiosnakeCallConfig.idxEntryType
+      ~BiosnakeCallConfig.idxSeqSrc
+      ~BiosnakeCallConfig.ignoreMultiKmer
+      ~BiosnakeCallConfig.includeIdentity
+      ~BiosnakeCallConfig.includeOnlyExtendable
+      ~BiosnakeCallConfig.joinDB
+      ~BiosnakeCallConfig.kbColumns
+      ~BiosnakeCallConfig.kmerScore
+      ~BiosnakeCallConfig.kmerSize
+      ~BiosnakeCallConfig.kmersPerSequence
+      ~BiosnakeCallConfig.kmersPerSequenceScale
+      ~BiosnakeCallConfig.lcaRanks
+      ~BiosnakeCallConfig.lcaSearch
+      ~BiosnakeCallConfig.localTmp
+      ~BiosnakeCallConfig.logFilePath
+      ~BiosnakeCallConfig.majorityThr
+      ~BiosnakeCallConfig.mappingFile
+      ~BiosnakeCallConfig.maskLowerCaseMode
+      ~BiosnakeCallConfig.maskMode
+      ~BiosnakeCallConfig.maskProfile
+      ~BiosnakeCallConfig.matchMode
+      ~BiosnakeCallConfig.matchRatio
+      ~BiosnakeCallConfig.maxAccept
+      ~BiosnakeCallConfig.maxIteration
+      ~BiosnakeCallConfig.maxRejected
+      ~BiosnakeCallConfig.maxResListLen
+      ~BiosnakeCallConfig.maxSeqLen
+      ~BiosnakeCallConfig.maxSequences
+      ~BiosnakeCallConfig.mergePrefixes
+      ~BiosnakeCallConfig.mergeQuery
+      ~BiosnakeCallConfig.mergeStopEmpty
+      ~BiosnakeCallConfig.minDiagScoreThr
+      ~BiosnakeCallConfig.minSequences
+      ~BiosnakeCallConfig.msaFormatMode
+      ~BiosnakeCallConfig.msaType
+      ~BiosnakeCallConfig.ncbiTaxDump
+      ~BiosnakeCallConfig.neff
+      ~BiosnakeCallConfig.numIterations
+      ~BiosnakeCallConfig.orfFilter
+      ~BiosnakeCallConfig.orfFilterEval
+      ~BiosnakeCallConfig.orfFilterSens
+      ~BiosnakeCallConfig.orfMaxGaps
+      ~BiosnakeCallConfig.orfMaxLength
+      ~BiosnakeCallConfig.orfMinLength
+      ~BiosnakeCallConfig.orfStartMode
+      ~BiosnakeCallConfig.outfmt
+      ~BiosnakeCallConfig.outputDbType
+      ~BiosnakeCallConfig.overlap
+      ~BiosnakeCallConfig.pca
+      ~BiosnakeCallConfig.pcb
+      ~BiosnakeCallConfig.pickIdFrom
+      ~BiosnakeCallConfig.pickNbest
+      ~BiosnakeCallConfig.positiveFilter
+      ~BiosnakeCallConfig.prefix
+      ~BiosnakeCallConfig.preloadMode
+      ~BiosnakeCallConfig.preserveKeysB
+      ~BiosnakeCallConfig.qid
+      ~BiosnakeCallConfig.qsc
+      ~BiosnakeCallConfig.realign
+      ~BiosnakeCallConfig.realignMaxSeqs
+      ~BiosnakeCallConfig.realignScoreBias
+      ~BiosnakeCallConfig.recoverDeleted
+      ~BiosnakeCallConfig.removeTmpFiles
+      ~BiosnakeCallConfig.reportMode
+      ~BiosnakeCallConfig.rescoreMode
+      ~BiosnakeCallConfig.resultDirection
+      ~BiosnakeCallConfig.reuseLatest
+      ~BiosnakeCallConfig.reverseFrames
+      ~BiosnakeCallConfig.runner
+      ~BiosnakeCallConfig.scoreBias
+      ~BiosnakeCallConfig.scoringMatrixFile
+      ~BiosnakeCallConfig.searchType
+      ~BiosnakeCallConfig.seedScoringMatrixFile
+      ~BiosnakeCallConfig.sensSteps
+      ~BiosnakeCallConfig.sensitivity
+      ~BiosnakeCallConfig.seqIdMode
+      ~BiosnakeCallConfig.seqIdThr
+      ~BiosnakeCallConfig.sequenceOverlap
+      ~BiosnakeCallConfig.sequenceSplitMode
+      ~BiosnakeCallConfig.shortOutput
+      ~BiosnakeCallConfig.showTaxLineage
+      ~BiosnakeCallConfig.shuffleDatabase
+      ~BiosnakeCallConfig.similarityScoreType
+      ~BiosnakeCallConfig.simpleBestHit
+      ~BiosnakeCallConfig.singleStepClustering
+      ~BiosnakeCallConfig.skipQuery
+      ~BiosnakeCallConfig.sliceSearch
+      ~BiosnakeCallConfig.sortEntries
+      ~BiosnakeCallConfig.sortResults
+      ~BiosnakeCallConfig.spacedKmer
+      ~BiosnakeCallConfig.spacedKmerPattern
+      ~BiosnakeCallConfig.split
+      ~BiosnakeCallConfig.splitAA
+      ~BiosnakeCallConfig.splitMemoryLimit
+      ~BiosnakeCallConfig.splitMode
+      ~BiosnakeCallConfig.startSens
+      ~BiosnakeCallConfig.stat
+      ~BiosnakeCallConfig.strand
+      ~BiosnakeCallConfig.subDbMode
+      ~BiosnakeCallConfig.summaryPrefix
+      ~BiosnakeCallConfig.takeLargerEntry
+      ~BiosnakeCallConfig.tarExclude
+      ~BiosnakeCallConfig.tarInclude
+      ~BiosnakeCallConfig.targetTsvColumn
+      ~BiosnakeCallConfig.tau
+      ~BiosnakeCallConfig.taxDbMode
+      ~BiosnakeCallConfig.taxMappingFile
+      ~BiosnakeCallConfig.taxMappingMode
+      ~BiosnakeCallConfig.taxonList
+      ~BiosnakeCallConfig.taxonomyOutputMode
+      ~BiosnakeCallConfig.taxonomySearchMode
+      ~BiosnakeCallConfig.threads
+      ~BiosnakeCallConfig.translate
+      ~BiosnakeCallConfig.translationTable
+      ~BiosnakeCallConfig.trimToOneColumn
+      ~BiosnakeCallConfig.tsvOut
+      ~BiosnakeCallConfig.useAllTableStarts
+      ~BiosnakeCallConfig.useHeader
+      ~BiosnakeCallConfig.useHeaderFile
+      ~BiosnakeCallConfig.useSequenceId
+      ~BiosnakeCallConfig.verbosity
+      ~BiosnakeCallConfig.voteMode
+      ~BiosnakeCallConfig.wg
+      ~BiosnakeCallConfig.wrappedScoring
+      ~BiosnakeCallConfig.writeLookup
+      ~BiosnakeCallConfig.zdrop
+   
+   
