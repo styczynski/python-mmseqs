@@ -11,3 +11,14 @@ plugins:
     enabled: true
   gnu-complexity:
     enabled: true
+  git-legal:
+    enabled: true
+exclude_patterns:
+- "docs/"
+- "docs/*"
+- "docs/**"
+- "lib/"
+- "lib/*"
+- "lib/**"
+- ".doc/"
+- ".github/"
