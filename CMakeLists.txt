@@ -45,21 +45,6 @@ set(HAVE_POWER8 0 CACHE BOOL "Have POWER8 CPU")
 set(HAVE_ARM8 0 CACHE BOOL "Have ARMv8 CPU")
 set(NATIVE_ARCH 1 CACHE BOOL "Assume native architecture for SIMD. Use one of the HAVE_* options or set CMAKE_CXX_FLAGS to the appropriate flags if you disable this.")
 
-if(BUILD_PYTHON_VERSION)
-    message("-- Detected BUILD_PYTHON_VERSION parameter. Looking for python ${BUILD_PYTHON_VERSION}")
-    set(Python3_ROOT_DIR ${BUILD_PYTHON_VERSION})
-    find_package(Python3 ${BUILD_PYTHON_VERSION} REQUIRED COMPONENTS NumPy)
-else ()
-    set(Python3_FIND_STRATEGY LOCATION)
-    message("-- Looking for Python3")
-    find_package(Python3 REQUIRED COMPONENTS NumPy)
-    if (Python3_NumPy_FOUND)
-        message("-- Detected NumPy installation")
-    else ()
-        message("-- No NumPy")
-    endif ()
-endif ()
-
 if (HAVE_SANITIZER)
     include(FindUBSan)
     include(FindASan)
@@ -311,7 +296,6 @@ set(BINDINGS_COMMON_SRCS
 # Generate python module
 
 set(BIOSNAKE_TARGET_INCLUDES
-    ${Python3_NumPy_INCLUDE_DIRS}
     ${CMAKE_BINARY_DIR}/generated
     ${PROJECT_BINARY_DIR}/generated
     "src/biosnake_native/src)"
@@ -329,7 +313,6 @@ set(BIOSNAKE_TARGET_DEPENDENCIES
 set(BIOSNAKE_TARGET_LINKS
     "spdlog"
     "cppfs"
-    "Python3::NumPy"
 )
 
  # this will probably break if you omit the "s

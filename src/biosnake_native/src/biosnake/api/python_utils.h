@@ -1,7 +1,6 @@
 #ifndef API_PYTHON_UTILS_H
 #define API_PYTHON_UTILS_H
 
-#include <numpy/arrayobject.h>
 #include <Python.h>
 #include <pybind11/pybind11.h>
 #include <pybind11/stl.h>
