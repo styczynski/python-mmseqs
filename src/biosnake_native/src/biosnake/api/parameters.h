@@ -25,6 +25,8 @@ static std::map<std::string, std::string> PARAM_SEARCH_COL_NAMES_MAPPING = {
   {"target_sequence_id", "target"},
   {"query_sequence_content", "qseq"},
   {"target_sequence_content", "tseq"},
+  {"query_sequence_aligned", "qaln"},
+  {"target_sequence_aligned", "taln"},
   {"sequence_identity", "fident"},
   {"alignment_length", "alnlen"},
   {"number_of_mismatches", "mismatch"},
