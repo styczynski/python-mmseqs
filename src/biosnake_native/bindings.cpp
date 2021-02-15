@@ -148,6 +148,10 @@ PYBIND11_MODULE(biosnake_native, m) {
                      &biosnake_blast_tab_record::target_sequence_content)
       .def_readwrite("query_sequence_content",
                      &biosnake_blast_tab_record::query_sequence_content)
+      .def_readwrite("target_sequence_length",
+                     &biosnake_blast_tab_record::target_sequence_length)
+      .def_readwrite("query_sequence_length",
+                     &biosnake_blast_tab_record::query_sequence_length)
       .def_readwrite("e_value", &biosnake_blast_tab_record::e_value)
       .def_readwrite("bit_score", &biosnake_blast_tab_record::bit_score)
       .def("__repr__", &biosnake_blast_tab_record::toString);
