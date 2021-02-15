@@ -266,6 +266,11 @@ void Database::_init_readers() {
     }
 }
 
+const int Database::getSize() {
+    _init_readers();
+    return db_reader->getSize();
+}
+
 const std::tuple<py::array, py::array, py::array> Database::getColumnData() {
      _init_readers();
 

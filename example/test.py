@@ -7,4 +7,4 @@ import biosnake
 # Create a client
 client = biosnake.Biosnake()
 a = client.databases.create("testa", "Test database A", "a.fasta")
-print(a.name)
+print(a.size)

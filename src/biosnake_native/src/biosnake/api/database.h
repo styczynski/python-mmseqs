@@ -61,6 +61,8 @@ public:
 
     void setDescription(const std::string& new_description);
 
+    const int getSize();
+
     const std::string& getDescription() const;
 
     const std::string& getType() const;

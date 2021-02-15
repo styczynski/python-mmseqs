@@ -76,6 +76,7 @@ PYBIND11_MODULE(biosnake_native, m) {
       .def_property("description", &Database::getDescription, &Database::setDescription)
       .def_property_readonly("type", &Database::getType)
       .def_property_readonly("columns_data", &Database::getColumnData)
+      .def_property_readonly("size", &Database::getSize)
       .def("__iter__", [](Database &db) { return py::make_iterator(db.begin(), db.end()); }, py::keep_alive<0, 1>());
 
   pybind11::class_<Database::Record>(m, "Record")
