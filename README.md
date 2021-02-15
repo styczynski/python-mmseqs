@@ -2,9 +2,12 @@
 
 ![PyPi version](https://img.shields.io/pypi/v/biosnake?style=flat-square)
 ![Build status](https://img.shields.io/github/workflow/status/covid-genomics/biosnake/Build?style=flat-square)
+[![Maintainability](https://api.codeclimate.com/v1/badges/bb922f4c1b788ed1a6a4/maintainability)](https://codeclimate.com/github/covid-genomics/biosnake/maintainability)
 ![Supported Python versions](https://img.shields.io/pypi/pyversions/biosnake?style=flat-square)
 ![Python implementation](https://img.shields.io/pypi/implementation/biosnake?style=flat-square)
 ![Commit activity](https://img.shields.io/github/commit-activity/w/covid-genomics/biosnake?style=flat-square)
+
+Please see [online documentation](http://biosnake.covidgenomics.com/)
 
 ## Project description
 
