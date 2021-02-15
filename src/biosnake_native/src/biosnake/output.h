@@ -59,6 +59,8 @@ struct biosnake_blast_tab_record {
   std::string target_sequence_id;
   std::string query_sequence_content;
   std::string target_sequence_content;
+  std::string query_sequence_aligned;
+  std::string target_sequence_aligned;
   float sequence_identity;
   int alignment_length;
   int number_of_mismatches;

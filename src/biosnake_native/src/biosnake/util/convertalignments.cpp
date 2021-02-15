@@ -637,39 +637,44 @@ int convertalignments(biosnake_output *out, Parameters &par) {
                   case Parameters::OUTFMT_THEADER:
                     // results_row.push_back(std::string(tHeader, tHeaderLen));
                     break;
-                  case Parameters::OUTFMT_QALN:
+                  case Parameters::OUTFMT_QALN: {
+                    std::string val;
                     if (queryProfile) {
                       printSeqBasedOnAln(
-                          out, result, queryProfData.c_str(), res.qStartPos,
+                          out, val, queryProfData.c_str(), res.qStartPos,
                           Matcher::uncompressAlignment(res.backtrace), false,
                           (res.qStartPos > res.qEndPos),
                           (isTranslatedSearch == true && queryNucs == true),
                           translateNucl);
                     } else {
                       printSeqBasedOnAln(
-                          out, result, querySeqData, res.qStartPos,
+                          out, val, querySeqData, res.qStartPos,
                           Matcher::uncompressAlignment(res.backtrace), false,
                           (res.qStartPos > res.qEndPos),
                           (isTranslatedSearch == true && queryNucs == true),
                           translateNucl);
                     }
+                    record.query_sequence_aligned = val;
                     break;
+                  }
                   case Parameters::OUTFMT_TALN: {
+                    std::string val;
                     if (targetProfile) {
                       printSeqBasedOnAln(
-                          out, result, targetProfData.c_str(), res.dbStartPos,
+                          out, val, targetProfData.c_str(), res.dbStartPos,
                           Matcher::uncompressAlignment(res.backtrace), true,
                           (res.dbStartPos > res.dbEndPos),
                           (isTranslatedSearch == true && targetNucs == true),
                           translateNucl);
                     } else {
                       printSeqBasedOnAln(
-                          out, result, targetSeqData, res.dbStartPos,
+                          out, val, targetSeqData, res.dbStartPos,
                           Matcher::uncompressAlignment(res.backtrace), true,
                           (res.dbStartPos > res.dbEndPos),
                           (isTranslatedSearch == true && targetNucs == true),
                           translateNucl);
                     }
+                    record.target_sequence_aligned = val;
                     break;
                   }
                   case Parameters::OUTFMT_MISMATCH:

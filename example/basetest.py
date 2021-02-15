@@ -10,7 +10,7 @@ client = biosnake.Biosnake()
 # Create a database from fasta file
 # Here we specify name of the database, description and input file
 # (The input can also be a Seq/SeqRecord list/iterator/etc.)
-client.databases.create("test", "Test database", "example/a.fasta")
+client.databases.create("test", "Test database", "a.fasta")
 
 # Get description of the database
 print(client.databases[0].description)
@@ -25,6 +25,10 @@ results = client.databases[0].search(
         "ACTAGCTCAGT",
     ],
     search_type="nucleotides",
+    headers=["query_sequence_id",
+      "target_sequence_id",
+      "sequence_identity",
+      "target_sequence_aligned"],
 )
 
 # Load queries from file:
@@ -62,4 +66,5 @@ results = client.databases[0].search(
 # print(results.records)
 
 # You can also get a pandas dataframe
-print(results.dataframe)
+#print(results.dataframe)
+results.to_fasta('search_results.fasta', "target_sequence_aligned", "query_sequence_id")

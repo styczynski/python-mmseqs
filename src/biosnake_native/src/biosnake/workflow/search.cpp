@@ -70,8 +70,6 @@ void call_blastp(biosnake_output *out, Parameters &par, int no_steps,
         prefilter_par.kmerSize = 0;
         prefilter_par.kmerScore = 2147483647;
         prefilter_par.alphabetSize = MultiParam<int>(21, 5);
-        prefilter_par.maxSeqLen = 65535;
-        prefilter_par.maxResListLen = 300;
         prefilter_par.split = 0;
         prefilter_par.splitMode = 2;
         prefilter_par.splitMemoryLimit = 0;
@@ -128,7 +126,6 @@ void call_blastp(biosnake_output *out, Parameters &par, int no_steps,
         align_par.altAlignment = 0;
         align_par.covThr = 0;
         align_par.covMode = 0;
-        align_par.maxSeqLen = 65535;
         align_par.compBiasCorrection = 1;
         align_par.maxRejected = 2147483647;
         align_par.maxAccept = 2147483647;
@@ -143,6 +140,7 @@ void call_blastp(biosnake_output *out, Parameters &par, int no_steps,
         align_par.gapOpen = MultiParam<int>(11, 5);
         align_par.gapExtend = MultiParam<int>(1, 2);
         align_par.zdrop = 40;
+        align_par.addBacktrace = true;
 
         subcall_biosnake(out, align_module, align_par);
         out->info("step_search K_6");

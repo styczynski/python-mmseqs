@@ -17,6 +17,19 @@ def _search_results_get_dataframe(self):
         data[header] = header_data
     return pd.DataFrame(data)
 
+def _search_results_to_fasta(self, output_file_path, sequence_pattern, *header_patterns, remove_blanks=True):
+    df = self.dataframe
+    with open(output_file_path, 'w') as output_file:
+        for index, row in df.iterrows():
+            header = []
+            content = row[sequence_pattern]
+            if remove_blanks:
+                content = content.replace('-', '')
+            for header_pattern in header_patterns:
+                header.append(row[header_pattern])
+            output_file.write(f'>{"|".join(header)}\n')
+            output_file.write(f'{content}\n')
+
 def _database_get_dataframe(self):
     data = self.columns_data
     return pd.DataFrame(dict(

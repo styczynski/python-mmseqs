@@ -207,12 +207,12 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
       createlinindex_par.filenames = createlinindex_filenames;
       createlinindex_par.setDBFields(1, target);
       createlinindex_par.setDBFields(2, tmpDir + "/index_tmp");
-      createlinindex_par.orfStartMode = 1;
-      createlinindex_par.orfMinLength = 30;
-      createlinindex_par.orfMaxLength = 32734;
+      //createlinindex_par.orfStartMode = 1;
+      //createlinindex_par.orfMinLength = 30;
+      //createlinindex_par.orfMaxLength = 32734;
       createlinindex_par.kmerScore = 0;
       createlinindex_par.maskMode = 1;
-      createlinindex_par.sensitivity = 7.5;
+      //createlinindex_par.sensitivity = 7.5;
       // createlinindex_par.removeTmpFiles=true;
       subcall_biosnake(out, "createlinindex", createlinindex_par);
     }
@@ -235,11 +235,11 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
     search_par.setDBFields(4, originalTmpDir);
     search_par.spacedKmer = true;
     search_par.alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV;
-    search_par.sensitivity = 5.7;
+    //search_par.sensitivity = 5.7;
     search_par.evalThr = 0.001;
     search_par.orfStartMode = 1;
-    search_par.orfMinLength = 30;
-    search_par.orfMaxLength = 32734;
+    //search_par.orfMinLength = 30;
+    //search_par.orfMaxLength = 32734;
     search_par.evalProfile = 0.1;
     search_par.baseTmpPath = par.baseTmpPath;
     search_par.searchType = par.searchType;
@@ -247,7 +247,7 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
     search_par.exactKmerMatching = true;
     search_par.strand = 2;
     search_par.kmerSize = 15;
-    search_par.maxSeqLen = 10000;
+    //search_par.maxSeqLen = 10000;
 
     out->info("Call search (subcall): {}", search_module);
     subcall_biosnake(out, search_module, search_par);
@@ -298,7 +298,6 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
     convertalis_par.setDBFields(4, results);
     convertalis_par.setSubstitutionMatrices("blosum62.out", "nucleotide.out");
     convertalis_par.formatAlignmentMode = 0;
-    convertalis_par.outfmt = par.outfmt;
     convertalis_par.translationTable = 1;
     convertalis_par.gapOpen = MultiParam<int>(11, 5);
     convertalis_par.gapExtend = MultiParam<int>(1, 2);
