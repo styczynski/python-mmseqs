@@ -62,5 +62,8 @@ static const int DEFAULT_MAX_SEQUENCE_LENGTH = 30000;
 static const int DEFAULT_MAX_ORF_LENGTH = 32734;
 static const int DEFAULT_MIN_ORF_LENGTH = 30;
 static const int DEFAULT_ORF_START_MODE = 1;
+static const int DEFAULT_MAX_RESULTS_COUNT_PER_QUERY = 300;
+static const int DEFAULT_SEARCH_STEPS = 1;
+static const float DEFAULT_START_SENSITIVITY = 4.0;
 
 #endif

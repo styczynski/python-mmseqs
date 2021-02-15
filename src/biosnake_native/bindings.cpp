@@ -45,14 +45,24 @@ PYBIND11_MODULE(biosnake_native, m) {
             py::arg("search_type") = DEFAULT_SEARCH_TYPE,
             py::arg("headers") = std::vector<std::string>(),
             py::arg("sensitivity") = DEFAULT_SENSITIVITY,
-            py::arg("max_sequence_length") = DEFAULT_MAX_SEQUENCE_LENGTH
+            py::arg("max_sequence_length") = DEFAULT_MAX_SEQUENCE_LENGTH,
+            py::arg("max_results_count_per_query") = DEFAULT_MAX_RESULTS_COUNT_PER_QUERY,
+            py::arg("max_orf_length") = DEFAULT_MAX_ORF_LENGTH,
+            py::arg("min_orf_length") = DEFAULT_MIN_ORF_LENGTH,
+            py::arg("search_steps") = DEFAULT_SEARCH_STEPS,
+            py::arg("start_sensitivity") = DEFAULT_START_SENSITIVITY
             )
       .def("search_file", &Database::search_file,
             py::arg("search_input_fasta"),
             py::arg("search_type") = DEFAULT_SEARCH_TYPE,
             py::arg("headers") = std::vector<std::string>(),
             py::arg("sensitivity") = DEFAULT_SENSITIVITY,
-            py::arg("max_sequence_length") = DEFAULT_MAX_SEQUENCE_LENGTH
+            py::arg("max_sequence_length") = DEFAULT_MAX_SEQUENCE_LENGTH,
+            py::arg("max_results_count_per_query") = DEFAULT_MAX_RESULTS_COUNT_PER_QUERY,
+            py::arg("max_orf_length") = DEFAULT_MAX_ORF_LENGTH,
+            py::arg("min_orf_length") = DEFAULT_MIN_ORF_LENGTH,
+            py::arg("search_steps") = DEFAULT_SEARCH_STEPS,
+            py::arg("start_sensitivity") = DEFAULT_START_SENSITIVITY
             )
       .def("create_index", &Database::create_index,
             py::arg("search_type") = DEFAULT_SEARCH_TYPE,

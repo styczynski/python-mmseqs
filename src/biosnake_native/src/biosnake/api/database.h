@@ -25,7 +25,12 @@ public:
         std::string search_type = DEFAULT_SEARCH_TYPE,
         std::vector<std::string> headers = {},
         float sensitivity = DEFAULT_SENSITIVITY,
-        int max_sequence_length = DEFAULT_MAX_SEQUENCE_LENGTH
+        int max_sequence_length = DEFAULT_MAX_SEQUENCE_LENGTH,
+        int max_results_count_per_query = DEFAULT_MAX_RESULTS_COUNT_PER_QUERY,
+        int max_orf_length = DEFAULT_MAX_ORF_LENGTH,
+        int min_orf_length = DEFAULT_MIN_ORF_LENGTH,
+        int search_steps = DEFAULT_SEARCH_STEPS,
+        float start_sensitivity = DEFAULT_START_SENSITIVITY
     );
 
     SearchResults search_file(
@@ -33,7 +38,12 @@ public:
         std::string search_type = DEFAULT_SEARCH_TYPE,
         std::vector<std::string> headers = {},
         float sensitivity = DEFAULT_SENSITIVITY,
-        int max_sequence_length = DEFAULT_MAX_SEQUENCE_LENGTH
+        int max_sequence_length = DEFAULT_MAX_SEQUENCE_LENGTH,
+        int max_results_count_per_query = DEFAULT_MAX_RESULTS_COUNT_PER_QUERY,
+        int max_orf_length = DEFAULT_MAX_ORF_LENGTH,
+        int min_orf_length = DEFAULT_MIN_ORF_LENGTH,
+        int search_steps = DEFAULT_SEARCH_STEPS,
+        float start_sensitivity = DEFAULT_START_SENSITIVITY
     );
 
     biosnake_output create_index(

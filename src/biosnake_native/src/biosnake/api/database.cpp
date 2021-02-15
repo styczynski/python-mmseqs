@@ -79,10 +79,19 @@ SearchResults Database::search(
     std::string search_type,
     std::vector<std::string> headers,
     float sensitivity,
-    int max_sequence_length
+    int max_sequence_length,
+    int max_results_count_per_query,
+    int max_orf_length,
+    int min_orf_length,
+    int search_steps,
+    float start_sensitivity
 ) {
     auto path = write_temp_fasta(sequences, _parent->get_workdir_path());
-    auto search_results = search_file(path, search_type, headers, sensitivity, max_sequence_length);
+    auto search_results = search_file(path, search_type,
+        headers, sensitivity,
+        max_sequence_length, max_results_count_per_query,
+        max_orf_length, min_orf_length,
+        search_steps, start_sensitivity);
     biosnake_output* out;
     FileUtil::remove(out, path.c_str());
     return search_results;
@@ -93,7 +102,12 @@ SearchResults Database::search_file(
     std::string search_type,
     std::vector<std::string> headers,
     float sensitivity,
-    int max_sequence_length
+    int max_sequence_length,
+    int max_results_count_per_query,
+    int max_orf_length,
+    int min_orf_length,
+    int search_steps,
+    float start_sensitivity
 ) {
     _parent->prepare_to_execute_command();
     std::string tmp_dir = "tmp_" + get_uuid();
@@ -117,6 +131,11 @@ SearchResults Database::search_file(
     args.removeTmpFiles=false;
     args.writeLookup=false;
     args.maxSeqLen=max_sequence_length;
+    args.maxResListLen=max_results_count_per_query;
+    args.orfMinLength=min_orf_length;
+    args.orfMaxLength=max_orf_length;
+    args.startSens=start_sensitivity;
+    args.sensSteps=search_steps;
     args.outfmt="";
     for (auto& header_name: headers) {
         args.outfmt += PARAM_SEARCH_COL_NAMES_MAPPING[header_name] + ",";
