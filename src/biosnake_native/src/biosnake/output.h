@@ -69,6 +69,8 @@ struct biosnake_blast_tab_record {
   int domain_end_index_query;
   int domain_start_index_target;
   int domain_end_index_target;
+  int target_sequence_length;
+  int query_sequence_length;
   float e_value;
   int bit_score;
 

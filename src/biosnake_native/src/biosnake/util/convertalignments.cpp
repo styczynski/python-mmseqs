@@ -583,6 +583,7 @@ int convertalignments(biosnake_output *out, Parameters &par) {
                     break;
                   case Parameters::OUTFMT_QLEN:
                     // results_row.push_back(SSTR(res.qLen));
+                    record.query_sequence_length = res.qLen;
                     break;
                   case Parameters::OUTFMT_TSTART:
                     record.domain_start_index_target = res.dbStartPos + 1;
@@ -593,6 +594,7 @@ int convertalignments(biosnake_output *out, Parameters &par) {
                     // results_row.push_back(SSTR(res.dbEndPos + 1));
                     break;
                   case Parameters::OUTFMT_TLEN:
+                    record.target_sequence_length = res.dbLen;
                     // results_row.push_back(SSTR(res.dbLen));
                     break;
                   case Parameters::OUTFMT_ALNLEN:
