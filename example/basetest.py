@@ -67,4 +67,4 @@ results = client.databases[0].search(
 
 # You can also get a pandas dataframe
 #print(results.dataframe)
-results.to_fasta('search_results.fasta', "target_sequence_aligned", "query_sequence_id")
+results.to_fasta('search_results_{query_sequence_id}.fasta', "{query_sequence_id}", "{target_sequence_aligned}")
