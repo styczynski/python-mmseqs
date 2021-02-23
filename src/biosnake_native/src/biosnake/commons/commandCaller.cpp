@@ -46,6 +46,14 @@ void CommandCaller::addVar(std::string key, std::string value) {
   addVariable(key.c_str(), value.c_str());
 }
 
+void CommandCaller::addVariableStr(std::string key, std::string value) {
+  if (value.size() == 0) {
+    unsetenv(key.c_str());
+  } else {
+    setenv(key.c_str(), value.c_str(), true);
+  }
+}
+
 void CommandCaller::addVariable(const char* key, const char* value) {
   if (value == NULL) {
     unsetenv(key);

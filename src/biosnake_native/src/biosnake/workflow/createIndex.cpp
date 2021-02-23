@@ -66,7 +66,7 @@ int createindex(biosnake_output *out, Parameters &par,
   if (flag == "TRANSLATED") {
     tmp_db_path = tmpDir + "/orfs_aa";
     if (!FileUtil::fileExists(out, (tmp_db_path + ".dbtype").c_str())) {
-      Parameters extractorfs_par;
+      Parameters extractorfs_par(par);
       extractorfs_par.setDBFields(1, par.db1);
       extractorfs_par.setDBFields(2, tmp_db_path + ".dbtype");
       extractorfs_par.orfMinLength = 30;
@@ -82,20 +82,18 @@ int createindex(biosnake_output *out, Parameters &par,
       extractorfs_par.useAllTableStarts = true;
       extractorfs_par.identifierOffset = 0;
       extractorfs_par.createLookup = 0;
-      extractorfs_par.threads = 1;
       extractorfs_par.compressed = 0;
       subcall_biosnake(out, "extractorfs", extractorfs_par);
     }
   } else if (flag == "LIN_NUCL") {
     tmp_db_path = tmpDir + "/nucl_split_seq";
     if (!FileUtil::fileExists(out, (tmp_db_path + ".dbtype").c_str())) {
-      Parameters extractorfs_par;
+      Parameters extractorfs_par(par);
       extractorfs_par.maxSeqLen = 65535;
       extractorfs_par.sequenceOverlap = 0;
       extractorfs_par.sequenceSplitMode = 1;
       extractorfs_par.headerSplitMode = 0;
       extractorfs_par.createLookup = 0;
-      extractorfs_par.threads = 1;
       extractorfs_par.compressed = 0;
       subcall_biosnake(out, "extractorfs", extractorfs_par);
     }
@@ -118,8 +116,6 @@ int createindex(biosnake_output *out, Parameters &par,
   indexer_par.checkCompatible = 0;
   indexer_par.searchType = 3;
   indexer_par.split = 0;
-  indexer_par.splitMemoryLimit = 0;
-  indexer_par.threads = 1;
 
   if (flag != "TRANSLATED" && flag != "LIN_NUCL") {
     indexer_par.setDBFields(1, par.db1);

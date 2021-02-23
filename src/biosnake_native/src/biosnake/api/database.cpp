@@ -136,6 +136,7 @@ SearchResults Database::search_file(
     args.orfMaxLength=max_orf_length;
     args.startSens=start_sensitivity;
     args.sensSteps=search_steps;
+    args.splitMemoryLimit=5000000000;
     args.outfmt="";
     for (auto& header_name: headers) {
         args.outfmt += PARAM_SEARCH_COL_NAMES_MAPPING[header_name] + ",";

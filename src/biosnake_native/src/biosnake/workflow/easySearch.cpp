@@ -107,12 +107,14 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
   tmpDir = FileUtil::createTemporaryDirectory(out, par.baseTmpPath, tmpDir, hash);
   par.filenames.pop_back();
 
-  out->output_string("TMP_PATH", tmpDir);
+  CommandCaller cmd(out);
+  cmd.addVariableStr("BIOSNAKE", "mmseqs");
+  cmd.addVariableStr("TMP_PATH", tmpDir);
   results = par.filenames.back();
-  out->output_string("RESULTS", results);
+  cmd.addVariableStr("RESULTS", results);
   par.filenames.pop_back();
   std::string target = par.filenames.back();
-  out->output_string("TARGET", target);
+  cmd.addVariableStr("TARGET", target);
   par.filenames.pop_back();
 
   if (needTaxonomy || needTaxonomyMapping) {
@@ -130,41 +132,51 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
     search_module = "linsearch";
     const bool isIndex =
         LinsearchIndexReader::searchForIndex(out, target).empty() == false;
-    out->output_string("INDEXEXT", isIndex ? ".linidx" : "");
+    cmd.addVariableStr("INDEXEXT", isIndex ? ".linidx" : "");
     index_ext = isIndex ? ".linidx" : "";
-    out->output_string("SEARCH_MODULE", "linsearch");
-    out->output_string("LINSEARCH", "TRUE");
-    out->output_string("CREATELININDEX_PAR",
+    cmd.addVariableStr("SEARCH_MODULE", "linsearch");
+    cmd.addVariableStr("LINSEARCH", "TRUE");
+    cmd.addVariableStr("CREATELININDEX_PAR",
                        par.createParameterString(out, par.createlinindex));
-    out->output_string("SEARCH_PAR",
+    cmd.addVariableStr("SEARCH_PAR",
                        par.createParameterString(out, par.linsearchworkflow, true));
   } else {
     search_module = "search";
     const bool isIndex =
         PrefilteringIndexReader::searchForIndex(out, target).empty() == false;
-    out->output_string("INDEXEXT", isIndex ? ".idx" : "");
+    cmd.addVariableStr("INDEXEXT", isIndex ? ".idx" : "");
     index_ext = isIndex ? ".idx" : "";
-    out->output_string("SEARCH_MODULE", "search");
-    out->output_string("LINSEARCH", "");
-    out->output_string("CREATELININDEX_PAR", "");
-    out->output_string("SEARCH_PAR",
+    cmd.addVariableStr("SEARCH_MODULE", "search");
+    cmd.addVariableStr("LINSEARCH", "");
+    cmd.addVariableStr("CREATELININDEX_PAR", "");
+    cmd.addVariableStr("SEARCH_PAR",
                        par.createParameterString(out, par.searchworkflow, true));
   }
-  out->output_string("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : "");
-  out->output_string("GREEDY_BEST_HITS", par.greedyBestHits ? "TRUE" : "");
-  out->output_string("LEAVE_INPUT", par.dbOut ? "TRUE" : "");
+  cmd.addVariableStr("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : "");
+  cmd.addVariableStr("GREEDY_BEST_HITS", par.greedyBestHits ? "TRUE" : "");
+  cmd.addVariableStr("LEAVE_INPUT", par.dbOut ? "TRUE" : "");
 
-  out->output_string("RUNNER", par.runner);
-  out->output_string("VERBOSITY", par.createParameterString(out, par.onlyverbosity));
+  cmd.addVariableStr("RUNNER", par.runner);
+  cmd.addVariableStr("VERBOSITY", par.createParameterString(out, par.onlyverbosity));
 
-  out->output_string("CREATEDB_QUERY_PAR",
+  cmd.addVariableStr("CREATEDB_QUERY_PAR",
                      par.createParameterString(out, par.createdb));
   par.createdbMode = Parameters::SEQUENCE_SPLIT_MODE_HARD;
-  out->output_string("CREATEDB_PAR", par.createParameterString(out, par.createdb));
-  out->output_string("CONVERT_PAR",
+  cmd.addVariableStr("CREATEDB_PAR", par.createParameterString(out, par.createdb));
+  cmd.addVariableStr("CONVERT_PAR",
                      par.createParameterString(out, par.convertalignments));
-  out->output_string("SUMMARIZE_PAR",
+  cmd.addVariableStr("SUMMARIZE_PAR",
                      par.createParameterString(out, par.summarizeresult));
+
+  std::string program = tmpDir + "/easysearch.sh";
+  FileUtil::writeFile(out, program, easysearch_sh, easysearch_sh_len);
+  std::vector<std::string> args;
+  args.push_back(program);
+  for (auto path : par.filenames) {
+    args.push_back(path);
+  }
+  cmd.execProgram("/bin/bash", args);
+  return 0;
 
   std::string query_file_path = par.filenames.back();
 
@@ -303,7 +315,6 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
     convertalis_par.gapExtend = MultiParam<int>(1, 2);
     convertalis_par.dbOut = 0;
     convertalis_par.preloadMode = 0;
-    convertalis_par.threads = 1;
     convertalis_par.compressed = 0;
 
     subcall_biosnake(out, "convertalis", convertalis_par);

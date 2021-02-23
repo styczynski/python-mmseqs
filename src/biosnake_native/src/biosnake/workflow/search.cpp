@@ -86,7 +86,6 @@ void call_blastp(biosnake_output *out, Parameters &par, int no_steps,
         prefilter_par.preloadMode = 0;
         prefilter_par.pca = 1;
         prefilter_par.pcb = 1.5;
-        prefilter_par.threads = 1;
         prefilter_par.compressed = 0;
         prefilter_par.sensitivity = sens;
         subcall_biosnake(out, "prefilter", prefilter_par);
@@ -113,7 +112,6 @@ void call_blastp(biosnake_output *out, Parameters &par, int no_steps,
         align_par.setDBFields(3, blastp_tmp + "/pref_" + step_str);
         align_par.setDBFields(4, align_path);
         align_par.filenames = align_filenames;
-        align_par.threads = 1;
         align_par.compressed = 0;
         align_par.setSubstitutionMatrices("blosum62.out", "nucleotide.out");
         align_par.addBacktrace = 0;
@@ -882,7 +880,6 @@ int search(biosnake_output *out, Parameters &par) {
       splitsequence_par.sequenceSplitMode = 1;
       splitsequence_par.headerSplitMode = 0;
       splitsequence_par.createLookup = 0;
-      splitsequence_par.threads = 1;
       splitsequence_par.compressed = 0;
       subcall_biosnake(out, "splitsequence", splitsequence_par);
     }
@@ -905,7 +902,6 @@ int search(biosnake_output *out, Parameters &par) {
       extractframes_par.forwardFrames = par.forwardFrames;
       extractframes_par.reverseFrames = par.reverseFrames;
       extractframes_par.createLookup = 0;
-      extractframes_par.threads = 1;
       extractframes_par.compressed = 0;
 
       subcall_biosnake(out, "extractframes", extractframes_par);
@@ -927,7 +923,6 @@ int search(biosnake_output *out, Parameters &par) {
       splitsequence_par.sequenceSplitMode = 1;
       splitsequence_par.headerSplitMode = 0;
       splitsequence_par.createLookup = 0;
-      splitsequence_par.threads = 1;
       splitsequence_par.compressed = 0;
       subcall_biosnake(out, "splitsequence", splitsequence_par);
     }
@@ -957,12 +952,6 @@ int search(biosnake_output *out, Parameters &par) {
     offsetalignment_par.setDBFields(6, result);
     offsetalignment_par.searchType = par.searchType;
     offsetalignment_par.baseTmpPath = par.baseTmpPath;
-    //        offsetalignment_par.chainAlignment = 0;
-    //        offsetalignment_par.mergeQuery = 1;
-    //        //offsetalignment_par.searchType = 0;
-    //        offsetalignment_par.threads = 1;
-    //        offsetalignment_par.compressed = 0;
-    //        offsetalignment_par.preloadMode = 0;
     subcall_biosnake(out, "offsetalignment", offsetalignment_par);
     out->info("biosnake offsetalignment {} {} {} {} {} {}", par.filenames[0], query, par.filenames[1], target, (tmpDir + "/aln"), result);
     out->info("step_search O");
