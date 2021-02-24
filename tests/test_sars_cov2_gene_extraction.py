@@ -72,13 +72,14 @@ def extract_genes(
     gene_fasta: str,
     input_file: str,
     use_native: bool = True,
-    remove_temp_files: bool = False,
+    remove_temp_files: bool = True,
 ):
     """
     For given FASTA input file and set of reference genes extract them into separate files.
     :param gene_fasta: Path to input FASTA file with reference genes
     :param input_file: Path to input FASTA file with sequences
     :param use_native: If true will use native bindings. Spawn process otherwise.
+    :param remove_temp_files: Remove temporary results?
     """
     sensitivity = 6
     max_sequence_length = 30000
@@ -127,7 +128,7 @@ def extract_genes(
             "--max-seqs",
             str(get_fasta_size(input_file)),
             "--split-memory-limit",
-            "45000000",
+            "45000",
         ]
         # Spawn mmseqs
         p = subprocess.Popen(" ".join(args), shell=True)
@@ -146,7 +147,7 @@ def extract_genes(
     # Process the dataframe.
     # This loop resizes all matches so that all genes have the same size
     # as the reference ones
-    df = df.assign(alignment="")
+    df = df.assign(start=0, end=0)
     for index, row in df.iterrows():
         # If domain_start_index_query > 0 then we will take more nucleotides at the start
         sequence_start = (
@@ -162,10 +163,12 @@ def extract_genes(
                 - row["domain_end_index_query"]
         )
         # Extract the sequence content
-        df.at[index, "alignment"] = row["target_sequence_content"][
-                                    sequence_start:sequence_end
-                                    ]
-    return df[["query_sequence_id", "target_sequence_id", "alignment"]].rename(
+        df.at[index, "start"] = sequence_start
+        df.at[index, "end"] = sequence_end
+        #df.at[index, "alignment"] = row["target_sequence_content"][
+        #                            sequence_start:sequence_end
+        #                            ]
+    return df[["query_sequence_id", "target_sequence_id", "start", "end"]].rename(
         columns=dict(
             query_sequence_id="gene",
             target_sequence_id="id",
@@ -173,12 +176,24 @@ def extract_genes(
     )
 
 
+def assert_extracted_genes_are_the_same(our: pd.DataFrame, ref: pd.DataFrame):
+    def clean_dataframe(input_df: pd.DataFrame) -> pd.DataFrame:
+        df = input_df.copy()
+        df.drop_duplicates(subset=['gene', 'id', 'start', 'end'], inplace=True)
+        df["key"] = df["gene"] + df["id"]
+        df.set_index("key", inplace=True)
+        return df
+    our, ref = clean_dataframe(our), clean_dataframe(ref)
+    pd.testing.assert_frame_equal(our, ref, check_like=True)
+
+
 def test_sars_cov2_gene_extraction():
-    extract_genes(
+    biosnake_result, mmseqs_result = tuple(extract_genes(
         TEST_REFERENCE_GENES_FILE,
         TEST_GENOMES_FILE,
-        use_native=True,
-    ).to_csv("out_native.csv")
+        use_native=use_native,
+    ) for use_native in [True, False])
+    assert_extracted_genes_are_the_same(biosnake_result, mmseqs_result)
 
 
 if __name__ == "__main__":

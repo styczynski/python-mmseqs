@@ -69,32 +69,12 @@ int createindex(biosnake_output *out, Parameters &par,
       Parameters extractorfs_par(par);
       extractorfs_par.setDBFields(1, par.db1);
       extractorfs_par.setDBFields(2, tmp_db_path + ".dbtype");
-      extractorfs_par.orfMinLength = 30;
-      extractorfs_par.orfMaxLength = 32734;
-      extractorfs_par.orfMaxGaps = 2147483647;
-      extractorfs_par.contigStartMode = 2;
-      extractorfs_par.contigEndMode = 2;
-      extractorfs_par.orfStartMode = 1;
-      extractorfs_par.forwardFrames = "1,2,3";
-      extractorfs_par.reverseFrames = "1,2,3";
-      extractorfs_par.translationTable = 1;
-      extractorfs_par.translate = 0;
-      extractorfs_par.useAllTableStarts = true;
-      extractorfs_par.identifierOffset = 0;
-      extractorfs_par.createLookup = 0;
-      extractorfs_par.compressed = 0;
       subcall_biosnake(out, "extractorfs", extractorfs_par);
     }
   } else if (flag == "LIN_NUCL") {
     tmp_db_path = tmpDir + "/nucl_split_seq";
     if (!FileUtil::fileExists(out, (tmp_db_path + ".dbtype").c_str())) {
       Parameters extractorfs_par(par);
-      extractorfs_par.maxSeqLen = 65535;
-      extractorfs_par.sequenceOverlap = 0;
-      extractorfs_par.sequenceSplitMode = 1;
-      extractorfs_par.headerSplitMode = 0;
-      extractorfs_par.createLookup = 0;
-      extractorfs_par.compressed = 0;
       subcall_biosnake(out, "extractorfs", extractorfs_par);
     }
   }
@@ -102,21 +82,6 @@ int createindex(biosnake_output *out, Parameters &par,
   Parameters indexer_par;
   indexer_par.setDBFields(1, tmp_db_path);
   indexer_par.setDBFields(2, par.db1);
-  indexer_par.setSeedSubstitutionMatrices("VTML80.out", "nucleotide.out");
-  indexer_par.kmerSize = 0;
-  indexer_par.alphabetSize = MultiParam<int>(21, 5);
-  indexer_par.compBiasCorrection = 1;
-  indexer_par.maxSeqLen = 65535;
-  indexer_par.maxResListLen = 300;
-  indexer_par.maskMode = 1;
-  indexer_par.maskLowerCaseMode = 0;
-  indexer_par.spacedKmer = 1;
-  indexer_par.sensitivity = 7.5;
-  indexer_par.kmerScore = 0;
-  indexer_par.checkCompatible = 0;
-  indexer_par.searchType = 3;
-  indexer_par.split = 0;
-
   if (flag != "TRANSLATED" && flag != "LIN_NUCL") {
     indexer_par.setDBFields(1, par.db1);
   }
@@ -133,6 +98,8 @@ int createindex(biosnake_output *out, Parameters &par,
 }
 
 int createlinindex(biosnake_output *out, Parameters &par) {
+std::cout << "CMDDEBUG biosnake createlinindex " << par.createParameterString(out, par.createlinindex);
+
   //    Parameters& par = Parameters::getInstance();
   //    par.orfStartMode = 1;
   //    par.orfMinLength = 30;

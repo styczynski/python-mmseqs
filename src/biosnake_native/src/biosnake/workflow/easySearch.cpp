@@ -32,6 +32,7 @@ void setEasySearchMustPassAlong(Parameters *p, bool linsearch) {
 }
 
 int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
+  std::cout << "CMDDEBUG biosnake doeasysearch " << par.createParameterString(out, par.easysearchworkflow);
   //    Parameters &par = Parameters::getInstance();
   //    par.PARAM_ADD_BACKTRACE.addCategory(BiosnakeParameter::COMMAND_EXPERT);
   //    par.PARAM_MAX_REJECTED.addCategory(BiosnakeParameter::COMMAND_EXPERT);
@@ -62,7 +63,7 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
   //    setEasySearchDefaults(&par, linsearch);
   //    par.parseParameters(argc, argv, command, true,
   //    Parameters::PARSE_VARIADIC, 0);
-  // setEasySearchMustPassAlong(&par, linsearch);
+  //setEasySearchMustPassAlong(&par, linsearch);
 
   bool needBacktrace = false;
   bool needTaxonomy = false;
@@ -138,8 +139,9 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
     cmd.addVariableStr("LINSEARCH", "TRUE");
     cmd.addVariableStr("CREATELININDEX_PAR",
                        par.createParameterString(out, par.createlinindex));
-    cmd.addVariableStr("SEARCH_PAR",
-                       par.createParameterString(out, par.linsearchworkflow, true));
+    auto search_par = par.createParameterString(out, par.linsearchworkflow, true);
+    std::cout << "LIN_SEARCH_PAR = [" << search_par << "]\n";
+    cmd.addVariableStr("SEARCH_PAR", search_par);
   } else {
     search_module = "search";
     const bool isIndex =
@@ -149,8 +151,9 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
     cmd.addVariableStr("SEARCH_MODULE", "search");
     cmd.addVariableStr("LINSEARCH", "");
     cmd.addVariableStr("CREATELININDEX_PAR", "");
-    cmd.addVariableStr("SEARCH_PAR",
-                       par.createParameterString(out, par.searchworkflow, true));
+    auto search_par = par.createParameterString(out, par.searchworkflow, true);
+    std::cout << "LIN_SEARCH_PAR = [" << search_par << "]\n";
+    cmd.addVariableStr("SEARCH_PAR", search_par);
   }
   cmd.addVariableStr("REMOVE_TMP", par.removeTmpFiles ? "TRUE" : "");
   cmd.addVariableStr("GREEDY_BEST_HITS", par.greedyBestHits ? "TRUE" : "");
@@ -175,8 +178,8 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
   for (auto path : par.filenames) {
     args.push_back(path);
   }
-  cmd.execProgram("/bin/bash", args);
-  return 0;
+//  cmd.execProgram("/bin/bash", args);
+//  return 0;
 
   std::string query_file_path = par.filenames.back();
 
@@ -206,6 +209,7 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
       createdb_par.identifierOffset = 0;
       createdb_par.writeLookup = 0;
       createdb_par.compressed = 0;
+
       subcall_biosnake(out, "createdb", createdb_par);
     }
     target = tmpDir + "/target";
@@ -219,13 +223,7 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
       createlinindex_par.filenames = createlinindex_filenames;
       createlinindex_par.setDBFields(1, target);
       createlinindex_par.setDBFields(2, tmpDir + "/index_tmp");
-      //createlinindex_par.orfStartMode = 1;
-      //createlinindex_par.orfMinLength = 30;
-      //createlinindex_par.orfMaxLength = 32734;
-      createlinindex_par.kmerScore = 0;
-      createlinindex_par.maskMode = 1;
-      //createlinindex_par.sensitivity = 7.5;
-      // createlinindex_par.removeTmpFiles=true;
+
       subcall_biosnake(out, "createlinindex", createlinindex_par);
     }
   }
@@ -245,20 +243,6 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
     search_par.setDBFields(2, target);
     search_par.setDBFields(3, intermediate);
     search_par.setDBFields(4, originalTmpDir);
-    search_par.spacedKmer = true;
-    search_par.alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV;
-    //search_par.sensitivity = 5.7;
-    search_par.evalThr = 0.001;
-    search_par.orfStartMode = 1;
-    //search_par.orfMinLength = 30;
-    //search_par.orfMaxLength = 32734;
-    search_par.evalProfile = 0.1;
-    search_par.baseTmpPath = par.baseTmpPath;
-    search_par.searchType = par.searchType;
-    search_par.alignmentMode = Parameters::ALIGNMENT_MODE_SCORE_COV_SEQID;
-    search_par.exactKmerMatching = true;
-    search_par.strand = 2;
-    search_par.kmerSize = 15;
     //search_par.maxSeqLen = 10000;
 
     out->info("Call search (subcall): {}", search_module);
@@ -308,14 +292,6 @@ int doeasysearch(biosnake_output *out, Parameters &par, bool linsearch) {
     convertalis_par.setDBFields(2, target + index_ext);
     convertalis_par.setDBFields(3, intermediate);
     convertalis_par.setDBFields(4, results);
-    convertalis_par.setSubstitutionMatrices("blosum62.out", "nucleotide.out");
-    convertalis_par.formatAlignmentMode = 0;
-    convertalis_par.translationTable = 1;
-    convertalis_par.gapOpen = MultiParam<int>(11, 5);
-    convertalis_par.gapExtend = MultiParam<int>(1, 2);
-    convertalis_par.dbOut = 0;
-    convertalis_par.preloadMode = 0;
-    convertalis_par.compressed = 0;
 
     subcall_biosnake(out, "convertalis", convertalis_par);
   }

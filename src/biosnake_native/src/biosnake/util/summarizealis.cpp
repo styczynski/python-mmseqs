@@ -12,6 +12,8 @@
 #endif
 
 int summarizealis(biosnake_output* out, Parameters& par) {
+  std::cout << "CMDDEBUG biosnake sumamrizeresult " << par.createParameterString(out, par.summarizeresult);
+
   //    Parameters &par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 

@@ -18,6 +18,8 @@
 #endif
 
 int extractframes(biosnake_output* out, Parameters& par) {
+  std::cout << "CMDDEBUG biosnake extractframes " << par.createParameterString(out, par.extractframes);
+
   //    Parameters& par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
