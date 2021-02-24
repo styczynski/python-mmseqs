@@ -62,6 +62,7 @@ sphinxcontrib-needs = "^0.6.0"
 pytest-cov = "^2.11.1"
 pytest-xdist = "^2.2.0"
 numpy = "^1.20.1"
+biotite = "^0.25.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^6.2.1"

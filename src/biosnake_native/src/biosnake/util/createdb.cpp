@@ -14,6 +14,8 @@
 #include <biosnake/output.h>
 
 int createdb(biosnake_output* out, Parameters& par) {
+std::cout << "CMDDEBUG biosnake createdb " << par.createParameterString(out, par.createdb);
+
   //    Parameters &par = Parameters::getInstance();
   //    par.parseParameters(argc, argv, command, true,
   //    Parameters::PARSE_VARIADIC, 0);

@@ -11,6 +11,7 @@ class CommandCaller {
   CommandCaller(biosnake_output* output);
 
   void addVariable(const char* key, const char* value);
+  void addVariableStr(std::string key, std::string value);
   void addVar(std::string key, std::string value);
 
   int callProgram(const char* program, size_t argc, const char** argv);

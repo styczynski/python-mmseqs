@@ -31,6 +31,8 @@ void call_blastp(biosnake_output *out, Parameters &par, int no_steps,
                  std::string blastp_input, std::string blastp_target,
                  std::string blastp_out, std::string blastp_tmp,
                  std::string script_path, CommandCaller cmd) {
+  std::cout << "CMDDEBUG biosnake search " << par.createParameterString(out, par.searchworkflow);
+
   if (false) {
     out->info("[blastn.sh] Executing native script: {}", script_path);
     std::vector<std::string> args = {blastp_input, blastp_target, blastp_out,
@@ -64,31 +66,7 @@ void call_blastp(biosnake_output *out, Parameters &par, int no_steps,
         prefilter_par.setDBFields(1, blastp_input);
         prefilter_par.setDBFields(2, blastp_target);
         prefilter_par.setDBFields(3, blastp_tmp + "/pref_" + step_str);
-        prefilter_par.setSubstitutionMatrices("blosum62.out", "nucleotide.out");
-        prefilter_par.setSeedSubstitutionMatrices("VTML80.out",
-                                                  "nucleotide.out");
-        prefilter_par.kmerSize = 0;
-        prefilter_par.kmerScore = 2147483647;
-        prefilter_par.alphabetSize = MultiParam<int>(21, 5);
-        prefilter_par.split = 0;
-        prefilter_par.splitMode = 2;
-        prefilter_par.splitMemoryLimit = 0;
-        prefilter_par.covThr = 0;
-        prefilter_par.covMode = 0;
-        prefilter_par.compBiasCorrection = 1;
-        prefilter_par.diagonalScoring = 1;
-        prefilter_par.exactKmerMatching = 0;
-        prefilter_par.maskMode = 1;
-        prefilter_par.maskLowerCaseMode = 0;
-        prefilter_par.minDiagScoreThr = 15;
-        prefilter_par.includeIdentity = 0;
-        prefilter_par.spacedKmer = 1;
-        prefilter_par.preloadMode = 0;
-        prefilter_par.pca = 1;
-        prefilter_par.pcb = 1.5;
-        prefilter_par.threads = 1;
-        prefilter_par.compressed = 0;
-        prefilter_par.sensitivity = sens;
+
         subcall_biosnake(out, "prefilter", prefilter_par);
         out->info("step_search K_3");
       }
@@ -113,34 +91,6 @@ void call_blastp(biosnake_output *out, Parameters &par, int no_steps,
         align_par.setDBFields(3, blastp_tmp + "/pref_" + step_str);
         align_par.setDBFields(4, align_path);
         align_par.filenames = align_filenames;
-        align_par.threads = 1;
-        align_par.compressed = 0;
-        align_par.setSubstitutionMatrices("blosum62.out", "nucleotide.out");
-        align_par.addBacktrace = 0;
-        align_par.alignmentMode = 3;
-        align_par.wrappedScoring = 0;
-        align_par.evalThr = 0.001;
-        align_par.seqIdThr = 0;
-        align_par.alnLenThr = 0;
-        align_par.seqIdMode = 0;
-        align_par.altAlignment = 0;
-        align_par.covThr = 0;
-        align_par.covMode = 0;
-        align_par.compBiasCorrection = 1;
-        align_par.maxRejected = 2147483647;
-        align_par.maxAccept = 2147483647;
-        align_par.includeIdentity = 0;
-        align_par.preloadMode = 0;
-        align_par.pca = 1;
-        align_par.pcb = 1.5;
-        align_par.scoreBias = 0;
-        align_par.realign = 0;
-        align_par.realignScoreBias = -0.2;
-        align_par.realignMaxSeqs = 2147483647;
-        align_par.gapOpen = MultiParam<int>(11, 5);
-        align_par.gapExtend = MultiParam<int>(1, 2);
-        align_par.zdrop = 40;
-        align_par.addBacktrace = true;
 
         subcall_biosnake(out, align_module, align_par);
         out->info("step_search K_6");
@@ -164,7 +114,6 @@ void call_blastp(biosnake_output *out, Parameters &par, int no_steps,
             mergedbs_par.setDBFields(2, blastp_tmp + "/aln_merge_new");
             mergedbs_par.setDBFields(3, blastp_tmp + "/pref_" + step_str);
             mergedbs_par.setDBFields(4, align_path);
-            mergedbs_par.compressed = 0;
             subcall_biosnake(out, "mergedbs", mergedbs_par);
 
             Parameters rmdb_par(par);
@@ -187,7 +136,6 @@ void call_blastp(biosnake_output *out, Parameters &par, int no_steps,
             mergedbs_par.setDBFields(2, align_path);
             mergedbs_par.setDBFields(3, blastp_tmp + "/pref_" + step_str);
             mergedbs_par.setDBFields(4, align_path);
-            mergedbs_par.compressed = 0;
             subcall_biosnake(out, "mergedbs", mergedbs_par);
             out->info("step_search K_11");
           }
@@ -877,13 +825,6 @@ int search(biosnake_output *out, Parameters &par) {
       // --threads 1 --compressed 0 -v 3 ]
       splitsequence_par.setDBFields(1, target);
       splitsequence_par.setDBFields(2, tmpDir + "/target_seqs_split");
-      splitsequence_par.maxSeqLen = 65535;
-      splitsequence_par.sequenceOverlap = 0;
-      splitsequence_par.sequenceSplitMode = 1;
-      splitsequence_par.headerSplitMode = 0;
-      splitsequence_par.createLookup = 0;
-      splitsequence_par.threads = 1;
-      splitsequence_par.compressed = 0;
       subcall_biosnake(out, "splitsequence", splitsequence_par);
     }
     target = tmpDir + "/target_seqs_split";
@@ -902,11 +843,6 @@ int search(biosnake_output *out, Parameters &par) {
       // --create-lookup 0 --threads 1 --compressed 0 -v 3 ]
       extractframes_par.setDBFields(1, query);
       extractframes_par.setDBFields(2, tmpDir + "/query_seqs");
-      extractframes_par.forwardFrames = par.forwardFrames;
-      extractframes_par.reverseFrames = par.reverseFrames;
-      extractframes_par.createLookup = 0;
-      extractframes_par.threads = 1;
-      extractframes_par.compressed = 0;
 
       subcall_biosnake(out, "extractframes", extractframes_par);
       out->info("Call extract frames [{}] [{}]", query, (tmpDir + "/query_seqs"));
@@ -922,13 +858,6 @@ int search(biosnake_output *out, Parameters &par) {
       Parameters splitsequence_par(par);
       splitsequence_par.setDBFields(1, query);
       splitsequence_par.setDBFields(2, tmpDir + "/query_seqs_split");
-      splitsequence_par.maxSeqLen = 65535;
-      splitsequence_par.sequenceOverlap = 0;
-      splitsequence_par.sequenceSplitMode = 1;
-      splitsequence_par.headerSplitMode = 0;
-      splitsequence_par.createLookup = 0;
-      splitsequence_par.threads = 1;
-      splitsequence_par.compressed = 0;
       subcall_biosnake(out, "splitsequence", splitsequence_par);
     }
     query = tmpDir + "/query_seqs_split";
@@ -955,14 +884,6 @@ int search(biosnake_output *out, Parameters &par) {
     offsetalignment_par.setDBFields(4, target);
     offsetalignment_par.setDBFields(5, tmpDir + "/aln");
     offsetalignment_par.setDBFields(6, result);
-    offsetalignment_par.searchType = par.searchType;
-    offsetalignment_par.baseTmpPath = par.baseTmpPath;
-    //        offsetalignment_par.chainAlignment = 0;
-    //        offsetalignment_par.mergeQuery = 1;
-    //        //offsetalignment_par.searchType = 0;
-    //        offsetalignment_par.threads = 1;
-    //        offsetalignment_par.compressed = 0;
-    //        offsetalignment_par.preloadMode = 0;
     subcall_biosnake(out, "offsetalignment", offsetalignment_par);
     out->info("biosnake offsetalignment {} {} {} {} {} {}", par.filenames[0], query, par.filenames[1], target, (tmpDir + "/aln"), result);
     out->info("step_search O");
