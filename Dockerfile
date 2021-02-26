@@ -32,11 +32,6 @@ RUN apk add --no-cache \
 WORKDIR /usr/src/biosnake
 
 # Install dependencies
-ADD pyproject.toml .
-ADD poetry.lock .
-RUN $HOME/.poetry/bin/poetry install --no-root
-
-# Copy source code
 COPY . ./
 RUN $HOME/.poetry/bin/poetry install
 

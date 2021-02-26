@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "biosnake"
-version = "1.0.10"
+version = "1.0.11"
 description = "Biosnake - most comprehensive and fastest Python framework for biological data"
 authors = ["Piotr Styczyński <piotr@styczynski.in>"]
 build = "build.py"
@@ -70,7 +70,6 @@ sphinx-test-reports = "^0.3.3"
 sphinxcontrib-plantuml = "^0.19"
 sphinxcontrib-needs = "^0.6.0"
 pytest-cov = "^2.11.1"
-pytest-xdist = "^2.2.0"
 
 [tool.black]
 line-length = 79
