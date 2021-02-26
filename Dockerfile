@@ -36,4 +36,5 @@ RUN apk add xxd
 
 # Install dependencies
 COPY . ./
+RUN rm -rf dist build > /dev/null 2> /dev/null
 ENTRYPOINT $HOME/.poetry/bin/poetry build
