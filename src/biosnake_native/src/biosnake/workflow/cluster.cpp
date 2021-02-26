@@ -168,9 +168,9 @@ int clusteringworkflow(biosnake_output *out, Parameters &par) {
     cmd.addVariable("LINCLUST_PAR",
                     par.createParameterString(out, par.linclustworkflow).c_str());
     par.kmerSize = oldKmer;
-    if (par.PARAM_MAX_SEQS.wasSet == false) {
-      par.maxResListLen = 300;
-    }
+//    if (par.PARAM_MAX_SEQS.wasSet == false) {
+//      par.maxResListLen = 300;
+//    }
 
     cmd.addVariable("PREFILTER_PAR",
                     par.createParameterString(out, par.prefilter).c_str());

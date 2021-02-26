@@ -67,6 +67,8 @@ void call_blastp(biosnake_output *out, Parameters &par, int no_steps,
         prefilter_par.setDBFields(2, blastp_target);
         prefilter_par.setDBFields(3, blastp_tmp + "/pref_" + step_str);
 
+        std::cout << "HEYOMAYO prefilter maxResListLen = " << prefilter_par.maxResListLe << "\n";
+
         subcall_biosnake(out, "prefilter", prefilter_par);
         out->info("step_search K_3");
       }
