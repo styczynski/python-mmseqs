@@ -182,9 +182,9 @@ int createindex(biosnake_output *out, Parameters &par) {
   //
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
-//  int dbType = FileUtil::parseDbType(out, par.db1.c_str());
-//  bool isNucl =
-//      Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_NUCLEOTIDES);
+  int dbType = FileUtil::parseDbType(out, par.db1.c_str());
+  bool isNucl =
+      Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_NUCLEOTIDES);
 //
 //  if (par.PARAM_STRAND.wasSet == false) {
 //    par.strand = 1;
