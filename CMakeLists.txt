@@ -29,8 +29,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(AppendTargetProperty)
 include(GenerateExportHeader)
-include(Custom)
-include(HealthCheck)
 
 set(FRAMEWORK_ONLY 0 CACHE BOOL "Framework mode (don't create biosnake executable)")
 set(HAVE_SANITIZER 0 CACHE BOOL "Have sanitizers")

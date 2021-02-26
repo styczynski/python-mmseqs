@@ -31,6 +31,9 @@ RUN apk add --no-cache \
 
 WORKDIR /usr/src/biosnake
 
+RUN mv /usr/bin/xxd /usr/bin/xxd_old
+RUN apk add xxd
+
 # Install dependencies
 COPY . ./
 RUN $HOME/.poetry/bin/poetry install
