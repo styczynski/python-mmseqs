@@ -26,6 +26,6 @@ docs:
 alpine-build:
 	mkdir -p alpine_dist > /dev/null 2> /dev/null
 	docker build -t covid-genomics/biosnake-alpine-builder:1.0 .
-	docker run -it -v "$(CURDIR)/alpine_dist":/usr/src/biosnake/dist covid-genomics/biosnake-alpine-builder:1.0
+	docker run -v "$(CURDIR)/alpine_dist":/usr/src/biosnake/dist covid-genomics/biosnake-alpine-builder:1.0
 
 .PHONY: docs
