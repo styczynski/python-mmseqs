@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "biosnake"
-version = "1.0.10"
+version = "1.0.11"
 description = "Biosnake - most comprehensive and fastest Python framework for biological data"
 authors = ["Piotr Styczyński <piotr@styczynski.in>"]
 build = "build.py"
