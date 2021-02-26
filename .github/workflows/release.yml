@@ -67,8 +67,6 @@ jobs:
       - name: Copy all prebuilt wheels
         shell: bash
         run: cp ./_build_and_release/* dist
-      - name: Copy Alpine wheels
-        run: cp ./alpine_dist/* dist
       - name: Publish a Python distribution to PyPI
         uses: pypa/gh-action-pypi-publish@master
         with:
