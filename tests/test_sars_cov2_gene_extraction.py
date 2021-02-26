@@ -19,7 +19,7 @@ TEST_REFERENCE_GENES_FILE = os.path.abspath(
 )
 
 TEST_GENOMES_FILE = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "data", "test_sars_cov2_gene_extraction", "genomes.fasta")
+    os.path.join(os.path.dirname(__file__), "data", "test_sars_cov2_gene_extraction", "africa.fasta")
 )
 
 HEADER_MAPPINGS = {
@@ -90,7 +90,6 @@ def extract_genes(
         input_sequences = client.databases.create(
             "input_sequences", "Input sequences to cut", input_file
         )
-        print("OK?")
         df = input_sequences.search_file(
             gene_fasta,
             sensitivity=sensitivity,
@@ -128,7 +127,7 @@ def extract_genes(
             "--max-seqs",
             str(get_fasta_size(input_file)),
             "--split-memory-limit",
-            "45000",
+            "120000",
         ]
         # Spawn mmseqs
         p = subprocess.Popen(" ".join(args), shell=True)
@@ -190,11 +189,18 @@ def assert_extracted_genes_are_the_same(our: pd.DataFrame, ref: pd.DataFrame):
 
 
 def test_sars_cov2_gene_extraction():
-    biosnake_result, mmseqs_result = tuple(extract_genes(
+    biosnake_result = extract_genes(
         TEST_REFERENCE_GENES_FILE,
         TEST_GENOMES_FILE,
-        use_native=use_native,
-    ) for use_native in [True, False])
+        use_native=True,
+    )
+    biosnake_result.to_csv('biosnake_result.csv', index=False)
+    mmseqs_result = extract_genes(
+        TEST_REFERENCE_GENES_FILE,
+        TEST_GENOMES_FILE,
+        use_native=False,
+    )
+    mmseqs_result.to_csv('mmseqs_result', index=False)
     assert_extracted_genes_are_the_same(biosnake_result, mmseqs_result)
 
 

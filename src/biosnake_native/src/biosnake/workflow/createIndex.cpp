@@ -128,12 +128,12 @@ std::cout << "CMDDEBUG biosnake createlinindex " << par.createParameterString(ou
   int dbType = FileUtil::parseDbType(out, par.db1.c_str());
   bool isNucl =
       Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_NUCLEOTIDES);
-  if (isNucl && par.searchType == Parameters::SEARCH_TYPE_NUCLEOTIDES &&
-      par.PARAM_MAX_SEQ_LEN.wasSet == false) {
-    if (par.PARAM_MAX_SEQ_LEN.wasSet == false) {
-      par.maxSeqLen = 10000;
-    }
-  }
+//  if (isNucl && par.searchType == Parameters::SEARCH_TYPE_NUCLEOTIDES &&
+//      par.PARAM_MAX_SEQ_LEN.wasSet == false) {
+//    if (par.PARAM_MAX_SEQ_LEN.wasSet == false) {
+//      par.maxSeqLen = 10000;
+//    }
+//  }
   //// par.printParameters(command.cmd, argc, argv, *command.params);
 
   if (isNucl && par.searchType == Parameters::SEARCH_TYPE_AUTO) {
@@ -182,37 +182,37 @@ int createindex(biosnake_output *out, Parameters &par) {
   //
   //    par.parseParameters(argc, argv, command, true, 0, 0);
 
-  int dbType = FileUtil::parseDbType(out, par.db1.c_str());
-  bool isNucl =
-      Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_NUCLEOTIDES);
-
-  if (par.PARAM_STRAND.wasSet == false) {
-    par.strand = 1;
-  }
-  if (isNucl && par.searchType == Parameters::SEARCH_TYPE_NUCLEOTIDES) {
-    if (par.PARAM_K.wasSet == false) {
-      par.kmerSize = 15;
-    }
-    if (par.PARAM_MAX_SEQ_LEN.wasSet == false) {
-      par.maxSeqLen = 10000;
-    }
-
-    //  0: reverse, 1: forward, 2: both
-    switch (par.strand) {
-      case 0:
-        par.forwardFrames = "";
-        par.reverseFrames = "1";
-        break;
-      case 1:
-        par.forwardFrames = "1";
-        par.reverseFrames = "";
-        break;
-      case 2:
-        par.forwardFrames = "1";
-        par.reverseFrames = "1";
-        break;
-    }
-  }
+//  int dbType = FileUtil::parseDbType(out, par.db1.c_str());
+//  bool isNucl =
+//      Parameters::isEqualDbtype(dbType, Parameters::DBTYPE_NUCLEOTIDES);
+//
+//  if (par.PARAM_STRAND.wasSet == false) {
+//    par.strand = 1;
+//  }
+//  if (isNucl && par.searchType == Parameters::SEARCH_TYPE_NUCLEOTIDES) {
+//    if (par.PARAM_K.wasSet == false) {
+//      par.kmerSize = 15;
+//    }
+//    if (par.PARAM_MAX_SEQ_LEN.wasSet == false) {
+//      par.maxSeqLen = 10000;
+//    }
+//
+//    //  0: reverse, 1: forward, 2: both
+//    switch (par.strand) {
+//      case 0:
+//        par.forwardFrames = "";
+//        par.reverseFrames = "1";
+//        break;
+//      case 1:
+//        par.forwardFrames = "1";
+//        par.reverseFrames = "";
+//        break;
+//      case 2:
+//        par.forwardFrames = "1";
+//        par.reverseFrames = "1";
+//        break;
+//    }
+//  }
   //// par.printParameters(command.cmd, argc, argv, *command.params);
   if (isNucl && par.searchType == Parameters::SEARCH_TYPE_AUTO) {
     out->warn("Database {} is a nucleotide database. Please provide the parameter --search-type 2 (translated) or 3 (nucleotide)", par.db1);
