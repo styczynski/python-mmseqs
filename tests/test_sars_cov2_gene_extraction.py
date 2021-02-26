@@ -140,9 +140,11 @@ def extract_genes(
         df = pd.read_table("result.m8", names=headers, header=None)
 
     # Remove temporary files
-    if remove_temp_files:
-        os.unlink("result.m8")
-    shutil.rmtree("biosnake_storage")
+    if remove_temp_files and not use_native:
+        if os.path.exists("result.m8"):
+            os.unlink("result.m8")
+    if os.path.exists("biosnake_storage"):
+        shutil.rmtree("biosnake_storage")
 
     # Process the dataframe.
     # This loop resizes all matches so that all genes have the same size
