@@ -25,7 +25,7 @@ SET(SOURCE_DIR "src/biosnake_native")
 
 message("-- Source Directory: ${CMAKE_CURRENT_SOURCE_DIR}")
 message("-- Project Directory: ${PROJECT_SOURCE_DIR}")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake" "${CMAKE_CURRENT_SOURCE_DIR}/lib/cppfs/cmake")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 include(AppendTargetProperty)
 include(GenerateExportHeader)
@@ -214,9 +214,6 @@ set_target_properties(libzstd_static PROPERTIES COMPILE_FLAGS "${BIOSNAKE_C_FLAG
 # global utils
 include_directories(src/biosnake_native/src)
 
-# cppfs
-add_subdirectory(lib/cppfs)
-
 # spdlog
 add_subdirectory(lib/spdlog)
 
@@ -301,7 +298,6 @@ set(BIOSNAKE_TARGET_INCLUDES
     "src/biosnake_native/src)"
     "lib/toml11"
     "lib/spdlog/include"
-    "lib/cppfs/include"
     "src"
     .
 )
@@ -312,7 +308,6 @@ set(BIOSNAKE_TARGET_DEPENDENCIES
 
 set(BIOSNAKE_TARGET_LINKS
     "spdlog"
-    "cppfs"
 )
 
  # this will probably break if you omit the "s
