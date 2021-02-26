@@ -36,5 +36,4 @@ RUN apk add xxd
 
 # Install dependencies
 COPY . ./
-RUN $HOME/.poetry/bin/poetry install
-
+ENTRYPOINT $HOME/.poetry/bin/poetry build

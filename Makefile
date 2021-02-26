@@ -23,7 +23,9 @@ format: lint
 docs:
 	rm -rfd docs && cd .doc && rm -rfd _build && poetry run make html && mv _build/html ../docs && cp CNAME ../docs && touch ../docs/.nojekyll
 
-build-docker:
-	docker build -t covid-genomics/biosnake:1.0 .
+alpine-build:
+	mkdir -p alpine_dist > /dev/null 2> /dev/null
+	docker build -t covid-genomics/biosnake-alpine-builder:1.0 .
+	docker run -it -v "$(CURDIR)/alpine_dist":/usr/src/biosnake/dist covid-genomics/biosnake-alpine-builder:1.0
 
 .PHONY: docs
