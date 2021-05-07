@@ -15,7 +15,7 @@ Biopython is slow, but Biotite solves that problem. Nevertheless both tools do n
 
 ## Project roadmap
 
-- Create a Biosnake2 PoC Python bindings
+- Create a MMSeqs2 PoC Python bindings
 - Provide bindings for all Biosnake2 functionalities with pandas/numpy compatibility
 - Provide visualizations that use custom components or Plotly (similar to those of Biotite)
 - Incorporate [Phylip](https://evolution.genetics.washington.edu/phylip/progs.data.prot.html)
