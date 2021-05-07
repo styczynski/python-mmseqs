@@ -7,8 +7,6 @@
 ![Python implementation](https://img.shields.io/pypi/implementation/biosnake?style=flat-square)
 ![Commit activity](https://img.shields.io/github/commit-activity/w/covid-genomics/biosnake?style=flat-square)
 
-Please see [online documentation](http://biosnake.covidgenomics.com/)
-
 ## Project description
 
 This project aims at providing unified biological Python processing framework.
